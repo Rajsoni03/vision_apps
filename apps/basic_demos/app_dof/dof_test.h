@@ -68,6 +68,7 @@
 static vx_bool test_result = vx_true_e;
 #define NUM_CHECKSUM_SETS 2
 #define NUM_CHECKSUM_SAMPLES 16
+#ifndef x86_64
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
   {0x3017c570,0x06dbcce0,0x53d00370,0xe920ee90,
   0x085477b0,0x43ecee50,0x6b2f3b50,0x323e18a0,
@@ -78,6 +79,18 @@ static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
   0xaa2b461f,0xe902c0ba,0x8d1a7277,0x837116bf,
   0x6a2d50ae,0xef0e6101,0x2b971d19,0x366e31d5}
 };
+#else
+static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
+  {0x87b7fde0,0x59198090,0xe83469d0,0xe62a5c50,
+  0x47e86350,0x89e57de0,0x0dd342b0,0xf3687200,
+  0xb06641c0,0x38322e00,0x585b5200,0x9924d2c0,
+  0xba185910,0x2e48a4e0,0x43b86930,0x7285cb50},
+  {0x6fe9bca1,0x33ba3d16,0x21e35332,0x4c6045a9,
+  0x4f8fa325,0x6596aa96,0xecb12530,0x074b2265,
+  0x30bf9da0,0x989647eb,0xbe927042,0xc0f51d32,
+  0x255557c2,0xde6be8dc,0x3dce8fe3,0xddbdfb61}
+};
+#endif
 
 /* use this to get new checksums if the input data
     changes or something about the logic changes */
