@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#999;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#999;color:#444;background-color:#F7FDFA;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#999;color:#fff;background-color:#26ADE4;}
+.tg .tg-kftd{background-color:#efefef;text-align:left;vertical-align:top}
+.tg .tg-6sgx{background-color:#ffffff;text-align:left;vertical-align:top}
+.tg .tg-fjir{background-color:#343434;color:#ffffff;text-align:left;vertical-align:top}
+</style>
+
+    <head>
+        <title>System Memory Map</title>
+    </head>
+    <body>
+        <h1>System Memory Map</h1>
+        <p>Note, this file is auto generated using PyTI_PSDK_RTOS tool</p>
+        <table class="tg">
+            <tr>
+                <th class="tg-fjir">Name</th>
+                <th class="tg-fjir">Start Addr</th>
+                <th class="tg-fjir">End Addr</th>
+                <th class="tg-fjir">Size </th>
+                <th class="tg-fjir">Attributes</th>
+                <th class="tg-fjir">Description</th>
+            </tr>
+            <tr>
+                <td class="tg-kftd">MSMC_MPU1</td>
+                <td class="tg-kftd">0x70000000</td>
+                <td class="tg-kftd">0x70000FFF</td>
+                <td class="tg-kftd"> 4.00 KB</td>
+                <td class="tg-kftd">RWIX</td>
+                <td class="tg-kftd">MSMC for MPU1</td>
+            </tr>
+            <tr>
+                <td class="tg-6sgx">DDR_MPU1</td>
+                <td class="tg-6sgx">0x80000000</td>
+                <td class="tg-6sgx">0x80FFFFFF</td>
+                <td class="tg-6sgx">16.00 MB</td>
+                <td class="tg-6sgx">RWIX</td>
+                <td class="tg-6sgx">DDR for MPU1   for code/data</td>
+            </tr>
+            <tr>
+                <td class="tg-kftd">APP_LOG_MEM</td>
+                <td class="tg-kftd">0x81000000</td>
+                <td class="tg-kftd">0x8103FFFF</td>
+                <td class="tg-kftd">256.00 KB</td>
+                <td class="tg-kftd"></td>
+                <td class="tg-kftd">Memory for remote core logging</td>
+            </tr>
+        </table>
+    </body>
+</html>

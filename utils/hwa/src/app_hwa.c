@@ -1,0 +1,659 @@
+/*
+ *
+ * Copyright (c) 2018 Texas Instruments Incorporated
+ *
+ * All rights reserved not granted herein.
+ *
+ * Limited License.
+ *
+ * Texas Instruments Incorporated grants a world-wide, royalty-free, non-exclusive
+ * license under copyrights and patents it now or hereafter owns or controls to make,
+ * have made, use, import, offer to sell and sell ("Utilize") this software subject to the
+ * terms herein.  With respect to the foregoing patent license, such license is granted
+ * solely to the extent that any such patent is necessary to Utilize the software alone.
+ * The patent license shall not apply to any combinations which include this software,
+ * other than combinations with devices manufactured by or for TI ("TI Devices").
+ * No hardware patent is licensed hereunder.
+ *
+ * Redistributions must preserve existing copyright notices and reproduce this license
+ * (including the above copyright notice and the disclaimer and (if applicable) source
+ * code license limitations below) in the documentation and/or other materials provided
+ * with the distribution
+ *
+ * Redistribution and use in binary form, without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * *       No reverse engineering, decompilation, or disassembly of this software is
+ * permitted with respect to any software provided in binary form.
+ *
+ * *       any redistribution and use are licensed by TI for use only with TI Devices.
+ *
+ * *       Nothing shall obligate TI to provide you with source code for the software
+ * licensed and provided to you in object code.
+ *
+ * If software source code is provided to you, modification and redistribution of the
+ * source code are permitted provided that the following conditions are met:
+ *
+ * *       any redistribution and use of the source code, including any resulting derivative
+ * works, are licensed by TI for use only with TI Devices.
+ *
+ * *       any redistribution and use of any object code compiled from the source code
+ * and any resulting derivative works, are licensed by TI for use only with TI Devices.
+ *
+ * Neither the name of Texas Instruments Incorporated nor the names of its suppliers
+ *
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * DISCLAIMER.
+ *
+ * THIS SOFTWARE IS PROVIDED BY TI AND TI'S LICENSORS "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL TI AND TI'S LICENSORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+#include <utils/mem/include/app_mem.h>
+#include <utils/udma/include/app_udma.h>
+#include <utils/hwa/include/app_hwa.h>
+#include <utils/console_io/include/app_log.h>
+#include <utils/sciclient/include/app_sciclient_wrapper_api.h>
+#include <ti/drv/csirx/csirx.h>
+#include <ti/drv/csitx/csitx.h>
+#include <ti/drv/vhwa/include/vhwa_m2mDof.h>
+#include <ti/drv/vhwa/include/vhwa_m2mLdc.h>
+#include <ti/drv/vhwa/include/vhwa_m2mMsc.h>
+#include <ti/drv/vhwa/include/vhwa_m2mNf.h>
+#include <ti/drv/vhwa/include/vhwa_m2mSde.h>
+#include <ti/drv/vhwa/include/vhwa_m2mViss.h>
+#include <mm_dec.h>
+#include <mm_enc.h>
+#include <mm_common.h>
+
+#define APP_DEBUG_VHWA
+
+#define ENABLE_DOF
+#define ENABLE_SDE
+#define ENABLE_MSC
+#define ENABLE_NF
+#define ENABLE_VISS
+#define ENABLE_LDC
+#define ENABLE_VDEC
+#define ENABLE_VENC
+
+/* below define's set max limits for line width in order to
+ * reserved space in SL2 for VHWA modules during init
+ */
+#define APP_UTILS_VHWA_MAX_IN_IMG_WIDTH        (1920U)
+#define APP_UTILS_VHWA_IN_IMG_CCSF             (FVID2_CCSF_BITS12_UNPACKED16)
+#define APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH   (6)
+#define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (1920U)
+#define APP_UTILS_VHWA_OUT_IMG_CCSF            (FVID2_CCSF_BITS12_UNPACKED16)
+#define APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH  (2)
+#define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (192)
+#define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (80)
+
+void *appHwaVideoCodecMemAlloc(uint32_t size)
+{
+    void *ptr = NULL;
+    /* Set 4K alignment for all the decoder buffers, VXD HW/MMU need this */
+    uint32_t align = 4*1024;
+
+    ptr = appMemAlloc(APP_MEM_HEAP_DDR_NON_CACHE, size, align);
+
+    if (NULL == ptr)
+    {
+        appLogPrintf("appHwaVideoCodecMemAlloc: ERROR: alloc failed!!!\n");
+        appLogPrintf("appHwaVideoCodecMemAlloc: Change memory map to increase size of MCU2_1 non-cached carveout\n");
+    }
+
+    return ptr;
+}
+
+void appHwaVideoCodecMemFree(void *ptr, uint32_t size)
+{
+	appMemFree(APP_MEM_HEAP_DDR_NON_CACHE, ptr, size);
+}
+
+int32_t appFvid2Init(void)
+{
+    int32_t retVal = FVID2_SOK;
+    Fvid2_InitPrms initPrmsFvid2;
+
+    appLogPrintf("FVID2: Init ... !!!\n");
+
+    Fvid2InitPrms_init(&initPrmsFvid2);
+    initPrmsFvid2.printFxn = appLogPrintf;
+    retVal = Fvid2_init(&initPrmsFvid2);
+    if(retVal!=FVID2_SOK)
+    {
+        appLogPrintf("FVID2: ERROR: Fvid2_init failed !!!\n");
+    }
+    appLogPrintf("FVID2: Init ... Done !!!\n");
+
+    return (retVal);
+}
+
+int32_t appCsi2RxInit(void)
+{
+    int32_t status = FVID2_SOK;
+    Csirx_InitParams initPrmsCsirx;
+
+    appLogPrintf("CSI2RX: Init ... !!!\n");
+
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_PSILSS0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_RX_IF0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_RX_IF1);
+    SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_RX0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_RX1);
+
+    Csirx_initParamsInit(&initPrmsCsirx);
+    initPrmsCsirx.drvHandle = appUdmaGetObj();
+    status = Csirx_init(&initPrmsCsirx);
+    if(status!=FVID2_SOK)
+    {
+        appLogPrintf("CSI2RX: ERROR: Csirx_init failed !!!\n");
+    }
+    appLogPrintf("CSI2RX: Init ... Done !!!\n");
+
+    return (status);
+}
+
+int32_t appCsi2TxInit(void)
+{
+    int32_t status = FVID2_SOK;
+    Csitx_InitParams initPrmsCsitx;
+
+    appLogPrintf("CSI2TX: Init ... !!!\n");
+
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_PSILSS0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_TX0);
+
+    /* Select CSITX0 as the source for DPHYTX0 */
+    CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
+                    CSL_MAIN_CTRL_MMR_CFG0_DPHY_TX0_CTRL,
+                    0x1);
+
+    Csitx_initParamsInit(&initPrmsCsitx);
+    initPrmsCsitx.drvHandle = appUdmaGetObj();
+    status = Csitx_init(&initPrmsCsitx);
+    if(status!=FVID2_SOK)
+    {
+        appLogPrintf("CSI2TX: ERROR: Csitx_init failed !!!\n");
+    }
+    appLogPrintf("CSI2TX: Init ... Done !!!\n");
+
+    return (status);
+}
+
+int32_t appFvid2DeInit(void)
+{
+    int32_t retVal = FVID2_SOK;
+
+    retVal = Fvid2_deInit(NULL);
+    if(retVal!=FVID2_SOK)
+    {
+        appLogPrintf("FVID2: ERROR: Fvid2_deInit failed !!!\n");
+    }
+    return (retVal);
+}
+
+int32_t appCsi2RxDeInit(void)
+{
+    int32_t retVal = FVID2_SOK;
+
+    retVal = Csirx_deInit();
+    if(retVal!=FVID2_SOK)
+    {
+        appLogPrintf("CSI2RX: ERROR: Csirx_deInit failed !!!\n");
+    }
+    return (retVal);
+}
+
+int32_t appCsi2TxDeInit(void)
+{
+    int32_t retVal = FVID2_SOK;
+
+    retVal = Csitx_deInit();
+    if(retVal!=FVID2_SOK)
+    {
+        appLogPrintf("CSI2TX: ERROR: Csitx_deInit failed !!!\n");
+    }
+    return (retVal);
+}
+
+int32_t appVhwaDmpacInit()
+{
+    int32_t  status = FVID2_SOK;
+
+    appLogPrintf("VHWA: DMPAC: Init ... !!!\n");
+
+    #if defined(ENABLE_DOF) || defined(ENABLE_SDE)
+    SET_DEVICE_STATE_ON(TISCI_DEV_DMPAC0);
+    #endif
+    #if defined(ENABLE_SDE)
+    SET_DEVICE_STATE_ON(TISCI_DEV_DMPAC0_SDE_0);
+    #endif
+
+#ifdef ENABLE_DOF
+    Vhwa_M2mDofSl2AllocPrms sl2AllocPrms;
+    Vhwa_M2mDofInitParams   initPrms;
+
+    #ifdef APP_DEBUG_VHWA
+    appLogPrintf("VHWA: DOF Init ... !!!\n");
+    #endif
+
+    /* Initialize DOF Init parameters */
+    Vhwa_m2mDofInitParamsInit(&initPrms);
+
+    /* Set UDMA driver handle */
+    initPrms.udmaDrvHndl = appUdmaGetObj();
+
+    status = Vhwa_m2mDofInit(&initPrms);
+    if (0 != status)
+    {
+        appLogPrintf("VHWA: ERROR: DOF Init Failed !!!\n");
+    }
+    else
+    {
+        /* Initilize SL2 parameters */
+        Vhwa_M2mDofSl2AllocPrmsInit(&sl2AllocPrms);
+
+        status = Vhwa_m2mDofAllocSl2(&sl2AllocPrms);
+        if (0 != status)
+        {
+            appLogPrintf("VHWA: ERROR: DOF SL2 Alloc Failed !!!\n");
+        }
+        else
+        {
+            #ifdef APP_DEBUG_VHWA
+            appLogPrintf("VHWA: DOF Init ... Done !!!\n");
+            #endif
+        }
+    }
+#endif
+
+#ifdef ENABLE_SDE
+    /* SDE */
+    if (0 == status)
+    {
+        Vhwa_M2mSdeSl2AllocPrms sl2AllocPrms;
+        Vhwa_M2mSdeInitParams   initPrms;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: SDE Init ... !!!\n");
+        #endif
+
+        /* Initialize SDE Init parameters */
+        Vhwa_M2mSdeInitParamsInit(&initPrms);
+
+        /* Set UDMA driver handle */
+        initPrms.udmaDrvHndl = appUdmaGetObj();
+
+        status = Vhwa_m2mSdeInit(&initPrms);
+        if (0 != status)
+        {
+            appLogPrintf("VHWA: ERROR: SDE Init Failed !!!\n");
+        }
+        else
+        {
+            /* Initilize SL2 parameters */
+            Vhwa_M2mSdeSl2AllocPrmsInit(&sl2AllocPrms);
+
+            status = Vhwa_m2mSdeAllocSl2(&sl2AllocPrms);
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: SDE SL2 Alloc Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: SDE Init ... Done !!!\n");
+                #endif
+            }
+        }
+    }
+#endif
+
+    appLogPrintf("VHWA: DMPAC: Init ... Done !!!\n");
+    return (status);
+    
+}
+
+int32_t appVhwaCodecInit()
+{
+    int32_t  status = FVID2_SOK;
+
+    appLogPrintf("VHWA: Codec: Init ... !!!\n");
+
+#ifdef ENABLE_VDEC
+    if (0 == status)
+    {
+	    struct mm_osa_cfg osa_prms;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: VDEC Init ... !!!\n");
+        #endif
+
+        osa_prms.memAlloc = (void* (*)(uint32_t))appHwaVideoCodecMemAlloc;
+        osa_prms.memFree  = (void (*)(void *, uint32_t ))appHwaVideoCodecMemFree;
+        osa_prms.printFxn = (void (*)(const char *, ... ))appLogPrintf;
+        MM_COMMON_OsaInit(&osa_prms);
+        if (0 == status)
+        {
+            status = MM_DEC_Init();
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: VDEC Init Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: VDEC Init ... Done !!!\n");
+                #endif
+            }
+        }
+        else
+        {
+            appLogPrintf("VHWA: ERROR: VDEC Init Failed !!!\n");
+        }
+    }
+#endif
+
+#ifdef ENABLE_VENC
+    if (0 == status)
+    {
+	    struct mm_osa_cfg osa_prms;
+	    mm_enc_init_params init_params;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: VENC Init ... !!!\n");
+        #endif
+
+        osa_prms.memAlloc = (void* (*)(uint32_t))appHwaVideoCodecMemAlloc;
+        osa_prms.memFree  = (void (*)(void *, uint32_t ))appHwaVideoCodecMemFree;
+        osa_prms.printFxn = (void (*)(const char *, ... ))appLogPrintf;
+        MM_COMMON_OsaInit(&osa_prms);
+
+        if (0 == status)
+        {
+            MM_ENC_SetDefaultInitParams(&init_params);
+
+            status = MM_ENC_Init(&init_params);
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: VENC Init Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: VENC Init ... Done !!!\n");
+                #endif
+            }
+        }
+        else
+        {
+            appLogPrintf("VHWA: ERROR: VENC Init Failed !!!\n");
+        }
+    }
+#endif
+
+    appLogPrintf("VHWA: Init ... Done !!!\n");
+    return (status);
+}
+
+int32_t appVhwaVpacInit()
+{
+    int32_t  status = FVID2_SOK;
+
+    appLogPrintf("VHWA: VPAC Init ... !!!\n");
+
+    #if defined(ENABLE_LDC) || defined(ENABLE_MSC) || defined(ENABLE_NF) || defined(ENABLE_VISS)
+    SET_DEVICE_STATE_ON(TISCI_DEV_VPAC0);
+    #endif
+
+#ifdef ENABLE_LDC
+    /* LDC */
+    if (0 == status)
+    {
+        Vhwa_M2mLdcSl2AllocPrms sl2AllocPrms;
+        Vhwa_M2mLdcInitParams   initPrms;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: LDC Init ... !!!\n");
+        #endif
+
+        /* Initialize LDC Init parameters */
+        Vhwa_m2mLdcInitParamsInit(&initPrms);
+
+        /* Set UDMA driver handle */
+        initPrms.udmaDrvHndl = appUdmaGetObj();
+
+        status = Vhwa_m2mLdcInit(&initPrms);
+        if (0 != status)
+        {
+            appLogPrintf("VHWA: ERROR: LDC Init Failed !!!\n");
+        }
+        else
+        {
+            Vhwa_M2mLdcSl2AllocPrmsInit(&sl2AllocPrms);
+
+            sl2AllocPrms.maxBlockWidth  = APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH;
+            sl2AllocPrms.maxBlockHeight = APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT;
+
+            status = Vhwa_m2mLdcAllocSl2(&sl2AllocPrms);
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: LDC SL2 Alloc Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: LDC Init ... Done !!!\n");
+                #endif
+            }
+        }
+    }
+#endif
+
+#ifdef ENABLE_MSC
+    /* MSC */
+    if (0 == status)
+    {
+        uint32_t cnt;
+
+        Vhwa_M2mMscInitParams initPrms;
+        Vhwa_M2mMscSl2AllocPrms sl2Prms;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: MSC Init ... !!!\n");
+        #endif
+
+        Vhwa_m2mMscInitParamsInit(&initPrms);
+
+        initPrms.drvHandle = appUdmaGetObj();
+
+        status = Vhwa_m2mMscInit(&initPrms);
+
+        if (0 == status)
+        {
+            for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INPUT_BUFF; cnt++)
+            {
+                sl2Prms.maxInWidth[cnt]    = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
+                sl2Prms.inCcsf[cnt]        = APP_UTILS_VHWA_IN_IMG_CCSF;
+                sl2Prms.inBuffDepth[cnt]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
+            }
+
+            for(cnt = 0; cnt < MSC_MAX_OUTPUT; cnt++)
+            {
+                sl2Prms.maxOutWidth[cnt]   = APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH;
+                sl2Prms.outCcsf[cnt]       = APP_UTILS_VHWA_OUT_IMG_CCSF;
+                sl2Prms.outBuffDepth[cnt]  = APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH;
+            }
+            status = Vhwa_m2mMscAllocSl2(&sl2Prms);
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: MSC SL2 Alloc Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: MSC Init ... Done !!!\n");
+                #endif
+            }
+        }
+        else
+        {
+            appLogPrintf("VHWA: ERROR: MSC Init Failed !!!\n");
+        }
+    }
+#endif
+
+#ifdef ENABLE_NF
+    /* NF */
+    if (0 == status)
+    {
+        Vhwa_M2mNfSl2AllocPrms  sl2AllocPrms;
+        Vhwa_M2mNfInitPrms      initPrms;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: NF Init ... !!!\n");
+        #endif
+
+        /* Initialize NF Init parameters */
+        Vhwa_m2mNfInitPrmsInit(&initPrms);
+
+        /* Set UDMA driver handle */
+        initPrms.udmaDrvHndl = appUdmaGetObj();
+
+        status = Vhwa_m2mNfInit(&initPrms);
+        if (0 != status)
+        {
+            appLogPrintf("VHWA: ERROR: NF Init Failed !!!\n");
+        }
+        else
+        {
+            /* Initilize SL2 parameters */
+            sl2AllocPrms.maxImgWidth  = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
+            sl2AllocPrms.inCcsf       = APP_UTILS_VHWA_IN_IMG_CCSF;
+            sl2AllocPrms.inBuffDepth  = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
+            sl2AllocPrms.outBuffDepth = APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH;
+            sl2AllocPrms.outCcsf      = APP_UTILS_VHWA_OUT_IMG_CCSF;
+
+            status = Vhwa_m2mNfAllocSl2(&sl2AllocPrms);
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: NF SL2 Alloc Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: NF Init ... Done !!!\n");
+                #endif
+            }
+        }
+    }
+#endif
+
+#ifdef ENABLE_VISS
+    /* VISS */
+    if (0 == status)
+    {
+        Vhwa_M2mVissSl2Params   sl2AllocPrms;
+        Vhwa_M2mVissInitParams  initPrms;
+
+        #ifdef APP_DEBUG_VHWA
+        appLogPrintf("VHWA: VISS Init ... !!!\n");
+        #endif
+
+        /* Initialize VISS Init parameters */
+        Vhwa_m2mVissInitParamsInit(&initPrms);
+
+        /* Set UDMA driver handle */
+        initPrms.udmaDrvHndl = appUdmaGetObj();
+
+        status = Vhwa_m2mVissInit(&initPrms);
+        if (0 != status)
+        {
+            appLogPrintf("VHWA: ERROR: VISS Init Failed !!!\n");
+        }
+        else
+        {
+            int32_t cnt;
+            
+            Vhwa_m2mVissSl2ParamsInit(&sl2AllocPrms);
+
+            sl2AllocPrms.inDepth = 3U; /* Minimum 3 */
+
+            for (cnt = 0U; cnt < VHWA_M2M_VISS_MAX_OUTPUTS; cnt ++)
+            {
+                sl2AllocPrms.outDepth[cnt] = 2U; /* Minimum 2 */
+            }
+
+            status = Vhwa_m2mVissAllocSl2(&sl2AllocPrms);
+            if (0 != status)
+            {
+                appLogPrintf("VHWA: ERROR: VISS SL2 Alloc Failed !!!\n");
+            }
+            else
+            {
+                #ifdef APP_DEBUG_VHWA
+                appLogPrintf("VHWA: VISS Init ... Done !!!\n");
+                #endif
+            }
+        }
+    }
+#endif
+
+    appLogPrintf("VHWA: VPAC Init ... Done !!!\n");
+    return (status);
+}
+
+int32_t appVhwaDmpacDeInit()
+{
+#ifdef ENABLE_DOF
+    Vhwa_m2mDofDeInit();
+#endif
+#ifdef ENABLE_SDE
+    Vhwa_m2mSdeDeInit();
+#endif
+
+    return (0);
+}
+
+int32_t appVhwaCodecDeInit()
+{
+#ifdef ENABLE_VDEC
+    MM_DEC_Deinit();
+#endif
+#ifdef ENABLE_VENC
+    MM_ENC_Deinit();
+#endif
+    return (0);
+}
+
+int32_t appVhwaVpacDeInit()
+{
+#ifdef ENABLE_LDC
+    Vhwa_m2mLdcDeInit();
+#endif
+#ifdef ENABLE_MSC
+    Vhwa_m2mMscDeInit();
+#endif
+#ifdef ENABLE_NF
+    Vhwa_m2mNfDeInit();
+#endif
+#ifdef ENABLE_VISS
+    Vhwa_m2mVissDeInit();
+#endif
+
+    return (0);
+}

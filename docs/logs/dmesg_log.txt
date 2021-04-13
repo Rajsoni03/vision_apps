@@ -1,0 +1,28 @@
+root@j7-evm:/opt/vision_apps# dmesg | grep rpmsg
+[   11.645925] virtio_rpmsg_bus virtio0: rpmsg host is online
+[   11.674968] virtio_rpmsg_bus virtio0: creating channel rpmsg_chrdev addr 0xd
+[   11.895276] virtio_rpmsg_bus virtio1: rpmsg host is online
+[   11.926545] virtio_rpmsg_bus virtio1: creating channel rpmsg_chrdev addr 0xd
+[   12.358941] virtio_rpmsg_bus virtio2: rpmsg host is online
+[   12.360858] virtio_rpmsg_bus virtio2: creating channel rpmsg_chrdev addr 0xd
+[   12.564245] virtio_rpmsg_bus virtio3: rpmsg host is online
+[   12.594490] virtio_rpmsg_bus virtio3: creating channel ti.ipc4.ping-pong addr 0xd
+[   12.602105] virtio_rpmsg_bus virtio3: creating channel rpmsg_chrdev addr 0xe
+[   13.023025] virtio_rpmsg_bus virtio4: rpmsg host is online
+[   13.051430] virtio_rpmsg_bus virtio4: creating channel rpmsg_chrdev addr 0xd
+[   13.267107] virtio_rpmsg_bus virtio5: rpmsg host is online
+[   13.272167] virtio_rpmsg_bus virtio5: creating channel rpmsg_chrdev addr 0xd
+[   13.280834] virtio_rpmsg_bus virtio5: creating channel rpmsg_chrdev addr 0x15
+[   13.301423] virtio_rpmsg_bus virtio2: creating channel rpmsg_chrdev addr 0x15
+[   13.312954] virtio_rpmsg_bus virtio2: creating channel ti.ipc4.ping-pong addr 0xe
+[   13.324875] virtio_rpmsg_bus virtio0: creating channel rpmsg_chrdev addr 0x15
+[   13.336735] virtio_rpmsg_bus virtio0: creating channel ti.ipc4.ping-pong addr 0xe
+[   13.355257] virtio_rpmsg_bus virtio1: creating channel rpmsg_chrdev addr 0x15
+[   13.362563] virtio_rpmsg_bus virtio1: creating channel ti.ipc4.ping-pong addr 0xe
+[   13.372567] virtio_rpmsg_bus virtio4: creating channel rpmsg_chrdev addr 0x15
+[   13.384308] virtio_rpmsg_bus virtio4: creating channel ti.ethfw.notifyservice addr 0x1e
+[   13.398527] virtio_rpmsg_bus virtio4: creating channel rpmsg-kdrv addr 0x1a
+[   13.407891] virtio_rpmsg_bus virtio5: creating channel ti.ipc4.ping-pong addr 0xe
+[   13.418470] rpmsg-kdrv-eth-switch rpmsg-kdrv-2-mpu_1_0_ethswitch-device-0: Device info: permissions: 07FFFFFF uart_id: 2
+[   13.434450] rpmsg-kdrv-eth-switch rpmsg-kdrv-2-mpu_1_0_ethswitch-device-0: FW ver 0.1 (rev 1)  8/Apr/2021 SHA:
+[   13.446521] virtio_rpmsg_bus virtio4: creating channel ti.ipc4.ping-pong addr 0xe
