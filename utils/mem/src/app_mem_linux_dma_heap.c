@@ -792,10 +792,7 @@ static int32_t appMemAddTupleToList(uint32_t dmaBufFd, uint32_t size, uint64_t *
     printf("MEM: Translated dmaBufFd %d to virtPtr %p and phyPtr %p!!!\n",
            dmaBufFd, (void*)*virtPtr, (void*)*phyPtr);
     #endif
-    if (dmabuf2phys_fd != -1)
-    {
-        close(dmabuf2phys_fd);
-    }
+
     return status;
 }
 
