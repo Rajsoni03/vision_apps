@@ -779,6 +779,7 @@ static void appRegisterOpenVXTargetKernels()
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxRegisterHwaTargetDisplayKernels();
+        tivxRegisterHwaTargetDisplayM2MKernels();
         #endif
         #ifdef C71
         {
@@ -833,6 +834,7 @@ static void appUnRegisterOpenVXTargetKernels()
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxUnRegisterHwaTargetDisplayKernels();
+        tivxUnRegisterHwaTargetDisplayM2MKernels();
         #endif
         #ifdef ENABLE_CSI2RX
         tivxUnRegisterHwaTargetCaptureKernels();
