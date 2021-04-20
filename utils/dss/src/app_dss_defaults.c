@@ -125,6 +125,16 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
         obj->vpId          = APP_DSS_VP_ID_3;
         obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
     }
+    else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_M2M)
+    {
+        appLogPrintf("DSS: Display type is M2M !!!\n");
+        obj->nodeOverlayId = APP_DCTRL_NODE_OVERLAY2;
+        obj->nodeVpId      = APP_DCTRL_NODE_VP2;
+        obj->nodeDpiId     = APP_DCTRL_NODE_DPI_DPI0;
+        obj->overlayId     = APP_DSS_OVERLAY_ID_2;
+        obj->vpId          = APP_DSS_VP_ID_2;
+        obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
+    }
 
     appDssConfigurePm(prm);
 

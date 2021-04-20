@@ -563,6 +563,9 @@ int32_t appInit()
         #ifdef ENABLE_DSS_EDP
         prm.display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_EDP;
         #endif
+        #ifdef ENABLE_DSS_M2M
+        prm.display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_M2M;
+        #endif
 
         /* Do not rely on "init". Always provide known good tmings */
         prm.timings.width        = 1920U;

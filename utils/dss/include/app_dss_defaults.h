@@ -93,6 +93,9 @@ extern "C" {
 /** \brief Enables DSI output on AOU LCD Display */
 #define APP_DSS_DEFAULT_DISPLAY_TYPE_DSI         (2u)
 
+/** \brief Enables Display M2M */
+#define APP_DSS_DEFAULT_DISPLAY_TYPE_M2M         (3u)
+
 /* ========================================================================== */
 /*                         Structure Declarations                             */
 /* ========================================================================== */

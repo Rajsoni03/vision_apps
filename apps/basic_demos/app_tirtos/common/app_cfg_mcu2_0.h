@@ -88,12 +88,18 @@
     #define ENABLE_DSS_SINGLE
     #undef  ENABLE_DSS_DUAL
 
-    /* define below to enable eDP display, make sure to undef ENABLE_DSS_HDMI & ENABLE_DSS_DSI as well */
+    /* define below to enable eDP display,
+       make sure to undef ENABLE_DSS_HDMI, ENABLE_DSS_M2M & ENABLE_DSS_DSI as well */
     #define ENABLE_DSS_EDP
-    /* define below to enable HDMI display, make sure to undef ENABLE_DSS_EDP & ENABLE_DSS_DSI as well */
+    /* define below to enable HDMI display,
+       make sure to undef ENABLE_DSS_EDP, ENABLE_DSS_M2M & ENABLE_DSS_DSI as well */
     #undef ENABLE_DSS_HDMI
-    /* define below to enable DSI display, make sure to undef ENABLE_DSS_HDMI & ENABLE_DSS_EDP as well */
+    /* define below to enable DSI display, make sure to undef ENABLE_DSS_HDMI,
+       ENABLE_DSS_M2M & ENABLE_DSS_EDP as well */
     #undef ENABLE_DSS_DSI
+    /* define below to enable Display M2M,
+       make sure to undef ENABLE_DSS_HDMI, ENABLE_DSS_DSI & ENABLE_DSS_EDP as well */
+    #undef ENABLE_DSS_M2M
 
     #define ENABLE_I2C
     #define ENABLE_BOARD
