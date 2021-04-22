@@ -523,6 +523,9 @@ Sensor driver does not support metadata yet.
     /* Config initialization */
     tivx_capture_params_init(&local_capture_config);
 
+    local_capture_config.timeout = 33;
+    local_capture_config.timeoutInitial = 500;
+
     local_capture_config.numInst  = 2U;/* Configure both instances */
     local_capture_config.numCh = 1U;/* Single cam. Only 1 channel enabled */
     {
