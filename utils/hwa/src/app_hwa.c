@@ -73,9 +73,6 @@
 #include <ti/drv/vhwa/include/vhwa_m2mNf.h>
 #include <ti/drv/vhwa/include/vhwa_m2mSde.h>
 #include <ti/drv/vhwa/include/vhwa_m2mViss.h>
-#include <mm_dec.h>
-#include <mm_enc.h>
-#include <mm_common.h>
 
 #define APP_DEBUG_VHWA
 
@@ -85,8 +82,6 @@
 #define ENABLE_NF
 #define ENABLE_VISS
 #define ENABLE_LDC
-#define ENABLE_VDEC
-#define ENABLE_VENC
 
 /* below define's set max limits for line width in order to
  * reserved space in SL2 for VHWA modules during init
@@ -99,28 +94,6 @@
 #define APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH  (2)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (192)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (80)
-
-void *appHwaVideoCodecMemAlloc(uint32_t size)
-{
-    void *ptr = NULL;
-    /* Set 4K alignment for all the decoder buffers, VXD HW/MMU need this */
-    uint32_t align = 4*1024;
-
-    ptr = appMemAlloc(APP_MEM_HEAP_DDR_NON_CACHE, size, align);
-
-    if (NULL == ptr)
-    {
-        appLogPrintf("appHwaVideoCodecMemAlloc: ERROR: alloc failed!!!\n");
-        appLogPrintf("appHwaVideoCodecMemAlloc: Change memory map to increase size of MCU2_1 non-cached carveout\n");
-    }
-
-    return ptr;
-}
-
-void appHwaVideoCodecMemFree(void *ptr, uint32_t size)
-{
-	appMemFree(APP_MEM_HEAP_DDR_NON_CACHE, ptr, size);
-}
 
 int32_t appFvid2Init(void)
 {
@@ -326,88 +299,6 @@ int32_t appVhwaDmpacInit()
     appLogPrintf("VHWA: DMPAC: Init ... Done !!!\n");
     return (status);
     
-}
-
-int32_t appVhwaCodecInit()
-{
-    int32_t  status = FVID2_SOK;
-
-    appLogPrintf("VHWA: Codec: Init ... !!!\n");
-
-#ifdef ENABLE_VDEC
-    if (0 == status)
-    {
-	    struct mm_osa_cfg osa_prms;
-
-        #ifdef APP_DEBUG_VHWA
-        appLogPrintf("VHWA: VDEC Init ... !!!\n");
-        #endif
-
-        osa_prms.memAlloc = (void* (*)(uint32_t))appHwaVideoCodecMemAlloc;
-        osa_prms.memFree  = (void (*)(void *, uint32_t ))appHwaVideoCodecMemFree;
-        osa_prms.printFxn = (void (*)(const char *, ... ))appLogPrintf;
-        MM_COMMON_OsaInit(&osa_prms);
-        if (0 == status)
-        {
-            status = MM_DEC_Init();
-            if (0 != status)
-            {
-                appLogPrintf("VHWA: ERROR: VDEC Init Failed !!!\n");
-            }
-            else
-            {
-                #ifdef APP_DEBUG_VHWA
-                appLogPrintf("VHWA: VDEC Init ... Done !!!\n");
-                #endif
-            }
-        }
-        else
-        {
-            appLogPrintf("VHWA: ERROR: VDEC Init Failed !!!\n");
-        }
-    }
-#endif
-
-#ifdef ENABLE_VENC
-    if (0 == status)
-    {
-	    struct mm_osa_cfg osa_prms;
-	    mm_enc_init_params init_params;
-
-        #ifdef APP_DEBUG_VHWA
-        appLogPrintf("VHWA: VENC Init ... !!!\n");
-        #endif
-
-        osa_prms.memAlloc = (void* (*)(uint32_t))appHwaVideoCodecMemAlloc;
-        osa_prms.memFree  = (void (*)(void *, uint32_t ))appHwaVideoCodecMemFree;
-        osa_prms.printFxn = (void (*)(const char *, ... ))appLogPrintf;
-        MM_COMMON_OsaInit(&osa_prms);
-
-        if (0 == status)
-        {
-            MM_ENC_SetDefaultInitParams(&init_params);
-
-            status = MM_ENC_Init(&init_params);
-            if (0 != status)
-            {
-                appLogPrintf("VHWA: ERROR: VENC Init Failed !!!\n");
-            }
-            else
-            {
-                #ifdef APP_DEBUG_VHWA
-                appLogPrintf("VHWA: VENC Init ... Done !!!\n");
-                #endif
-            }
-        }
-        else
-        {
-            appLogPrintf("VHWA: ERROR: VENC Init Failed !!!\n");
-        }
-    }
-#endif
-
-    appLogPrintf("VHWA: Init ... Done !!!\n");
-    return (status);
 }
 
 int32_t appVhwaVpacInit()
@@ -626,17 +517,6 @@ int32_t appVhwaDmpacDeInit()
     Vhwa_m2mSdeDeInit();
 #endif
 
-    return (0);
-}
-
-int32_t appVhwaCodecDeInit()
-{
-#ifdef ENABLE_VDEC
-    MM_DEC_Deinit();
-#endif
-#ifdef ENABLE_VENC
-    MM_ENC_Deinit();
-#endif
     return (0);
 }
 

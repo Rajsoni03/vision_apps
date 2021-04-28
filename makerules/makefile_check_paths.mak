@@ -23,7 +23,6 @@ endif
 	@if [ ! -d $(XDCTOOLS_PATH) ]; then echo 'ERROR: $(XDCTOOLS_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(PDK_PATH) ]; then echo 'ERROR: $(PDK_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(VISION_APPS_PATH) ]; then echo 'ERROR: $(VISION_APPS_PATH) not found !!!'; exit 1; fi
-	@if [ ! -d $(VIDEO_CODEC_PATH) ]; then echo 'ERROR: $(VIDEO_CODEC_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(TIOVX_PATH) ]; then echo 'ERROR: $(TIOVX_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(PTK_PATH) ]; then echo 'ERROR: $(PTK_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(REMOTE_DEVICE_PATH) ]; then echo 'ERROR: $(REMOTE_DEVICE_PATH) not found !!!'; exit 1; fi

@@ -29,7 +29,6 @@ LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(IMAGING_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
-LDIRS += $(VIDEO_CODEC_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 STATIC_LIBS += app_utils_mem
 STATIC_LIBS += app_utils_console_io
@@ -55,8 +54,6 @@ TIOVX_LIBS += vx_kernels_hwa_tests vx_kernels_hwa
 TIOVX_LIBS += vx_target_kernels_vpac_nf vx_target_kernels_vpac_viss
 TIOVX_LIBS += vx_target_kernels_vpac_msc vx_target_kernels_vpac_ldc
 TIOVX_LIBS += vx_target_kernels_dmpac_dof vx_target_kernels_dmpac_sde
-TIOVX_LIBS += vx_target_kernels_vdec
-TIOVX_LIBS += vx_target_kernels_venc
 TIOVX_LIBS += vx_target_kernels_display
 TIOVX_LIBS += vx_target_kernels_capture
 TIOVX_LIBS += vx_target_kernels_csitx
@@ -71,11 +68,8 @@ IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_sensordrv
 IMAGING_LIBS += ti_imaging_ittsrvr
 
-VIDEO_CODEC_LIBS = video_codec_common_tirtos video_codec_decoder_tirtos video_codec_osal_tirtos video_codec_encoder_tirtos
-
 SYS_STATIC_LIBS += $(TIOVX_LIBS)
 SYS_STATIC_LIBS += $(IMAGING_LIBS)
-SYS_STATIC_LIBS += $(VIDEO_CODEC_LIBS)
 SYS_STATIC_LIBS += rtsv7R4_T_le_v3D16_eabi
 
 ifeq ($(RTOS),FREERTOS)

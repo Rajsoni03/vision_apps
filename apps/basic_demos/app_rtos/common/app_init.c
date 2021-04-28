@@ -603,11 +603,6 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
 
-    #ifdef ENABLE_VHWA_CODEC
-    status = appVhwaCodecInit();
-    APP_ASSERT_SUCCESS(status);
-    #endif
-
     #ifdef ENABLE_TIOVX
     tivxInit();
     #ifdef ENABLE_TIOVX_HOST
@@ -663,9 +658,6 @@ void appDeInit()
     #endif
     #ifdef ENABLE_VHWA_DMPAC
     appVhwaDmpacDeInit();
-    #endif
-    #ifdef ENABLE_VHWA_CODEC
-    appVhwaCodecDeInit();
     #endif
     #ifdef ENABLE_DSS_SINGLE
     appDssDefaultDeInit();
@@ -740,10 +732,6 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetDmpacSdeKernels();
         tivxRegisterHwaTargetDmpacDofKernels();
         #endif
-        #ifdef ENABLE_VHWA_CODEC
-        tivxRegisterHwaTargetVdecKernels();
-        tivxRegisterHwaTargetVencKernels();
-        #endif
         #ifdef ENABLE_CSI2RX
         tivxRegisterHwaTargetCaptureKernels();
         #endif
@@ -800,10 +788,6 @@ static void appUnRegisterOpenVXTargetKernels()
         #ifdef ENABLE_VHWA_DMPAC
         tivxUnRegisterHwaTargetDmpacSdeKernels();
         tivxUnRegisterHwaTargetDmpacDofKernels();
-        #endif
-        #ifdef ENABLE_VHWA_CODEC
-        tivxUnRegisterHwaTargetVdecKernels();
-        tivxUnRegisterHwaTargetVencKernels();
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxUnRegisterHwaTargetDisplayKernels();

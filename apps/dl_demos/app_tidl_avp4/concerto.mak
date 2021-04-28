@@ -10,7 +10,6 @@ CSOURCES    := main.c
 CSOURCES    += main_linux_arm.c
 CSOURCES    += app_pre_proc_module.c
 CSOURCES    += app_post_proc_module.c
-CSOURCES    += app_encode_module.c
 CSOURCES    += app_srv_module.c
 CSOURCES    += app_img_hist_module.c
 CSOURCES    += app_dof_pyramid_module.c

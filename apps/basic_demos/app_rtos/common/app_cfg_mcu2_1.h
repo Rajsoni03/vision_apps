@@ -72,7 +72,6 @@
 
 #define ENABLE_FVID2
 #define ENABLE_VHWA_DMPAC
-#define ENABLE_VHWA_CODEC
 
 
 #endif /* APP_CFG_MCU2_1_H_ */

@@ -148,7 +148,6 @@ include makerules/makefile_test_data.mak
 include makerules/makefile_linux_arm.mak
 include makerules/makefile_help.mak
 include makerules/makefile_config.mak
-include makerules/makefile_codec.mak
 include makerules/makefile_tiadalg.mak
 include makerules/makefile_check_paths.mak
 include makerules/makefile_qnx.mak
@@ -166,24 +165,24 @@ vision_apps_scrub: sdk_check_paths
 
 vision_apps_docs: sdk_check_paths doxy_docs
 
-sdk: sdk_check_paths pdk ethfw remote_device imaging ptk codec tiovx tiadalg qnx
+sdk: sdk_check_paths pdk ethfw remote_device imaging ptk tiovx tiadalg qnx
 	$(MAKE) vision_apps
 	$(MAKE) tidl_rt
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot
 endif
 
-sdk_clean: sdk_check_paths pdk_clean ethfw_clean remote_device_clean imaging_clean ptk_clean codec_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean tidl_rt_clean
+sdk_clean: sdk_check_paths pdk_clean ethfw_clean remote_device_clean imaging_clean ptk_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean tidl_rt_clean
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
 
-sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scrub ptk_scrub codec_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
+sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scrub ptk_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
 
-sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs ptk_docs codec_docs tiadalg_docs
+sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs ptk_docs tiadalg_docs
 	$(MAKE) -C $(PSDK_PATH)/psdk_rtos sphinx_docs
 
 #KW build: Split the build into two - components which need not be part of

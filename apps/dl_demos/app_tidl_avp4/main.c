@@ -78,7 +78,6 @@
 #include "app_post_proc_module.h"
 #include "app_img_mosaic_module.h"
 #include "app_display_module.h"
-#include "app_encode_module.h"
 #include "app_srv_module.h"
 #include "app_img_hist_module.h"
 #include "app_dof_pyramid_module.h"
@@ -87,8 +86,6 @@
 #define APP_BUFFER_Q_DEPTH   (4)
 #define APP_PIPELINE_DEPTH   (10)
 
-//#define WRITE_ENCODE_OUTPUT
-#define ENABLE_ENCODE
 #define ENABLE_SRV
 #define ENABLE_DISPLAY
 
@@ -106,7 +103,6 @@ typedef struct {
     ImgMosaicObj  imgMosaicObj;
     DisplayObj    displayObj;
     SRVObj        srvObj;
-    EncodeObj     encodeObj[2];
     ImgHistObj    imgHistObj;
     PyramidObj    pyramidObj;
     DofProcObj    dofProcObj;
@@ -150,11 +146,9 @@ typedef struct {
     int32_t enable_mosaic;
     int32_t enable_display;
     int32_t enable_srv;
-    int32_t enable_enc;
     int32_t enable_hist;
     int32_t enable_dof;
 
-    int32_t write_enc_out;
     int32_t write_file;
 
 } AppObj;
@@ -486,15 +480,6 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 }
             }
             else
-            if(strcmp(token, "enable_enc")==0)
-            {
-                token = strtok(NULL, s);
-                if(token != NULL)
-                {
-                    obj->enable_enc = atoi(token);
-                }
-            }
-            else
             if(strcmp(token, "enable_hist")==0)
             {
                 token = strtok(NULL, s);
@@ -510,15 +495,6 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 if(token != NULL)
                 {
                     obj->pipeline_exec = atoi(token);
-                }
-            }
-            else
-            if(strcmp(token, "write_enc_out")==0)
-            {
-                token = strtok(NULL, s);
-                if(token != NULL)
-                {
-                    obj->write_enc_out = atoi(token);
                 }
             }
             else
@@ -625,8 +601,6 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     strcpy(obj->vissObj.output_file_path, token);
                     strcpy(obj->ldcObj.output_file_path, token);
                     strcpy(obj->scalerObj.output_file_path, token);
-                    strcpy(obj->encodeObj[0].output_file_path, token);
-                    strcpy(obj->encodeObj[1].output_file_path, token);
                     strcpy(obj->srvObj.output_file_path, token);
                 }
             }
@@ -1108,13 +1082,6 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("Img Mosaic init done!\n");
     }
 
-    if(obj->enable_enc == 1)
-    {
-        app_init_encode(obj->context, &obj->encodeObj[0], "encode_obj_0", 0);
-        app_init_encode(obj->context, &obj->encodeObj[1], "encode_obj_1", 1);
-        APP_PRINTF("Encode init done!\n");
-    }
-
     if(obj->enable_hist == 1)
     {
         app_init_img_hist(obj->context, &obj->imgHistObj, "img_hist_obj", obj->sensorObj.num_cameras_enabled);
@@ -1216,13 +1183,6 @@ static void app_deinit(AppObj *obj)
         APP_PRINTF("Img Mosaic deinit done!\n");
     }
 
-    if(obj->enable_enc == 1)
-    {
-        app_deinit_encode(&obj->encodeObj[0]);
-        app_deinit_encode(&obj->encodeObj[1]);
-        APP_PRINTF("Encode deinit done!\n");
-    }
-
     if(obj->enable_hist == 1)
     {
         app_deinit_img_hist(&obj->imgHistObj);
@@ -1321,13 +1281,6 @@ static void app_delete_graph(AppObj *obj)
     {
         app_delete_img_mosaic(&obj->imgMosaicObj);
         APP_PRINTF("Img Mosaic delete done!\n");
-    }
-
-    if(obj->enable_enc == 1)
-    {
-        app_delete_encode(&obj->encodeObj[0]);
-        app_delete_encode(&obj->encodeObj[1]);
-        APP_PRINTF("Encode delete done!\n");
     }
 
     if(obj->enable_hist == 1)
@@ -1479,20 +1432,6 @@ static vx_status app_create_graph(AppObj *obj)
         APP_PRINTF("Img Mosaic graph done!\n");
     }
 
-    if((status == VX_SUCCESS) && (obj->enable_enc == 1))
-    {
-        status = app_create_graph_encode(obj->graph, &obj->encodeObj[0],
-                &obj->imgMosaicObj.output_image[0]);
-        APP_PRINTF("Encode graph done!\n");
-    }
-
-    if((status == VX_SUCCESS) && (obj->enable_enc == 1))
-    {
-        status = app_create_graph_encode(obj->graph, &obj->encodeObj[1],
-                &obj->imgMosaicObj.output_image[0]);
-        APP_PRINTF("Encode graph done!\n");
-    }
-
     if((status == VX_SUCCESS) && (obj->enable_display == 1))
     {
         status = app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);
@@ -1511,27 +1450,6 @@ static vx_status app_create_graph(AppObj *obj)
             graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
             graph_parameters_queue_params_list[graph_parameter_index].refs_list = (vx_reference*)&obj->captureObj.raw_image_arr[0];
             graph_parameter_index++;
-        }
-
-        if(obj->enable_enc == 1)
-        {
-#ifdef WRITE_ENCODED_BITSTREAMS
-            add_graph_parameter_by_node_index(obj->graph, obj->encodeObj[0].node, 2);
-            graph_parameters_queue_params_list[graph_parameter_index].graph_parameter_index = graph_parameter_index;
-            graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = 1;
-            graph_parameters_queue_params_list[graph_parameter_index].refs_list =
-                (vx_reference*)&obj->encodeObj[0].bitstream_obj;
-            obj->encodeObj[0].graph_parameter_index = graph_parameter_index;
-            graph_parameter_index++;
-
-            add_graph_parameter_by_node_index(obj->graph, obj->encodeObj[1].node, 2);
-            graph_parameters_queue_params_list[graph_parameter_index].graph_parameter_index = graph_parameter_index;
-            graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = 1;
-            graph_parameters_queue_params_list[graph_parameter_index].refs_list =
-                (vx_reference*)&obj->encodeObj[1].bitstream_obj;
-            obj->encodeObj[1].graph_parameter_index = graph_parameter_index;
-            graph_parameter_index++;
-#endif
         }
 
         vxSetGraphScheduleConfig(obj->graph,
@@ -1660,10 +1578,6 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     appPerfPointBegin(&obj->total_perf);
 
     CaptureObj *captureObj = &obj->captureObj;
-#ifdef WRITE_ENCODED_BITSTREAMS
-    EncodeObj  *encodeObj[0] = &obj->encodeObj[0];
-    EncodeObj  *encodeObj[1] = &obj->encodeObj[1];
-#endif
 
     if(obj->pipeline < 0)
     {
@@ -1675,13 +1589,6 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->enqueueCnt], 1);
         }
 
-#ifdef WRITE_ENCODED_BITSTREAMS
-        if(obj->enable_enc == 1)
-        {
-            vxGraphParameterEnqueueReadyRef(obj->graph, encodeObj[0]->graph_parameter_index, (vx_reference*)&encodeObj[0]->bitstream_obj, 1);
-            vxGraphParameterEnqueueReadyRef(obj->graph, encodeObj[1]->graph_parameter_index, (vx_reference*)&encodeObj[1]->bitstream_obj, 1);
-        }
-#endif
         obj->enqueueCnt++;
         obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
         obj->pipeline++;
@@ -1694,13 +1601,6 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         {
             vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->enqueueCnt], 1);
         }
-#ifdef WRITE_ENCODED_BITSTREAMS
-        if(obj->enable_enc == 1)
-        {
-            vxGraphParameterEnqueueReadyRef(obj->graph, encodeObj[0]->graph_parameter_index, (vx_reference*)&encodeObj[0]->bitstream_obj, 1);
-            vxGraphParameterEnqueueReadyRef(obj->graph, encodeObj[1]->graph_parameter_index, (vx_reference*)&encodeObj[1]->bitstream_obj, 1);
-        }
-#endif
         obj->enqueueCnt++;
         obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
         obj->pipeline++;
@@ -1716,37 +1616,6 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             /* Dequeue input */
             vxGraphParameterDequeueDoneRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&raw_image, 1, &num_refs);
         }
-#ifdef WRITE_ENCODED_BITSTREAMS
-        if(obj->enable_enc == 1)
-        {
-            /* Dequeue Bitstream Object */
-            vxGraphParameterDequeueDoneRef(obj->graph, encodeObj[0]->graph_parameter_index, (vx_reference*)&obj->encodeObj[0].encoded_image, 1, &num_refs);
-            vxGraphParameterDequeueDoneRef(obj->graph, encodeObj[1]->graph_parameter_index, (vx_reference*)&obj->encodeObj[1].encoded_image, 1, &num_refs);
-        }
-#endif
-
-    appPerfPointBegin(&obj->fileio_perf);
-
-    if(obj->write_enc_out == 1)
-    {
-        /* Write encoded data to file */
-        writeEncodeOutput(&obj->encodeObj[0]);
-        writeEncodeOutput(&obj->encodeObj[1]);
-    }
-
-    appPerfPointEnd(&obj->fileio_perf);
-
-#ifdef WRITE_ENCODED_BITSTREAMS
-    if(obj->enable_enc == 1)
-    {
-        /* Encode the buffer again */
-        vxGraphParameterEnqueueReadyRef(obj->graph, encodeObj[0]->graph_parameter_index, (vx_reference*)&encodeObj[0]->bitstream_obj, 1);
-
-        /* Encode the buffer again */
-        vxGraphParameterEnqueueReadyRef(obj->graph, encodeObj[1]->graph_parameter_index, (vx_reference*)&encodeObj[1]->bitstream_obj, 1);
-
-    }
-#endif
 
     if(obj->enable_capture == 1)
     {
@@ -1951,12 +1820,6 @@ static void update_post_proc_params(AppObj *obj, PostProcObj *postProcObj)
     }
 }
 
-static void set_encode_defaults(EncodeObj *encodeObj)
-{
-    encodeObj->inWidth = DISPLAY_WIDTH;
-    encodeObj->inHeight = DISPLAY_HEIGHT;
-}
-
 static void set_scaler_defaults(ScalerObj *scalerObj)
 {
 
@@ -1977,9 +1840,6 @@ static void app_default_param_set(AppObj *obj)
     set_pre_proc_defaults(&obj->preProcObj);
 
     set_post_proc_defaults(&obj->postProcObj);
-
-    set_encode_defaults(&obj->encodeObj[0]);
-    set_encode_defaults(&obj->encodeObj[1]);
 
     set_img_hist_defaults(&obj->imgHistObj);
 
@@ -2005,11 +1865,9 @@ static void app_default_param_set(AppObj *obj)
     obj->enable_mosaic    = 1;
     obj->enable_display   = 1;
     obj->enable_srv       = 1;
-    obj->enable_enc       = 1;
     obj->enable_hist      = 1;
     obj->enable_dof       = 1;
 
-    obj->write_enc_out    = 0;
     obj->pipeline_exec    = 1;
 
 }

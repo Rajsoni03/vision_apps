@@ -32,10 +32,6 @@ sdk_help:
 	# make remote_device_clean   # Clean remote device
 	# make remote_device_scrub   # Delete all generated files and folders in remote device
 	#
-	# make codec                 # Build video codec
-	# make codec_clean           # Clean video codec
-	# make codec_scrub           # Delete all generated files and folders in video codec
-	#
 	# make                       # Build vision apps
 	# make vision_apps           # Build vision apps
 	# make vision_apps_clean     # Clean vision apps

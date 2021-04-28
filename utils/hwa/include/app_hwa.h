@@ -96,7 +96,6 @@ int32_t appCsi2TxInit(void);
  */
 int32_t appVhwaVpacInit(void);
 int32_t appVhwaDmpacInit(void);
-int32_t appVhwaCodecInit(void);
 
 /** \brief Performs de-initializations needed for CSI2RX driver
  *
@@ -119,7 +118,6 @@ int32_t appFvid2DeInit(void);
  */
 int32_t appVhwaVpacDeInit(void);
 int32_t appVhwaDmpacDeInit(void);
-int32_t appVhwaCodecDeInit(void);
 
 /* @} */
 
