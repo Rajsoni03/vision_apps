@@ -69,15 +69,15 @@ static vx_status configure_viss_params(vx_context context, VISSObj *vissObj, Sen
     tivx_vpac_viss_params_init(&vissObj->params);
 
     vissObj->params.sensor_dcc_id    = sensorObj->sensorParams.dccId;
-    vissObj->params.ee_mode          = 0;
-    vissObj->params.mux_output0      = 0;
-    vissObj->params.mux_output1      = 0;
-    vissObj->params.mux_output2      = 4;
-    vissObj->params.mux_output3      = 0;
-    vissObj->params.mux_output4      = 3;
+    vissObj->params.fcp[0].ee_mode          = 0;
+    vissObj->params.fcp[0].mux_output0      = 0;
+    vissObj->params.fcp[0].mux_output1      = 0;
+    vissObj->params.fcp[0].mux_output2      = 4;
+    vissObj->params.fcp[0].mux_output3      = 0;
+    vissObj->params.fcp[0].mux_output4      = 3;
     vissObj->params.h3a_in           = 3;
     vissObj->params.h3a_aewb_af_mode = 0;
-    vissObj->params.chroma_mode      = 0;
+    vissObj->params.fcp[0].chroma_mode      = 0;
     vissObj->params.bypass_nsf4      = 0;
     vissObj->params.enable_ctx       = 1;
     if(sensorObj->sensor_wdr_enabled == 1)
@@ -343,7 +343,7 @@ vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_arra
                                 vissObj->dcc_config,
                                 raw_image, NULL, NULL,
                                 output_img, NULL, NULL,
-                                h3a_stats, NULL);
+                                h3a_stats, NULL, NULL, NULL);
 
     tivxReleaseRawImage(&raw_image);
     vxReleaseImage(&output_img);
@@ -355,8 +355,8 @@ vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_arra
         vxSetNodeTarget(vissObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_VISS1);
         vxSetReferenceName((vx_reference)vissObj->node, "viss_node");
 
-        vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e};
-        vxReplicateNode(graph, vissObj->node, replicate, 11);
+        vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
+        vxReplicateNode(graph, vissObj->node, replicate, 13);
 
         if(vissObj->en_out_viss_write == 1)
         {

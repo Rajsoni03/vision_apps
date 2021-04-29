@@ -315,15 +315,15 @@ void TestGraProcessingDcc(int32_t load, int32_t time)
         tivx_vpac_viss_params_init(&params);
 
         params.sensor_dcc_id = sensor_dcc_id;
-        params.ee_mode = TIVX_VPAC_VISS_EE_MODE_OFF;
-        params.mux_output0 = 0;
-        params.mux_output1 = 0;
-        params.mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
-        params.mux_output3 = 0;
-        params.mux_output4 = 3;
+        params.fcp[0].ee_mode = TIVX_VPAC_VISS_EE_MODE_OFF;
+        params.fcp[0].mux_output0 = 0;
+        params.fcp[0].mux_output1 = 0;
+        params.fcp[0].mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
+        params.fcp[0].mux_output3 = 0;
+        params.fcp[0].mux_output4 = 3;
         params.h3a_in = TIVX_VPAC_VISS_H3A_IN_LSC;
         params.h3a_aewb_af_mode = TIVX_VPAC_VISS_H3A_MODE_AEWB;
-        params.chroma_mode = TIVX_VPAC_VISS_CHROMA_MODE_420;
+        params.fcp[0].chroma_mode = TIVX_VPAC_VISS_CHROMA_MODE_420;
         params.bypass_glbce = 0;
         params.bypass_nsf4 = 0;
 
@@ -403,7 +403,7 @@ void TestGraProcessingDcc(int32_t load, int32_t time)
 
         node = tivxVpacVissNode(graph, configuration, ae_awb_result, dcc_param_viss,
             raw, y12, uv12_c1, y8_r8_c2, uv8_g8_c3, s8_b8_c4,
-            h3a_aew_af, histogram);
+            h3a_aew_af, histogram, NULL, NULL);
 
         vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_VPAC_VISS1);
 

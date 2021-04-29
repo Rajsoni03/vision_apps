@@ -460,24 +460,24 @@ int app_srv_calibration_main(int argc, char* argv[])
 
     if (VX_SUCCESS == status)
     {
-	    status = app_create_graph(obj);
-	    if (VX_SUCCESS == status)
-	    {
-	        APP_PRINTF("app_create_graph done\n");
-	        if(obj->is_interactive)
-	        {
-	            app_run_graph_interactive(obj);
-	        }
-	        else
-	        {
-	            app_run_graph(obj);
-	        }
-	        APP_PRINTF("app_run_graph done\n");
+        status = app_create_graph(obj);
+        if (VX_SUCCESS == status)
+        {
+            APP_PRINTF("app_create_graph done\n");
+            if(obj->is_interactive)
+            {
+                app_run_graph_interactive(obj);
+            }
+            else
+            {
+                app_run_graph(obj);
+            }
+            APP_PRINTF("app_run_graph done\n");
 
-	        status = appStopImageSensor(obj->sensor_name, 0xF);/*Mask = 0xF for 4 cameras*/
-	        app_delete_graph(obj);
-	        APP_PRINTF("app_delete_graph done\n");
-	    }
+            status = appStopImageSensor(obj->sensor_name, 0xF);/*Mask = 0xF for 4 cameras*/
+            app_delete_graph(obj);
+            APP_PRINTF("app_delete_graph done\n");
+        }
     }
     else
     {
@@ -673,13 +673,13 @@ static vx_status app_create_viss_aewb(SrvCalibAppObj *obj)
         vx_user_data_object h3a_aew_af_exemplar;
         vx_bool viss_prms_replicate[] =
             {vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e,
-             vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e};
+             vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
         vx_bool aewb_prms_replicate[] =
             {vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e};
 #else
         vx_bool viss_prms_replicate[] =
             {vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e,
-             vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e};
+             vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e};
 #endif
         vx_user_data_object aewb_config_exemplar;
 
@@ -783,16 +783,16 @@ static vx_status app_create_viss_aewb(SrvCalibAppObj *obj)
 
         viss_params.sensor_dcc_id = obj->cam_dcc_id;
         viss_params.use_case = 0;
-        viss_params.ee_mode = 0;
-        viss_params.mux_output0 = 0;
-        viss_params.mux_output1 = 0;
-        viss_params.mux_output2 = 4;
-        viss_params.mux_output3 = 0;
-        viss_params.mux_output4 = 3;
+        viss_params.fcp[0].ee_mode = 0;
+        viss_params.fcp[0].mux_output0 = 0;
+        viss_params.fcp[0].mux_output1 = 0;
+        viss_params.fcp[0].mux_output2 = 4;
+        viss_params.fcp[0].mux_output3 = 0;
+        viss_params.fcp[0].mux_output4 = 3;
         viss_params.bypass_nsf4 = 1;
         viss_params.h3a_in = 3;
         viss_params.h3a_aewb_af_mode = 0;
-        viss_params.chroma_mode = 0;
+        viss_params.fcp[0].chroma_mode = 0;
         viss_params.enable_ctx = 1;
         if(sensor_wdr_enabled == 1)
         {
@@ -934,7 +934,7 @@ static vx_status app_create_viss_aewb(SrvCalibAppObj *obj)
                              NULL,
                              NULL,
                              obj->h3a_aew_af,
-                             NULL);
+                             NULL, NULL, NULL);
         if (vxGetStatus((vx_reference)obj->vissNode) != VX_SUCCESS)
         {
             APP_PRINTF("vissNode create failed\n");
@@ -946,7 +946,7 @@ static vx_status app_create_viss_aewb(SrvCalibAppObj *obj)
         vxSetReferenceName((vx_reference)obj->vissNode, "VISS_Processing");
         vxSetNodeTarget(obj->vissNode, VX_TARGET_STRING,
             TIVX_TARGET_VPAC_VISS1);
-        vxReplicateNode(obj->graph, obj->vissNode, viss_prms_replicate, 11u);
+        vxReplicateNode(obj->graph, obj->vissNode, viss_prms_replicate, 13u);
 #ifdef _ENABLE_2A_
         obj->aewb_cfg.sensor_dcc_id = obj->cam_dcc_id;
         obj->aewb_cfg.sensor_img_format = 0;

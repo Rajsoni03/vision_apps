@@ -320,7 +320,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
         VX_CALL(tivxQueryRawImage(raw[0], TIVX_RAW_IMAGE_WIDTH, &width, sizeof(width)));
         VX_CALL(tivxQueryRawImage(raw[0], TIVX_RAW_IMAGE_HEIGHT, &height, sizeof(height)));
 
-        ASSERT_VX_OBJECT(viss_nv12_out_img = 
+        ASSERT_VX_OBJECT(viss_nv12_out_img =
             vxCreateImage(context, width, height,
             VX_DF_IMAGE_NV12), VX_TYPE_IMAGE);
 
@@ -331,16 +331,16 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
 
         params.sensor_dcc_id = 390;
         params.use_case = 0;
-        params.ee_mode = 0;
-        params.mux_output0 = 0;
-        params.mux_output1 = 0;
-        params.mux_output2 = 4;
-        params.mux_output3 = 0;
-        params.mux_output4 = 3;
+        params.fcp[0].ee_mode = 0;
+        params.fcp[0].mux_output0 = 0;
+        params.fcp[0].mux_output1 = 0;
+        params.fcp[0].mux_output2 = 4;
+        params.fcp[0].mux_output3 = 0;
+        params.fcp[0].mux_output4 = 3;
         params.bypass_nsf4 = 1;
         params.h3a_in = 3;
         params.h3a_aewb_af_mode = 0;
-        params.chroma_mode = 0;
+        params.fcp[0].chroma_mode = 0;
         params.bypass_glbce = 1;
 
         VX_CALL(vxCopyUserDataObject(configuration, 0, sizeof(tivx_vpac_viss_params_t), &params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
@@ -360,7 +360,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
         ASSERT_VX_OBJECT(vissNode = tivxVpacVissNode(graph, configuration,
                                                 (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, -1), NULL,
                                                 raw[0], NULL, NULL, viss_nv12_out_img, NULL, NULL,
-                                                h3a_aew_af, NULL), VX_TYPE_NODE);
+                                                h3a_aew_af, NULL, NULL, NULL), VX_TYPE_NODE);
         tivxSetNodeParameterNumBufByIndex(vissNode, 6u, NUM_BUFS);
         tivxSetNodeParameterNumBufByIndex(vissNode, 10u, NUM_BUFS);
 
@@ -551,7 +551,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
     tivx_ae_awb_params_t ae_awb_params;
     vx_bool viss_prms_replicate[] =
         {vx_false_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e,
-         vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e};
+         vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
     vx_bool aewb_prms_replicate[] =
         {vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_false_e};
 
@@ -611,7 +611,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
         ASSERT_VX_OBJECT(viss_out_frames = vxCreateObjectArray(context,
             (vx_reference)sample_nv12_img, NUM_CAPT_CHANNELS), VX_TYPE_OBJECT_ARRAY);
 
-        ASSERT_VX_OBJECT(viss_nv12_out_img = 
+        ASSERT_VX_OBJECT(viss_nv12_out_img =
             (vx_image)vxGetObjectArrayItem(viss_out_frames, 0), VX_TYPE_IMAGE);
 
         /* Sample image is no longer required */
@@ -624,16 +624,16 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
 
         params.sensor_dcc_id = 390;
         params.use_case = 0;
-        params.ee_mode = 0;
-        params.mux_output0 = 0;
-        params.mux_output1 = 0;
-        params.mux_output2 = 4;
-        params.mux_output3 = 0;
-        params.mux_output4 = 3;
+        params.fcp[0].ee_mode = 0;
+        params.fcp[0].mux_output0 = 0;
+        params.fcp[0].mux_output1 = 0;
+        params.fcp[0].mux_output2 = 4;
+        params.fcp[0].mux_output3 = 0;
+        params.fcp[0].mux_output4 = 3;
         params.bypass_nsf4 = 1;
         params.h3a_in = 3;
         params.h3a_aewb_af_mode = 0;
-        params.chroma_mode = 0;
+        params.fcp[0].chroma_mode = 0;
         params.bypass_glbce = 1;
 
         VX_CALL(vxCopyUserDataObject(configuration, 0, sizeof(tivx_vpac_viss_params_t), &params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
@@ -675,13 +675,13 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
         ASSERT_VX_OBJECT(vissNode = tivxVpacVissNode(graph, configuration,
                                                 (vx_user_data_object)tmp_user_data_object_1, NULL,
                                                 raw[0], NULL, NULL, viss_nv12_out_img, NULL, NULL,
-                                                h3a_aew_af, NULL), VX_TYPE_NODE);
+                                                h3a_aew_af, NULL, NULL, NULL), VX_TYPE_NODE);
         tivxSetNodeParameterNumBufByIndex(vissNode, 6u, NUM_BUFS);
 
         vxSetReferenceName((vx_reference)vissNode, "VISS_Processing");
         vxSetNodeTarget(vissNode, VX_TARGET_STRING,
             TIVX_TARGET_VPAC_VISS1);
-        vxReplicateNode(graph, vissNode, viss_prms_replicate, 11u);
+        vxReplicateNode(graph, vissNode, viss_prms_replicate, 13u);
 
         aewb_cfg.sensor_dcc_id = 390;
         aewb_cfg.sensor_img_format = 0;
@@ -886,7 +886,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
     tivx_ae_awb_params_t ae_awb_params;
     vx_bool viss_prms_replicate[] =
         {vx_false_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e,
-         vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e};
+         vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
     vx_bool aewb_prms_replicate[] =
         {vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_false_e};
 
@@ -946,7 +946,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
         ASSERT_VX_OBJECT(viss_out_frames = vxCreateObjectArray(context,
             (vx_reference)sample_nv12_img, NUM_CAPT_CHANNELS), VX_TYPE_OBJECT_ARRAY);
 
-        ASSERT_VX_OBJECT(viss_nv12_out_img = 
+        ASSERT_VX_OBJECT(viss_nv12_out_img =
             (vx_image)vxGetObjectArrayItem(viss_out_frames, 0), VX_TYPE_IMAGE);
 
         /* Sample image is no longer required */
@@ -959,16 +959,16 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
 
         params.sensor_dcc_id = 390;
         params.use_case = 0;
-        params.ee_mode = 0;
-        params.mux_output0 = 0;
-        params.mux_output1 = 0;
-        params.mux_output2 = 4;
-        params.mux_output3 = 0;
-        params.mux_output4 = 3;
+        params.fcp[0].ee_mode = 0;
+        params.fcp[0].mux_output0 = 0;
+        params.fcp[0].mux_output1 = 0;
+        params.fcp[0].mux_output2 = 4;
+        params.fcp[0].mux_output3 = 0;
+        params.fcp[0].mux_output4 = 3;
         params.bypass_nsf4 = 1;
         params.h3a_in = 3;
         params.h3a_aewb_af_mode = 0;
-        params.chroma_mode = 0;
+        params.fcp[0].chroma_mode = 0;
         params.bypass_glbce = 1;
 
         VX_CALL(vxCopyUserDataObject(configuration, 0, sizeof(tivx_vpac_viss_params_t), &params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
@@ -1010,13 +1010,13 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
         ASSERT_VX_OBJECT(vissNode = tivxVpacVissNode(graph, configuration,
                                                 (vx_user_data_object)tmp_user_data_object_1, NULL,
                                                 raw[0], NULL, NULL, viss_nv12_out_img, NULL, NULL,
-                                                NULL, NULL), VX_TYPE_NODE);
+                                                NULL, NULL, NULL, NULL), VX_TYPE_NODE);
         tivxSetNodeParameterNumBufByIndex(vissNode, 6u, NUM_BUFS);
 
         vxSetReferenceName((vx_reference)vissNode, "VISS_Processing");
         vxSetNodeTarget(vissNode, VX_TARGET_STRING,
             TIVX_TARGET_VPAC_VISS1);
-        vxReplicateNode(graph, vissNode, viss_prms_replicate, 11u);
+        vxReplicateNode(graph, vissNode, viss_prms_replicate, 13u);
 
         aewb_cfg.sensor_dcc_id = 390;
         aewb_cfg.sensor_img_format = 0;

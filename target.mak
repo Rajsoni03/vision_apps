@@ -90,6 +90,11 @@ endif
 
 ifeq ($(TARGET_PLATFORM),PC)
     SYSDEFS +=
+
+ifeq ($(BUILD_VPAC3),yes)
+    SYSDEFS += VPAC3
+endif
+
     SYSIDIRS += $(GCC_WINDOWS_ROOT)/include
     SYSLDIRS += $(GCC_WINDOWS_ROOT)/lib
     SYSIDIRS += $(VXLIB_PATH)/packages

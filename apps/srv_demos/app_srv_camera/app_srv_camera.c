@@ -1008,7 +1008,7 @@ static vx_status app_create_viss_aewb(AppObj *obj)
     vx_user_data_object ae_awb_result_exemplar;
     vx_bool viss_prms_replicate[] =
         {vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e,
-         vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e};
+         vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
     vx_bool aewb_prms_replicate[] =
         {vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e};
 
@@ -1123,23 +1123,23 @@ static vx_status app_create_viss_aewb(AppObj *obj)
 
     viss_params.sensor_dcc_id = obj->cam_dcc_id;
     viss_params.use_case = 0;
-    viss_params.ee_mode = 0;
-    viss_params.mux_output0 = 0;
-    viss_params.mux_output1 = 0;
+    viss_params.fcp[0].ee_mode = 0;
+    viss_params.fcp[0].mux_output0 = 0;
+    viss_params.fcp[0].mux_output1 = 0;
     if (0 == obj->is_enable_yuyv)
     {
-        viss_params.mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
+        viss_params.fcp[0].mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
     }
     else
     {
-        viss_params.mux_output2 = TIVX_VPAC_VISS_MUX2_YUV422;
+        viss_params.fcp[0].mux_output2 = TIVX_VPAC_VISS_MUX2_YUV422;
     }
-    viss_params.mux_output3 = 0;
-    viss_params.mux_output4 = 3;
+    viss_params.fcp[0].mux_output3 = 0;
+    viss_params.fcp[0].mux_output4 = 3;
     viss_params.bypass_nsf4 = 1;
     viss_params.h3a_in = 3;
     viss_params.h3a_aewb_af_mode = 0;
-    viss_params.chroma_mode = 0;
+    viss_params.fcp[0].chroma_mode = 0;
     viss_params.enable_ctx = 1;
     if(sensor_wdr_enabled == 1)
     {
@@ -1274,7 +1274,7 @@ static vx_status app_create_viss_aewb(AppObj *obj)
                          NULL,
                          NULL,
                          obj->h3a_aew_af,
-                         NULL);
+                         NULL, NULL, NULL);
     if (vxGetStatus((vx_reference)obj->vissNode) != VX_SUCCESS)
     {
         APP_PRINTF("vissNode create failed\n");
@@ -1287,7 +1287,7 @@ static vx_status app_create_viss_aewb(AppObj *obj)
     vxSetReferenceName((vx_reference)obj->vissNode, "VISS_Processing");
     vxSetNodeTarget(obj->vissNode, VX_TARGET_STRING,
         TIVX_TARGET_VPAC_VISS1);
-    vxReplicateNode(obj->graph, obj->vissNode, viss_prms_replicate, 11u);
+    vxReplicateNode(obj->graph, obj->vissNode, viss_prms_replicate, 13u);
     obj->aewb_cfg.sensor_dcc_id = obj->cam_dcc_id;
     obj->aewb_cfg.sensor_img_format = 0;
     obj->aewb_cfg.sensor_img_phase = 3;

@@ -161,10 +161,10 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
     imgaddr_width  = image_addr.dim_x;
     imgaddr_height = image_addr.dim_y;
     imgaddr_stride = image_addr.stride_y;
-    printf("imgaddr_width = %d \n", imgaddr_width);    
-    printf("imgaddr_height = %d \n", imgaddr_height);    
+    printf("imgaddr_width = %d \n", imgaddr_width);
+    printf("imgaddr_height = %d \n", imgaddr_height);
     printf("imgaddr_stride = %d \n", imgaddr_stride);
-    printf("width = %d \n", width);    
+    printf("width = %d \n", width);
     printf("height = %d \n", height);
 
     num_luma_bytes_written_to_file = 0;
@@ -191,26 +191,26 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
             VX_MEMORY_TYPE_HOST,
             VX_NOGAP_X
             );
-        
+
         if(!data_ptr2)
         {
             printf("data_ptr2 is NULL \n");
             return -1;
         }
-        
+
         imgaddr_width  = image_addr.dim_x;
         imgaddr_height = image_addr.dim_y;
         imgaddr_stride = image_addr.stride_y;
-        
+
         num_chroma_bytes_written_to_file = 0;
         for(i=0;i<imgaddr_height/2;i++)
         {
             num_chroma_bytes_written_to_file  += fwrite(data_ptr2, 1, imgaddr_width*num_bytes_per_pixel, fp);
             data_ptr2 += imgaddr_stride;
         }
-        
+
         fflush(fp);
-        
+
         vxUnmapImagePatch(out_image, map_id2);
     }
 
@@ -221,16 +221,16 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
 }
 
 vx_int32 write_output_image_yuv422_8bit(char * file_name, vx_image out_yuv)
-{    
-    FILE * fp = fopen(file_name, "wb");    
-    if(!fp)    
-    {        
-        APP_PRINTF("Unable to open file %s\n", file_name);        
-        return -1;    
-    }    
-    vx_uint32 len1 = write_output_image_fp(fp, out_yuv);    
-    fclose(fp);    
-    APP_PRINTF("%d bytes written to %s\n", len1, file_name);    
+{
+    FILE * fp = fopen(file_name, "wb");
+    if(!fp)
+    {
+        APP_PRINTF("Unable to open file %s\n", file_name);
+        return -1;
+    }
+    vx_uint32 len1 = write_output_image_fp(fp, out_yuv);
+    fclose(fp);
+    APP_PRINTF("%d bytes written to %s\n", len1, file_name);
     return len1;
 }
 
@@ -250,7 +250,7 @@ vx_int32 write_output_image_nv12_8bit(char * file_name, vx_image out_nv12)
 
 vx_int32 read_test_image_raw(char *raw_image_test_fname, tivx_raw_image raw_image, vx_uint32 test_mode)
 {
-	char raw_image_fname[MAX_FNAME] = {0};
+    char raw_image_fname[MAX_FNAME] = {0};
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = app_get_test_file_path();
     FILE * fp;
@@ -267,15 +267,15 @@ vx_int32 read_test_image_raw(char *raw_image_test_fname, tivx_raw_image raw_imag
     tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_WIDTH, &width, sizeof(vx_uint32));
     tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
     tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_FORMAT, &format, sizeof(format));
-	if(0==test_mode)
-	{
-		if(NULL == test_data_path)
-		{
-		    printf("Test data path is NULL. Defaulting to current folder \n");
-		    test_data_path = failsafe_test_data_path;
-		}
-		snprintf(raw_image_fname, MAX_FNAME, "%s/%s.raw", test_data_path, "img_test");
-	}
+    if(0==test_mode)
+    {
+        if(NULL == test_data_path)
+        {
+            printf("Test data path is NULL. Defaulting to current folder \n");
+            test_data_path = failsafe_test_data_path;
+        }
+        snprintf(raw_image_fname, MAX_FNAME, "%s/%s.raw", test_data_path, "img_test");
+    }
     else if(1==test_mode)
     {
         char test_data_paths[2][255] = {"psdkra/app_single_cam/IMX390_001/input2",
@@ -289,10 +289,10 @@ vx_int32 read_test_image_raw(char *raw_image_test_fname, tivx_raw_image raw_imag
     }
     else if(2==test_mode)
     {
-    	if(NULL != raw_image_test_fname)
-    	{
-			memcpy(raw_image_fname, raw_image_test_fname,MAX_FNAME);
-    	}
+        if(NULL != raw_image_test_fname)
+        {
+            memcpy(raw_image_fname, raw_image_test_fname,MAX_FNAME);
+        }
     }
 
     if (NULL != raw_image_fname)
@@ -331,9 +331,9 @@ vx_int32 read_test_image_raw(char *raw_image_test_fname, tivx_raw_image raw_imag
         imgaddr_height = image_addr.dim_y;
         imgaddr_stride = image_addr.stride_y;
 
-    	printf("imgaddr_width = %d \n", imgaddr_width);
-    	printf("imgaddr_height = %d \n", imgaddr_height);
-    	printf("imgaddr_stride = %d \n", imgaddr_stride);
+        printf("imgaddr_width = %d \n", imgaddr_width);
+        printf("imgaddr_height = %d \n", imgaddr_height);
+        printf("imgaddr_stride = %d \n", imgaddr_stride);
 
         for(i=0;i<imgaddr_height;i++)
         {
@@ -631,7 +631,7 @@ vx_status app_create_ldc(AppObj *obj, vx_image ldc_in_image)
                 NULL, obj->dcc_param_ldc, ldc_in_image,
                 obj->ldc_out, NULL);
     }
-	return status;
+    return status;
 }
 
 vx_status app_delete_ldc(AppObj *obj)
@@ -678,7 +678,7 @@ vx_status app_delete_ldc(AppObj *obj)
     {
         vxReleaseNode(&obj->node_ldc);
     }
-    
+
     return VX_SUCCESS;
 }
 
@@ -687,11 +687,11 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     vx_status status = VX_SUCCESS;
     vx_uint32 sensor_dcc_enabled = 1;
 
-	const vx_char dcc_viss_user_data_object_name[] = "dcc_viss";
-	uint8_t * dcc_viss_buf;
-	vx_map_id dcc_viss_buf_map_id;
-	unsigned int image_width;
-	unsigned int image_height;
+    const vx_char dcc_viss_user_data_object_name[] = "dcc_viss";
+    uint8_t * dcc_viss_buf;
+    vx_map_id dcc_viss_buf_map_id;
+    unsigned int image_width;
+    unsigned int image_height;
     int32_t dcc_buff_size = 0;
     int32_t dcc_buff_size_driver;
 
@@ -700,8 +700,8 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
 #endif
     vx_uint32 sensor_wdr_enabled = sensor_wdr_mode;
 
-	image_width = obj->width_in;
-	image_height = obj->height_in;
+    image_width = obj->width_in;
+    image_height = obj->height_in;
 
     obj->num_viss_out_buf = 3;
     obj->y8_r8_c2 = vxCreateImage(obj->context, image_width, image_height, VX_DF_IMAGE_NV12);
@@ -716,17 +716,17 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     tivx_vpac_viss_params_init(&obj->viss_params);
     obj->viss_params.sensor_dcc_id = obj->cam_dcc_id;
     printf("app_create_viss : sensor_dcc_id = %d \n", obj->viss_params.sensor_dcc_id);
-    obj->viss_params.ee_mode = 0;
-    obj->viss_params.mux_output0 = 0;
-    obj->viss_params.mux_output1 = 0;
-    obj->viss_params.mux_output2 = 4;
-    obj->viss_params.mux_output3 = 0;
-    obj->viss_params.mux_output4 = 3;
+    obj->viss_params.fcp[0].ee_mode = 0;
+    obj->viss_params.fcp[0].mux_output0 = 0;
+    obj->viss_params.fcp[0].mux_output1 = 0;
+    obj->viss_params.fcp[0].mux_output2 = 4;
+    obj->viss_params.fcp[0].mux_output3 = 0;
+    obj->viss_params.fcp[0].mux_output4 = 3;
     obj->viss_params.h3a_in = 3;
     obj->viss_params.h3a_aewb_af_mode = 0;
     obj->viss_params.channel_id = obj->selectedCam;
 
-    obj->viss_params.chroma_mode = 0;
+    obj->viss_params.fcp[0].chroma_mode = 0;
     if(sensor_wdr_enabled == 1)
     {
         obj->viss_params.bypass_glbce = 0;
@@ -817,10 +817,10 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
                                 obj->dcc_param_viss,
                                 obj->raw, NULL, NULL,
                                 obj->y8_r8_c2, NULL, NULL,
-                                obj->h3a_aew_af, NULL
+                                obj->h3a_aew_af, NULL, NULL, NULL
             );
 
-    vxSetReferenceName((vx_reference)obj->node_viss, "VISS_Processing");   
+    vxSetReferenceName((vx_reference)obj->node_viss, "VISS_Processing");
 
     return status;
 }
@@ -907,7 +907,7 @@ vx_status app_delete_viss(AppObj *obj)
         APP_PRINTF("releasing h3a_aew_af\n");
         status |= vxReleaseUserDataObject(&obj->h3a_aew_af);
     }
-    
+
     return status;
 }
 
@@ -921,9 +921,9 @@ vx_status app_create_aewb(AppObj *obj, uint32_t sensor_wdr_mode)
     int32_t dcc_buff_size_fs = 0;
 #endif
 
-	const vx_char dcc_2a_user_data_object_name[] = "dcc_2a";
-	uint8_t * dcc_2a_buf;
-	vx_map_id dcc_2a_buf_map_id;
+    const vx_char dcc_2a_user_data_object_name[] = "dcc_2a";
+    uint8_t * dcc_2a_buf;
+    vx_map_id dcc_2a_buf_map_id;
     vx_int32 sensor_dcc_enabled = 1;
 
     obj->aewb_cfg.sensor_dcc_id = obj->cam_dcc_id;
