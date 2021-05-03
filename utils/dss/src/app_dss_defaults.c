@@ -170,20 +170,27 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
     {
         appLogPrintf("DSS: ERROR: Dss init failed !!!\n");
     }
-    if (FVID2_SOK == retVal)
+
+    if (prm->display_type != APP_DSS_DEFAULT_DISPLAY_TYPE_M2M)
     {
-        retVal = appDctrlInit();
-        if(retVal!=FVID2_SOK)
+        /* Do not configure Overlay and VP in case of M2M
+           VP should not be configured in M2M node and
+           M2M Node will take care of configuring overlay. */
+        if (FVID2_SOK == retVal)
         {
-            appLogPrintf("DSS: ERROR: Dctrl init failed !!!\n");
+            retVal = appDctrlInit();
+            if(retVal!=FVID2_SOK)
+            {
+                appLogPrintf("DSS: ERROR: Dctrl init failed !!!\n");
+            }
         }
-    }
-    if (FVID2_SOK == retVal)
-    {
-        retVal = appDctrlDefaultInit(obj);
-        if(retVal!=FVID2_SOK)
+        if (FVID2_SOK == retVal)
         {
-            appLogPrintf("DSS: ERROR: Dctrl default init failed !!!\n");
+            retVal = appDctrlDefaultInit(obj);
+            if(retVal!=FVID2_SOK)
+            {
+                appLogPrintf("DSS: ERROR: Dctrl default init failed !!!\n");
+            }
         }
     }
 
