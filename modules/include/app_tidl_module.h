@@ -62,46 +62,131 @@
 #ifndef _APP_TIDL_MODULE
 #define _APP_TIDL_MODULE
 
+/**
+ * \defgroup group_vision_apps_modules_tidl TIDL Node Module
+ *
+ * \brief This section contains module APIs for the TIOVX TIDL node tivxTIDLNode
+ *
+ * \ingroup group_vision_apps_modules
+ *
+ * @{
+ */
+
 #include "app_modules.h"
 #include "itidl_ti.h"
 
+/** \brief Maximum number of TIDL tensors
+ *
+ */
 #define APP_MODULE_TIDL_MAX_TENSORS (8)
 
 typedef struct {
+  /*! TIDL node object */
   vx_node    node;
+
+  /*! TIDL kernel object */
   vx_kernel  kernel;
 
+  /*! TIDL config user data object */
   vx_user_data_object  config;
+
+  /*! TIDL network user data object */
   vx_user_data_object  network;
+
+  /*! TIDL create params user data object */
   vx_user_data_object  createParams;
 
+  /*! TIDL create params user data object */
   vx_object_array  in_args_arr;
+
+  /*! TIDL object array of output args */
   vx_object_array  out_args_arr;
 
+  /*! TIDL object array of trace data */
   vx_object_array trace_data_arr;
 
+  /*! TIDL object array of output tensors */
   vx_object_array  output_tensor_arr[APP_MODULE_TIDL_MAX_TENSORS];
 
+  /*! TIDL number of input tensors */
   vx_uint32 num_input_tensors;
+
+  /*! TIDL number of output tensors */
   vx_uint32 num_output_tensors;
 
+  /*! TIDL graph parameter index */
   vx_int32 graph_parameter_index;
 
+  /*! Config structure file path */
   vx_char config_file_path[APP_MODULES_MAX_FILE_PATH_SIZE];
+
+  /*! Network structure file path */
   vx_char network_file_path[APP_MODULES_MAX_FILE_PATH_SIZE];
 
+  /*! Name of TIDL module */
   vx_char objName[APP_MODULES_MAX_OBJ_NAME_SIZE];
 
+  /*! Config structure checksum */
   vx_uint8 config_checksum[TIVX_TIDL_J7_CHECKSUM_SIZE];
+
+  /*! Network structure checksum */
   vx_uint8 network_checksum[TIVX_TIDL_J7_CHECKSUM_SIZE];
 
 } TIDLObj;
 
+/** \brief TIDL module init helper function
+ *
+ * This TIDL init helper function will create all the data objects required to create the TIDL
+ * node
+ *
+ * \param [in]  context     OpenVX context which must be created using \ref vxCreateContext
+ * \param [out] obj         TIDL Module object which gets populated with TIDL node data objects
+ * \param [in]  objName     String of the name of this object
+ * \param [in]  num_cameras Number of cameras used by TIDL
+ *
+ */
 vx_status app_init_tidl(vx_context context, TIDLObj *obj, char *objName, vx_int32 num_cameras);
+
+/** \brief TIDL module deinit helper function
+ *
+ * This TIDL deinit helper function will release all the data objects created during the \ref app_init_tidl call
+ *
+ * \param [in,out] obj    TIDL Module object which contains TIDL node data objects which are released in this function
+ *
+ */
 void app_deinit_tidl(TIDLObj *obj);
+
+/** \brief TIDL module delete helper function
+ *
+ * This TIDL delete helper function will delete the TIDL node that is created during the \ref app_create_graph_tidl call
+ *
+ * \param [in,out] obj   TIDL Module object which contains TIDL node objects which are released in this function
+ *
+ */
 void app_delete_tidl(TIDLObj *obj);
+
+/** \brief TIDL module create helper function
+ *
+ * This TIDL create helper function will create the node using all the data objects created during the \ref app_init_tidl call.
+ *
+ * \param [in]     context           OpenVX context which must be created using \ref vxCreateContext
+ * \param [in]     graph             OpenVX graph that has been created using \ref vxCreateGraph and where the TIDL node is created
+ * \param [in,out] tidlObj           TIDL Module object which contains TIDL node which is created in this function
+ * \param [in,out] input_tensor_arr  Input tensors to TIDL node; must be created separately outside the TIDL module
+ *
+ */
 vx_status app_create_graph_tidl(vx_context context, vx_graph graph, TIDLObj *tidlObj, vx_object_array input_tensor_arr[]);
 
+/** \brief TIDL module write TIDL output helper function
+ *
+ * This TIDL helper function will write each element of the output_tensor_arr to file.
+ *
+ * \param [in]  file_name  Full path to file to write
+ * \param [in]  tidlObj    TIDL Module object which contains the output_tensor_arr which is written to file in this function
+ *
+ */
 vx_status writeTIDLOutput(char *file_name, TIDLObj *tidlObj);
+
+/* @} */
 
 #endif

@@ -62,31 +62,108 @@
 #ifndef _APP_IMG_MOSAIC_MODULE
 #define _APP_IMG_MOSAIC_MODULE
 
+/**
+ * \defgroup group_vision_apps_modules_mosaic MSC HW Mosaic Node Module
+ *
+ * \brief This section contains module APIs for the MSC HW Mosaic Node tivxImgMosaicNode
+ *
+ * \ingroup group_vision_apps_modules
+ *
+ * @{
+ */
+
 #include "app_modules.h"
 
+/** \brief HW Mosaic Module Data Structure
+ *
+ * Contains the data objects required to use tivxImgMosaicNode
+ *
+ */
 typedef struct {
+  /*! MSC HW Mosaic node object */
   vx_node  node;
+
+  /*! MSC HW Mosaic kernel object */
   vx_kernel kernel;
 
+  /*! MSC HW Mosaic node user data object for configuration of node */
   vx_user_data_object config;
+
+  /*! Mosaic node params structure to initialize config object */
   tivxImgMosaicParams params;
 
+  /*! Input object array to mosaic node */
   vx_object_array input_arr[TIVX_IMG_MOSAIC_MAX_INPUTS];
 
+  /*! Buffer array of output images of mosaic node */
   vx_image output_image[APP_MODULES_MAX_OBJ_NAME_SIZE];
 
+  /*! Mosaic node graph parameter index */
   vx_int32 graph_parameter_index;
 
+  /*! Width of mosaic node output image */
   vx_int32 out_width;
+
+  /*! Height of mosaic node output image */
   vx_int32 out_height;
+
+  /*! Total number of inputs to mosaic node */
   vx_int32 num_inputs;
 
 } ImgMosaicObj;
 
+/** \brief Mosaic module init helper function
+ *
+ * This mosaic init helper function will create all the data objects required to create the mosaic
+ * node
+ *
+ * \param [in]  context      OpenVX context which must be created using \ref vxCreateContext
+ * \param [out] imgMosaicObj Mosaic Module object which gets populated with mosaic node data objects
+ * \param [in]  objName      String of the name of this object
+ * \param [in]  bufq_depth   Mosaic output buffer queue depth
+ *
+ */
 vx_status app_init_img_mosaic(vx_context context, ImgMosaicObj *imgMosaicObj, char *objName, vx_int32 bufq_depth);
+
+/** \brief Mosaic module deinit helper function
+ *
+ * This mosaic deinit helper function will release all the data objects created during the \ref app_init_img_mosaic call
+ *
+ * \param [in,out] imgMosaicObj  Mosaic Module object which contains mosaic node data objects which are released in this function
+ * \param [in]     bufq_depth    Mosaic output buffer queue depth
+ *
+ */
 void app_deinit_img_mosaic(ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth);
+
+/** \brief Mosaic module delete helper function
+ *
+ * This mosaic delete helper function will delete the mosaic node that is created during the \ref app_create_graph_img_mosaic call
+ *
+ * \param [in,out] imgMosaicObj   Mosaic Module object which contains mosaic node objects which are released in this function
+ *
+ */
 void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj);
+
+/** \brief Mosaic module create helper function
+ *
+ * This mosaic create helper function will create the node using all the data objects created during the \ref app_init_img_mosaic call.
+ *
+ * \param [in]     graph         OpenVX graph that has been created using \ref vxCreateGraph and where the mosaic node is created
+ * \param [in,out] imgMosaicObj  Mosaic Module object which contains mosaic node which is created in this function
+ *
+ */
 vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj);
 
+/** \brief Mosaic module write image helper function
+ *
+ * This mosaic helper function will write the contents of the provided image to the path provided in the file_name argument
+ *
+ * \param [in] file_name  String of file path for where this output will be written
+ * \param [in] out_img    Output image to write to file
+ *
+ */
 vx_status writeMosaicOutput(char* file_name, vx_image out_img);
+
+/* @} */
+
 #endif

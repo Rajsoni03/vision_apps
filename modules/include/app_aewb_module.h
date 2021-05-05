@@ -62,29 +62,93 @@
 #ifndef _APP_AEWB_MODULE
 #define _APP_AEWB_MODULE
 
+/**
+ * \defgroup group_vision_apps_modules_aewb AEWB Node Module
+ *
+ * \brief This section contains module APIs for the AEWB node tivxAewbNode
+ *
+ * \ingroup group_vision_apps_modules
+ *
+ * @{
+ */
+
 #include <TI/j7_imaging_aewb.h>
 
 #include "app_modules.h"
 #include "app_sensor_module.h"
 
+/** \brief AEWB Module Data Structure
+ *
+ * Contains the data objects required to use tivxAewbNode
+ *
+ */
 typedef struct {
+    /*! AEWB node object */
     vx_node node;
 
+    /*! AEWB node config param object array */
     vx_object_array config_arr;
+
+    /*! AEWB node params structure to initialize config object */
     tivx_aewb_config_t params;
 
+    /*! AEWB DCC config user data object */
     vx_user_data_object dcc_config;
 
+    /*! AEWB histogram object array */
     vx_object_array histogram_arr;
 
+    /*! AEWB output object array */
     vx_object_array aewb_output_arr;
 
+    /*! AEWB module object name */
     vx_char objName[APP_MODULES_MAX_OBJ_NAME_SIZE];
 }AEWBObj;
 
+/** \brief AEWB module init helper function
+ *
+ * This AEWB init helper function will create all the data objects required to create the AEWB
+ * node
+ *
+ * \param [in]  context    OpenVX context which must be created using \ref vxCreateContext
+ * \param [out] aewbObj    AEWB Module object which gets populated with AEWB node data objects
+ * \param [in]  sensorObj  Sensor Module object used to initialize AEWB data object parameters;
+ *                         must be initialized prior to passing to this function
+ * \param [in]  objName    String of the name of this object
+ *
+ */
 vx_status app_init_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, char *objName);
+
+/** \brief AEWB module deinit helper function
+ *
+ * This AEWB deinit helper function will release all the data objects created during the \ref app_init_aewb call
+ *
+ * \param [in,out] aewbObj    AEWB Module object which contains AEWB node data objects which are released in this function
+ *
+ */
 void app_deinit_aewb(AEWBObj *aewbObj);
+
+/** \brief AEWB module delete helper function
+ *
+ * This AEWB delete helper function will delete the AEWB node that is created during the \ref app_create_graph_aewb call
+ *
+ * \param [in,out] aewbObj   AEWB Module object which contains AEWB node objects which are released in this function
+ *
+ */
 void app_delete_aewb(AEWBObj *aewbObj);
+
+
+/** \brief AEWB module create helper function
+ *
+ * This AEWB create helper function will create the node using the data objects created during the \ref app_init_aewb call.
+ *
+ * \param [in]     graph          OpenVX graph that has been created using \ref vxCreateGraph and where the AEWB node is created
+ * \param [in,out] aewbObj        AEWB Module object which contains AEWB node which is created in this function
+ * \param [in]     h3a_stats_arr  Object array of H3A stats; must already have been created prior to passing to this function
+ *
+ */
 vx_status app_create_graph_aewb(vx_graph graph, AEWBObj *aewbObj, vx_object_array h3a_stats_arr);
+
+/* @} */
 
 #endif

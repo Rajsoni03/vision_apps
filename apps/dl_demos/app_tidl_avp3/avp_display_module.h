@@ -85,6 +85,5 @@ vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *obj
 void app_deinit_display(DisplayObj *displayObj);
 void app_delete_display(DisplayObj *displayObj);
 vx_status app_create_graph_display(vx_graph graph, DisplayObj *scalerObj, vx_image disp_image);
-vx_status app_update_display_image(DisplayObj *displayObj, vx_image image);
 
 #endif
