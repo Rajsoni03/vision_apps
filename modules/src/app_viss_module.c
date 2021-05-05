@@ -96,6 +96,10 @@ static vx_status configure_viss_params(vx_context context, VISSObj *vissObj, Sen
     {
         printf("[VISS-MODULE] Unable to create VISS config object! \n");
     }
+    else
+    {
+        vxSetReferenceName((vx_reference)vissObj->config, "viss_node_config");
+    }
 
     return status;
 }
@@ -122,6 +126,8 @@ static vx_status configure_dcc_params(vx_context context, VISSObj *vissObj, Sens
 
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)vissObj->dcc_config, "viss_node_dcc_config");
+
             vxMapUserDataObject(
                     vissObj->dcc_config,
                     0,
@@ -174,6 +180,10 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
             printf("[VISS-MODULE] Unable to create h3a stats object array! \n");
             return status;
         }
+        else
+        {
+            vxSetReferenceName((vx_reference)vissObj->h3a_stats_arr, "viss_node_h3a_stats_arr");
+        }
     }
     else
     {
@@ -200,6 +210,10 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
                 printf("[VISS-MODULE] Unable to create VISS output image array! \n");
                 return status;
             }
+            else
+            {
+                vxSetReferenceName((vx_reference)vissObj->output_arr, "viss_node_output_arr");
+            }
         }
         else
         {
@@ -219,6 +233,7 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
         status = vxGetStatus((vx_reference)vissObj->file_path);
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)vissObj->file_path, "viss_write_node_file_path");
             vxAddArrayItems(vissObj->file_path, TIVX_FILEIO_FILE_PATH_LENGTH, &file_path[0], 1);
         }
         else
@@ -232,6 +247,7 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
         status = vxGetStatus((vx_reference)vissObj->img_file_prefix);
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)vissObj->img_file_prefix, "viss_write_node_img_file_prefix");
             vxAddArrayItems(vissObj->img_file_prefix, TIVX_FILEIO_FILE_PREFIX_LENGTH, &file_prefix[0], 1);
         }
         else
@@ -256,6 +272,10 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
         if(status != VX_SUCCESS)
         {
             printf("[VISS-MODULE] Unable to create fileio write cmd object for VISS node! \n");
+        }
+        else
+        {
+            vxSetReferenceName((vx_reference)vissObj->write_cmd, "viss_write_node_write_cmd");
         }
     }
     else

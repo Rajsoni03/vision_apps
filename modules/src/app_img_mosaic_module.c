@@ -71,6 +71,8 @@ static vx_status configure_params(vx_context context, ImgMosaicObj *imgMosaicObj
 
     if(status == VX_SUCCESS)
     {
+        vxSetReferenceName((vx_reference)imgMosaicObj->config, "mosaic_node_config");
+
         status = vxCopyUserDataObject(imgMosaicObj->config, 0, sizeof(tivxImgMosaicParams),\
                     &imgMosaicObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
         if(status != VX_SUCCESS)
@@ -120,6 +122,14 @@ static vx_status create_output_image(vx_context context, ImgMosaicObj *imgMosaic
         {
             printf("[SW-MOSAIC-MODULE] Unable to create output image of size %d x %d!\n", imgMosaicObj->out_width, imgMosaicObj->out_height);
             break;
+        }
+        else
+        {
+            vx_char name[VX_MAX_REFERENCE_NAME];
+
+            snprintf(name, VX_MAX_REFERENCE_NAME, "mosaic_node_output_image_%d", q);
+
+            vxSetReferenceName((vx_reference)imgMosaicObj->output_image[q], name);
         }
     }
 

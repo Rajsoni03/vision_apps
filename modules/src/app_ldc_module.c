@@ -84,6 +84,8 @@ static vx_status configure_dcc_params(vx_context context, LDCObj *ldcObj, Sensor
 
             if(status == VX_SUCCESS)
             {
+                vxSetReferenceName((vx_reference)ldcObj->dcc_config, "ldc_node_dcc_config");
+
                 vxMapUserDataObject(
                         ldcObj->dcc_config, 0,
                         dcc_buff_size,
@@ -129,6 +131,8 @@ static vx_status configure_mesh_params(vx_context context, LDCObj *ldcObj, Senso
 
     if(status == VX_SUCCESS)
     {
+        vxSetReferenceName((vx_reference)ldcObj->mesh_img, "ldc_node_mesh_img");
+
         /* Copy Mesh table */
         rect.start_x = 0;
         rect.start_y = 0;
@@ -162,6 +166,8 @@ static vx_status configure_mesh_params(vx_context context, LDCObj *ldcObj, Senso
 
             if(status == VX_SUCCESS)
             {
+                vxSetReferenceName((vx_reference)ldcObj->mesh_config, "ldc_node_mesh_config");
+
                 status = vxCopyUserDataObject(ldcObj->mesh_config, 0,
                                     sizeof(tivx_vpac_ldc_mesh_params_t),
                                     &ldcObj->mesh_params,
@@ -204,6 +210,8 @@ static vx_status configure_region_params(vx_context context, LDCObj *ldcObj, Sen
 
     if(status == VX_SUCCESS)
     {
+        vxSetReferenceName((vx_reference)ldcObj->region_config, "ldc_node_region_config");
+
         status = vxCopyUserDataObject(ldcObj->region_config, 0,
                             sizeof(tivx_vpac_ldc_region_params_t),
                             &ldcObj->region_params,
@@ -236,6 +244,8 @@ static vx_status configure_ldc_params(vx_context context, LDCObj *ldcObj, Sensor
 
     if(status == VX_SUCCESS)
     {
+        vxSetReferenceName((vx_reference)ldcObj->config, "ldc_node_config");
+
         status = vxCopyUserDataObject(ldcObj->config, 0,
                             sizeof(tivx_vpac_ldc_params_t),
                             &ldcObj->params,
@@ -271,6 +281,10 @@ static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorOb
         {
             printf("[LDC-MODULE] Unable to create output image array! \n");
         }
+        else
+        {
+            vxSetReferenceName((vx_reference)ldcObj->output_arr, "ldc_node_output_arr");
+        }
     }
     else
     {
@@ -287,6 +301,8 @@ static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorOb
         status = vxGetStatus((vx_reference)ldcObj->file_path);
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)ldcObj->file_path, "ldc_write_node_file_path");
+
             vxAddArrayItems(ldcObj->file_path, TIVX_FILEIO_FILE_PATH_LENGTH, &file_path[0], 1);
         }
         else
@@ -299,6 +315,8 @@ static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorOb
         status = vxGetStatus((vx_reference)ldcObj->file_prefix);
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)ldcObj->file_prefix, "ldc_write_node_file_prefix");
+
             vxAddArrayItems(ldcObj->file_prefix, TIVX_FILEIO_FILE_PREFIX_LENGTH, &file_prefix[0], 1);
         }
         else
@@ -311,6 +329,10 @@ static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorOb
         if(status != VX_SUCCESS)
         {
             printf("[LDC-MODULE] Unable to create file write cmd object! \n");
+        }
+        else
+        {
+            vxSetReferenceName((vx_reference)ldcObj->write_cmd, "ldc_write_node_write_cmd");
         }
     }
     else

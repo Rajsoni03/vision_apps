@@ -89,6 +89,11 @@ vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *obj
 
             displayObj->disp_params_obj = vxCreateUserDataObject(context, "tivx_display_params_t", sizeof(tivx_display_params_t), &displayObj->disp_params);
             status = vxGetStatus((vx_reference)displayObj->disp_params_obj);
+
+            if(VX_SUCCESS == status)
+            {
+                vxSetReferenceName((vx_reference)displayObj->disp_params_obj, "display_node_disp_params_obj");
+            }
         }
     }
 

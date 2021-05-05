@@ -122,6 +122,10 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     {
         printf("[CAPTURE_MODULE] - Unable to create capture config object! \n");
     }
+    else
+    {
+        vxSetReferenceName((vx_reference)captureObj->config, "capture_node_config");
+    }
 
     return status;
 }
@@ -149,6 +153,14 @@ static vx_status create_capture_output(vx_context context, CaptureObj *captureOb
                     printf("[CAPTURE-MODULE] Unable to create RAW image object array! \n");
                     break;
                 }
+                else
+                {
+                    vx_char name[VX_MAX_REFERENCE_NAME];
+
+                    snprintf(name, VX_MAX_REFERENCE_NAME, "capture_node_raw_image_arr_%d", q);
+
+                    vxSetReferenceName((vx_reference)captureObj->raw_image_arr[q], name);
+                }
             }
             tivxReleaseRawImage(&raw_image);
         }
@@ -172,6 +184,14 @@ static vx_status create_capture_output(vx_context context, CaptureObj *captureOb
                 {
                     printf("[CAPTURE-MODULE] Unable to create YUV image object array! \n");
                     break;
+                }
+                else
+                {
+                    vx_char name[VX_MAX_REFERENCE_NAME];
+
+                    snprintf(name, VX_MAX_REFERENCE_NAME, "capture_node_raw_image_arr_%d", q);
+
+                    vxSetReferenceName((vx_reference)captureObj->raw_image_arr[q], name);
                 }
             }
             vxReleaseImage(&cap_yuv_image);
@@ -259,6 +279,8 @@ static vx_status create_error_detection_frame(vx_context context, CaptureObj *ca
 
             if(status == VX_SUCCESS)
             {
+                vxSetReferenceName((vx_reference)captureObj->error_frame_raw_image, "capture_node_error_frame_raw_image");
+
                 status = tivxMapRawImagePatch((tivx_raw_image)captureObj->error_frame_raw_image, &rect, 0, &map_id, &image_addr, &data_ptr, VX_READ_ONLY, VX_MEMORY_TYPE_HOST, TIVX_RAW_IMAGE_ALLOC_BUFFER);
 
                 if ((vx_status)VX_SUCCESS == status)
@@ -295,6 +317,8 @@ static vx_status configure_capture_output_write(vx_context context, CaptureObj *
 
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)captureObj->file_path, "capture_write_node_file_path");
+
             vxAddArrayItems(captureObj->file_path, TIVX_FILEIO_FILE_PATH_LENGTH, &file_path[0], 1);
         }
         else
@@ -309,6 +333,8 @@ static vx_status configure_capture_output_write(vx_context context, CaptureObj *
 
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)captureObj->file_prefix, "capture_write_node_file_prefix");
+
             vxAddArrayItems(captureObj->file_prefix, TIVX_FILEIO_FILE_PREFIX_LENGTH, &file_prefix[0], 1);
         }
         else
@@ -323,6 +349,10 @@ static vx_status configure_capture_output_write(vx_context context, CaptureObj *
         if(status != VX_SUCCESS)
         {
             printf("[CAPTURE-MODULE] Unable to create file write cmd object for writing capture output! \n");
+        }
+        else
+        {
+            vxSetReferenceName((vx_reference)captureObj->write_cmd, "capture_write_node_write_cmd");
         }
     }
     else

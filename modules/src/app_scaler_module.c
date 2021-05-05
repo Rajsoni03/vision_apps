@@ -78,6 +78,8 @@ static vx_status configure_scaler_coeffs(vx_context context, ScalerObj *scalerOb
 
     if(status == VX_SUCCESS)
     {
+        vxSetReferenceName((vx_reference)scalerObj->coeff_obj, "scaler_node_coeff_obj");
+
         status = vxCopyUserDataObject(scalerObj->coeff_obj, 0,
                                     sizeof(tivx_vpac_msc_coefficients_t),
                                     &coeffs,
@@ -140,6 +142,14 @@ static vx_status create_scaler_outputs(vx_context context, ScalerObj *scalerObj)
                 printf("[SCALER-MODULE] Unable to create output array! \n");
                 break;
             }
+            else
+            {
+                vx_char name[VX_MAX_REFERENCE_NAME];
+
+                snprintf(name, VX_MAX_REFERENCE_NAME, "scaler_node_output_arr_%d", idx);
+
+                vxSetReferenceName((vx_reference)scalerObj->output[idx].arr, name);
+            }
         }
         else
         {
@@ -156,6 +166,8 @@ static vx_status create_scaler_outputs(vx_context context, ScalerObj *scalerObj)
         status = vxGetStatus((vx_reference)scalerObj->file_path);
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)scalerObj->file_path, "scaler_write_node_file_path");
+
             vxAddArrayItems(scalerObj->file_path, TIVX_FILEIO_FILE_PATH_LENGTH, &file_path[0], 1);
         }
         else
@@ -172,6 +184,12 @@ static vx_status create_scaler_outputs(vx_context context, ScalerObj *scalerObj)
             status = vxGetStatus((vx_reference)scalerObj->file_prefix[idx]);
             if(status == VX_SUCCESS)
             {
+                vx_char name[VX_MAX_REFERENCE_NAME];
+
+                snprintf(name, VX_MAX_REFERENCE_NAME, "scaler_write_node_file_prefix_%d", idx);
+
+                vxSetReferenceName((vx_reference)scalerObj->file_prefix[idx], name);
+
                 vxAddArrayItems(scalerObj->file_prefix[idx], TIVX_FILEIO_FILE_PREFIX_LENGTH, &file_prefix[0], 1);
             }
             else
@@ -181,9 +199,17 @@ static vx_status create_scaler_outputs(vx_context context, ScalerObj *scalerObj)
 
             scalerObj->write_cmd[idx] = vxCreateUserDataObject(context, "tivxFileIOWriteCmd", sizeof(tivxFileIOWriteCmd), NULL);
             status = vxGetStatus((vx_reference)scalerObj->write_cmd[idx]);
-            if(status == VX_SUCCESS)
+            if(status != VX_SUCCESS)
             {
                 printf("[SCALER-MODULE] Unable to create write cmd object for output %d!\n", idx);
+            }
+            else
+            {
+                vx_char name[VX_MAX_REFERENCE_NAME];
+
+                snprintf(name, VX_MAX_REFERENCE_NAME, "scaler_write_node_write_cmd_%d", idx);
+
+                vxSetReferenceName((vx_reference)scalerObj->write_cmd[idx], name);
             }
         }
 
@@ -316,7 +342,7 @@ vx_status app_create_graph_scaler(vx_context context, vx_graph graph, ScalerObj 
     if(status == VX_SUCCESS)
     {
         vxSetNodeTarget(scalerObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
-        vxSetReferenceName((vx_reference)scalerObj->node, "ScalerNode");
+        vxSetReferenceName((vx_reference)scalerObj->node, "scaler_node");
 
         vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e};
 

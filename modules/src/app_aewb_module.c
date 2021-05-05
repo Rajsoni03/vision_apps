@@ -83,6 +83,8 @@ static vx_status configure_dcc(vx_context context, AEWBObj *aewbObj, SensorObj *
 
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)aewbObj->dcc_config, "aewb_node_dcc_config");
+
             vxMapUserDataObject(
                 aewbObj->dcc_config,
                 0,
@@ -152,6 +154,8 @@ static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj 
 
         if(status == VX_SUCCESS)
         {
+            vxSetReferenceName((vx_reference)aewbObj->config_arr, "aewb_node_config_arr");
+
             for(ch = 0; ch < sensorObj->num_cameras_enabled; ch++)
             {
                 vx_user_data_object config = (vx_user_data_object)vxGetObjectArrayItem(aewbObj->config_arr, ch);
@@ -183,6 +187,10 @@ static vx_status create_histogram(vx_context context, AEWBObj *aewbObj, SensorOb
         {
             printf("[AEWB_MODULE] Unable to create Histogram object array! \n");
         }
+        else
+        {
+            vxSetReferenceName((vx_reference)aewbObj->histogram_arr, "aewb_node_histogram_arr");
+        }
         vxReleaseDistribution(&histogram);
     }
     else
@@ -206,6 +214,10 @@ static vx_status create_aewb_output(vx_context context, AEWBObj *aewbObj, Sensor
         if(status != VX_SUCCESS)
         {
             printf("[AEWB_MODULE] Unable to create AEWB output object array! \n");
+        }
+        else
+        {
+            vxSetReferenceName((vx_reference)aewbObj->aewb_output_arr, "aewb_node_aewb_output_arr");
         }
         vxReleaseUserDataObject(&aewb_output);
     }

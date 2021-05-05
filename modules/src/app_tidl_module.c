@@ -125,6 +125,8 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, char *objName, vx_
          tidlObj->in_args_arr  = vxCreateObjectArray(context, (vx_reference)inArgs, num_cameras);
          vxReleaseUserDataObject(&inArgs);
 
+         vxSetReferenceName((vx_reference)tidlObj->in_args_arr, "tidl_node_in_args_arr");
+
          for(i = 0; i < num_cameras; i++)
          {
             vx_user_data_object inArgs;
@@ -143,6 +145,8 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, char *objName, vx_
          outArgs = vxCreateUserDataObject(context, "TIDL_outArgs", capacity, NULL );
          tidlObj->out_args_arr  = vxCreateObjectArray(context, (vx_reference)outArgs, num_cameras);
          vxReleaseUserDataObject(&outArgs);
+
+         vxSetReferenceName((vx_reference)tidlObj->out_args_arr, "tidl_node_out_args_arr");
 
          for(i = 0; i < num_cameras; i++)
          {
@@ -164,6 +168,7 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, char *objName, vx_
      for(i = 0; i < num_output_tensors; i++)
      {
          tidlObj->output_tensor_arr[i]  = vxCreateObjectArray(context, (vx_reference)output_tensors[i], num_cameras);
+         vxSetReferenceName((vx_reference)tidlObj->output_tensor_arr[i], "tidl_node_output_tensor_arr");
          vxReleaseTensor(&output_tensors[i]);
      }
 
@@ -258,7 +263,7 @@ vx_status app_create_graph_tidl(vx_context context, vx_graph graph, TIDLObj *tid
 
     tidlObj->node = tivxTIDLNode(graph, tidlObj->kernel, params, input_tensor, output_tensor);
     status = vxGetStatus((vx_reference)tidlObj->node);
-    vxSetReferenceName((vx_reference)tidlObj->node, "TIDLNode");
+    vxSetReferenceName((vx_reference)tidlObj->node, "tidl_node");
 
     vx_bool replicate[16];
     replicate[TIVX_KERNEL_TIDL_IN_CONFIG_IDX] = vx_false_e;
@@ -421,6 +426,8 @@ static vx_user_data_object readConfig(vx_context context, vx_char *config_file, 
 
         if (VX_SUCCESS == status)
         {
+            vxSetReferenceName((vx_reference)config, "tidl_node_config");
+
             vxMapUserDataObject(config, 0, sizeof(tivxTIDLJ7Params), &map_id,
                             (void **)&tidlParams, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST, 0);
 
@@ -486,6 +493,8 @@ static vx_user_data_object readNetwork(vx_context context, vx_char *network_file
 
     if (VX_SUCCESS == status)
     {
+        vxSetReferenceName((vx_reference)network, "tidl_node_network");
+
         vxMapUserDataObject(network, 0, capacity, &map_id,
                         (void **)&network_buffer, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST, 0);
 
@@ -559,6 +568,8 @@ static vx_status setCreateParams(vx_context context, vx_user_data_object createP
 
     if(VX_SUCCESS == status)
     {
+        vxSetReferenceName((vx_reference)createParams, "tidl_node_createParams");
+
         capacity = sizeof(TIDL_CreateParams);
         vxMapUserDataObject(createParams, 0, capacity, &map_id,
               (void **)&createParams_buffer, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST, 0);
@@ -666,12 +677,17 @@ static void createOutputTensors(vx_context context, vx_user_data_object config, 
 
     ioBufDesc = (sTIDL_IOBufDesc_t *)&tidlParams->ioBufDesc;
     for(id = 0; id < ioBufDesc->numOutputBuf; id++) {
+        vx_char name[VX_MAX_REFERENCE_NAME];
+
+        snprintf(name, VX_MAX_REFERENCE_NAME, "tidl_node_output_tensors_%d", id);
+
         output_sizes[0] = ioBufDesc->outWidth[id]  + ioBufDesc->outPadL[id] + ioBufDesc->outPadR[id];
         output_sizes[1] = ioBufDesc->outHeight[id] + ioBufDesc->outPadT[id] + ioBufDesc->outPadB[id];
         output_sizes[2] = ioBufDesc->outNumChannels[id];
 
         vx_enum data_type = get_vx_tensor_datatype(ioBufDesc->outElementType[id]);
         output_tensors[id] = vxCreateTensor(context, 3, output_sizes, data_type, 0);
+        vxSetReferenceName((vx_reference)output_tensors[id], name);
     }
 
   vxUnmapUserDataObject(config, map_id_config);
