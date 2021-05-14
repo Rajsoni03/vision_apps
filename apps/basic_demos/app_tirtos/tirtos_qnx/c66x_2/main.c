@@ -64,9 +64,8 @@
 #include <utils/console_io/include/app_log.h>
 #include <stdio.h>
 #include <string.h>
-#include <xdc/runtime/Error.h>
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
+#include <ti/osal/osal.h>
+#include <ti/osal/TaskP.h>
 #include <ti/sysbios/family/c66/Cache.h>
 #include <ti/drv/sciclient/sciclient.h>
 #include <app_ipc_rsctable.h>
@@ -78,7 +77,7 @@ void _system_post_cinit(void)
 {
 }
 
-static Void appMain(UArg arg0, UArg arg1)
+static void appMain(void* arg0, void* arg1)
 {
     appInit();
     appTimerInterruptInit();
@@ -108,9 +107,8 @@ __attribute__ ((aligned(8192)))
 
 int main(void)
 {
-    Task_Params tskParams;
-    Error_Block eb;
-    Task_Handle task;
+    TaskP_Params tskParams;
+    TaskP_Handle task;
 
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
@@ -118,20 +116,16 @@ int main(void)
     /* set cache, non-cache sections for C6x */
     appCacheMarInit();
 
-    Error_init(&eb);
-    Task_Params_init(&tskParams);
-
-    tskParams.arg0 = (UArg) NULL;
-    tskParams.arg1 = (UArg) NULL;
+    TaskP_Params_init(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;
-    tskParams.stackSize = sizeof (gTskStackMain);
-    task = Task_create(appMain, &tskParams, &eb);
+    tskParams.stacksize = sizeof (gTskStackMain);
+    task = TaskP_create(appMain, &tskParams);
     if(NULL == task)
     {
-        BIOS_exit(0);
+        OS_stop();
     }
-    BIOS_start();
+    OS_start();
 
     return 0;
 }
@@ -185,4 +179,6 @@ void appTimerInterruptInit(void)
     }
 #endif
 
+    return;
 }
+

@@ -65,9 +65,6 @@
 #include <app_run.h>
 #include <stdio.h>
 #include <string.h>
-#include <xdc/runtime/Error.h>
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/mmc_sd/include/app_mmc_sd.h>

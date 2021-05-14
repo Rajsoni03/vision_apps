@@ -66,6 +66,7 @@
 #include <xdc/runtime/IHeap.h>
 #include <xdc/runtime/Error.h>
 #include <xdc/runtime/Memory.h>
+#include <ti/osal/MemoryP.h>
 #include <ti/osal/HwiP.h>
 #include <ti/osal/CacheP.h>
 #include <utils/console_io/include/app_log.h>

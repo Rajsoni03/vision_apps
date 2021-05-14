@@ -65,9 +65,8 @@
 #include <utils/misc/include/app_misc.h>
 #include <stdio.h>
 #include <string.h>
-#include <xdc/runtime/Error.h>
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
+#include <ti/osal/osal.h>
+#include <ti/osal/TaskP.h>
 #include <ti/sysbios/family/c7x/Hwi.h>
 #include <ti/sysbios/family/c7x/Cache.h>
 #include <app_mem_map.h>
@@ -80,7 +79,7 @@
 #define DDR_C7X_1_LOCAL_HEAP_VADDR (DDR_C7X_1_LOCAL_HEAP_ADDR)
 #define DDR_C7X_1_LOCAL_HEAP_PADDR (0x880000000u)
 
-static Void appMain(UArg arg0, UArg arg1)
+static void appMain(void* arg0, void* arg1)
 {
     appInit();
     appRun();
@@ -152,28 +151,23 @@ void setup_dru_qos(void)
 
 int main(void)
 {
-    Task_Params tskParams;
-    Error_Block eb;
-    Task_Handle task;
+    TaskP_Params tskParams;
+    TaskP_Handle task;
 
     setup_dru_qos();
 
     appTimerInterruptInit();
 
-    Error_init(&eb);
-    Task_Params_init(&tskParams);
-
-    tskParams.arg0 = (UArg) NULL;
-    tskParams.arg1 = (UArg) NULL;
+    TaskP_Params_init(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;
-    tskParams.stackSize = sizeof (gTskStackMain);
-    task = Task_create(appMain, &tskParams, &eb);
+    tskParams.stacksize = sizeof (gTskStackMain);
+    task = TaskP_create(appMain, &tskParams);
     if(NULL == task)
     {
-        BIOS_exit(0);
+        OS_stop();
     }
-    BIOS_start();
+    OS_start();
 
     return 0;
 }

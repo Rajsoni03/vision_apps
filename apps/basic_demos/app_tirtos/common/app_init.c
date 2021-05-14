@@ -66,13 +66,7 @@
 #include <app.h>
 #include <stdio.h>
 #include <string.h>
-
-/* XDC header files */
-#include <xdc/runtime/Error.h>
-
-/* BIOS header files */
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
+#include <ti/csl/csl_types.h>
 
 /* Vision_apps utils header files */
 #include <utils/mem/include/app_mem.h>
