@@ -39,12 +39,10 @@
 #include <stdint.h>
 #include <string.h>
 
-/* BIOS Header files */
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
-
 #include <ti/drv/ipc/ipc.h>
+#include <ti/osal/osal.h>
 #include <ti/osal/SemaphoreP.h>
+#include <ti/osal/TaskP.h>
 
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
@@ -192,7 +190,7 @@ static void appIpcEchoTestStatusShow()
  * This "Task" waits for a "ping" message from any processor
  * then replies with a "pong" message.
  */
-static void rpmsg_responderFxn(UArg arg0, UArg arg1)
+static void rpmsg_responderFxn(void* arg0, void* arg1)
 {
     RPMessage_Handle    handle;
     RPMessage_Params    params;
@@ -283,7 +281,7 @@ static void rpmsg_responderFxn(UArg arg0, UArg arg1)
     //RPMessage_delete(&handle);
 }
 
-static void rpmsg_senderFxn(UArg arg0, UArg arg1)
+static void rpmsg_senderFxn(uintptr_t arg0, uintptr_t arg1)
 {
     RPMessage_Handle    handle;
     RPMessage_Params    params;
@@ -298,8 +296,8 @@ static void rpmsg_senderFxn(UArg arg0, UArg arg1)
     char                buf[MSGSIZE];
     uint8_t            *buf1;
 
-    dstProc = arg0;
-    appDstProcId = arg1;
+    dstProc = (uint16_t)arg0;
+    appDstProcId = (uint32_t)arg1;
 
     buf1 = &g_sendBuf[RPMSG_DATA_SIZE * appDstProcId];
 
@@ -323,7 +321,7 @@ static void rpmsg_senderFxn(UArg arg0, UArg arg1)
     }
 
     status = RPMessage_getRemoteEndPt(dstProc, SERVICE, &remoteProcId,
-                             &remoteEndPt, BIOS_WAIT_FOREVER);
+                             &remoteEndPt, SemaphoreP_WAIT_FOREVER);
 
     if(dstProc != remoteProcId)
     {
@@ -404,11 +402,11 @@ static void rpmsg_senderFxn(UArg arg0, UArg arg1)
 int32_t appIpcEchoTestStart(void)
 {
     uint32_t          cpu_id;
-    Task_Params       params;
+    TaskP_Params      params;
     uint32_t          numProc = APP_IPC_CPU_MAX;
     int32_t status = 0;
     SemaphoreP_Params semParams;
-    Task_Handle rx_task, tx_task[APP_IPC_CPU_MAX];
+    TaskP_Handle rx_task, tx_task[APP_IPC_CPU_MAX];
 
     appLogPrintf("IPC: Starting echo test ...\n");
 
@@ -434,16 +432,16 @@ int32_t appIpcEchoTestStart(void)
         #endif
 
         /* Respond to messages coming in to endPt ENDPT1 */
-        Task_Params_init(&params);
+        TaskP_Params_init(&params);
         params.priority = 3;
-        params.stackSize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
+        params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
         params.arg0 = 0;
-        params.instance->name = &g_rpmsg_responder_task_name[0];
+        params.name = (uint8_t*)&g_rpmsg_responder_task_name[0];
 
         strncpy(g_rpmsg_responder_task_name, "IPC_TEST_RX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
         g_rpmsg_responder_task_name[APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
 
-        rx_task = Task_create(rpmsg_responderFxn, &params, NULL);
+        rx_task = TaskP_create(rpmsg_responderFxn, &params);
         if(rx_task==NULL)
         {
             appLogPrintf("IPC: ERROR: Failed to create RX task !!!\n");
@@ -465,18 +463,18 @@ int32_t appIpcEchoTestStart(void)
                     appLogPrintf("IPC: SendTask%d: Creating ...\n", ipc_lld_cpu_id);
                     #endif
                     /* send messages to peer(s) on ENDPT1 */
-                    Task_Params_init(&params);
+                    TaskP_Params_init(&params);
                     params.priority = 3;
                     params.stack     = g_taskStackBuf[cpu_id];
-                    params.stackSize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
-                    params.arg0     = ipc_lld_cpu_id;
-                    params.arg1     = cpu_id;
-                    params.instance->name = &g_rpmsg_sender_task_name[cpu_id][0];
+                    params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
+                    params.arg0     = (void*)ipc_lld_cpu_id;
+                    params.arg1     = (void*)cpu_id;
+                    params.name     = (uint8_t*)&g_rpmsg_sender_task_name[cpu_id][0];
 
                     strncpy(g_rpmsg_sender_task_name[cpu_id], "IPC_TEST_TX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
                     g_rpmsg_sender_task_name[cpu_id][APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
 
-                    tx_task[cpu_id] = Task_create(rpmsg_senderFxn, &params, NULL);
+                    tx_task[cpu_id] = TaskP_create(rpmsg_senderFxn, &params);
                     if(tx_task[cpu_id]==NULL)
                     {
                         appLogPrintf("IPC: ERROR: Failed to create TX task %d !!!\n", cpu_id);
