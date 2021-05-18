@@ -66,9 +66,10 @@
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/mem/include/app_mem.h>
 #include <ti/sysbios/utils/Load.h>
-#include <ti/osal/HwiP.h>
 #include <ti/sysbios/knl/Task.h>
+#include <ti/osal/HwiP.h>
 #include <ti/osal/SemaphoreP.h>
+#include <ti/osal/TaskP.h>
 #include "app_perf_stats_priv.h"
 
 #define APP_PERF_DDR_MHZ                (1866u)  /* DDR clock speed in MHZ */
@@ -400,7 +401,7 @@ int32_t appPerfStatsDeInit()
     return 0;
 }
 
-void appPerfStatsTaskLoadUpdate(Task_Handle task, app_perf_stats_load_t *load)
+void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
 {
     Load_Stat rtos_load_stat;
 
@@ -430,14 +431,14 @@ void appPerfStatsHwiSwiLoadUpdate(uint32_t is_hwi, app_perf_stats_load_t *load)
 void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
 {
     uint32_t i;
-    Task_Handle task;
+    TaskP_Handle task;
 
     task = Task_getIdleTaskHandle(0u);
     appPerfStatsTaskLoadUpdate(task, &obj->idleLoad);
 
     for(i=0; i< obj->num_tasks; i++)
     {
-        appPerfStatsTaskLoadUpdate((Task_Handle)obj->task_handle[i], &obj->taskLoad[i]);
+        appPerfStatsTaskLoadUpdate((TaskP_Handle)obj->task_handle[i], &obj->taskLoad[i]);
     }
 }
 
