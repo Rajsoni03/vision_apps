@@ -60,7 +60,7 @@
  *
  */
 
-#include <ti/sysbios/BIOS.h>
+#include <ti/osal/osal.h>
 
 void appUtilsSetDLFOBitInACTRLReg(void)
 {
