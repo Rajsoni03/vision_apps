@@ -120,7 +120,7 @@ static int32_t EthApp_initEthFw(void);
 
 void appEthFwEarlyInit()
 {
-    Semaphore_Params semParams;
+    SemaphoreP_Params semParams;
 
     /* Create semaphore used to synchronize EthFw and NDK init.
      * EthFw opens the CPSW driver which is required by NDK during NIMU
@@ -128,9 +128,9 @@ void appEthFwEarlyInit()
      * Currently, there is no control over NDK initialization time and its
      * task runs right away after BIOS_start() hence causing a race
      * condition with EthFw init */
-    Semaphore_Params_init(&semParams);
-    semParams.mode = Semaphore_Mode_BINARY;
-    gEthAppObj.hInitSem = Semaphore_create(0, &semParams, NULL);
+    SemaphoreP_Params_init(&semParams);
+    semParams.mode = SemaphoreP_Mode_BINARY;
+    gEthAppObj.hInitSem = SemaphoreP_create(0, &semParams);
 }
 
 int32_t appEthFwInit()
@@ -246,7 +246,7 @@ static int32_t EthApp_initEthFw(void)
     }
 
     /* Post semaphore so that NDK/NIMU can continue with their initialization */
-    Semaphore_post(gEthAppObj.hInitSem); /* need to create this */
+    SemaphoreP_post(gEthAppObj.hInitSem); /* need to create this */
 
     return status;
 }
@@ -273,7 +273,7 @@ void NimuEnetAppCb_getHandle(NimuEnetAppIf_GetHandleInArgs *inArgs,
                              NimuEnetAppIf_GetHandleOutArgs *outArgs)
 {
     /* Wait for EthFw to be initialized */
-    Semaphore_pend(gEthAppObj.hInitSem, BIOS_WAIT_FOREVER);
+    SemaphoreP_pend(gEthAppObj.hInitSem, SemaphoreP_WAIT_FOREVER);
 
     EthFwCallbacks_nimuCpswGetHandle(inArgs, outArgs);
 

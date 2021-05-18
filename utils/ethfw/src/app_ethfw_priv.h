@@ -70,16 +70,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-/* XDCtools Header files */
-#include <xdc/std.h>
-#include <xdc/runtime/System.h>
-#include <xdc/runtime/Error.h>
-
-/* BIOS Header files */
-#include <ti/sysbios/BIOS.h>
-#include <ti/sysbios/knl/Task.h>
-#include <ti/sysbios/knl/Clock.h>
-#include <ti/sysbios/knl/Semaphore.h>
+/* OSAL Header files */
+#include <ti/osal/osal.h>
+#include <ti/osal/SemaphoreP.h>
 
 /* PDK Driver Header files */
 #include <ti/drv/ipc/ipc.h>
@@ -129,7 +122,7 @@ typedef struct
     Udma_DrvHandle hUdmaDrv;
 
     /* Semaphore for synchronizing EthFw and NDK initialization */
-    Semaphore_Handle hInitSem;
+    SemaphoreP_Handle hInitSem;
 
     /* Host MAC address */
     uint8_t hostMacAddr[ENET_MAC_ADDR_LEN];
