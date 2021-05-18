@@ -123,15 +123,15 @@ uint64_t appLogGetGlobalTimeInUsec()
 
 uint64_t appLogGetLocalTimeInUsec()
 {
-    Types_Timestamp64 bios_timestamp64;
-    Types_FreqHz bios_freq;
+    Types_Timestamp64 rtos_timestamp64;
+    Types_FreqHz rtos_freq;
     uint64_t cur_ts, freq;
 
-    Timestamp_get64(&bios_timestamp64);
-    Timestamp_getFreq(&bios_freq);
+    Timestamp_get64(&rtos_timestamp64);
+    Timestamp_getFreq(&rtos_freq);
 
-    cur_ts = ((uint64_t) bios_timestamp64.hi << 32) | bios_timestamp64.lo;
-    freq = ((uint64_t) bios_freq.hi << 32) | bios_freq.lo; /* in units of HZ */
+    cur_ts = ((uint64_t) rtos_timestamp64.hi << 32) | rtos_timestamp64.lo;
+    freq = ((uint64_t) rtos_freq.hi << 32) | rtos_freq.lo; /* in units of HZ */
     freq = freq / 1000000u; /* in units of MHZ */
 
     return cur_ts/freq; /* in units of usecs */
@@ -204,24 +204,24 @@ void appLogWaitMsecs(uint32_t time_in_msecs)
 
 int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm)
 {
-    TaskP_Params bios_task_prms;
+    TaskP_Params rtos_task_prms;
     int32_t status = 0;
 
-    TaskP_Params_init(&bios_task_prms);
+    TaskP_Params_init(&rtos_task_prms);
 
-    bios_task_prms.stacksize = obj->task_stack_size;
-    bios_task_prms.stack = obj->task_stack;
-    bios_task_prms.priority = prm->log_rd_task_pri;
-    bios_task_prms.arg0 = (void*)(obj);
-    bios_task_prms.arg1 = NULL;
-    bios_task_prms.name = (uint8_t*)&obj->task_name[0];
+    rtos_task_prms.stacksize = obj->task_stack_size;
+    rtos_task_prms.stack = obj->task_stack;
+    rtos_task_prms.priority = prm->log_rd_task_pri;
+    rtos_task_prms.arg0 = (void*)(obj);
+    rtos_task_prms.arg1 = NULL;
+    rtos_task_prms.name = (uint8_t*)&obj->task_name[0];
 
     strncpy(obj->task_name, "LOG_RD", APP_LOG_MAX_TASK_NAME);
     obj->task_name[APP_LOG_MAX_TASK_NAME-1] = 0;
 
     obj->task_handle = (void*)TaskP_create(
                             (void*)appLogRdRun,
-                            &bios_task_prms);
+                            &rtos_task_prms);
     if(obj->task_handle==NULL)
     {
         status = -1;
@@ -235,10 +235,10 @@ int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm)
 
 void *appMemMap(void *phys_ptr, uint32_t size)
 {
-    return phys_ptr; /* phys == virtual in sysbios */
+    return phys_ptr; /* phys == virtual in rtos */
 }
 
 int32_t appMemUnMap(void *virt_ptr, uint32_t size)
 {
-    return 0; /* nothing to do in sysbios */
+    return 0; /* nothing to do in rtos */
 }

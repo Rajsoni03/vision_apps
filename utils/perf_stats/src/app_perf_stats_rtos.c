@@ -374,7 +374,7 @@ int32_t appPerfStatsInit()
     }
     if(status==0)
     {
-        /* now enable load calculation in appPerfStatsBiosLoadUpdate */
+        /* now enable load calculation in appPerfStatsRtosLoadUpdate */
         g_perf_stats_load_update_enable = 1;
     }
 
@@ -402,29 +402,29 @@ int32_t appPerfStatsDeInit()
 
 void appPerfStatsTaskLoadUpdate(Task_Handle task, app_perf_stats_load_t *load)
 {
-    Load_Stat bios_load_stat;
+    Load_Stat rtos_load_stat;
 
-    Load_getTaskLoad(task, &bios_load_stat);
+    Load_getTaskLoad(task, &rtos_load_stat);
 
-    load->total_time += bios_load_stat.totalTime;
-    load->thread_time += bios_load_stat.threadTime;
+    load->total_time += rtos_load_stat.totalTime;
+    load->thread_time += rtos_load_stat.threadTime;
 }
 
 void appPerfStatsHwiSwiLoadUpdate(uint32_t is_hwi, app_perf_stats_load_t *load)
 {
-    Load_Stat bios_load_stat;
+    Load_Stat rtos_load_stat;
 
     if(is_hwi)
     {
-        Load_getGlobalHwiLoad(&bios_load_stat);
+        Load_getGlobalHwiLoad(&rtos_load_stat);
     }
     else
     {
-        Load_getGlobalSwiLoad(&bios_load_stat);
+        Load_getGlobalSwiLoad(&rtos_load_stat);
     }
 
-    load->total_time += bios_load_stat.totalTime;
-    load->thread_time += bios_load_stat.threadTime;
+    load->total_time += rtos_load_stat.totalTime;
+    load->thread_time += rtos_load_stat.threadTime;
 }
 
 void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
@@ -441,7 +441,7 @@ void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
     }
 }
 
-void appPerfStatsBiosLoadUpdate(void)
+void appPerfStatsRtosLoadUpdate(void)
 {
     app_perf_stats_obj_t *obj = &g_app_perf_stats_obj;
 

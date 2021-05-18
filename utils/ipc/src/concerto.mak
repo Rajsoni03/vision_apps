@@ -5,7 +5,7 @@ TARGET      := app_utils_ipc
 TARGETTYPE  := library
 
 ifeq ($(TARGET_OS),SYSBIOS)
-CSOURCES    := app_ipc_sysbios.c app_ipc_sysbios_echo_test.c
+CSOURCES    := app_ipc_rtos.c app_ipc_rtos_echo_test.c
 endif
 
 ifeq ($(TARGET_OS),LINUX)

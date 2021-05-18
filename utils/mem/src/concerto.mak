@@ -5,7 +5,7 @@ TARGET      := app_utils_mem
 TARGETTYPE  := library
 
 ifeq ($(TARGET_OS),SYSBIOS)
-CSOURCES    := app_mem_sysbios.c
+CSOURCES    := app_mem_rtos.c
 
 endif
 

@@ -93,8 +93,8 @@ extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
 typedef struct {
 
     uint16_t is_valid;
-    HeapMem_Struct bios_heap_struct;
-    IHeap_Handle bios_heap_handle;
+    HeapMem_Struct rtos_heap_struct;
+    IHeap_Handle rtos_heap_handle;
     uint32_t alloc_offset;
     app_mem_heap_prm_t heap_prm;
 
@@ -143,7 +143,7 @@ int32_t appMemInit(app_mem_init_prm_t *prm)
 
         heap_obj->is_valid = 0;
         heap_obj->alloc_offset = 0;
-        heap_obj->bios_heap_handle = NULL;
+        heap_obj->rtos_heap_handle = NULL;
 
         if( (heap_prm->base == NULL) || (heap_prm->size == 0))
         {
@@ -160,27 +160,27 @@ int32_t appMemInit(app_mem_init_prm_t *prm)
 
             if( (heap_prm->flags & APP_MEM_HEAP_FLAGS_TYPE_LINEAR_ALLOCATE))
             {
-                /* no BIOS heap, linear allocator based on offset */
+                /* no rtos heap, linear allocator based on offset */
                 heap_obj->alloc_offset = 0;
             }
             else
             {
-                /* create a BIOS heap */
-                HeapMem_Params bios_heap_prm;
+                /* create a rtos heap */
+                HeapMem_Params rtos_heap_prm;
 
-                HeapMem_Params_init(&bios_heap_prm);
-                bios_heap_prm.buf = APP_MEM_ALIGNPTR(
+                HeapMem_Params_init(&rtos_heap_prm);
+                rtos_heap_prm.buf = APP_MEM_ALIGNPTR(
                     heap_prm->base, APP_MEM_ALIGN_MIN_BYTES);
-                bios_heap_prm.size = APP_MEM_ALIGN32(
+                rtos_heap_prm.size = APP_MEM_ALIGN32(
                     heap_prm->size, APP_MEM_ALIGN_MIN_BYTES);
 
-                HeapMem_construct(&heap_obj->bios_heap_struct, &bios_heap_prm);
+                HeapMem_construct(&heap_obj->rtos_heap_struct, &rtos_heap_prm);
 
-                heap_prm->base   = bios_heap_prm.buf;
-                heap_prm->size   = bios_heap_prm.size;
+                heap_prm->base   = rtos_heap_prm.buf;
+                heap_prm->size   = rtos_heap_prm.size;
 
-                heap_obj->bios_heap_handle = HeapMem_Handle_upCast(
-                            HeapMem_handle(&heap_obj->bios_heap_struct)
+                heap_obj->rtos_heap_handle = HeapMem_Handle_upCast(
+                            HeapMem_handle(&heap_obj->rtos_heap_struct)
                                 );
             }
             appLogPrintf("MEM: Created heap (%s, id=%d, flags=0x%08x) @ %p of size %d bytes !!!\n",
@@ -211,14 +211,14 @@ int32_t appMemDeInit()
 
         if(heap_obj->is_valid)
         {
-            if(heap_obj->bios_heap_handle != NULL)
+            if(heap_obj->rtos_heap_handle != NULL)
             {
-                HeapMem_destruct(&heap_obj->bios_heap_struct);
+                HeapMem_destruct(&heap_obj->rtos_heap_struct);
             }
 
             heap_obj->is_valid = 0;
             heap_obj->alloc_offset = 0;
-            heap_obj->bios_heap_handle = NULL;
+            heap_obj->rtos_heap_handle = NULL;
         }
     }
 
@@ -267,7 +267,7 @@ void    *appMemAlloc(uint32_t heap_id, uint32_t size, uint32_t align)
             }
             else
             {
-                if(heap_obj->bios_heap_handle!=NULL)
+                if(heap_obj->rtos_heap_handle!=NULL)
                 {
                     Error_Block eb;
 
@@ -276,7 +276,7 @@ void    *appMemAlloc(uint32_t heap_id, uint32_t size, uint32_t align)
                     size  = APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES);
                     align = APP_MEM_ALIGN32(align, APP_MEM_ALIGN_MIN_BYTES);
 
-                    ptr = Memory_alloc(heap_obj->bios_heap_handle,
+                    ptr = Memory_alloc(heap_obj->rtos_heap_handle,
                                size,
                                align,
                                &eb);
@@ -367,7 +367,7 @@ int32_t appMemFree(uint32_t heap_id, void *ptr, uint32_t size)
             }
             else
             {
-                if(heap_obj->bios_heap_handle!=NULL && ptr != NULL && size != 0)
+                if(heap_obj->rtos_heap_handle!=NULL && ptr != NULL && size != 0)
                 {
                     size  = APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES);
 
@@ -380,7 +380,7 @@ int32_t appMemFree(uint32_t heap_id, void *ptr, uint32_t size)
                     appLogPrintf("MEM: Freeing %d bytes @ 0x%08x\n", size, (uint32_t)(uintptr_t)ptr);
                     #endif
 
-                    Memory_free(heap_obj->bios_heap_handle,
+                    Memory_free(heap_obj->rtos_heap_handle,
                         ptr,
                         size);
 
@@ -431,13 +431,13 @@ int32_t appMemStats(uint32_t heap_id, app_mem_stats_t *stats)
             }
             else
             {
-                if(heap_obj->bios_heap_handle!=NULL)
+                if(heap_obj->rtos_heap_handle!=NULL)
                 {
-                    Memory_Stats bios_heap_stats;
+                    Memory_Stats rtos_heap_stats;
 
-                    Memory_getStats(heap_obj->bios_heap_handle, &bios_heap_stats);
+                    Memory_getStats(heap_obj->rtos_heap_handle, &rtos_heap_stats);
 
-                    stats->free_size = bios_heap_stats.totalFreeSize;
+                    stats->free_size = rtos_heap_stats.totalFreeSize;
 
                     status = 0;
                 }
@@ -504,7 +504,7 @@ void  appMemCacheWbInv(void *ptr, uint32_t size)
 
 uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 {
-    /* For Bios implementation, virtual and shared pointers are same
+    /* For rtos implementation, virtual and shared pointers are same
      */
 #ifdef C71
     uint64_t physPtr;
@@ -520,7 +520,7 @@ uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 
 uint32_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 {
-   /* For Bios implementation, dmaBufFd is not valid and just return 0
+   /* For rtos implementation, dmaBufFd is not valid and just return 0
      */
     *dmaBufFdOffset = 0;
     return (uint32_t)(-1);
@@ -528,13 +528,13 @@ uint32_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 
 int32_t appMemTranslateDmaBufFd(uint32_t dmaBufFd, uint32_t size, uint64_t *virtPtr, uint64_t *phyPtr)
 {
-    /* For Bios implementation, dmaBufFd is not valid and just return -1. */
+    /* For rtos implementation, dmaBufFd is not valid and just return -1. */
     return -1;
 }
 
 void appMemCloseDmaBufFd(int32_t dmaBufFd)
 {
-   /* For Bios implementation, dmaBufFd is not valid and just return 0
+   /* For rtos implementation, dmaBufFd is not valid and just return 0
      */
     return;
 }

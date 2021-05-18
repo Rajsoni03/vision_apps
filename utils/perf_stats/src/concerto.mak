@@ -18,7 +18,7 @@ TARGET      := app_utils_perf_stats
 TARGETTYPE  := library
 
 ifeq ($(TARGET_OS),SYSBIOS)
-CSOURCES    := app_perf_stats_sysbios.c
+CSOURCES    := app_perf_stats_rtos.c
 endif
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))

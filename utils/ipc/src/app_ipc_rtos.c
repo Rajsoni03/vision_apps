@@ -240,24 +240,24 @@ static void appIpcRpmsgRxTaskMain(void *arg0, void *arg1)
 
 static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
 {
-    TaskP_Params bios_task_prms;
+    TaskP_Params rtos_task_prms;
     int32_t status = 0;
 
-    TaskP_Params_init(&bios_task_prms);
+    TaskP_Params_init(&rtos_task_prms);
 
-    bios_task_prms.stacksize = obj->task_stack_size;
-    bios_task_prms.stack = obj->task_stack;
-    bios_task_prms.priority = obj->task_pri;
-    bios_task_prms.arg0 = NULL;
-    bios_task_prms.arg1 = NULL;
-    bios_task_prms.name = (uint8_t*)&obj->task_name[0];
+    rtos_task_prms.stacksize = obj->task_stack_size;
+    rtos_task_prms.stack = obj->task_stack;
+    rtos_task_prms.priority = obj->task_pri;
+    rtos_task_prms.arg0 = NULL;
+    rtos_task_prms.arg1 = NULL;
+    rtos_task_prms.name = (uint8_t*)&obj->task_name[0];
 
     strncpy(obj->task_name, "IPC_RX", APP_IPC_MAX_TASK_NAME);
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
 
     obj->task_handle = (void*)TaskP_create(
                             (void*)appIpcRpmsgRxTaskMain,
-                            &bios_task_prms);
+                            &rtos_task_prms);
     if(obj->task_handle==NULL)
     {
         appLogPrintf("IPC: ERROR: Unable to create RX task \n");

@@ -39,7 +39,7 @@ PTK_LIBS += ptk_base
 SYS_STATIC_LIBS += $(PTK_LIBS)
 
 TIOVX_LIBS =
-TIOVX_LIBS += vx_framework vx_platform_psdk_j7_bios vx_kernels_target_utils
+TIOVX_LIBS += vx_framework vx_platform_psdk_j7_rtos vx_kernels_target_utils
 TIOVX_LIBS += vx_target_kernels_openvx_core
 TIOVX_LIBS += vx_target_kernels_tutorial
 TIOVX_LIBS += vx_target_kernels_c66
