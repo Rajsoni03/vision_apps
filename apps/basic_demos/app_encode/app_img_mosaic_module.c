@@ -62,168 +62,243 @@
 
 #include "app_img_mosaic_module.h"
 
+static vx_status configure_params(vx_context context, ImgMosaicObj *imgMosaicObj)
+{
+    vx_status status = VX_SUCCESS;
+
+    imgMosaicObj->config = vxCreateUserDataObject(context, "ImgMosaicConfig", sizeof(tivxImgMosaicParams), NULL);
+    status = vxGetStatus((vx_reference)imgMosaicObj->config);
+
+    if(status == VX_SUCCESS)
+    {
+        vxSetReferenceName((vx_reference)imgMosaicObj->config, "mosaic_node_config");
+
+        status = vxCopyUserDataObject(imgMosaicObj->config, 0, sizeof(tivxImgMosaicParams),\
+                    &imgMosaicObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
+        if(status != VX_SUCCESS)
+        {
+            printf("[SW-MOSAIC-MODULE] Unable to copy mosaic params! \n");
+        }
+    }
+    else
+    {
+        printf("[SW-MOSAIC-MODULE] Unable to create config object! \n");
+    }
+
+    return status;
+}
+
+static vx_status create_sw_mosaic_kernel(vx_context context, ImgMosaicObj *imgMosaicObj)
+{
+    vx_status status = VX_SUCCESS;
+    vx_int32 i;
+
+    for(i = 0; i < TIVX_IMG_MOSAIC_MAX_INPUTS; i++)
+    {
+        imgMosaicObj->input_arr[i] = NULL;
+    }
+
+    imgMosaicObj->kernel = tivxAddKernelImgMosaic(context, imgMosaicObj->num_inputs);
+    status = vxGetStatus((vx_reference)imgMosaicObj->kernel);
+
+    if(status != VX_SUCCESS)
+    {
+        printf("[SW-MOSAIC-MODULE] Unable to create kernel with %d inputs!\n", imgMosaicObj->num_inputs);
+    }
+
+    return status;
+}
+
+static vx_status create_output_image(vx_context context, ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth)
+{
+    vx_status status = VX_SUCCESS;
+    vx_int32 q;
+
+    for(q = 0; q < bufq_depth; q++)
+    {
+        imgMosaicObj->output_image[q] = vxCreateImage(context, imgMosaicObj->out_width, imgMosaicObj->out_height, VX_DF_IMAGE_NV12);
+        status = vxGetStatus((vx_reference)imgMosaicObj->output_image[q]);
+        if(status != VX_SUCCESS)
+        {
+            printf("[SW-MOSAIC-MODULE] Unable to create output image of size %d x %d!\n", imgMosaicObj->out_width, imgMosaicObj->out_height);
+            break;
+        }
+        else
+        {
+            vx_char name[VX_MAX_REFERENCE_NAME];
+
+            snprintf(name, VX_MAX_REFERENCE_NAME, "mosaic_node_output_image_%d", q);
+
+            vxSetReferenceName((vx_reference)imgMosaicObj->output_image[q], name);
+        }
+    }
+
+    return status;
+}
 
 vx_status app_init_img_mosaic(vx_context context, ImgMosaicObj *imgMosaicObj, char *objName, vx_int32 bufq_depth)
 {
-  vx_status status = VX_SUCCESS;
-  vx_int32 i, q;
+    vx_status status = VX_SUCCESS;
 
-  imgMosaicObj->config = vxCreateUserDataObject(context, "ImgMosaicConfig", sizeof(tivxImgMosaicParams), NULL);
-  status = vxGetStatus((vx_reference)imgMosaicObj->config);
+    status = configure_params(context, imgMosaicObj);
 
-  if(status == VX_SUCCESS)
-  {
-      status = vxCopyUserDataObject(imgMosaicObj->config, 0, sizeof(tivxImgMosaicParams),\
-                &imgMosaicObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
-  }
-
-  for(q = 0; q < bufq_depth; q++)
-  {
     if(status == VX_SUCCESS)
     {
-      imgMosaicObj->output_image[q] = vxCreateImage(context, imgMosaicObj->out_width, imgMosaicObj->out_height, VX_DF_IMAGE_NV12);
-      status = vxGetStatus((vx_reference)imgMosaicObj->output_image[q]);
+        status = create_output_image(context, imgMosaicObj, bufq_depth);
     }
-  }
 
-  if(status == VX_SUCCESS)
-  {
-      imgMosaicObj->kernel = tivxAddKernelImgMosaic(context, imgMosaicObj->num_inputs);
-      status = vxGetStatus((vx_reference)imgMosaicObj->kernel);
-  }
+    if(status == VX_SUCCESS)
+    {
+        status = create_sw_mosaic_kernel(context, imgMosaicObj);
+    }
 
-  for(i = 0; i < TIVX_IMG_MOSAIC_MAX_INPUTS; i++)
-  {
-    imgMosaicObj->input_arr[i] = NULL;
-  }
-
-  return status;
+    return status;
 }
 
 void app_deinit_img_mosaic(ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth)
 {
-  vx_int32 q;
+    vx_int32 q;
 
-  vxReleaseUserDataObject(&imgMosaicObj->config);
-  for(q = 0; q < bufq_depth; q++)
-  {
-    vxReleaseImage(&imgMosaicObj->output_image[q]);
-  }
+    vxReleaseUserDataObject(&imgMosaicObj->config);
+    for(q = 0; q < bufq_depth; q++)
+    {
+        vxReleaseImage(&imgMosaicObj->output_image[q]);
+    }
 
-  return;
+    return;
 }
 
 void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj)
 {
-  if(imgMosaicObj->node != NULL)
-  {
-    vxReleaseNode(&imgMosaicObj->node);
-  }
-  if(imgMosaicObj->kernel != NULL)
-  {
-    vxRemoveKernel(imgMosaicObj->kernel);
-  }
-  return;
+    if(imgMosaicObj->node != NULL)
+    {
+        vxReleaseNode(&imgMosaicObj->node);
+    }
+
+    if(imgMosaicObj->kernel != NULL)
+    {
+        vxRemoveKernel(imgMosaicObj->kernel);
+    }
+    return;
 }
 
 vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj)
 {
 
-  vx_status status = VX_SUCCESS;
+    vx_status status = VX_SUCCESS;
 
-  imgMosaicObj->node = tivxImgMosaicNode(graph,
-                                         imgMosaicObj->kernel,
-                                         imgMosaicObj->config,
-                                         imgMosaicObj->output_image[0],
-                                         imgMosaicObj->input_arr,
-                                         imgMosaicObj->num_inputs);
+    imgMosaicObj->node = tivxImgMosaicNode(graph,
+                                           imgMosaicObj->kernel,
+                                           imgMosaicObj->config,
+                                           imgMosaicObj->output_image[0],
+                                           imgMosaicObj->input_arr,
+                                           imgMosaicObj->num_inputs);
 
-  APP_ASSERT_VALID_REF(imgMosaicObj->node);
-  #ifdef x86_64
-  vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP1);
-  #else
-  vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
-  #endif
-  vxSetReferenceName((vx_reference)imgMosaicObj->node, "mosaic_node");
-  status = vxGetStatus((vx_reference)imgMosaicObj->node);
+    status = vxGetStatus((vx_reference)imgMosaicObj->node);
 
-  return (status);
+    if(status == VX_SUCCESS)
+    {
+        #ifdef x86_64
+        vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP1);
+        #else
+        vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
+        #endif
+        vxSetReferenceName((vx_reference)imgMosaicObj->node, "mosaic_node");
+    }
+    else
+    {
+        printf("[SW-MOSAIC-MODULE] Unable to create mosaic node! \n");
+    }
 
+    return (status);
 }
 
 vx_status writeMosaicOutput(char* file_name, vx_image out_img)
 {
-  vx_status status;
+    vx_status status;
+    vx_int32 j;
 
-  status = vxGetStatus((vx_reference)out_img);
+    status = vxGetStatus((vx_reference)out_img);
 
-  if(status == VX_SUCCESS)
-  {
-    FILE * fp = fopen(file_name,"wb");
-
-    if(fp == NULL)
+    if(status == VX_SUCCESS)
     {
-      printf("File could not be opened \n");
-      return (VX_FAILURE);
+        FILE * fp = fopen(file_name,"wb");
+
+        if(fp == NULL)
+        {
+            printf("Unable to open file %s \n", file_name);
+            return (VX_FAILURE);
+        }
+
+        {
+            vx_rectangle_t rect;
+            vx_imagepatch_addressing_t image_addr;
+            vx_map_id map_id;
+            void * data_ptr;
+            vx_uint32  img_width;
+            vx_uint32  img_height;
+            vx_uint32  num_bytes = 0;
+
+            vxQueryImage(out_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+            vxQueryImage(out_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+
+            rect.start_x = 0;
+            rect.start_y = 0;
+            rect.end_x = img_width;
+            rect.end_y = img_height;
+            status = vxMapImagePatch(out_img,
+                                   &rect,
+                                   0,
+                                   &map_id,
+                                   &image_addr,
+                                   &data_ptr,
+                                   VX_READ_ONLY,
+                                   VX_MEMORY_TYPE_HOST,
+                                   VX_NOGAP_X);
+
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fwrite(data_ptr, 1, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
+
+            if(num_bytes != (img_width*img_height))
+            {
+                printf("Luma bytes written = %d, expected = %d\n", num_bytes, img_width*img_height);
+            }
+
+            vxUnmapImagePatch(out_img, map_id);
+
+            status = vxMapImagePatch(out_img,
+                                   &rect,
+                                   1,
+                                   &map_id,
+                                   &image_addr,
+                                   &data_ptr,
+                                   VX_READ_ONLY,
+                                   VX_MEMORY_TYPE_HOST,
+                                   VX_NOGAP_X);
+
+            /* Copy CbCr */
+            num_bytes = 0;
+            for (j = 0; j < img_height/2; j++)
+            {
+                num_bytes += fwrite(data_ptr, 1, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
+
+            if(num_bytes != (img_width*img_height/2))
+            {
+                printf("CbCr bytes written = %d, expected = %d\n", num_bytes, img_width*img_height/2);
+            }
+
+            vxUnmapImagePatch(out_img, map_id);
+
+        }
+
+        fclose(fp);
     }
 
-    {
-      vx_rectangle_t rect;
-      vx_imagepatch_addressing_t image_addr;
-      vx_map_id map_id;
-      void * data_ptr;
-      vx_uint32  img_width;
-      vx_uint32  img_height;
-      vx_uint32  num_bytes;
-
-      vxQueryImage(out_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
-      vxQueryImage(out_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
-
-      rect.start_x = 0;
-      rect.start_y = 0;
-      rect.end_x = img_width;
-      rect.end_y = img_height;
-      status = vxMapImagePatch(out_img,
-                               &rect,
-                               0,
-                               &map_id,
-                               &image_addr,
-                               &data_ptr,
-                               VX_READ_ONLY,
-                               VX_MEMORY_TYPE_HOST,
-                               VX_NOGAP_X);
-
-      //Copy Luma
-      num_bytes = fwrite(data_ptr,1,img_width*img_height, fp);
-
-      if(num_bytes != (img_width*img_height))
-        printf("Luma bytes written = %d, expected = %d", num_bytes, img_width*img_height);
-
-      vxUnmapImagePatch(out_img, map_id);
-
-      status = vxMapImagePatch(out_img,
-                               &rect,
-                               1,
-                               &map_id,
-                               &image_addr,
-                               &data_ptr,
-                               VX_READ_ONLY,
-                               VX_MEMORY_TYPE_HOST,
-                               VX_NOGAP_X);
-
-
-      //Copy CbCr
-      num_bytes = fwrite(data_ptr,1,img_width*img_height/2, fp);
-
-      if(num_bytes != (img_width*img_height/2))
-        printf("CbCr bytes written = %d, expected = %d", num_bytes, img_width*img_height/2);
-
-      vxUnmapImagePatch(out_img, map_id);
-
-    }
-
-    fclose(fp);
-  }
-
-  return(status);
+    return(status);
 }

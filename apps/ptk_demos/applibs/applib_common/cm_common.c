@@ -73,8 +73,9 @@ vx_status CM_saveImage(const char *fname, vx_image image)
     vx_map_id                   map_id;
     vx_uint32                   img_width;
     vx_uint32                   img_height;
-    vx_uint32                   num_bytes;
+    vx_uint32                   num_bytes = 0;
     vx_status                   vxStatus;
+    vx_int32                    j;
 
     vxStatus = VX_SUCCESS;
 
@@ -116,12 +117,16 @@ vx_status CM_saveImage(const char *fname, vx_image image)
 
     if (vxStatus == (vx_status)VX_SUCCESS)
     {
-        // Copy Luma
-        num_bytes = fwrite(data_ptr,1, img_width*img_height, fp);
+        /* Copy Luma */
+        for (j = 0; j < img_height; j++)
+        {
+            num_bytes += fwrite(data_ptr, 1, img_width, fp);
+            data_ptr += image_addr.stride_y;
+        }
 
         if (num_bytes != (img_width*img_height))
         {
-            VX_PRINT(VX_ZONE_ERROR, "Luma bytes read = %d, expected = %d\n",
+            VX_PRINT(VX_ZONE_ERROR, "Luma bytes written = %d, expected = %d\n",
                         __FUNCTION__, __LINE__,
                         num_bytes, img_width*img_height);
 
@@ -156,13 +161,18 @@ vx_status CM_saveImage(const char *fname, vx_image image)
 
     if (vxStatus == (vx_status)VX_SUCCESS)
     {
-        //Copy CbCr
-        num_bytes = fwrite(data_ptr,1,img_width*img_height/2, fp);
+        /* Copy CbCr */
+        num_bytes = 0;
+        for (j = 0; j < img_height/2; j++)
+        {
+            num_bytes += fwrite(data_ptr, 1, img_width, fp);
+            data_ptr += image_addr.stride_y;
+        }
 
         if (num_bytes != (img_width*img_height/2))
         {
             VX_PRINT(VX_ZONE_ERROR,
-                     "CbCr bytes read = %d, expected = %d",
+                     "CbCr bytes written = %d, expected = %d\n",
                      img_width*img_height/2);
 
             vxStatus = VX_FAILURE;
@@ -298,7 +308,7 @@ vx_status CM_extractImageData(uint8_t         *outImageData,
 
         if ((img_format != VX_DF_IMAGE_NV12) &&
             (img_format != VX_DF_IMAGE_S16)  &&
-            (img_format != VX_DF_IMAGE_RGB)) 
+            (img_format != VX_DF_IMAGE_RGB))
         {
             VX_PRINT(VX_ZONE_ERROR, "Image format is NOT supported.");
             vxStatus = VX_FAILURE;
@@ -351,7 +361,7 @@ vx_status CM_extractImageData(uint8_t         *outImageData,
             if (img_format == VX_DF_IMAGE_NV12)
             {
                 size = width * height;
-            } 
+            }
             else if (img_format == VX_DF_IMAGE_S16)
             {
                 size = 2 * width * height;

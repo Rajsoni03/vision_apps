@@ -374,7 +374,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
   vx_image output;
   vx_size numCh;
-  vx_int32 ch;
+  vx_int32 ch, j;
 
   vxQueryObjectArray((vx_object_array)output_arr, VX_OBJECT_ARRAY_NUMITEMS, &numCh, sizeof(vx_size));
 
@@ -388,6 +388,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
     void * data_ptr_2;
     vx_uint32  img_width;
     vx_uint32  img_height;
+    vx_uint32  num_bytes = 0;
 
     vx_char new_name[APP_MAX_FILE_PATH];
 
@@ -421,8 +422,16 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
     if(VX_SUCCESS == status)
     {
-      fwrite(data_ptr_1, 1, img_width * img_height, fp);
-      vxUnmapImagePatch(output, map_id_1);
+        /* Copy Luma */
+        for (j = 0; j < img_height; j++)
+        {
+            num_bytes += fwrite(data_ptr_1, 1, img_width, fp);
+            data_ptr_1 += image_addr.stride_y;
+        }
+        if(num_bytes != (img_width*img_height))
+            printf("Luma bytes written = %d, expected = %d\n", num_bytes, img_width*img_height);
+
+        vxUnmapImagePatch(output, map_id_1);
     }
 
     rect.start_x = 0;
@@ -457,8 +466,8 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
           {
             for(j = 0; j < img_width; j+=2)
             {
-              pCb[k] = pData[i*img_width + j];
-              pCr[k] = pData[i*img_width + j + 1];
+              pCb[k] = pData[i*image_addr.stride_y + j];
+              pCr[k] = pData[i*image_addr.stride_y + j + 1];
               k++;
             }
           }
@@ -674,21 +683,21 @@ static void drawPoints(PostProcObj *postProcObj, vx_uint8 *data_ptr_1, vx_uint8 
 
     if(label == 1)
     {
-      color[0] = 128; //Y
-      color[1] = 55;  //Cb
-      color[2] = 35;  //Cr
+        color[0] = 128; //Y
+        color[1] = 55;  //Cb
+        color[2] = 35;  //Cr
     }
     else if(label == 2)
     {
-      color[0] = 66;  //Y
-      color[1] = 91;  //Cb
-      color[2] = 240; //Cr
+        color[0] = 66;  //Y
+        color[1] = 91;  //Cb
+        color[2] = 240; //Cr
     }
     else
     {
-      color[0] = 0;   //Y
-      color[1] = 128; //Cb
-      color[2] = 128; //Cr
+        color[0] = 0;   //Y
+        color[1] = 128; //Cb
+        color[2] = 128; //Cr
     }
 
 

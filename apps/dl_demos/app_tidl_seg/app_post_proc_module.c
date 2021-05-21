@@ -216,7 +216,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
     vx_image output;
     vx_size numCh;
-    vx_int32 ch;
+    vx_int32 ch, j;
 
     status = vxQueryObjectArray((vx_object_array)output_arr, VX_OBJECT_ARRAY_NUMITEMS, &numCh, sizeof(vx_size));
 
@@ -231,6 +231,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
         vx_uint32  img_width;
         vx_uint32  img_height;
         FILE *fp = NULL;
+        vx_uint32  num_bytes = 0;
 
         vx_char new_name[APP_MAX_FILE_PATH];
 
@@ -280,7 +281,15 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
         }
         if(VX_SUCCESS == status)
         {
-            fwrite(data_ptr_1, 1, img_width * img_height, fp);
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fwrite(data_ptr_1, 1, img_width, fp);
+                data_ptr_1 += image_addr.stride_y;
+            }
+            if(num_bytes != (img_width*img_height))
+                printf("Luma bytes written = %d, expected = %d\n", num_bytes, img_width*img_height);
+
             status = vxUnmapImagePatch(output, map_id_1);
         }
 
@@ -318,8 +327,8 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
                 {
                     for(j = 0; j < img_width; j+=2)
                     {
-                        pCb[k] = pData[i*img_width + j];
-                        pCr[k] = pData[i*img_width + j + 1];
+                        pCb[k] = pData[i*image_addr.stride_y + j];
+                        pCr[k] = pData[i*image_addr.stride_y + j + 1];
                         k++;
                     }
                 }

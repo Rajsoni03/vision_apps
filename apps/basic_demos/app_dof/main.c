@@ -946,13 +946,18 @@ static vx_status app_save_vximage_to_bin_file(char *filename, vx_image image)
 
             if(fp!=NULL)
             {
-                size_t ret;
+                vx_int32 num_bytes = 0;
+                vx_int32 j;
 
-                ret = fwrite(data_ptr, image_addr.stride_y, height, fp);
-                if(ret!=height)
+                for (j = 0; j < height; j++)
                 {
-                    printf("# ERROR: Unable to write data to file [%s]\n", filename);
+                    num_bytes += fwrite(data_ptr, image_addr.stride_x, width, fp);
+                    data_ptr += image_addr.stride_y;
                 }
+
+                if(num_bytes != (width*image_addr.stride_x*height))
+                    printf("Luma bytes written = %d, expected = %d\n", num_bytes, width*image_addr.stride_x*height);
+
                 fclose(fp);
             }
             else
@@ -1000,25 +1005,30 @@ static vx_status app_load_vximage_from_bin_or_yuv_file(char *filename, vx_image 
         if(status==VX_SUCCESS)
         {
             FILE *fp = fopen(filename,"rb");
+            vx_int32 j;
+            vx_int32 num_bytes = 0;
 
             if(fp!=NULL)
             {
                 if(file_format==APP_FILE_FORMAT_BIN12B_UNPACKED)
                 {
-                    size_t ret;
-
-                    ret = fread(data_ptr, image_addr.stride_y, height, fp);
-                    if(ret!=height)
+                    for (j = 0; j < height; j++)
                     {
-                        printf("# ERROR: Unable to read data to file [%s]\n", filename);
+                        num_bytes += fread(data_ptr, image_addr.stride_x, width, fp);
+                        data_ptr += image_addr.stride_y;
                     }
+
+                    if(num_bytes != (width*height))
+                        printf("Bytes read = %d, expected = %d", num_bytes, width*height);
                 }
                 else if(file_format==APP_FILE_FORMAT_YUV)
                 {
-
-                    vx_uint32  num_bytes;
-                    //Copy Luma
-                    num_bytes = fread(data_ptr,1,width*height, fp);
+                    /* Copy Luma */
+                    for (j = 0; j < height; j++)
+                    {
+                        num_bytes += fread(data_ptr, image_addr.stride_x, width, fp);
+                        data_ptr += image_addr.stride_y;
+                    }
 
                     if(num_bytes != (width*height))
                       printf("Luma bytes read = %d, expected = %d", num_bytes, width*height);

@@ -151,7 +151,7 @@ vx_status readScalerInput(char* file_name, vx_object_array img_arr, int32_t ch_n
     {
         FILE * fp = fopen(file_name,"rb");
         vx_size arr_len;
-        vx_int32 i;
+        vx_int32 i, j;
 
         if(fp == NULL)
         {
@@ -170,7 +170,7 @@ vx_status readScalerInput(char* file_name, vx_object_array img_arr, int32_t ch_n
             vx_uint32  img_width;
             vx_uint32  img_height;
             vx_image   in_img;
-            vx_uint32  num_bytes;
+            vx_uint32  num_bytes = 0;
 
             in_img = (vx_image)vxGetObjectArrayItem(img_arr, i);
 
@@ -202,11 +202,15 @@ vx_status readScalerInput(char* file_name, vx_object_array img_arr, int32_t ch_n
                 fseek(fp, one_frame * ch_num, SEEK_SET);
             }
 
-            //Copy Luma
-            num_bytes = fread(data_ptr,1,img_width*img_height, fp);
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fread(data_ptr, 1, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
 
             if(num_bytes != (img_width*img_height))
-                printf("Luma bytes read = %d, expected = %d", num_bytes, img_width*img_height);
+                printf("Luma bytes read = %d, expected = %d\n", num_bytes, img_width*img_height);
 
             vxUnmapImagePatch(in_img, map_id);
 
@@ -225,11 +229,16 @@ vx_status readScalerInput(char* file_name, vx_object_array img_arr, int32_t ch_n
                                     VX_NOGAP_X);
 
 
-            //Copy CbCr
-            num_bytes = fread(data_ptr,1,img_width*img_height/2, fp);
+            /* Copy CbCr */
+            num_bytes = 0;
+            for (j = 0; j < img_height/2; j++)
+            {
+                num_bytes += fread(data_ptr, 1, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
 
             if(num_bytes != (img_width*img_height/2))
-                printf("CbCr bytes read = %d, expected = %d", num_bytes, img_width*img_height/2);
+                printf("CbCr bytes read = %d, expected = %d\n", num_bytes, img_width*img_height/2);
 
             vxUnmapImagePatch(in_img, map_id);
 
@@ -252,7 +261,7 @@ vx_status writeScalerOutput(char* file_name, vx_object_array img_arr)
     {
         FILE * fp = fopen(file_name,"wb");
         vx_size arr_len;
-        vx_int32 i;
+        vx_int32 i, j;
 
         if(fp == NULL)
         {
@@ -271,7 +280,7 @@ vx_status writeScalerOutput(char* file_name, vx_object_array img_arr)
             vx_uint32  img_width;
             vx_uint32  img_height;
             vx_image   out_img;
-            vx_uint32  num_bytes;
+            vx_uint32  num_bytes = 0;
 
             out_img = (vx_image)vxGetObjectArrayItem(img_arr, i);
 
@@ -292,8 +301,12 @@ vx_status writeScalerOutput(char* file_name, vx_object_array img_arr)
                                     VX_MEMORY_TYPE_HOST,
                                     VX_NOGAP_X);
 
-            //Copy Luma
-            num_bytes = fwrite(data_ptr,1,img_width*img_height, fp);
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fwrite(data_ptr, image_addr.stride_x, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
 
             if(num_bytes != (img_width*img_height))
                 printf("Luma bytes written = %d, expected = %d", num_bytes, img_width*img_height);
@@ -315,8 +328,13 @@ vx_status writeScalerOutput(char* file_name, vx_object_array img_arr)
                                     VX_NOGAP_X);
 
 
-            //Copy CbCr
-            num_bytes = fwrite(data_ptr,1,img_width*img_height/2, fp);
+            /* Copy CbCr */
+            num_bytes = 0;
+            for (j = 0; j < img_height/2; j++)
+            {
+                num_bytes += fwrite(data_ptr, image_addr.stride_x, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
 
             if(num_bytes != (img_width*img_height/2))
                 printf("CbCr bytes written = %d, expected = %d", num_bytes, img_width*img_height/2);

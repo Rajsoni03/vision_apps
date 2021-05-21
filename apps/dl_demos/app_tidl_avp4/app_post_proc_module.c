@@ -235,7 +235,7 @@ void app_create_graph_post_proc(vx_graph graph, PostProcObj *postProcObj, vx_obj
     {
         output_tensors[0] = (vx_tensor)vxGetObjectArrayItem((vx_object_array)postProcObj->output_tensor_arr[0], 0);
     }
-    
+
     output_images[0] = (vx_image)vxGetObjectArrayItem((vx_object_array)postProcObj->output_image_arr, 0);
 
     postProcObj->node = tivxPixelVizNode(graph,
@@ -281,7 +281,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
     vx_image output;
     vx_size numCh;
-    vx_int32 ch;
+    vx_int32 ch, j;
 
     vxQueryObjectArray((vx_object_array)output_arr, VX_OBJECT_ARRAY_NUMITEMS, &numCh, sizeof(vx_size));
 
@@ -295,6 +295,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
         void * data_ptr_2;
         vx_uint32  img_width;
         vx_uint32  img_height;
+        vx_uint32  num_bytes = 0;
 
         vx_char new_name[APP_MAX_FILE_PATH];
 
@@ -328,7 +329,15 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
         if(VX_SUCCESS == status)
         {
-            fwrite(data_ptr_1, 1, img_width * img_height, fp);
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fwrite(data_ptr_1, 1, img_width, fp);
+                data_ptr_1 += image_addr.stride_y;
+            }
+            if(num_bytes != (img_width*img_height))
+                printf("Luma bytes written = %d, expected = %d\n", num_bytes, img_width*img_height);
+
             vxUnmapImagePatch(output, map_id_1);
         }
 
@@ -364,8 +373,8 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
                 {
                     for(j = 0; j < img_width; j+=2)
                     {
-                        pCb[k] = pData[i*img_width + j];
-                        pCr[k] = pData[i*img_width + j + 1];
+                        pCb[k] = pData[i*image_addr.stride_y + j];
+                        pCr[k] = pData[i*image_addr.stride_y + j + 1];
                         k++;
                     }
                 }
@@ -433,7 +442,7 @@ static void createOutputTensors(vx_context context, vx_user_data_object config, 
                       (void **)&tidlParams, VX_READ_ONLY, VX_MEMORY_TYPE_HOST, 0);
 
     ioBufDesc = (sTIDL_IOBufDesc_t *)&tidlParams->ioBufDesc;
-    for(id = 0; id < ioBufDesc->numOutputBuf; id++) 
+    for(id = 0; id < ioBufDesc->numOutputBuf; id++)
     {
         output_sizes[0] = ioBufDesc->outWidth[id]  + ioBufDesc->outPadL[id] + ioBufDesc->outPadR[id];
         output_sizes[1] = ioBufDesc->outHeight[id] + ioBufDesc->outPadT[id] + ioBufDesc->outPadB[id];

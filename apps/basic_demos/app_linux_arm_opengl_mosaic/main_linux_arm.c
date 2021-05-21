@@ -130,23 +130,34 @@ static vx_status app_load_vximage_from_bin_file(char *filename, vx_image image)
 
             if(fp!=NULL)
             {
-                size_t ret;
+                vx_int32 j;
 
-                num_bytes = (width*height);
-                ret = fread(data_ptr1, sizeof(uint8_t), num_bytes, fp);
-                if(ret!=num_bytes)
+                num_bytes = 0;
+                for (j = 0; j < height; j++)
                 {
-                    printf("app_linux_arm_opengl_mosaic: ERROR: Unable to read data from file [%s]\n", filename);
+                    num_bytes += fread(data_ptr1, 1, width, fp);
+                    data_ptr1 += image_addr1.stride_y;
+                }
+
+                if(num_bytes != (width*height))
+                {
+                    printf("Luma bytes read = %d, expected = %d\n", num_bytes, width*height);
                     status = VX_FAILURE;
                 }
 
-                num_bytes = (width*height)/2;
-                ret = fread(data_ptr2, sizeof(uint8_t), num_bytes, fp);
-                if(ret!=num_bytes)
+                num_bytes = 0;
+                for (j = 0; j < height/2; j++)
                 {
-                    printf("app_linux_arm_opengl_mosaic: ERROR: Unable to read data from file [%s]\n", filename);
+                    num_bytes += fread(data_ptr2, 1, width, fp);
+                    data_ptr2 += image_addr2.stride_y;
+                }
+
+                if(num_bytes != (width*height/2))
+                {
+                    printf("CbCr bytes read = %d, expected = %d\n", num_bytes, width*height/2);
                     status = VX_FAILURE;
                 }
+
                 fclose(fp);
             }
             else

@@ -205,7 +205,7 @@ vx_status readPoseVizBackgroundImage(char* file_name, vx_image bg_img)
         void * data_ptr;
         vx_uint32  img_width;
         vx_uint32  img_height;
-        vx_uint32  num_bytes;
+        vx_uint32  num_bytes = 0, j;
 
         vxQueryImage(bg_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
         vxQueryImage(bg_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
@@ -224,11 +224,15 @@ vx_status readPoseVizBackgroundImage(char* file_name, vx_image bg_img)
                                 VX_MEMORY_TYPE_HOST,
                                 VX_NOGAP_X);
 
-        //Copy Luma
-        num_bytes = fread(data_ptr,1,img_width*img_height, fp);
+        /* Copy Luma */
+        for (j = 0; j < img_height; j++)
+        {
+            num_bytes += fread(data_ptr, 1, img_width, fp);
+            data_ptr += image_addr.stride_y;
+        }
 
         if(num_bytes != (img_width*img_height))
-            printf("Luma bytes read = %d, expected = %d", num_bytes, img_width*img_height);
+            printf("Luma bytes read = %d, expected = %d\n", num_bytes, img_width*img_height);
 
         vxUnmapImagePatch(bg_img, map_id);
 
@@ -242,12 +246,16 @@ vx_status readPoseVizBackgroundImage(char* file_name, vx_image bg_img)
                                 VX_MEMORY_TYPE_HOST,
                                 VX_NOGAP_X);
 
-
-        //Copy CbCr
-        num_bytes = fread(data_ptr,1,img_width*img_height/2, fp);
+        /* Copy CbCr */
+        num_bytes = 0;
+        for (j = 0; j < img_height/2; j++)
+        {
+             num_bytes += fread(data_ptr, 1, img_width, fp);
+             data_ptr += image_addr.stride_y;
+        }
 
         if(num_bytes != (img_width*img_height/2))
-            printf("CbCr bytes read = %d, expected = %d", num_bytes, img_width*img_height/2);
+            printf("CbCr bytes read = %d, expected = %d\n", num_bytes, img_width*img_height/2);
 
         vxUnmapImagePatch(bg_img, map_id);
 
@@ -279,7 +287,7 @@ vx_status writePoseVizOutput(char* file_name, vx_image out_img)
         void * data_ptr;
         vx_uint32  img_width;
         vx_uint32  img_height;
-        vx_uint32  num_bytes;
+        vx_uint32  num_bytes = 0, j;
 
         vxQueryImage(out_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
         vxQueryImage(out_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
@@ -298,11 +306,15 @@ vx_status writePoseVizOutput(char* file_name, vx_image out_img)
                                 VX_MEMORY_TYPE_HOST,
                                 VX_NOGAP_X);
 
-        //Copy Luma
-        num_bytes = fwrite(data_ptr,1,img_width*img_height, fp);
+        /* Copy Luma */
+        for (j = 0; j < img_height; j++)
+        {
+            num_bytes += fwrite(data_ptr, 1, img_width, fp);
+            data_ptr += image_addr.stride_y;
+        }
 
         if(num_bytes != (img_width*img_height))
-            printf("Luma bytes written = %d, expected = %d", num_bytes, img_width*img_height);
+            printf("Luma bytes written = %d, expected = %d\n", num_bytes, img_width*img_height);
 
         vxUnmapImagePatch(out_img, map_id);
 
@@ -317,11 +329,16 @@ vx_status writePoseVizOutput(char* file_name, vx_image out_img)
                                 VX_NOGAP_X);
 
 
-        //Copy CbCr
-        num_bytes = fwrite(data_ptr,1,img_width*img_height/2, fp);
+        /* Copy CbCr */
+        num_bytes = 0;
+        for (j = 0; j < img_height/2; j++)
+        {
+             num_bytes += fwrite(data_ptr, 1, img_width, fp);
+             data_ptr += image_addr.stride_y;
+        }
 
         if(num_bytes != (img_width*img_height/2))
-            printf("CbCr bytes written = %d, expected = %d", num_bytes, img_width*img_height/2);
+            printf("CbCr bytes written = %d, expected = %d\n", num_bytes, img_width*img_height/2);
 
         vxUnmapImagePatch(out_img, map_id);
 

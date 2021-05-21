@@ -331,7 +331,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
     vx_image output;
     vx_size numCh;
-    vx_int32 ch;
+    vx_int32 ch, j;
 
     vxQueryObjectArray((vx_object_array)output_arr, VX_OBJECT_ARRAY_NUMITEMS, &numCh, sizeof(vx_size));
 
@@ -345,6 +345,7 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
         void * data_ptr_2;
         vx_uint32  img_width;
         vx_uint32  img_height;
+        vx_uint32  num_bytes = 0;
 
         vx_char new_name[APP_MAX_FILE_PATH];
 
@@ -378,7 +379,15 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
         if(VX_SUCCESS == status)
         {
-            fwrite(data_ptr_1, 1, img_width * img_height, fp);
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fwrite(data_ptr_1, 1, img_width, fp);
+                data_ptr_1 += image_addr.stride_y;
+            }
+            if(num_bytes != (img_width*img_height))
+                printf("Luma bytes written = %d, expected = %d\n", num_bytes, img_width*img_height);
+
             vxUnmapImagePatch(output, map_id_1);
         }
 
@@ -414,8 +423,8 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
                 {
                     for(j = 0; j < img_width; j+=2)
                     {
-                        pCb[k] = pData[i*img_width + j];
-                        pCr[k] = pData[i*img_width + j + 1];
+                        pCb[k] = pData[i*image_addr.stride_y + j];
+                        pCr[k] = pData[i*image_addr.stride_y + j + 1];
                         k++;
                     }
                 }
@@ -507,7 +516,7 @@ void drawDetections(PostProcObj *postProcObj, vx_object_array output_tensor_arr,
 
             tivxMapTensorPatch(output_tensor, 3, start, output_sizes, &map_id_output, output_strides, &output_buffer, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
 
-            pOut   = (vx_float32*)output_buffer + (ioBufDesc->outPadT[0] * output_sizes[0]) + ioBufDesc->outPadL[0];
+            pOut     = (vx_float32*)output_buffer + (ioBufDesc->outPadT[0] * output_sizes[0]) + ioBufDesc->outPadL[0];
             pHeader  = (TIDL_ODLayerHeaderInfo *)pOut;
             pObjInfo = (TIDL_ODLayerObjInfo *)((uint8_t *)pOut + (vx_uint32)pHeader->objInfoOffset);
             numObjs  = (vx_uint32)pHeader->numDetObjects;
@@ -647,7 +656,6 @@ static void drawPoints(PostProcObj *postProcObj, vx_uint8 *data_ptr_1, vx_uint8 
         color[1] = 128; //Cb
         color[2] = 128; //Cr
     }
-
 
     for(i = 0; i < num_points; i++)
     {

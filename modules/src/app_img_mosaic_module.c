@@ -157,28 +157,29 @@ vx_status app_init_img_mosaic(vx_context context, ImgMosaicObj *imgMosaicObj, ch
 
 void app_deinit_img_mosaic(ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth)
 {
-  vx_int32 q;
+    vx_int32 q;
 
-  vxReleaseUserDataObject(&imgMosaicObj->config);
-  for(q = 0; q < bufq_depth; q++)
-  {
-    vxReleaseImage(&imgMosaicObj->output_image[q]);
-  }
+    vxReleaseUserDataObject(&imgMosaicObj->config);
+    for(q = 0; q < bufq_depth; q++)
+    {
+        vxReleaseImage(&imgMosaicObj->output_image[q]);
+    }
 
-  return;
+    return;
 }
 
 void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj)
 {
-  if(imgMosaicObj->node != NULL)
-  {
-    vxReleaseNode(&imgMosaicObj->node);
-  }
-  if(imgMosaicObj->kernel != NULL)
-  {
-    vxRemoveKernel(imgMosaicObj->kernel);
-  }
-  return;
+    if(imgMosaicObj->node != NULL)
+    {
+        vxReleaseNode(&imgMosaicObj->node);
+    }
+
+    if(imgMosaicObj->kernel != NULL)
+    {
+        vxRemoveKernel(imgMosaicObj->kernel);
+    }
+    return;
 }
 
 vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj)
@@ -194,7 +195,7 @@ vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj
                                            imgMosaicObj->num_inputs);
 
     status = vxGetStatus((vx_reference)imgMosaicObj->node);
-  
+
     if(status == VX_SUCCESS)
     {
         #ifdef x86_64
@@ -208,83 +209,96 @@ vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj
     {
         printf("[SW-MOSAIC-MODULE] Unable to create mosaic node! \n");
     }
-    
+
     return (status);
 }
 
 vx_status writeMosaicOutput(char* file_name, vx_image out_img)
 {
-  vx_status status;
+    vx_status status;
+    vx_int32 j;
 
-  status = vxGetStatus((vx_reference)out_img);
+    status = vxGetStatus((vx_reference)out_img);
 
-  if(status == VX_SUCCESS)
-  {
-    FILE * fp = fopen(file_name,"wb");
-
-    if(fp == NULL)
+    if(status == VX_SUCCESS)
     {
-      printf("Unable to open file %s \n", file_name);
-      return (VX_FAILURE);
+        FILE * fp = fopen(file_name,"wb");
+
+        if(fp == NULL)
+        {
+            printf("Unable to open file %s \n", file_name);
+            return (VX_FAILURE);
+        }
+
+        {
+            vx_rectangle_t rect;
+            vx_imagepatch_addressing_t image_addr;
+            vx_map_id map_id;
+            void * data_ptr;
+            vx_uint32  img_width;
+            vx_uint32  img_height;
+            vx_uint32  num_bytes = 0;
+
+            vxQueryImage(out_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+            vxQueryImage(out_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+
+            rect.start_x = 0;
+            rect.start_y = 0;
+            rect.end_x = img_width;
+            rect.end_y = img_height;
+            status = vxMapImagePatch(out_img,
+                                   &rect,
+                                   0,
+                                   &map_id,
+                                   &image_addr,
+                                   &data_ptr,
+                                   VX_READ_ONLY,
+                                   VX_MEMORY_TYPE_HOST,
+                                   VX_NOGAP_X);
+
+            /* Copy Luma */
+            for (j = 0; j < img_height; j++)
+            {
+                num_bytes += fwrite(data_ptr, 1, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
+
+            if(num_bytes != (img_width*img_height))
+            {
+                printf("Luma bytes written = %d, expected = %d", num_bytes, img_width*img_height);
+            }
+
+            vxUnmapImagePatch(out_img, map_id);
+
+            status = vxMapImagePatch(out_img,
+                                   &rect,
+                                   1,
+                                   &map_id,
+                                   &image_addr,
+                                   &data_ptr,
+                                   VX_READ_ONLY,
+                                   VX_MEMORY_TYPE_HOST,
+                                   VX_NOGAP_X);
+
+            /* Copy CbCr */
+            num_bytes = 0;
+            for (j = 0; j < img_height/2; j++)
+            {
+                num_bytes += fwrite(data_ptr, 1, img_width, fp);
+                data_ptr += image_addr.stride_y;
+            }
+
+            if(num_bytes != (img_width*img_height/2))
+            {
+                printf("CbCr bytes written = %d, expected = %d", num_bytes, img_width*img_height/2);
+            }
+
+            vxUnmapImagePatch(out_img, map_id);
+
+        }
+
+        fclose(fp);
     }
 
-    {
-      vx_rectangle_t rect;
-      vx_imagepatch_addressing_t image_addr;
-      vx_map_id map_id;
-      void * data_ptr;
-      vx_uint32  img_width;
-      vx_uint32  img_height;
-      vx_uint32  num_bytes;
-
-      vxQueryImage(out_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
-      vxQueryImage(out_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
-
-      rect.start_x = 0;
-      rect.start_y = 0;
-      rect.end_x = img_width;
-      rect.end_y = img_height;
-      status = vxMapImagePatch(out_img,
-                               &rect,
-                               0,
-                               &map_id,
-                               &image_addr,
-                               &data_ptr,
-                               VX_READ_ONLY,
-                               VX_MEMORY_TYPE_HOST,
-                               VX_NOGAP_X);
-
-      //Copy Luma
-      num_bytes = fwrite(data_ptr,1,img_width*img_height, fp);
-
-      if(num_bytes != (img_width*img_height))
-        printf("Luma bytes written = %d, expected = %d", num_bytes, img_width*img_height);
-
-      vxUnmapImagePatch(out_img, map_id);
-
-      status = vxMapImagePatch(out_img,
-                               &rect,
-                               1,
-                               &map_id,
-                               &image_addr,
-                               &data_ptr,
-                               VX_READ_ONLY,
-                               VX_MEMORY_TYPE_HOST,
-                               VX_NOGAP_X);
-
-
-      //Copy CbCr
-      num_bytes = fwrite(data_ptr,1,img_width*img_height/2, fp);
-
-      if(num_bytes != (img_width*img_height/2))
-        printf("CbCr bytes written = %d, expected = %d", num_bytes, img_width*img_height/2);
-
-      vxUnmapImagePatch(out_img, map_id);
-
-    }
-
-    fclose(fp);
-  }
-
-  return(status);
+    return(status);
 }
