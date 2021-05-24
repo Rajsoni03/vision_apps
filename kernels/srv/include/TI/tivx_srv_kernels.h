@@ -126,11 +126,9 @@ extern "C" {
 #define TIVX_KERNEL_GENERATE_GPULUT_NAME     "com.ti.srv.generate_gpulut"
 
 /*! \brief gl_srv kernel name
- *  \see group_vision_function_srv
+ *  \ingroup group_vision_apps_kernels_srv
  */
 #define TIVX_KERNEL_GL_SRV_NAME     "com.ti.srv.gl_srv"
-
-/*! End of group_vision_function_srv */
 
 /*!
  * \brief Used for the Application to load the srv kernels into the context.
