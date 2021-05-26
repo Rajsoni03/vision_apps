@@ -410,30 +410,6 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
 
-    /* tell BIOS what is CPU Hz so that it count times correctly */
-    {
-        uint32_t clkMhz = 1000; /* Default to MCU */
-
-        #ifdef CPU_mpu1
-        clkMhz = 2000;
-        #endif
-        #if defined(CPU_mcu1_0) || defined(CPU_mcu2_0) || defined(CPU_mcu2_1) || defined(CPU_mcu3_0) || defined(CPU_mcu3_1)
-        clkMhz = 1000;
-        #endif
-        #ifdef CPU_c6x_1
-        clkMhz = 1350;
-        #endif
-        #ifdef CPU_c6x_2
-        clkMhz = 1350;
-        #endif
-        #ifdef CPU_c7x_1
-        clkMhz = 1000;
-        #endif
-
-        /* convert to Hz before setting */
-        appUtilsSetCpuHz(clkMhz*1000*1000);
-    }
-
     appLogPrintf("APP: Init ... !!!\n");
 
     #ifdef ENABLE_UART

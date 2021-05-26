@@ -81,15 +81,6 @@ typedef struct
     uint32_t enable_i2c1;
 } app_pinmux_cfg_t;
 
-/**
- * \brief Tell TI-RTOS what is the CPU frequency
- *
- * NOTE, this does not set the actuall CPU Hz in PSC, this just tells
- * SysBIOS what is the CPU Hz so that its timestamp API returns value in
- * correct units
- */
-int32_t appUtilsSetCpuHz(uint32_t freq);
-
 
 /**
  * \brief Switch C7x from secure supervisor to non-secure supervisor

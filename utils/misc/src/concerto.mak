@@ -6,8 +6,6 @@ include $(PRELUDE)
 TARGET      := app_utils_misc
 TARGETTYPE  := library
 
-CSOURCES    := app_cpu_hz.c
-
 ifeq ($(TARGET_CPU),C71)
 ASSEMBLY += app_c7x_init_asm.asm
 CSOURCES += app_c7x_init.c
