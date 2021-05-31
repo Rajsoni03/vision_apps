@@ -94,6 +94,6 @@ MEMORY
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
     /* DDR for c7x_1 for Scratch Memory [ size 256.00 MB ] */
     DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xEC000000 , LENGTH = 0x10000000
-    /* DDR for c7x_1 for local heap [ size 1024.00 MB ] */
-    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x40000000
+    /* DDR for c7x_1 for local heap [ size 256.00 MB ] */
+    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x10000000
 }

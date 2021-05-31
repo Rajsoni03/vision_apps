@@ -118,7 +118,7 @@ ddr_mem_size  = 1*GB + 448*MB; # Last 64MB is used by Linux
 
 ddr_mem_addr_hi_phy = 0x880000000;
 ddr_mem_addr_hi = 0x100000000;
-ddr_mem_size_hi = 1*GB;
+ddr_mem_size_hi = 256*MB;
 
 msmc_mem_addr = 0x70000000;
 main_ocram_mem_addr = 0x03600000;

@@ -247,9 +247,9 @@
 #define DDR_C7X_1_SCRATCH_ADDR (0xEC000000u)
 #define DDR_C7X_1_SCRATCH_SIZE (0x10000000u)
 
-/* DDR for c7x_1 for local heap [ size 1024.00 MB ] */
+/* DDR for c7x_1 for local heap [ size 256.00 MB ] */
 #define DDR_C7X_1_LOCAL_HEAP_ADDR (0x100000000u)
-#define DDR_C7X_1_LOCAL_HEAP_SIZE (0x40000000u)
+#define DDR_C7X_1_LOCAL_HEAP_SIZE (0x10000000u)
 
 
 #endif /* APP_MEM_MAP_H */
