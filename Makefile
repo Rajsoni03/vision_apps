@@ -34,7 +34,7 @@ TARGET_COMBOS :=
 ifeq ($(BUILD_TARGET_MODE),yes)
   ifeq ($(PROFILE), $(filter $(PROFILE), debug all))
 	ifeq ($(BUILD_ISA_R5F),yes)
-	TARGET_COMBOS += J7:SYSBIOS:R5F:3:debug:TIARMCGT
+	TARGET_COMBOS += J7:$(RTOS):R5F:3:debug:TIARMCGT
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
 	TARGET_COMBOS += J7:SYSBIOS:C66:2:debug:CGT6X
@@ -54,7 +54,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 
   ifeq ($(PROFILE), $(filter $(PROFILE), release all))
 	ifeq ($(BUILD_ISA_R5F),yes)
-	TARGET_COMBOS += J7:SYSBIOS:R5F:3:release:TIARMCGT
+	TARGET_COMBOS += J7:$(RTOS):R5F:3:release:TIARMCGT
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
 	TARGET_COMBOS += J7:SYSBIOS:C66:2:release:CGT6X
