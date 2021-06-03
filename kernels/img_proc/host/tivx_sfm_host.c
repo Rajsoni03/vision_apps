@@ -133,10 +133,6 @@ static vx_status VX_CALLBACK tivxAddKernelSFMValidate(vx_node node,
 
     }
 
-    vxReleaseImage(&input);
-    vxReleaseImage(&flow);
-    vxReleaseImage(&output);
-
     /* CUSTOM PARAMETER CHECKING */
 
     return status;
