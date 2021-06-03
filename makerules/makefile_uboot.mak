@@ -22,10 +22,10 @@ endif
 uboot_check_firmware:
 ifeq ($(BUILD_TARGET_MODE),yes)
 ifeq ($(BUILD_LINUX_A72),yes)
-	@if [ ! -f  $(VISION_APPS_PATH)/out/J7/R5F/SYSBIOS/$(UBOOT_APP_PROFILE)/vx_app_tirtos_linux_mcu1_0.out ]; then echo 'ERROR: $(VISION_APPS_PATH)/out/J7/R5F/SYSBIOS/$(UBOOT_APP_PROFILE)/vx_app_tirtos_linux_mcu1_0.out not found !!!'; exit 1; fi
+	@if [ ! -f  $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_tirtos_linux_mcu1_0.out ]; then echo 'ERROR: $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_tirtos_linux_mcu1_0.out not found !!!'; exit 1; fi
 endif
 ifeq ($(BUILD_QNX_A72),yes)
-	@if [ ! -f $(VISION_APPS_PATH)/out/J7/R5F/SYSBIOS/$(UBOOT_APP_PROFILE)/vx_app_tirtos_qnx_mcu1_0.out ]; then echo 'ERROR: $(VISION_APPS_PATH)/out/J7/R5F/SYSBIOS/$(UBOOT_APP_PROFILE)/vx_app_tirtos_qnx_mcu1_0.out not found !!!'; exit 1; fi
+	@if [ ! -f $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_tirtos_qnx_mcu1_0.out ]; then echo 'ERROR: $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_tirtos_qnx_mcu1_0.out not found !!!'; exit 1; fi
 endif
 endif
 
@@ -40,11 +40,11 @@ uboot: uboot_check uboot_check_firmware
 ifeq ($(BUILD_TARGET_MODE),yes)
 ifeq ($(BUILD_LINUX_A72),yes)
 	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- O=j721e-arm64-linux -j8 j721e_evm_a72_defconfig
-	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_PATH)/out/J7/R5F/SYSBIOS/$(UBOOT_APP_PROFILE)/vx_app_tirtos_linux_mcu1_0.out O=j721e-arm64-linux
+	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_tirtos_linux_mcu1_0.out O=j721e-arm64-linux
 endif
 ifeq ($(BUILD_QNX_A72),yes)
 	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- O=j721e-arm64-qnx -j8 j721e_evm_a72_defconfig
-	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_PATH)/out/J7/R5F/SYSBIOS/$(UBOOT_APP_PROFILE)/vx_app_tirtos_qnx_mcu1_0.out O=j721e-arm64-qnx
+	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_tirtos_qnx_mcu1_0.out O=j721e-arm64-qnx
 endif
 endif
 
