@@ -84,6 +84,8 @@ typedef struct {
     InputObj     inputObj;
     ScalerObj    scalerObj;
     PyramidObj   pyramidObj;
+    ScalerObj    scalerObj_prime;
+    PyramidObj   pyramidObj_prime;
     DOFObj       dofObj;
     SFMObj       sfmObj;
     DisplayObj   displayObj;
@@ -686,10 +688,21 @@ static int app_init(AppObj *obj)
     }
 
     /* Initialize modules */
+
+    /* Configure the prime copies of scaler and pyramid before initializing */
+    memcpy(&obj->scalerObj_prime, &obj->scalerObj, sizeof(obj->scalerObj_prime));
+    memcpy(&obj->pyramidObj_prime, &obj->pyramidObj, sizeof(obj->pyramidObj_prime));
+
     if(status == VX_SUCCESS)
     {
         status = app_init_scaler(obj->context, &obj->scalerObj, "scaler_obj", NUM_CH, 1);
         APP_PRINTF("Scaler Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        status = app_init_scaler(obj->context, &obj->scalerObj_prime, "scaler_obj_prime", NUM_CH, 1);
+        APP_PRINTF("Scaler Prime Init Done! \n");
     }
 
     /* Initialize modules */
@@ -697,6 +710,12 @@ static int app_init(AppObj *obj)
     {
         status = app_init_pyramid(obj->context, &obj->pyramidObj, "pyramidObj");
         APP_PRINTF("Pyramid Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        status = app_init_pyramid(obj->context, &obj->pyramidObj_prime, "pyramidObj_prime");
+        APP_PRINTF("Pyramid Prime Init Done! \n");
     }
 
     if(status == VX_SUCCESS)
@@ -753,6 +772,12 @@ static void app_deinit(AppObj *obj)
 
     app_deinit_pyramid(&obj->pyramidObj);
     APP_PRINTF("Pyramid module de-initialized!\n");
+
+    app_deinit_scaler(&obj->scalerObj_prime);
+    APP_PRINTF("Scaler prime module de-initialized!\n");
+
+    app_deinit_pyramid(&obj->pyramidObj_prime);
+    APP_PRINTF("Pyramid prime module de-initialized!\n");
 
     app_deinit_dof(&obj->dofObj);
     APP_PRINTF("DOF module de-initialized!\n");
@@ -812,12 +837,12 @@ static vx_status app_prime_pyramid_output(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_scaler(obj->context, graph, &obj->scalerObj, obj->inputObj.input_image_arr[0]);
+        status = app_create_graph_scaler(obj->context, graph, &obj->scalerObj_prime, obj->inputObj.input_image_arr[0]);
         APP_PRINTF("Scaler Node added!\n");
     }
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_pyramid(graph, &obj->pyramidObj, obj->scalerObj.output[0].arr);
+        status = app_create_graph_pyramid(graph, &obj->pyramidObj_prime, obj->scalerObj_prime.output[0].arr);
         APP_PRINTF("Pyramid Node added!\n");
     }
     /* Prime the pyramid output to ensure that -1 delay has valid reference */
@@ -854,6 +879,12 @@ static vx_status app_prime_pyramid_output(AppObj *obj)
     {
         printf("Priming Pyramid output done!\n");
     }
+
+    app_delete_scaler(&obj->scalerObj_prime);
+    APP_PRINTF("Scaler prime objects deleted!\n");
+
+    app_delete_pyramid(&obj->pyramidObj_prime);
+    APP_PRINTF("Pyramid prime objects deleted!\n");
 
     vxReleaseGraph(&graph);
 
@@ -1653,6 +1684,8 @@ static vx_status readInputConfig(AppObj *obj, vx_object_array config_arr)
             {
                 obj->cur_frame = 0;
             }
+
+            vxReleaseUserDataObject(&in_config);
         }
     }
     return(status);
