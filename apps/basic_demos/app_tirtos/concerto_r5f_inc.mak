@@ -10,16 +10,16 @@ IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 IDIRS+=$(IMAGING_PATH)/sensor_drv/include
 
-LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/j721e/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/csl/lib/j721e/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/board/lib/$(BUILD_PDK_BOARD)/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/j721e/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/fvid2/lib/j721e/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/j721e/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/fvid2/lib/$(SOC)/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/j721e/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/pm/lib/j721e/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/j721e/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/pm/lib/$(SOC)/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)

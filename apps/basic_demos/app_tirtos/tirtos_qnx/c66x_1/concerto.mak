@@ -20,9 +20,9 @@ LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 
 IDIRS+=$(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_qnx
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/j721e/c66xdsp_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/j721e/c66xdsp_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/j721e/c66xdsp_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/c66xdsp_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/c66xdsp_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/c66xdsp_1/$(TARGET_BUILD)/
 
 include $($(_MODULE)_SDIR)/../../concerto_c6x_inc.mak
 
@@ -30,7 +30,9 @@ include $($(_MODULE)_SDIR)/../../concerto_c6x_inc.mak
 STATIC_LIBS += app_tirtos_common_c6x_1
 STATIC_LIBS += app_tirtos_qnx
 
+ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
+endif
 
 include $(FINALE)
 

@@ -9,7 +9,10 @@ CSOURCES    := network_api.c
 
 endif
 
+ifeq ($(SOC),j721e)
 DEFS=SOC_J721E
+endif
+
 IDIRS += $(VISION_APPS_PATH)
 IDIRS += $(VISION_APPS_PATH)/utils/itt_server/include
 IDIRS += $(VISION_APPS_PATH)/utils/network_api/include

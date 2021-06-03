@@ -9,15 +9,15 @@ IDIRS+=$(PTK_PATH)/include
 IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 
-LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/j721e/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/csl/lib/j721e/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/a72/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/board/lib/$(BUILD_PDK_BOARD)/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/j721e/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/mmcsd/lib/j721e/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/emac/lib/j721e/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/mmcsd/lib/$(SOC)/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/emac/lib/$(SOC)/a72/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/fs/fatfs/lib/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/transport/ndk/nimu/lib/j721e/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/j721e/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/transport/ndk/nimu/lib/$(SOC)/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/$(SOC)/a72/$(TARGET_BUILD)/
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(IMAGING_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 

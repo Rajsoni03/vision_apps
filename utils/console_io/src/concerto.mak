@@ -7,7 +7,9 @@ TARGETTYPE  := library
 CSOURCES    := app_log_writer.c app_log_reader.c
 CSOURCES += app_get.c
 
+ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
+endif
 
 ifeq ($(TARGET_OS),SYSBIOS)
 CSOURCES += app_log_rtos.c app_cli_rtos.c

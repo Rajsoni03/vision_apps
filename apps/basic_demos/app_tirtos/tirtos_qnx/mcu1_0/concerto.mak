@@ -28,9 +28,9 @@ LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 
 SYS_STATIC_LIBS += rtsv7R4_T_le_v3D16_eabi
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/j721e/mcu1_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/j721e/mcu1_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/j721e/mcu1_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu1_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu1_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu1_0/$(TARGET_BUILD)/
 
 include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
 

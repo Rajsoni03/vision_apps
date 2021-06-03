@@ -17,12 +17,13 @@ CSOURCES += app_r5f_init.c
 ifeq ($(BUILD_PDK_BOARD), j721e_evm)
 CSOURCES += app_pinmux.c
 DEFS+=j721e_evm
-
 endif
 
 endif
 
+ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
+endif
 
 include $(FINALE)
 

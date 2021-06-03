@@ -29,7 +29,9 @@ IDIRS += $(PDK_QNX_PATH)/packages/
 CSOURCES += app_ipc_qnx.c
 endif
 
+ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
+endif
 
 include $(FINALE)
 

@@ -13,7 +13,9 @@ TARGETTYPE  := library
 
 CSOURCES    := app_ethfw.c
 
+ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
+endif
 
 include $(FINALE)
 

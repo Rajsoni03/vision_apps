@@ -84,10 +84,10 @@ LDIRS       += $(LINUX_FS_PATH)/usr/lib
 endif
 ifeq ($(TARGET_OS), QNX)
 LDIRS       += $(QNX_HOST)/usr/lib
-LDIRS       += $(PDK_QNX_PATH)/packages/ti/csl/lib/j721e/qnx_a72/release
-LDIRS       += $(PDK_QNX_PATH)/packages/ti/osal/lib/qnx/j721e/qnx_a72/release
-LDIRS       += $(PDK_QNX_PATH)/packages/ti/drv/sciclient/lib/j721e/qnx_mpu1_0/release
-LDIRS       += $(PDK_QNX_PATH)/packages/ti/drv/udma/lib/j721e/qnx_mpu1_0/release
+LDIRS       += $(PDK_QNX_PATH)/packages/ti/csl/lib/$(SOC)/qnx_a72/release
+LDIRS       += $(PDK_QNX_PATH)/packages/ti/osal/lib/qnx/$(SOC)/qnx_a72/release
+LDIRS       += $(PDK_QNX_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/qnx_mpu1_0/release
+LDIRS       += $(PDK_QNX_PATH)/packages/ti/drv/udma/lib/$(SOC)/qnx_mpu1_0/release
 LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/a.le
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/a.le/
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/a.le/

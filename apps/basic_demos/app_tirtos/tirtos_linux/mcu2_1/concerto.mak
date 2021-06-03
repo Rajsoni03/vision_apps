@@ -20,13 +20,13 @@ IDIRS+=$(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_linux
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/j721e/mcu2_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/j721e/mcu2_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/j721e/mcu2_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/csirx/lib/j721e/mcu2_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/j721e/mcu2_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/j721e/mcu2_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/csirx/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 
 include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
 

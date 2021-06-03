@@ -9,7 +9,10 @@ CSOURCES    := itt_server_main.c itt_ctrl_handle_echo.c itt_ctrl_handle_2a.c itt
 
 endif
 
+ifeq ($(SOC),j721e)
 DEFS=SOC_J721E
+endif
+
 IDIRS += $(IMAGING_PATH)/kernels/include/
 IDIRS += $(VISION_APPS_PATH)
 IDIRS += $(VISION_APPS_PATH)/utils/itt_server/include

@@ -23,17 +23,17 @@ IDIRS+=$(ETHFW_PATH)
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/j721e/mcu2_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/j721e/mcu2_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/j721e/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/j721e/mcu2_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/j721e_evm/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)_evm/mcu2_0/$(TARGET_BUILD)/
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/csirx/lib/j721e/mcu2_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/j721e/mcu2_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/dss/lib/j721e/mcu2_0/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/j721e/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/csirx/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/dss/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 
 LDIRS += $(ETHFW_PATH)/out/J721E/R5Ft/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(REMOTE_DEVICE_PATH)/lib/J721E/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)

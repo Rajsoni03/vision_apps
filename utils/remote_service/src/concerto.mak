@@ -12,7 +12,9 @@ ifeq ($(TARGET_OS),LINUX)
 CSOURCES += app_remote_service_linux.c
 endif
 
+ifeq ($(SOC),j721e)
 DEFS=SOC_J721E
+endif
 
 include $(FINALE)
 

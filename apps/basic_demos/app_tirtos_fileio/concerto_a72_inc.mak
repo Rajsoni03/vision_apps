@@ -2,13 +2,13 @@ ifeq ($(TARGET_CPU),A72)
 
 IDIRS=$($(_MODULE)_SDIR)/../common
 
-LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/j721e/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/csl/lib/j721e/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/a72/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/board/lib/$(BUILD_PDK_BOARD)/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/j721e/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/mmcsd/lib/j721e/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/mmcsd/lib/$(SOC)/a72/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/fs/fatfs/lib/a72/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/j721e/a72/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/$(SOC)/a72/$(TARGET_BUILD)/
 
 STATIC_LIBS += app_utils_mem
 STATIC_LIBS += app_utils_console_io

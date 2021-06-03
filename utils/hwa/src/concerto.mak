@@ -9,7 +9,9 @@ TARGETTYPE  := library
 
 CSOURCES    := app_hwa.c
 
+ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
+endif
 
 IDIRS       += $(VIDEO_CODEC_PATH)/ti-img-encode-decode/timmlib/include
 

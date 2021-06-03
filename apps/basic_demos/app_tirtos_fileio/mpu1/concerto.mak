@@ -18,7 +18,7 @@ LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 
 include $($(_MODULE)_SDIR)/../concerto_a72_inc.mak
-LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/j721e/mpu1_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mpu1_0/$(TARGET_BUILD)/
 
 # CPU instance specific libraries
 STATIC_LIBS += app_tirtos_fileio_common_mpu1
