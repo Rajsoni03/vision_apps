@@ -8,20 +8,25 @@ DEFS+=CPU_mcu2_0
 
 TARGET      := vx_app_tirtos_linux_mcu2_0
 TARGETTYPE  := exe
-CSOURCES    := $(call all-c-files)
+CSOURCES    := main.c
 
-XDC_BLD_FILE  = $($(_MODULE)_SDIR)/../../bios_cfg/config_r5f.bld
-XDC_IDIRS     = $($(_MODULE)_SDIR)/../../bios_cfg/;$(NDK_PATH)/packages;$(BIOS_PATH)/packages/ti/posix/ccs
-XDC_CFG_FILE  = $($(_MODULE)_SDIR)/mcu2_0.cfg
-XDC_PLATFORM  = "ti.platforms.cortexR:J7ES_MAIN"
+ifeq ($(RTOS),SYSBIOS)
+	XDC_BLD_FILE = $($(_MODULE)_SDIR)/../../bios_cfg/config_r5f.bld
+	XDC_IDIRS    = $($(_MODULE)_SDIR)/../../bios_cfg/;$(NDK_PATH)/packages;$(BIOS_PATH)/packages/ti/posix/ccs
+	XDC_CFG_FILE = $($(_MODULE)_SDIR)/mcu2_0.cfg
+	XDC_PLATFORM = "ti.platforms.cortexR:J7ES_MAIN"
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
+endif
+ifeq ($(RTOS),FREERTOS)
+	CSOURCES += $(SOC)_mcu2_0_mpu_cfg.c
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_mcu2_0_freertos.lds
+endif
 
 IDIRS+=$(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_linux
 IDIRS+=$(NDK_PATH)/packages
 IDIRS+=$(REMOTE_DEVICE_PATH)
 IDIRS+=$(ETHFW_PATH)
-
-LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
-LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
@@ -37,6 +42,14 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 
 LDIRS += $(ETHFW_PATH)/out/J721E/R5Ft/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(REMOTE_DEVICE_PATH)/lib/J721E/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+
+ifeq ($(RTOS),SYSBIOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/r5f/$(TARGET_BUILD)/
+endif
+ifeq ($(RTOS),FREERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+endif
 
 include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
 
@@ -65,6 +78,11 @@ REMOTE_DEVICE_LIBS = lib_remote_device
 SYS_STATIC_LIBS += $(ETHFW_LIBS)
 SYS_STATIC_LIBS += $(REMOTE_DEVICE_LIBS)
 
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
+	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
+endif
+
 ADDITIONAL_STATIC_LIBS += csirx.aer5f
 ADDITIONAL_STATIC_LIBS += csitx.aer5f
 ADDITIONAL_STATIC_LIBS += dss.aer5f
@@ -80,6 +98,8 @@ ADDITIONAL_STATIC_LIBS += pm_lib.aer5f
 ADDITIONAL_STATIC_LIBS += ti.timesync.hal.aer5f
 ADDITIONAL_STATIC_LIBS += ti.timesync.ptp.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
+
+DEFS        += $(RTOS)
 
 include $(FINALE)
 

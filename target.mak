@@ -68,6 +68,8 @@ ifeq ($(TARGET_PLATFORM),J7)
     ifeq ($(TARGET_OS),SYSBIOS)
         SYSIDIRS += $(BIOS_PATH)/packages
         SYSIDIRS += $(XDCTOOLS_PATH)/packages
+    endif
+    ifeq ($(TARGET_OS), $(filter $(TARGET_OS), SYSBIOS FREERTOS))
         SYSIDIRS += $(PDK_PATH)/packages
     endif
 
