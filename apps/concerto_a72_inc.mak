@@ -32,14 +32,14 @@ VISION_APPS_APPLIBS_IDIRS =
 VISION_APPS_APPLIBS_IDIRS += $(VISION_APPS_PATH)/applibs
 
 ifeq ($(TARGET_OS),LINUX)
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_linux/mpu1
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_linux
+IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_linux/mpu1
+IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_linux
 endif
 ifeq ($(TARGET_OS),QNX)
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_qnx/mpu1
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_qnx
+IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx/mpu1
+IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx
 endif
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/common
+IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/common
 
 # These rpath-link linker options are to provide directories for
 # secondary *.so file lookup
@@ -150,10 +150,10 @@ TEST_LIBS += vx_applib_tests
 STATIC_LIBS += $(TIOVX_LIBS)
 STATIC_LIBS += $(VISION_APPS_UTILS_LIBS)
 ifeq ($(TARGET_OS),LINUX)
-STATIC_LIBS += app_tirtos_linux_mpu1_common
+STATIC_LIBS += app_rtos_linux_mpu1_common
 endif
 ifeq ($(TARGET_OS),QNX)
-STATIC_LIBS += app_tirtos_qnx_mpu1_common
+STATIC_LIBS += app_rtos_qnx_mpu1_common
 endif
 
 ifeq ($(TARGET_OS),LINUX)

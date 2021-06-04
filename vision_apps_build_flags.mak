@@ -34,7 +34,7 @@ BUILD_ENABLE_ETHFW=no
 endif
 
 # Need to export this variable so that the following xdc .cfg file can pick this up from the env:
-# ${PSDK_PATH}/vision_apps/apps/basic_demos/app_tirtos/tirtos_linux/mcu2_0/mcu2_0.cfg
+# ${PSDK_PATH}/vision_apps/apps/basic_demos/app_rtos/rtos_linux/mcu2_0/mcu2_0.cfg
 export BUILD_ENABLE_ETHFW
 
 # A72 OS specific Build flag
@@ -49,13 +49,13 @@ LINK_SHARED_OBJ?=no
 BUILD_CPU_MCU1_1?=no
 
 # Build TI-RTOS fileio binaries
-BUILD_APP_TIRTOS_FILEIO?=no
+BUILD_APP_RTOS_FILEIO?=no
 
-# Build TI-RTOS + Linux binaries
-BUILD_APP_TIRTOS_LINUX?=$(BUILD_LINUX_A72)
+# Build RTOS + Linux binaries
+BUILD_APP_RTOS_LINUX?=$(BUILD_LINUX_A72)
 
-# Build TI-RTOS + QNX binaries
-BUILD_APP_TIRTOS_QNX?=$(BUILD_QNX_A72)
+# Build RTOS + QNX binaries
+BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
 
 # PDK board to build for, valid values: j721e_sim j721e_evm
 ifeq ($(SOC),j721e)

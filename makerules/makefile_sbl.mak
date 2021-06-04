@@ -42,34 +42,34 @@ REMOTE_CORE_LIST_LATEAPP2=
 CERT_SCRIPT=$(PDK_PATH)/packages/ti/build/makerules/x509CertificateGen.sh
 
 ifeq ($(BUILD_CPU_MCU2_0),yes)
-	REMOTE_CORE_LIST_LATEAPP1+=6 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu2_0.out.rprc
+	REMOTE_CORE_LIST_LATEAPP1+=6 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
-	REMOTE_CORE_LIST_LATEAPP1+=7 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu2_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP1+=7 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_0),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=8 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu3_0.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=8 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=9 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu3_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=9 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=10 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_c6x_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=10 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=11 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_c6x_2.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=11 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=12 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_c7x_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=12 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
 endif
 
 ifeq ($(BUILD_LINUX_A72), yes)
 	SBL_SD_FS_PATH=$(LINUX_SD_FS_BOOT_PATH)
-	LDS_PATH=$(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_linux/linux_lds
+	LDS_PATH=$(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_linux/linux_lds
 endif
 ifeq ($(BUILD_QNX_A72), yes)
 	SBL_SD_FS_PATH=$(QNX_SD_FS_BOOT_PATH)
-	LDS_PATH=$(VISION_APPS_PATH)/apps/basic_demos/app_tirtos/tirtos_qnx/qnx_lds
+	LDS_PATH=$(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx/qnx_lds
 endif
 
 sbl_atf_optee:
@@ -157,10 +157,10 @@ sbl_mcusw_bootimage_ospi_hs:
 sbl_vision_apps_bootimage_1:
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 ifeq ($(BUILD_CPU_MCU2_0),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_mcu2_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu2_0.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_mcu2_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu2_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1 $(REMOTE_CORE_LIST_LATEAPP1)
 # 	$(CERT_SCRIPT) -b $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1 -o $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1.signed -c R5 -l 0x0 -k $(PDK_PATH)/packages/ti/build/makerules/k3_dev_mpk.pem
@@ -172,19 +172,19 @@ sbl_vision_apps_bootimage_hs_1:
 sbl_vision_apps_bootimage_2:
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 ifeq ($(BUILD_CPU_MCU3_0),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_mcu3_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu3_0.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_mcu3_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_mcu3_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C66/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_c6x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_c6x_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C66/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C66/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_c6x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_c6x_2.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C66/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C71/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_tirtos_qnx_c7x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_tirtos_qnx_c7x_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C71/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp2 $(REMOTE_CORE_LIST_LATEAPP2)
 

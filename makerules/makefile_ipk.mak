@@ -43,7 +43,7 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					tiovx/kernels/include \
 					tiovx/tiovx_dev/kernels_j7/include \
 					tiovx/utils/include \
-					vision_apps/apps/basic_demos/app_tirtos \
+					vision_apps/apps/basic_demos/app_rtos \
 					vision_apps/apps/ptk_demos/applibs \
 					vision_apps/apps/ptk_demos/app_common \
 					vision_apps/applibs \
