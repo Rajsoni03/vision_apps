@@ -25,4 +25,4 @@ typedef struct
 
 #endif
 
-void svGenerate_3D_GPULUT(svGpuLutGen_t *sv, svLdcLut_t  *ldclut, tivxGenerateGpulutParams *prms, svACCalmatStruct_t* calmat_scaled, float *lut3dxyz, uint16_t *out_gpulut);
+void svGenerate_3D_GPULUT(svGpuLutGen_t *sv, svLdcLut_t  *ldclut, tivxGenerateGpulutParams *prms, svACCalmatStruct_t* calmat_scaled, float *lut3dxyz, uint16_t *out_gpulut, int32_t *lut_count);

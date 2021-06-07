@@ -346,8 +346,6 @@ TEST(tivxSrvGenerateGpulut, testBowl_2mpix)
     VX_CALL(vxAddArrayItems(in_lut3dxyz_array, SV_XYZLUT3D_SIZE, in_lut3dxyz, sizeof(float)));   
     VX_CALL(vxCopyArrayRange(in_lut3dxyz_array, 0,SV_XYZLUT3D_SIZE, sizeof(float), (void *)in_lut3dxyz, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));   
 
-    VX_CALL(vxAddArrayItems(out_gpulut_array, 1, out_gpulut, SV_GPULUT_SIZE));
-
 
     // Create a graph object 
     #ifdef DEBUG_PRINT

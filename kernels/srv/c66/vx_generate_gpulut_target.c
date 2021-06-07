@@ -72,10 +72,6 @@
 #include "C6xSimulator.h"
 #endif
 
-
-
-
-
 static tivx_target_kernel vx_generate_gpulut_target_kernel = NULL;
 
 static vx_status VX_CALLBACK tivxGenerateGpulutProcess(
@@ -178,6 +174,7 @@ static vx_status VX_CALLBACK tivxGenerateGpulutProcess(
         {
 
             /* call kernel processing function */
+            int32_t count;
 
             in_params             = (svGpuLutGen_t *)in_configuration_target_ptr;
             in_ldclut             = (svLdcLut_t      *)in_ldclut_target_ptr;
@@ -186,8 +183,9 @@ static vx_status VX_CALLBACK tivxGenerateGpulutProcess(
 
             out_gpulut            = (vx_uint16 *) out_gpulut3d_target_ptr; 
 
-           svGenerate_3D_GPULUT(in_params, in_ldclut, prms, in_calmat_scaled, in_lut3dxyz, out_gpulut);
+            svGenerate_3D_GPULUT(in_params, in_ldclut, prms, in_calmat_scaled, in_lut3dxyz, out_gpulut, &count);
 
+            out_gpulut3d_desc->num_items = count;
         }
         tivxMemBufferUnmap(in_configuration_target_ptr,
            in_configuration_desc->mem_size, VX_MEMORY_TYPE_HOST,

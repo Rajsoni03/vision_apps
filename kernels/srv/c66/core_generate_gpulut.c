@@ -78,6 +78,7 @@
 #ifdef DEBUG_1
 #include <stdio.h>
 #endif
+
 /* Pull in inline for divsp */
 static inline float divspMod_atanspi(float a, float b) {
     cmn_DIVSP(b, a);
@@ -304,7 +305,7 @@ static inline void svFisheyeTransformUndistToDist(__float2_t point_u, int32_t *r
 
 
 
-void svGenerate_3D_GPULUT(svGpuLutGen_t *sv, svLdcLut_t  *ldclut, tivxGenerateGpulutParams *prms, svACCalmatStruct_t* calmat_scaled, float *lut3dxyz, uint16_t *out_gpulut)
+void svGenerate_3D_GPULUT(svGpuLutGen_t *sv, svLdcLut_t  *ldclut, tivxGenerateGpulutParams *prms, svACCalmatStruct_t* calmat_scaled, float *lut3dxyz, uint16_t *out_gpulut, int32_t *lut_count)
 {
 
 
@@ -507,6 +508,8 @@ void svGenerate_3D_GPULUT(svGpuLutGen_t *sv, svLdcLut_t  *ldclut, tivxGenerateGp
             }
         }
     }
+
+    *lut_count = (((2 + sv->SVOutDisplayWidth / sv->subsampleratio)*(2 + sv->SVOutDisplayHeight / sv->subsampleratio))) * NUM_ELEMENTS;
 
     #ifdef PC_VERSION
         fp = fopen("GAlingLUT3D.bin", "wb");
