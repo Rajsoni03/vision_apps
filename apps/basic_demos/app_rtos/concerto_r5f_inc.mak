@@ -10,7 +10,12 @@ IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 IDIRS+=$(IMAGING_PATH)/sensor_drv/include
 
-LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/r5f/$(TARGET_BUILD)/
+ifeq ($(RTOS),SYSBIOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/r5f/$(TARGET_BUILD)/
+endif
+ifeq ($(RTOS),FREERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/board/lib/$(BUILD_PDK_BOARD)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/r5f/$(TARGET_BUILD)/
@@ -73,6 +78,10 @@ SYS_STATIC_LIBS += $(IMAGING_LIBS)
 SYS_STATIC_LIBS += $(VIDEO_CODEC_LIBS)
 SYS_STATIC_LIBS += rtsv7R4_T_le_v3D16_eabi
 
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
+endif
 ADDITIONAL_STATIC_LIBS += ti.osal.aer5f
 ADDITIONAL_STATIC_LIBS += ti.csl.aer5f
 ADDITIONAL_STATIC_LIBS += ti.board.aer5f

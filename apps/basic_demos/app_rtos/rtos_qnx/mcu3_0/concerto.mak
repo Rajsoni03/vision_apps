@@ -29,12 +29,8 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu3_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu3_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu3_0/$(TARGET_BUILD)/
 
-ifeq ($(RTOS),SYSBIOS)
-	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/r5f/$(TARGET_BUILD)/
-endif
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu3_0/$(TARGET_BUILD)/
-	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
 endif
 
 include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
@@ -43,11 +39,6 @@ include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
 STATIC_LIBS += app_rtos_common_mcu3_0
 STATIC_LIBS += app_rtos_qnx
 STATIC_LIBS += app_utils_sciclient
-
-ifeq ($(RTOS),FREERTOS)
-	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
-	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
-endif
 
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
 

@@ -43,12 +43,8 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(ETHFW_PATH)/out/J721E/R5Ft/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(REMOTE_DEVICE_PATH)/lib/J721E/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
-ifeq ($(RTOS),SYSBIOS)
-	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/r5f/$(TARGET_BUILD)/
-endif
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
-	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
 endif
 
 include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
@@ -77,11 +73,6 @@ REMOTE_DEVICE_LIBS = lib_remote_device
 
 SYS_STATIC_LIBS += $(ETHFW_LIBS)
 SYS_STATIC_LIBS += $(REMOTE_DEVICE_LIBS)
-
-ifeq ($(RTOS),FREERTOS)
-	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
-	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
-endif
 
 ADDITIONAL_STATIC_LIBS += csirx.aer5f
 ADDITIONAL_STATIC_LIBS += csitx.aer5f

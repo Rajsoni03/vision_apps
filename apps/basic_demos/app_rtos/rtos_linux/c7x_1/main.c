@@ -154,6 +154,8 @@ int main(void)
     TaskP_Params tskParams;
     TaskP_Handle task;
 
+    OS_init();
+
     setup_dru_qos();
 
     appTimerInterruptInit();

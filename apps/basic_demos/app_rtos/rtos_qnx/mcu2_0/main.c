@@ -111,6 +111,8 @@ int main(void)
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
 
+    OS_init();
+
     TaskP_Params_init(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;

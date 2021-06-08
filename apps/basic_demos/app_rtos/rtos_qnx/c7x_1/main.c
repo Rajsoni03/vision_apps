@@ -158,6 +158,8 @@ int main(void)
 
     appTimerInterruptInit();
 
+    OS_init();
+
     TaskP_Params_init(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;

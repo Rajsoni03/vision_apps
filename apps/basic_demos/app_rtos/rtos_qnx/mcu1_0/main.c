@@ -106,6 +106,8 @@ int main(void)
 
     appSciserverInit();
 
+    OS_init();
+
     TaskP_Params_init(&tskParams);
     /* Setting this task priority to 3 and make Sciserver 
        priority lo as 3+1 and high as 3+2 */
