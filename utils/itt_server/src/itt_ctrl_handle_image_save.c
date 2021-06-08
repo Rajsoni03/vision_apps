@@ -73,7 +73,7 @@ static char *app_get_test_file_path()
 {
     char *tivxPlatformGetEnv(char *env_var);
 
-    #if defined(SYSBIOS)
+    #if defined(SYSBIOS) || defined(FREERTOS)
     return tivxPlatformGetEnv("VX_TEST_DATA_PATH");
     #else
     return getenv("VX_TEST_DATA_PATH");

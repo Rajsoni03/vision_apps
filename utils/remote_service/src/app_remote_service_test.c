@@ -68,7 +68,7 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 
-#ifdef SYSBIOS
+#if defined(SYSBIOS) || defined(FREERTOS)
 /* define this to enable load test */
 #define ENABLE_LOAD_TEST
 #endif

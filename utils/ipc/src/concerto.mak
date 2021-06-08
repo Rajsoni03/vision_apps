@@ -4,7 +4,7 @@ include $(PRELUDE)
 TARGET      := app_utils_ipc
 TARGETTYPE  := library
 
-ifeq ($(TARGET_OS),SYSBIOS)
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 CSOURCES    := app_ipc_rtos.c app_ipc_rtos_echo_test.c
 endif
 

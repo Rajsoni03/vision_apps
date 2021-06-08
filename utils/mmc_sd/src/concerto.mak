@@ -1,5 +1,5 @@
 ifeq ($(TARGET_PLATFORM),J7)
-ifeq ($(TARGET_OS),SYSBIOS)
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 ifeq ($(TARGET_CPU),A72)
 
 include $(PRELUDE)

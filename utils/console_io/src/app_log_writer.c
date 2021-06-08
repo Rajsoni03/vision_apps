@@ -258,7 +258,7 @@ void appLogPrintf(const char *format, ...)
 
         #if defined(A72)
         {
-            #if defined(SYSBIOS)
+            #if defined(SYSBIOS) || defined(FREERTOS)
             void appLogDeviceWrite(char *string, uint32_t max_size);
             appLogDeviceWrite(obj->buf, APP_LOG_BUF_MAX);
             #endif

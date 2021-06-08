@@ -11,7 +11,7 @@ ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
 endif
 
-ifeq ($(TARGET_OS),SYSBIOS)
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 CSOURCES += app_log_rtos.c app_cli_rtos.c
 ifeq ($(TARGET_CPU),A72)
 CSOURCES += app_log_printf_gcc_rtos.c

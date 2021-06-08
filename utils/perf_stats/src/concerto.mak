@@ -17,7 +17,7 @@ include $(PRELUDE)
 TARGET      := app_utils_perf_stats
 TARGETTYPE  := library
 
-ifeq ($(TARGET_OS),SYSBIOS)
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 CSOURCES    := app_perf_stats_rtos.c
 endif
 
