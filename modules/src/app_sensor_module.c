@@ -209,6 +209,7 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
                 printf("Invalid selection %c. Try again \n", ch);
             }
         }
+        sensorObj->ch_mask = (1<<sensorObj->num_cameras_enabled) - 1;
     }
     else
     {
@@ -241,6 +242,20 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
             }
 
             sensorSelected = vx_true_e;
+        }
+
+        if(sensorObj->ch_mask > 0)
+        {
+            vx_uint32 mask = sensorObj->ch_mask;
+            sensorObj->num_cameras_enabled = 0;
+            while(mask > 0)
+            {
+                if(mask & 0x1)
+                {
+                    sensorObj->num_cameras_enabled++;
+                }            
+                mask = mask >> 1;
+            }
         }
     }
 
@@ -314,8 +329,9 @@ vx_status app_init_sensor(SensorObj *sensorObj, char *objName)
 {
     vx_status status = VX_SUCCESS;
     int32_t sensor_init_status = -1;
+    int32_t ch_mask = sensorObj->ch_mask;
 
-    sensor_init_status = appInitImageSensor(sensorObj->sensor_name, sensorObj->sensor_features_enabled, ((1 << sensorObj->num_cameras_enabled) - 1));
+    sensor_init_status = appInitImageSensor(sensorObj->sensor_name, sensorObj->sensor_features_enabled, ch_mask);
     if(0 != sensor_init_status)
     {
         printf("Error initializing sensor %s \n", sensorObj->sensor_name);

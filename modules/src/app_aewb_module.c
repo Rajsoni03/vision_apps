@@ -121,6 +121,7 @@ static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj 
 {
     vx_status status = VX_SUCCESS;
     vx_int32 ch;
+    vx_int32 ch_mask;
 
     aewbObj->params.sensor_dcc_id       = sensorObj->sensorParams.dccId;
     aewbObj->params.sensor_img_format   = 0;
@@ -154,14 +155,23 @@ static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj 
 
         if(status == VX_SUCCESS)
         {
+            vx_uint32 array_obj_index = 0;
             vxSetReferenceName((vx_reference)aewbObj->config_arr, "aewb_node_config_arr");
 
-            for(ch = 0; ch < sensorObj->num_cameras_enabled; ch++)
+            ch = 0;
+            ch_mask = sensorObj->ch_mask;
+            while(ch_mask > 0)
             {
-                vx_user_data_object config = (vx_user_data_object)vxGetObjectArrayItem(aewbObj->config_arr, ch);
-                aewbObj->params.channel_id = ch;
-                vxCopyUserDataObject(config, 0, sizeof(tivx_aewb_config_t), &aewbObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
-                vxReleaseUserDataObject(&config);
+                if(ch_mask & 0x1)
+                {
+                    vx_user_data_object config = (vx_user_data_object)vxGetObjectArrayItem(aewbObj->config_arr, array_obj_index);
+                    array_obj_index++;
+	                aewbObj->params.channel_id = ch;
+	                vxCopyUserDataObject(config, 0, sizeof(tivx_aewb_config_t), &aewbObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
+	                vxReleaseUserDataObject(&config);
+                }
+                ch++;
+                ch_mask = ch_mask >> 1;
             }
         }
     }

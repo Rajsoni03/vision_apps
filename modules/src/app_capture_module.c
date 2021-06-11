@@ -69,9 +69,10 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     vx_status status = VX_SUCCESS;
 
     vx_uint32 num_capt_instances;
-    vx_int32 id, lane, q, ch;
+    vx_int32 id, lane, ch, vcNum;
+    int32_t ch_mask = sensorObj->ch_mask;
 
-    if(sensorObj->num_cameras_enabled > 4)
+    if(ch_mask > 0xF)
     {
         num_capt_instances= 2;
     }
@@ -92,7 +93,6 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     captureObj->params.numInst  = num_capt_instances;
     captureObj->params.numCh    = sensorObj->num_cameras_enabled;
 
-    ch = 0;
     for(id = 0; id < num_capt_instances; id++)
     {
         captureObj->params.instId[id]                       = id;
@@ -107,12 +107,29 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
                         lane,
                         captureObj->params.instCfg[id].dataLanesMap[lane]);
         }
-        for (q = 0; q < NUM_CAPT_CHANNELS; q++)
+    }
+
+    ch = 0;/*Camera Physical Channel Number*/
+    vcNum = 0;/*CSI2 Virtual Channel Number*/
+    id = 0;/*CSI2 Instance ID*/
+    while(ch_mask > 0)
+    {
+        if(ch > 3)
         {
-            captureObj->params.chVcNum[ch]   = q;
-            captureObj->params.chInstMap[ch] = id;
-            ch++;
+            id = 1;
         }
+        else
+        {
+            id = 0;
+        }
+        if(ch_mask & 0x1)
+        {
+            captureObj->params.chVcNum[vcNum] = ch%4;
+            captureObj->params.chInstMap[vcNum] = id;
+            vcNum++;
+        }
+        ch++;
+        ch_mask = ch_mask >> 1;
     }
 
     captureObj->config = vxCreateUserDataObject(context, "tivx_capture_params_t", sizeof(tivx_capture_params_t), &captureObj->params);

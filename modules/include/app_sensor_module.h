@@ -131,6 +131,8 @@ typedef struct {
     /*! Number of cameras enabled */
     uint32_t num_cameras_enabled;
 
+    uint32_t ch_mask;
+
     /*! Flag to whether or not interactive mode is enabled */
     vx_int32 is_interactive;
 

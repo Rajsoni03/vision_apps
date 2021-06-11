@@ -445,13 +445,19 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 obj->sensorObj.is_interactive = obj->is_interactive;
             }
             else
-            if(strcmp(token, "num_cameras_enabled")==0)
+
+            /*
+                num_cameras_enabled from cfg file is ignored
+                Instead channel_mask is read. num_cameras_enabled = number of 1 bits in mask
+                For e.g. channel_mask = 15 (0x0F) indicates that first 4 cameras are enabled  
+            */
+            if(strcmp(token, "channel_mask")==0)
             {
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
                     token[strlen(token)-1]=0;
-                    obj->sensorObj.num_cameras_enabled = atoi(token);
+                    obj->sensorObj.ch_mask = atoi(token);
                 }
             }
             else
@@ -1107,6 +1113,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     SensorObj *sensorObj = &obj->sensorObj;
     vx_int32 frame_id;
+    int32_t ch_mask = obj->sensorObj.ch_mask;
 
     app_pipeline_params_defaults(obj);
     APP_PRINTF("app_pipeline_params_defaults returned\n");
@@ -1120,11 +1127,11 @@ static vx_status app_run_graph(AppObj *obj)
     // if test_mode is enabled, don't fail the program if the sensor init fails
     if(obj->test_mode)
     {
-        appStartImageSensor(sensorObj->sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+        appStartImageSensor(sensorObj->sensor_name, ch_mask);
     }
     else
     {
-        status = appStartImageSensor(sensorObj->sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+        status = appStartImageSensor(sensorObj->sensor_name, ch_mask);
         APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
     }
 
@@ -1175,7 +1182,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     if (status == VX_SUCCESS)
     {
-        status = appStopImageSensor(obj->sensorObj.sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+        status = appStopImageSensor(obj->sensorObj.sensor_name, ch_mask);
     }
 
     return status;
@@ -1220,6 +1227,7 @@ static void app_default_param_set(AppObj *obj)
 
     obj->sensorObj.enable_ldc = 0;
     obj->sensorObj.num_cameras_enabled = 1;
+    obj->sensorObj.ch_mask = 0x1;
     obj->sensorObj.usecase_option = APP_SENSOR_FEATURE_CFG_UC0;
 }
 
