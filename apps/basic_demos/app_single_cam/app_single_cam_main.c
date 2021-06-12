@@ -535,6 +535,7 @@ Sensor driver does not support metadata yet.
             local_capture_config.instId[id]                       = id;
             local_capture_config.instCfg[id].enableCsiv2p0Support = (uint32_t)vx_true_e;
             local_capture_config.instCfg[id].numDataLanes         = sensorParams.sensorInfo.numDataLanes;
+            local_capture_config.instCfg[id].laneBandSpeed        = sensorParams.sensorInfo.csi_laneBandSpeed;
 
             for (lane = 0; lane < local_capture_config.instCfg[id].numDataLanes; lane++)
             {

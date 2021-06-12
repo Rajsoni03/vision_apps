@@ -97,8 +97,9 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     {
         captureObj->params.instId[id]                       = id;
         captureObj->params.instCfg[id].enableCsiv2p0Support = (uint32_t)vx_true_e;
-        captureObj->params.instCfg[id].numDataLanes         = 4U;
+        captureObj->params.instCfg[id].numDataLanes         = sensorObj->sensorParams.sensorInfo.numDataLanes;
         APP_PRINTF("captureObj->params.numDataLanes = %d \n", captureObj->params.instCfg[id].numDataLanes);
+        captureObj->params.instCfg[id].laneBandSpeed        = sensorObj->sensorParams.sensorInfo.csi_laneBandSpeed;
 
         for (lane = 0; lane < captureObj->params.instCfg[id].numDataLanes; lane++)
         {
