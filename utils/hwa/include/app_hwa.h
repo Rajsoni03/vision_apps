@@ -64,6 +64,63 @@
 #define APP_HWA_H_
 
 /**
+ *  Remote service name to free/reallocate DMAPC SL2
+ */
+#define APP_DMPAC_SL2_SERVICE_NAME  "com.ti.dmpac_sl2"
+
+/**
+ *  Remote service command to free SL2 for SDE
+ */
+#define APP_DMPAC_SDE_SL2_FREE        (0x0001)
+/**
+ *  Remote service command to free SL2 for DOF
+ */
+#define APP_DMPAC_DOF_SL2_FREE        (0x0002)
+/**
+ *  Remote service command to reallocate SL2 for SDE
+ */
+#define APP_DMPAC_SDE_SL2_REALLOC     (0x0003)
+/**
+ *  Remote service command to reallocate SL2 for SDE
+ */
+#define APP_DMPAC_DOF_SL2_REALLOC     (0x0004)
+
+/**
+ *  Identical to SDE_DEFAULT_DIS_BUFF_DEPTH 
+ */
+#define APP_SDE_DEFAULT_DIS_BUFF_DEPTH          (2U)
+/**
+ *  Identical to SDE_SR_192 
+ */
+#define APP_SDE_SR_192                          (2U)
+/**
+ *  Identical to FVID2_CCSF_BITS12_UNPACKED16
+ */
+#define APP_FVID2_CCSF_BITS12_UNPACKED16        ((uint32_t) 0x11U)
+
+/**
+ *  struct App_m2mSdeSl2AllocPrms
+ *  \brief Init Parameters required to allocate SDE driver.
+ *         This should be identical to Vhwa_m2mSdeSl2AllocPrms. 
+ *         It is defined locally for application to use the same params
+ */
+typedef struct
+{
+    /** These parameters are used by the driver to allocater SL2 memory, used
+     *  all driver handles.
+     *  Ensure to allocate max of all handles requirement.
+     */
+    uint32_t        maxImgWidth;
+    /**< Maximun image width */
+    uint32_t        inCcsf;
+    /**< CCSF for input image */
+    uint32_t        searchRange;
+    /**< Search range refer to \ref SDE_DispSearchRange */
+    uint32_t        disBuffDepth;
+    /**< Maximum disparity buffer depth */
+} App_M2mSdeSl2AllocPrms;
+
+/**
  * \defgroup group_vision_apps_utils_hwa HW accelerator initialization APIs (TI-RTOS only)
  *
  * \brief This section contains APIs for HW accelerator initialization 
@@ -118,6 +175,16 @@ int32_t appFvid2DeInit(void);
  */
 int32_t appVhwaVpacDeInit(void);
 int32_t appVhwaDmpacDeInit(void);
+
+/** \brief Performs registration of remote service for DMPAC SL2
+ *
+ */
+int32_t appVhwaDmpacRemoteServiceInit();
+
+/** \brief Performs unregistration of remote service for DMPAC SL2
+ *
+ */
+int32_t appVhwaDmpacRemoteServiceDeInit();
 
 /* @} */
 

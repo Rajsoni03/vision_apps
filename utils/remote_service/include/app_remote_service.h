@@ -90,6 +90,10 @@
  */
 #define APP_REMOTE_SERVICE_FLAG_NO_WAIT_ACK         (0x00000001u)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief Remote service init params
  */
@@ -169,6 +173,10 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, char *service_name, uint32_
  * \return 0 on success, else failure
  */
 int32_t appRemoteServiceDeInit();
+
+#ifdef __cplusplus
+}
+#endif
 
 /* @} */
 

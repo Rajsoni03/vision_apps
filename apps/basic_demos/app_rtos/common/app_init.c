@@ -601,6 +601,10 @@ int32_t appInit()
     #ifdef ENABLE_VHWA_DMPAC
     status = appVhwaDmpacInit();
     APP_ASSERT_SUCCESS(status);
+
+    /* Register remote service for SL2 reallocation */
+    status = appVhwaDmpacRemoteServiceInit();
+    APP_ASSERT_SUCCESS(status);
     #endif
 
     #ifdef ENABLE_TIOVX
@@ -658,6 +662,8 @@ void appDeInit()
     #endif
     #ifdef ENABLE_VHWA_DMPAC
     appVhwaDmpacDeInit();
+    /* Unregister remote service for SL2 reallocation */
+    appVhwaDmpacRemoteServiceDeInit();
     #endif
     #ifdef ENABLE_DSS_SINGLE
     appDssDefaultDeInit();

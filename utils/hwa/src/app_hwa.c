@@ -65,6 +65,8 @@
 #include <utils/hwa/include/app_hwa.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/sciclient/include/app_sciclient_wrapper_api.h>
+#include <utils/remote_service/include/app_remote_service.h>
+#include <utils/ipc/include/app_ipc.h>
 #include <ti/drv/csirx/csirx.h>
 #include <ti/drv/csitx/csitx.h>
 #include <ti/drv/vhwa/include/vhwa_m2mDof.h>
@@ -536,4 +538,89 @@ int32_t appVhwaVpacDeInit()
 #endif
 
     return (0);
+}
+
+int32_t appDmpacSl2Handler(char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags)
+{
+    int32_t  status = -1;
+
+    if (NULL != prm)
+    {
+        appLogPrintf(
+            " DMPAC SL2: Received command %08x to configure DMPAC SL2 memory !!!\n",
+            cmd);
+
+        switch(cmd)
+        {
+            case APP_DMPAC_SDE_SL2_FREE:
+                // free SDE SL2 memory
+                status = Vhwa_m2mSdeFreeSl2();
+                break;
+
+            case APP_DMPAC_DOF_SL2_FREE:
+                // free DOF SL2 memory
+                status = Vhwa_m2mDofFreeSl2();
+                break;
+
+            case APP_DMPAC_SDE_SL2_REALLOC:
+                // realloc SDE SL2 for 2MP
+                if (sizeof(Vhwa_M2mSdeSl2AllocPrms) == prm_size)
+                {
+                    Vhwa_M2mSdeSl2AllocPrms *cmdPrms = (Vhwa_M2mSdeSl2AllocPrms *)prm;
+                    status = Vhwa_m2mSdeAllocSl2(cmdPrms);
+                } else
+                {
+                    appLogPrintf(" DMPAC SL2: ERROR: Invalid SDE SL2 parameters passed !!!\n");
+                }
+
+                break;
+
+            case APP_DMPAC_DOF_SL2_REALLOC:
+                // realloc DOF SL2 for 2MP
+                if (sizeof(Vhwa_M2mDofSl2AllocPrms) == prm_size)
+                {
+                    Vhwa_M2mDofSl2AllocPrms *cmdPrms = (Vhwa_M2mDofSl2AllocPrms *)prm;
+                    status = Vhwa_m2mDofAllocSl2(cmdPrms);
+                } else
+                {
+                    appLogPrintf(" DMPAC SL2: ERROR: Invalid DOF SL2 parameters passed !!!\n");
+                }
+                break;
+        }
+
+        if (0 == status)
+        {
+            appLogPrintf(" DMPAC SL2: DMPAC SL2 configuration done !!!\n");
+        }
+        else
+        {
+            appLogPrintf(" DMPAC SL2: ERROR: DMPAC SL2 configuration failed !!!\n");
+        }
+    }    
+    else
+    {
+        appLogPrintf(" DMPAC SL2: ERROR: Invalid parameters passed !!!\n");
+    }
+ 
+
+    return status;
+}
+
+int32_t appVhwaDmpacRemoteServiceInit()
+{
+    int32_t status;
+
+    status = appRemoteServiceRegister(APP_DMPAC_SL2_SERVICE_NAME, appDmpacSl2Handler);
+    if(status!=0)
+    {
+        appLogPrintf("DMPAC SL2: ERROR: Unable to register service \n");
+    }
+
+    return 0;
+}
+
+int32_t appVhwaDmpacRemoteServiceDeInit()
+{
+    appRemoteServiceUnRegister(APP_DMPAC_SL2_SERVICE_NAME);
+    return 0;
 }
