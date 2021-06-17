@@ -601,10 +601,6 @@ int32_t appInit()
     #ifdef ENABLE_VHWA_DMPAC
     status = appVhwaDmpacInit();
     APP_ASSERT_SUCCESS(status);
-
-    /* Register remote service for SL2 reallocation */
-    status = appVhwaDmpacRemoteServiceInit();
-    APP_ASSERT_SUCCESS(status);
     #endif
 
     #ifdef ENABLE_TIOVX
@@ -638,6 +634,14 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
 
+    /* Register remote service for SL2 reallocation 
+     * Can add more conditions if needed.
+     */
+    #ifdef ENABLE_VHWA_DMPAC
+    status = appVhwaRemoteServiceInit();
+    APP_ASSERT_SUCCESS(status);
+    #endif
+
     appLogPrintf("APP: Init ... Done !!!\n");
 
     return status;
@@ -662,8 +666,6 @@ void appDeInit()
     #endif
     #ifdef ENABLE_VHWA_DMPAC
     appVhwaDmpacDeInit();
-    /* Unregister remote service for SL2 reallocation */
-    appVhwaDmpacRemoteServiceDeInit();
     #endif
     #ifdef ENABLE_DSS_SINGLE
     appDssDefaultDeInit();
@@ -719,6 +721,13 @@ void appDeInit()
 
     /* De-init GTC timer */
     appLogGlobalTimeDeInit();
+
+    /* Unregister remote service for SL2 reallocation.
+     * Can add more conditions if needed.
+     */
+    #ifdef ENABLE_VHWA_DMPAC
+    appVhwaRemoteServiceDeInit();
+    #endif
 
     appLogPrintf("APP: Deinit ... Done !!!\n");
 }

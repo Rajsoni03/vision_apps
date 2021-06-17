@@ -606,7 +606,7 @@ int32_t appDmpacSl2Handler(char *service_name, uint32_t cmd, void *prm, uint32_t
     return status;
 }
 
-int32_t appVhwaDmpacRemoteServiceInit()
+int32_t appVhwaRemoteServiceInit()
 {
     int32_t status;
 
@@ -616,11 +616,18 @@ int32_t appVhwaDmpacRemoteServiceInit()
         appLogPrintf("DMPAC SL2: ERROR: Unable to register service \n");
     }
 
-    return 0;
+    return status;
 }
 
-int32_t appVhwaDmpacRemoteServiceDeInit()
+int32_t appVhwaRemoteServiceDeInit()
 {
-    appRemoteServiceUnRegister(APP_DMPAC_SL2_SERVICE_NAME);
-    return 0;
+    int32_t status;
+    
+    status = appRemoteServiceUnRegister(APP_DMPAC_SL2_SERVICE_NAME);
+    if(status!=0)
+    {
+        appLogPrintf("DMPAC SL2: ERROR: Unable to unregister service \n");
+    }
+
+    return status;
 }

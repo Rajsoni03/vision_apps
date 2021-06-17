@@ -81,7 +81,7 @@
  */
 #define APP_DMPAC_SDE_SL2_REALLOC     (0x0003)
 /**
- *  Remote service command to reallocate SL2 for SDE
+ *  Remote service command to reallocate SL2 for DOF
  */
 #define APP_DMPAC_DOF_SL2_REALLOC     (0x0004)
 
@@ -97,6 +97,23 @@
  *  Identical to FVID2_CCSF_BITS12_UNPACKED16
  */
 #define APP_FVID2_CCSF_BITS12_UNPACKED16        ((uint32_t) 0x11U)
+
+
+/** 
+ *  Identical to DOF_DEFAULT_REF_BUFF_DEPTH
+ */
+#define APP_DOF_DEFAULT_REF_BUFF_DEPTH          (2U)
+
+/** 
+ *  Identical to DOF_DEFAULT_CUR_BUFF_DEPTH
+ */
+#define APP_DOF_DEFAULT_CUR_BUFF_DEPTH          (2U)
+
+/** 
+ *  Identical to DOF_DEFAULT_FV_BUFF_DEPTH
+ */
+#define APP_DOF_DEFAULT_FV_BUFF_DEPTH           (4U)
+
 
 /**
  *  struct App_m2mSdeSl2AllocPrms
@@ -119,6 +136,39 @@ typedef struct
     uint32_t        disBuffDepth;
     /**< Maximum disparity buffer depth */
 } App_M2mSdeSl2AllocPrms;
+
+
+/**
+ *  struct App_m2mDofSl2AllocPrms
+ *  \brief Init Parameters required to allocate DOF driver
+ *         This should be identical to Vhwa_m2mDofSl2AllocPrms. 
+ *         It is defined locally for application to use the same params
+ */
+typedef struct
+{
+    /** These parameters are used by the driver to allocater SL2 memory, used
+     *  all driver handles.
+     *  Ensure to allocate max of all handles requirement.
+     */
+    uint32_t        maxImgWidth;
+    /**< Maximun image width */
+    uint32_t        inCcsf;
+    /**< CCSF for input image */
+    uint32_t        refBuffDepth;
+    /**< Input buffer depth in SL2 for reference image, final depth will be
+         calculated based on tob and bottom searc range.
+         Minumum configurable depth is 2 */
+    uint32_t        currBuffDepth;
+    /**< Input buffer depth in SL2 for Current image
+         Minumum configurable depth is 2 */
+    uint32_t        fvBuffDepth;
+    /**< Flow vector buffer depth in Sl2 */
+    uint32_t        topSR;
+    /**< Top search range */
+    uint32_t        botSR;
+    /**< Bottom search range */
+} App_M2mDofSl2AllocPrms;
+
 
 /**
  * \defgroup group_vision_apps_utils_hwa HW accelerator initialization APIs (TI-RTOS only)
@@ -176,15 +226,15 @@ int32_t appFvid2DeInit(void);
 int32_t appVhwaVpacDeInit(void);
 int32_t appVhwaDmpacDeInit(void);
 
-/** \brief Performs registration of remote service for DMPAC SL2
+/** \brief Performs registration of remote service for SL2
  *
  */
-int32_t appVhwaDmpacRemoteServiceInit();
+int32_t appVhwaRemoteServiceInit();
 
-/** \brief Performs unregistration of remote service for DMPAC SL2
+/** \brief Performs unregistration of remote service for SL2
  *
  */
-int32_t appVhwaDmpacRemoteServiceDeInit();
+int32_t appVhwaRemoteServiceDeInit();
 
 /* @} */
 
