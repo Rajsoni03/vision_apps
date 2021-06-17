@@ -540,14 +540,14 @@ int32_t appVhwaVpacDeInit()
     return (0);
 }
 
-int32_t appDmpacSl2Handler(char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags)
+int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags)
 {
     int32_t  status = -1;
 
     if (NULL != prm)
     {
         appLogPrintf(
-            " DMPAC SL2: Received command %08x to configure DMPAC SL2 memory !!!\n",
+            " VHWA Remote Service: Received command %08x to configure VHWA !!!\n",
             cmd);
 
         switch(cmd)
@@ -570,7 +570,7 @@ int32_t appDmpacSl2Handler(char *service_name, uint32_t cmd, void *prm, uint32_t
                     status = Vhwa_m2mSdeAllocSl2(cmdPrms);
                 } else
                 {
-                    appLogPrintf(" DMPAC SL2: ERROR: Invalid SDE SL2 parameters passed !!!\n");
+                    appLogPrintf(" VHWA Remote Service: ERROR: Invalid SDE SL2 parameters passed !!!\n");
                 }
 
                 break;
@@ -583,23 +583,23 @@ int32_t appDmpacSl2Handler(char *service_name, uint32_t cmd, void *prm, uint32_t
                     status = Vhwa_m2mDofAllocSl2(cmdPrms);
                 } else
                 {
-                    appLogPrintf(" DMPAC SL2: ERROR: Invalid DOF SL2 parameters passed !!!\n");
+                    appLogPrintf(" VHWA Remote Service: ERROR: Invalid DOF SL2 parameters passed !!!\n");
                 }
                 break;
         }
 
         if (0 == status)
         {
-            appLogPrintf(" DMPAC SL2: DMPAC SL2 configuration done !!!\n");
+            appLogPrintf(" VHWA Remote Service: VHWA configuration done !!!\n");
         }
         else
         {
-            appLogPrintf(" DMPAC SL2: ERROR: DMPAC SL2 configuration failed !!!\n");
+            appLogPrintf(" VHWA Remote Service: ERROR: VHWA configuration failed !!!\n");
         }
     }    
     else
     {
-        appLogPrintf(" DMPAC SL2: ERROR: Invalid parameters passed !!!\n");
+        appLogPrintf(" VHWA Remote Service: ERROR: Invalid parameters passed !!!\n");
     }
  
 
@@ -610,10 +610,10 @@ int32_t appVhwaRemoteServiceInit()
 {
     int32_t status;
 
-    status = appRemoteServiceRegister(APP_DMPAC_SL2_SERVICE_NAME, appDmpacSl2Handler);
+    status = appRemoteServiceRegister(APP_VHWA_SERVICE_NAME, appVhwaHandler);
     if(status!=0)
     {
-        appLogPrintf("DMPAC SL2: ERROR: Unable to register service \n");
+        appLogPrintf("VHWA Remote Service: ERROR: Unable to register service \n");
     }
 
     return status;
@@ -623,10 +623,10 @@ int32_t appVhwaRemoteServiceDeInit()
 {
     int32_t status;
     
-    status = appRemoteServiceUnRegister(APP_DMPAC_SL2_SERVICE_NAME);
+    status = appRemoteServiceUnRegister(APP_VHWA_SERVICE_NAME);
     if(status!=0)
     {
-        appLogPrintf("DMPAC SL2: ERROR: Unable to unregister service \n");
+        appLogPrintf("VHWA Remote Service: ERROR: Unable to unregister service \n");
     }
 
     return status;

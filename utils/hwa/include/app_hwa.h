@@ -66,7 +66,7 @@
 /**
  *  Remote service name to free/reallocate DMAPC SL2
  */
-#define APP_DMPAC_SL2_SERVICE_NAME  "com.ti.dmpac_sl2"
+#define APP_VHWA_SERVICE_NAME  "com.ti.vhwa_remote_service"
 
 /**
  *  Remote service command to free SL2 for SDE
