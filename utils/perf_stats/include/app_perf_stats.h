@@ -65,6 +65,11 @@
 
 #include <stdint.h>
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <utils/mem/include/app_mem.h>
 
 /**
@@ -355,7 +360,7 @@ int32_t appPerfStatsPrintAll();
  *
  * \return 0 on success
  */
-int32_t appPerfStatsRegisterTask(void *task_handle, char *name);
+int32_t appPerfStatsRegisterTask(void *task_handle, const char *name);
 
 /**
  * \brief De-Initialize perf statistics collector module
@@ -375,7 +380,7 @@ int32_t appPerfStatsDeInit();
  * \param prm [out] performance point
  * \param name [out] name of this profile point
  */
-void appPerfPointSetName(app_perf_point_t *prm, char *name);
+void appPerfPointSetName(app_perf_point_t *prm, const char *name);
 
 /**
  * \brief Reset a performance point, MUST be called once before begin/end
@@ -421,7 +426,7 @@ void appPerfPointPrintFPS(app_perf_point_t *prm);
  * \param output_file_path   [in] path to output file
  * \param output_file_prefix [in] name of output file (function will append .md)
  */
-FILE *appPerfStatsExportOpenFile(char *output_file_path, char *output_file_prefix);
+FILE *appPerfStatsExportOpenFile(const char *output_file_path, const char *output_file_prefix);
 
 /**
  * \brief Exports the performance to a .md file
@@ -554,5 +559,9 @@ int32_t appPerfStatsDdrStatsResetAll();
 void appPerfStatsResetAll();
 
 /* @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

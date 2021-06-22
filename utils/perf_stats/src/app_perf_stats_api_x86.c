@@ -120,12 +120,12 @@ int32_t appPerfStatsCpuLoadPrint(uint32_t app_cpu_id, app_perf_stats_cpu_load_t 
     return 0;
 }
 
-int32_t appPerfStatsRegisterTask(void *task_handle, char *name)
+int32_t appPerfStatsRegisterTask(void *task_handle, const char *name)
 {
     return 0;
 }
 
-void appPerfPointSetName(app_perf_point_t *prm, char *name)
+void appPerfPointSetName(app_perf_point_t *prm, const char *name)
 {
 }
 
@@ -159,7 +159,7 @@ int32_t appPerfStatsExportAll(FILE *fp, app_perf_point_t *perf_points[], uint32_
     return 0;
 }
 
-FILE *appPerfStatsExportOpenFile(char *output_file_path, char *output_file_prefix)
+FILE *appPerfStatsExportOpenFile(const char *output_file_path, const char *output_file_prefix)
 {
     return NULL;
 }

@@ -466,7 +466,7 @@ void appPerfStatsRtosLoadUpdate(void)
     }
 }
 
-int32_t appPerfStatsRegisterTask(void *task_handle, char *name)
+int32_t appPerfStatsRegisterTask(void *task_handle, const char *name)
 {
     app_perf_stats_obj_t *obj = &g_app_perf_stats_obj;
     int32_t status = -1;

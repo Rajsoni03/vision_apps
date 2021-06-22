@@ -498,14 +498,14 @@ int32_t appPerfStatsCpuLoadPrint(uint32_t app_cpu_id, app_perf_stats_cpu_load_t 
 }
 
 #if defined(LINUX) || defined(QNX)
-int32_t appPerfStatsRegisterTask(void *task_handle, char *name)
+int32_t appPerfStatsRegisterTask(void *task_handle, const char *name)
 {
     /* NOT supported for LINUX */
     return -1;
 }
 #endif
 
-void appPerfPointSetName(app_perf_point_t *prm, char *name)
+void appPerfPointSetName(app_perf_point_t *prm, const char *name)
 {
     strncpy(prm->name, name, APP_PERF_POINT_NAME_MAX);
     prm->name[APP_PERF_POINT_NAME_MAX-1] = 0;
@@ -644,7 +644,7 @@ void appPerfPointExport(FILE *fp, app_perf_point_t *prm[], uint32_t num_points)
 
 }
 
-FILE *appPerfStatsExportOpenFile(char *output_file_path, char *output_file_prefix)
+FILE *appPerfStatsExportOpenFile(const char *output_file_path, const char *output_file_prefix)
 {
     FILE *fp = NULL;
     if ( (output_file_path!=NULL)
