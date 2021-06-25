@@ -241,7 +241,7 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
     {
         appDctrlAdvVpParamsInit(&advVpParams);
         doAdvVpSetup = true;
-        doHpd = true;
+        doHpd = false;
     }
     if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {

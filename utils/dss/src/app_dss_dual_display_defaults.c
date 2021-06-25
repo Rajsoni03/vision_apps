@@ -248,7 +248,7 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
         {
             appDctrlAdvVpParamsInit(&advVpParams[i]);
             doAdvVpSetup[i] = true;
-            doHpd = true;
+            doHpd = false;
         }
 
         vpParams[i].vpId             = obj->vpId;
