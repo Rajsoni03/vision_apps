@@ -19,8 +19,9 @@ ifeq ($(RTOS),SYSBIOS)
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 endif
 ifeq ($(RTOS),FREERTOS)
-	CSOURCES += $(SOC)_mcu1_1_mpu_cfg.c
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_mcu1_1_freertos.lds
+	CSOURCES += ../../common/mpu_cfg/$(SOC)_mpu_cfg.c
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_mem_map_freertos.cmd
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
 endif
 
 ifeq ($(RTOS),FREERTOS)
