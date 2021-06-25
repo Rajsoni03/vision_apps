@@ -432,8 +432,11 @@ int32_t appIpcEchoTestStart(void)
         #endif
 
         /* Respond to messages coming in to endPt ENDPT1 */
+        cpu_id = appIpcGetSelfCpuId();
+
         TaskP_Params_init(&params);
         params.priority = 3;
+        params.stack     = g_taskStackBuf[cpu_id];
         params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
         params.arg0 = 0;
         params.name = (uint8_t*)&g_rpmsg_responder_task_name[0];
