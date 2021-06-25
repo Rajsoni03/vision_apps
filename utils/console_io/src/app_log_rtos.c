@@ -63,9 +63,8 @@
 #include "app_log_priv.h"
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <ti/osal/HwiP.h>
+#include <ti/osal/TimerP.h>
 #include <ti/osal/TaskP.h>
-#include <xdc/runtime/Types.h>
-#include <xdc/runtime/Timestamp.h>
 #include <ti/osal/SemaphoreP.h>
 #include <string.h>
 #include <ti/drv/sciclient/sciclient.h>
@@ -123,18 +122,7 @@ uint64_t appLogGetGlobalTimeInUsec()
 
 uint64_t appLogGetLocalTimeInUsec()
 {
-    Types_Timestamp64 rtos_timestamp64;
-    Types_FreqHz rtos_freq;
-    uint64_t cur_ts, freq;
-
-    Timestamp_get64(&rtos_timestamp64);
-    Timestamp_getFreq(&rtos_freq);
-
-    cur_ts = ((uint64_t) rtos_timestamp64.hi << 32) | rtos_timestamp64.lo;
-    freq = ((uint64_t) rtos_freq.hi << 32) | rtos_freq.lo; /* in units of HZ */
-    freq = freq / 1000000u; /* in units of MHZ */
-
-    return cur_ts/freq; /* in units of usecs */
+    return TimerP_getTimeInUsecs(); /* in units of usecs */
 }
 
 uint64_t appLogGetTimeInUsec()
