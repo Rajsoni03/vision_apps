@@ -50,9 +50,14 @@ extern "C" {
 #define BUILD_C7X_1
 #endif
 
-#include <xdc/runtime/System.h>
 #include <ti/drv/ipc/include/ipc_rsctypes.h>
 #include <app_mem_map.h>
+
+#ifdef SYSBIOS
+  #include <xdc/runtime/SysMin.h>
+#else
+  #include "ipc_trace.h"
+#endif
 
 #define RPMSG_VRING_SIZE   (0x10000)
 
@@ -91,8 +96,12 @@ extern "C" {
 #define RPMSG_C66_DSP_FEATURES  1
 #define RPMSG_C7X_DSP_FEATURES  1
 
-extern char xdc_runtime_SysMin_Module_State_0_outbuf__A;
-#define TRACEBUFADDR ((uintptr_t)&xdc_runtime_SysMin_Module_State_0_outbuf__A)
+#ifdef SYSBIOS
+  extern __T1_xdc_runtime_SysMin_Module_State__outbuf xdc_runtime_SysMin_Module_State_0_outbuf__A[];
+  #define TRACEBUFADDR ((uintptr_t)&xdc_runtime_SysMin_Module_State_0_outbuf__A)
+#else
+  #define TRACEBUFADDR ((uintptr_t)&Ipc_traceBuffer)
+#endif
 
 const Ipc_ResourceTable ti_ipc_remoteproc_ResourceTable __attribute__ ((section (".resource_table"), aligned (4096))) = 
 {

@@ -7,6 +7,10 @@ TARGETTYPE  := library
 
 CSOURCES    := app_common.c
 
+ifeq ($(TARGET_OS),FREERTOS)
+CSOURCES    += ipc_trace.c
+endif
+
 IDIRS+=$(VISION_APPS_PATH)/apps/basic_demos/app_rtos/common
 
 include $(FINALE)
