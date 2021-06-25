@@ -4,9 +4,12 @@ include $(PRELUDE)
 TARGET      := app_utils_mem
 TARGETTYPE  := library
 
-ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
-CSOURCES    := app_mem_rtos.c
+ifeq ($(TARGET_OS),SYSBIOS)
+CSOURCES    := app_mem_tirtos.c
+endif
 
+ifeq ($(TARGET_OS),FREERTOS)
+CSOURCES    := app_mem_free_rtos.c
 endif
 
 ifeq ($(TARGET_OS),LINUX)
