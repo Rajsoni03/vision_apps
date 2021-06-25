@@ -11,7 +11,11 @@ IDIRS       += $(VISION_APPS_PATH)
 TARGET      := app_utils_ethfw
 TARGETTYPE  := library
 
-CSOURCES    := app_ethfw.c
+ifeq ($(TARGET_OS),SYSBIOS)
+CSOURCES    := app_ethfw_tirtos.c
+else ifeq ($(TARGET_OS),FREERTOS)
+CSOURCES    := app_ethfw_freertos.c
+endif
 
 ifeq ($(SOC),j721e)
 DEFS+=SOC_J721E
