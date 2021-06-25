@@ -162,14 +162,10 @@ static void appPerfStatsCpuLoadExport(FILE *fp)
             status = appPerfStatsCpuLoadGet(cpu_id, &cpu_load);
             if(status==0)
             {
-                APP_PERF_EXPORT_WRITELN(fp, "%6s    | %3d.%2d %% ( HWI = %3d.%2d %%, SWI = %3d.%2d %% )",
+                APP_PERF_EXPORT_WRITELN(fp, "%6s    | %3d.%2d ",
                             appIpcGetCpuName(cpu_id),
                             cpu_load.cpu_load/100u,
-                            cpu_load.cpu_load%100u,
-                            cpu_load.hwi_load/100u,
-                            cpu_load.hwi_load%100u,
-                            cpu_load.swi_load/100u,
-                            cpu_load.swi_load%100u
+                            cpu_load.cpu_load%100u
                         );
             }
         }
