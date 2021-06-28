@@ -473,6 +473,9 @@ int32_t appVhwaVpacInit()
         /* Set UDMA driver handle */
         initPrms.udmaDrvHndl = appUdmaGetObj();
 
+        /* Set configThroughUDMA to true to support multi handle */
+        initPrms.configThroughUdmaFlag = true;
+
         status = Vhwa_m2mVissInit(&initPrms);
         if (0 != status)
         {
