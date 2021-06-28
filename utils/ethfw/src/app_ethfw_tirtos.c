@@ -300,7 +300,7 @@ void EthApp_ipAddrHookFxn(uint32_t IPAddr,
     EthFwCallbacks_ipAddrHookFxn(IPAddr, IfIdx, fAdd);
 
     /* Save host port IP address */
-    ipAddrHex = ntohl(IPAddr);
+    ipAddrHex = NDK_ntohl(IPAddr);
     memcpy(&gEthAppObj.hostIpAddr[0U],
            (uint8_t *)&ipAddrHex,
            ENET_IPv4_ADDR_LEN);

@@ -45,7 +45,10 @@ LDIRS += $(ETHFW_PATH)/out/J721E/R5Ft/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(REMOTE_DEVICE_PATH)/lib/J721E/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 ifeq ($(RTOS),FREERTOS)
-	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/freertos/j721e/r5f/$(TARGET_BUILD)/
 endif
 
 include $($(_MODULE)_SDIR)/../../concerto_r5f_inc.mak
@@ -69,6 +72,9 @@ ETHFW_LIBS = ethfw
 ETHFW_LIBS += ethfw_callbacks
 ETHFW_LIBS += eth_intervlan
 ETHFW_LIBS += lib_remoteswitchcfg_server
+ifeq ($(RTOS),FREERTOS)
+	ETHFW_LIBS += ethfw_lwip
+endif
 
 REMOTE_DEVICE_LIBS = lib_remote_device
 
@@ -80,16 +86,26 @@ ADDITIONAL_STATIC_LIBS += csitx.aer5f
 ADDITIONAL_STATIC_LIBS += dss.aer5f
 ADDITIONAL_STATIC_LIBS += vhwa.aer5f
 
-ADDITIONAL_STATIC_LIBS += nimuenet.aer5f
 ADDITIONAL_STATIC_LIBS += enetsoc.aer5f
 ADDITIONAL_STATIC_LIBS += enet.aer5f
 ADDITIONAL_STATIC_LIBS += enetphy.aer5f
 ADDITIONAL_STATIC_LIBS += enet_cfgserver.aer5f
-ADDITIONAL_STATIC_LIBS += enet_example_utils_tirtos.aer5f
 ADDITIONAL_STATIC_LIBS += pm_lib.aer5f
 ADDITIONAL_STATIC_LIBS += ti.timesync.hal.aer5f
 ADDITIONAL_STATIC_LIBS += ti.timesync.ptp.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
+
+ifeq ($(RTOS),SYSBIOS)
+	ADDITIONAL_STATIC_LIBS += nimuenet.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_example_utils_tirtos.aer5f
+endif
+
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += lwipstack_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipcontrib_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipif_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_example_utils_freertos.aer5f
+endif
 
 DEFS        += $(RTOS)
 

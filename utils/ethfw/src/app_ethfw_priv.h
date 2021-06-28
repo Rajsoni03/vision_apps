@@ -85,13 +85,38 @@
 
 /* EthFw header files */
 #include <utils/intervlan/include/eth_hwintervlan.h>
-#include <utils/ethfw_callbacks/include/ethfw_callbacks_nimu.h>
-#include <utils/ethfw_callbacks/include/ethfw_callbacks_ndk.h>
+#include <utils/intervlan/include/eth_swintervlan.h>
 #include <ethfw/ethfw.h>
 
 /* Vision Apps utils */
 #include <utils/udma/include/app_udma.h>
 #include <utils/console_io/include/app_log.h>
+
+#if defined (SYSBIOS)
+#include <utils/ethfw_callbacks/include/ethfw_callbacks_nimu.h>
+#include <utils/ethfw_callbacks/include/ethfw_callbacks_ndk.h>
+#endif
+
+#if defined (FREERTOS)
+/* lwIP core includes */
+#include "lwip/opt.h"
+#include "lwip/sys.h"
+#include "lwip/tcpip.h"
+#include "lwip/netif.h"
+#include "lwip/api.h"
+
+#include "lwip/tcp.h"
+#include "lwip/udp.h"
+#include "lwip/dhcp.h"
+
+/* lwIP netif includes */
+#include "lwip/etharp.h"
+#include "netif/ethernet.h"
+
+#include <ti/drv/enet/lwipif/inc/default_netif.h>
+
+#include <utils/ethfw_callbacks/include/ethfw_callbacks_lwipif.h>
+#endif
 
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
@@ -128,11 +153,15 @@ typedef struct
     uint8_t hostMacAddr[ENET_MAC_ADDR_LEN];
 
     /* Host IP address */
-    uint8_t hostIpAddr[ENET_IPv4_ADDR_LEN];
+    uint32_t hostIpAddr;
 
     /* Enet instance id */
     uint32_t instId;
 
+#if defined(FREERTOS)
+    /* DHCP network interface */
+    struct dhcp dhcpNetif;
+#endif
 } EthAppObj;
 
 #endif //APP_ETHFW_PRIV_H

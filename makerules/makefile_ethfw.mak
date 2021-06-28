@@ -7,7 +7,7 @@
 ethfw: remote_device
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(MAKE) -C ${REMOTE_DEVICE_PATH} cp_to_lib BUILD_SOC_LIST=J721E PROFILE=$(PROFILE) -s
-	$(MAKE) -C $(ETHFW_PATH) ethfw ethfw_callbacks eth_intervlan lib_remoteswitchcfg_server BUILD_CPU_MCU2_1=no BUILD_SOC_LIST=J721E PROFILE=$(PROFILE) -s
+	$(MAKE) -C $(ETHFW_PATH) ethfw ethfw_callbacks ethfw_lwip eth_intervlan lib_remoteswitchcfg_server BUILD_CPU_MCU2_1=no BUILD_SOC_LIST=J721E PROFILE=$(PROFILE) -s
 endif
 
 ethfw_clean:

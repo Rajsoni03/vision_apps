@@ -12,9 +12,16 @@ TARGET      := app_utils_ethfw
 TARGETTYPE  := library
 
 ifeq ($(TARGET_OS),SYSBIOS)
+
 CSOURCES    := app_ethfw_tirtos.c
+
 else ifeq ($(TARGET_OS),FREERTOS)
+
+IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/src/include
+IDIRS += $(PDK_PATH)/packages/ti/drv/enet/lwipif/ports/freertos/include
+
 CSOURCES    := app_ethfw_freertos.c
+
 endif
 
 ifeq ($(SOC),j721e)
