@@ -62,11 +62,11 @@ imaging_scrub:
 
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
-	$(MAKE) -C $(REMOTE_DEVICE_PATH) lib_remote_device_display lib_remote_device
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) RTOS=$(RTOS) lib_remote_device_display lib_remote_device
 endif
 
 remote_device_clean:
-	$(MAKE) -C $(REMOTE_DEVICE_PATH) clean
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) RTOS=$(RTOS) clean
 
 remote_device_scrub:
 	rm -rf $(REMOTE_DEVICE_PATH)/out
