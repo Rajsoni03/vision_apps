@@ -432,15 +432,7 @@ static void EthApp_netifStatusCb(struct netif *netif)
             gEthAppObj.hostIpAddr = lwip_ntohl(ip_addr_get_ip4_u32(ipAddr));
 
             /* MAC port used for PTP */
-#if defined(SOC_J721E)
             macPort = ENET_MAC_PORT_3;
-#elif defined(SOC_J7200)
-#if defined(ENABLE_QSGMII_PORTS)
-            macPort = ENET_MAC_PORT_1;
-#else
-            macPort = ENET_MAC_PORT_2;
-#endif
-#endif
 
             /* Initialize and enable PTP stack */
             EthFw_initTimeSyncPtp(gEthAppObj.hostIpAddr,

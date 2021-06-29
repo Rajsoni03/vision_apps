@@ -93,8 +93,10 @@
 #include <utils/console_io/include/app_log.h>
 
 #if defined (SYSBIOS)
+
 #include <utils/ethfw_callbacks/include/ethfw_callbacks_nimu.h>
 #include <utils/ethfw_callbacks/include/ethfw_callbacks_ndk.h>
+
 #endif
 
 #if defined (FREERTOS)
@@ -152,8 +154,12 @@ typedef struct
     /* Host MAC address */
     uint8_t hostMacAddr[ENET_MAC_ADDR_LEN];
 
+#if defined(FREERTOS)
     /* Host IP address */
     uint32_t hostIpAddr;
+#elif (SYSBIOS)
+    uint8_t hostIpAddr[ENET_IPv4_ADDR_LEN];
+#endif
 
     /* Enet instance id */
     uint32_t instId;
