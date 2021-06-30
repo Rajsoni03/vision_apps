@@ -70,6 +70,7 @@
 #include <ti/osal/SemaphoreP.h>
 #include <ti/osal/TaskP.h>
 #include "app_perf_stats_priv.h"
+#include <inttypes.h>
 
 #define APP_PERF_DDR_MHZ                (1866u)  /* DDR clock speed in MHZ */
 #define APP_PERF_DDR_BUS_WIDTH          (  32u)  /* in units of bits */
@@ -164,8 +165,6 @@ void appPerfStatsResetLoadCalcAll(app_perf_stats_obj_t *obj)
 
     appPerfStatsLock(obj);
 
-    LoadP_reset();
-
     appPerfStatsResetLoadCalc(&obj->idleLoad);
     for(i=0; i<APP_PERF_STATS_TASK_MAX; i++)
     {
@@ -175,11 +174,33 @@ void appPerfStatsResetLoadCalcAll(app_perf_stats_obj_t *obj)
     appPerfStatsUnLock(obj);
 }
 
+void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
+{
+    LoadP_Stats rtos_load_stat;
+
+    LoadP_getTaskLoad(task, &rtos_load_stat);
+
+    load->total_time += rtos_load_stat.totalTime;
+    load->thread_time += rtos_load_stat.threadTime;
+}
+
+void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
+{
+    uint32_t i;
+
+    for(i=0; i< obj->num_tasks; i++)
+    {
+        appPerfStatsTaskLoadUpdate((TaskP_Handle)obj->task_handle[i], &obj->taskLoad[i]);
+    }
+}
+
 void appPerfStatsGetTaskLoadAll(app_perf_stats_obj_t *obj, app_perf_stats_task_stats_t *cpu_stats)
 {
     uint32_t i;
 
     appPerfStatsLock(obj);
+
+    appPerfStatsTaskLoadUpdateAll(obj);
 
     cpu_stats->num_tasks = obj->num_tasks;
     if(cpu_stats->num_tasks>APP_PERF_STATS_TASK_MAX)
@@ -257,6 +278,13 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
                 /* interrupts disabled since update happens in ISR */
                 cookie = HwiP_disable();
 
+                #ifdef R5F
+                /* not taken in inside lock since interrupts are disabled for locking
+                 * interrupts are disable since counters are read in ISR context
+                 */
+                appPerfStatsDddrStatsUpdate();
+                #endif
+
                 *ddr_load = obj->ddrLoad.ddr_stats;
 
                 HwiP_restore(cookie);
@@ -284,6 +312,8 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
                 appPerfStatsLock(obj);
 
                 cpu_load->cpu_load = LoadP_getCPULoad();
+                cpu_load->hwi_load = 0U;
+                cpu_load->swi_load = 0U;
 
                 appPerfStatsUnLock(obj);
             }
@@ -362,6 +392,7 @@ int32_t appPerfStatsInit()
 
     if(status==0)
     {
+        LoadP_reset();
         appPerfStatsResetLoadCalcAll(obj);
         appPerfStatsResetHwaLoadCalcAll();
         appPerfStatsResetDdrLoadCalcAll();
@@ -392,26 +423,6 @@ int32_t appPerfStatsDeInit()
     appRemoteServiceUnRegister(APP_PERF_STATS_SERVICE_NAME);
     /* SemaphoreP_delete(obj->lock);  DO NOT delete since idle task will keep running even after deinit */
     return 0;
-}
-
-void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
-{
-    LoadP_Stats rtos_load_stat;
-
-    LoadP_getTaskLoad(task, &rtos_load_stat);
-
-    load->total_time += rtos_load_stat.totalTime;
-    load->thread_time += rtos_load_stat.threadTime;
-}
-
-void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
-{
-    uint32_t i;
-
-    for(i=0; i< obj->num_tasks; i++)
-    {
-        appPerfStatsTaskLoadUpdate((TaskP_Handle)obj->task_handle[i], &obj->taskLoad[i]);
-    }
 }
 
 void appPerfStatsRtosLoadUpdate(void)
