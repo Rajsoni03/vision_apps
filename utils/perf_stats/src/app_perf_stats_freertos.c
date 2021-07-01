@@ -311,7 +311,9 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
 
                 appPerfStatsLock(obj);
 
-                cpu_load->cpu_load = LoadP_getCPULoad();
+                /* Multiplying by 100 to show decimal points when printing */
+                cpu_load->cpu_load = 100 * LoadP_getCPULoad();
+
                 cpu_load->hwi_load = 0U;
                 cpu_load->swi_load = 0U;
 
