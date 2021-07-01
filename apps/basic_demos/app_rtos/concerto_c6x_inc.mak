@@ -23,6 +23,7 @@ STATIC_LIBS += app_utils_ipc
 STATIC_LIBS += app_utils_remote_service
 STATIC_LIBS += app_utils_udma
 STATIC_LIBS += app_utils_sciclient
+STATIC_LIBS += app_utils_misc
 STATIC_LIBS += app_utils_perf_stats
 STATIC_LIBS += vx_target_kernels_img_proc_c66
 STATIC_LIBS += vx_app_ptk_demo_common

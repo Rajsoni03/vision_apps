@@ -410,6 +410,8 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
 
+    appUtilsPrintCpuHz();
+
     appLogPrintf("APP: Init ... !!!\n");
 
     #ifdef ENABLE_UART
