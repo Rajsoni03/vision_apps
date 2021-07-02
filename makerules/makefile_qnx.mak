@@ -33,6 +33,11 @@ ifeq ($(BUILD_QNX_A72),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_create      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 
+qnx_fs_copy_spl_uboot:
+ifeq ($(BUILD_QNX_A72),yes)
+	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_copy_spl_uboot      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
+endif
+
 qnx_fs_install: qnx_fs_create
 ifeq ($(BUILD_CPU_MPU1),yes)
 	# copy application binaries and scripts
@@ -142,13 +147,13 @@ qnx_fs_install_firmware:
 	cp -v $(QNX_AUX_FS_PATH)/lib/firmware/j7-*-fw $(QNX_SD_FS_ROOT_PATH)/lib/firmware/
 	sync
 
-qnx_fs_install_sd: qnx_fs_install qnx_fs_install_firmware
+qnx_fs_install_sd: qnx_fs_copy_spl_uboot qnx_fs_install qnx_fs_install_firmware
 	$(call MODIFY_QNX_SD_FS)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_qnx_install_sd
 endif
 
-qnx_fs_install_nfs: qnx_fs_install
+qnx_fs_install_nfs: qnx_fs_copy_spl_uboot qnx_fs_install
 	# QNX_FS_INSTALL_NFS with QNX_FS_PATH ${QNX_FS_PATH}
 	$(call MODIFY_QNX_SD_FS_WITH_ARG,${QNX_FS_PATH})
 	cp $(PSDK_QNX_PATH)/qnx/bsp/images/ifs-j721e-evm-ti-spl-nfs.raw $(QNX_AUX_FS_PATH)/qnx-ifs-spl-nfs
@@ -165,19 +170,10 @@ qnx_fs_install_tar: qnx_fs_install_nfs qnx_fs_install_nfs_test_data
 	cp -r $(QNX_FS_PATH) $(QNX_AUX_FS_PATH)/
 	cd  $(QNX_AUX_FS_PATH) && sudo tar cpzf $(VISION_APPS_PATH)/rootfs.tar.xz .
 
-qnx_fs_spl_uboot_remove:
-	# remove spl-uboot related files for sd bootfs
-	rm -rf $(QNX_SD_FS_BOOT_PATH)/tiboot3.bin
-	rm -rf $(QNX_SD_FS_BOOT_PATH)/sysfw*.itb
-	rm -rf $(QNX_SD_FS_BOOT_PATH)/tispl.bin
-	rm -rf $(QNX_SD_FS_BOOT_PATH)/uEnv.txt
-	rm -rf $(QNX_SD_FS_BOOT_PATH)/u-boot.img
-	rm -rf $(QNX_SD_FS_BOOT_PATH)/version
-
-qnx_fs_install_sd_sbl: qnx_fs_install qnx_fs_spl_uboot_remove sbl_bootimage_install_sd qnx_fs_install_firmware
+qnx_fs_install_sd_sbl: qnx_fs_install sbl_bootimage_install_sd qnx_fs_install_firmware
 	$(call MODIFY_QNX_SD_FS)
 
-qnx_fs_install_sd_sbl_hs: qnx_fs_install qnx_fs_spl_uboot_remove sbl_bootimage_hs_install_sd qnx_fs_install_firmware
+qnx_fs_install_sd_sbl_hs: qnx_fs_install sbl_bootimage_hs_install_sd qnx_fs_install_firmware
 	$(call MODIFY_QNX_SD_FS)
 
 qnx_fs_install_ospi: qnx_fs_install sbl_bootimage_install_ospi qnx_fs_install_firmware
