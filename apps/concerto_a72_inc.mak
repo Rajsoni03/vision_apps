@@ -150,7 +150,7 @@ TEST_LIBS += vx_applib_tests
 STATIC_LIBS += $(TIOVX_LIBS)
 STATIC_LIBS += $(VISION_APPS_UTILS_LIBS)
 ifeq ($(TARGET_OS),LINUX)
-STATIC_LIBS += app_tirtos_linux_mpu1_common
+STATIC_LIBS += app_rtos_linux_mpu1_common
 endif
 ifeq ($(TARGET_OS),QNX)
 STATIC_LIBS += app_rtos_qnx_mpu1_common

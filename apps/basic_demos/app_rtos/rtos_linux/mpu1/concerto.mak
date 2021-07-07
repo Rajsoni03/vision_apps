@@ -4,7 +4,7 @@ ifeq ($(TARGET_OS),LINUX)
 
 include $(PRELUDE)
 
-TARGET      := app_tirtos_linux_mpu1_common
+TARGET      := app_rtos_linux_mpu1_common
 TARGETTYPE  := library
 CSOURCES    := $(call all-c-files)
 
