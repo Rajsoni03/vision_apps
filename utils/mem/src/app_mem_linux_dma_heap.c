@@ -380,6 +380,7 @@ void *appMemAlloc(uint32_t block, uint32_t size, uint32_t align)
                                     flags,
                                     &dma_buf_fd
                                 );
+
     if(status != 0)
     {
         printf("MEM: ERROR: Alloc failed with status = %d !!!\n", status);
@@ -659,7 +660,7 @@ static int32_t appMemAddTupleToList(uint32_t dmaBufFd, uint32_t size, uint64_t *
     app_mem_obj_t  *obj = &g_app_mem_obj;
     void           *vPtr = NULL;
     app_mem_type_t  m;
-    uint32_t        dmabuf2phys_fd = -1;
+    int32_t         dmabuf2phys_fd = -1;
     int32_t         status = 0;
 
     *virtPtr = 0;
