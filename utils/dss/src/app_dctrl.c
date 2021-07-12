@@ -69,7 +69,6 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <ti/drv/dss/dss.h>
-#include <ti/osal/SwiP.h>
 
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
@@ -94,8 +93,6 @@
 /* ========================================================================== */
 
 static Fvid2_Handle gAppDctrlHandle;
-static uint32_t gAppDctrlHpdState = false;
-static SwiP_Handle gAppDctrlSwiHandle;
 
 /* ========================================================================== */
 /*                  Internal/Private Function Declarations                    */
@@ -248,17 +245,9 @@ static int32_t appDctrlControl(char *serviceName,
     return retVal;
 }
 
-static void appDctrlDpHpdSwi(uintptr_t arg0, uintptr_t arg1)
-{
-    Fvid2_Handle handle = (Fvid2_Handle)arg1;
-    uint32_t *hpdState   = (uint32_t *)arg0;
-    Fvid2_control(handle, IOCTL_DSS_DCTRL_PROCESS_DP_HPD, hpdState, NULL);
-}
-
 static void appDctrlDpHpdCbFxn(uint32_t hpdState, void *appData)
 {
-    gAppDctrlHpdState = hpdState;
-    SwiP_post(gAppDctrlSwiHandle);
+    Fvid2_control(gAppDctrlHandle, IOCTL_DSS_DCTRL_PROCESS_DP_HPD, &hpdState, NULL);
 }
 
 static int32_t appDctrlRegisterHandleCmd(Fvid2_Handle *handle,
@@ -267,7 +256,6 @@ static int32_t appDctrlRegisterHandleCmd(Fvid2_Handle *handle,
 {
     int32_t retVal = 0;
     Dss_DctrlDpHpdCbParams cbParams;
-    SwiP_Params swiParams;
 
     if((params_size != sizeof(bool)) || (NULL == handle))
     {
@@ -291,27 +279,11 @@ static int32_t appDctrlRegisterHandleCmd(Fvid2_Handle *handle,
      * The driver handles the interrupt and calls hpdCbFxn if a
      * DP_HPD_CB is registered.
      *
-     * This callback is made from a Hwi context, and it is advised
-     * that the new link is initialised in a Swi (it takes 600 us+)
-     *
      * Note: The HPD is generated in Dss_init() when we still dont have
      * a DCTRL handle and a registered callback. The driver keeps
      * a state, so that the link is initialised immediately after
      * the callback is registered
      */
-    if(0 == retVal && (true == *doHpd))
-    {
-        SwiP_Params_init(&swiParams);
-        swiParams.arg0 = (uintptr_t)(&gAppDctrlHpdState);
-        swiParams.arg1 = (uintptr_t)(*handle);
-
-        gAppDctrlSwiHandle = SwiP_create(appDctrlDpHpdSwi, &swiParams);
-        if(NULL == gAppDctrlSwiHandle)
-        {
-            retVal = -1;
-        }
-    }
-
     if(0 == retVal && (true == *doHpd))
     {
         Dss_dctrlDpHpdCbParamsInit(&cbParams);

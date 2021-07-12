@@ -129,7 +129,7 @@ int32_t appDssInit(app_dss_init_params_t *dssParams)
     }
 
     dssInitParams.socParams.dpInitParams.isAvailable = dssParams->isDpAvailable;
-    dssInitParams.socParams.dpInitParams.isHpdSupported = false;
+    dssInitParams.socParams.dpInitParams.isHpdSupported = true;
 
     dssInitParams.socParams.dsiInitParams.isAvailable = dssParams->isDsiAvailable;
 
