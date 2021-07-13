@@ -48,6 +48,7 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					vision_apps/apps/ptk_demos/app_common \
 					vision_apps/applibs \
 					vision_apps/kernels \
+					vision_apps/modules \
 					vision_apps/utils
 
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
