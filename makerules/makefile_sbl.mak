@@ -127,10 +127,20 @@ sbl_mcusw_bootimage_touch:
 sbl_mcusw_bootimage_sd:
 	$(MAKE) sbl_mcusw_bootimage_touch
 ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(RTOS),SYSBIOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=tirtos CANFUNC=none
 endif
+ifeq ($(RTOS),FREERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
+endif
+endif
 ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(RTOS),SYSBIOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=tirtos CANFUNC=none
+endif
+ifeq ($(RTOS),FREERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
+endif
 endif
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles
 	cp $(MCUSW_PATH)/binary/can_boot_app_mcu_rtos/bin/$(BOARD)/can_boot_app_mcu_rtos_$(SBL_CORE)_release.appimage $(VISION_APPS_PATH)/out/sbl_bootfiles/app
@@ -142,10 +152,20 @@ sbl_mcusw_bootimage_sd_hs:
 sbl_mcusw_bootimage_ospi:
 	$(MAKE) sbl_mcusw_bootimage_touch
 ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(RTOS),SYSBIOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=tirtos CANFUNC=none
 endif
+ifeq ($(RTOS),FREERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
+endif
+endif
 ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(RTOS),SYSBIOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=tirtos CANFUNC=none
+endif
+ifeq ($(RTOS),FREERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
+endif
 endif
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles
 	cp $(MCUSW_PATH)/binary/can_boot_app_mcu_rtos/bin/$(BOARD)/can_boot_app_mcu_rtos_$(SBL_CORE)_release.appimage $(VISION_APPS_PATH)/out/sbl_bootfiles/can_boot_app_mcu_rtos_$(SBL_CORE)_release_ospi.appimage
