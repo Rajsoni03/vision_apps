@@ -39,7 +39,7 @@ ifeq ($(BUILD_QNX_A72),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_copy_spl_uboot      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 
-qnx_fs_install: qnx_fs_create
+qnx_fs_install:
 ifeq ($(BUILD_CPU_MPU1),yes)
 	# copy application binaries and scripts
 	mkdir -p $(QNX_FS_PATH)/vision_apps
@@ -136,12 +136,11 @@ define MODIFY_QNX_SD_FS =
 	sync
 endef
 
-qnx_fs_create_sd: qnx_fs_install
+qnx_fs_create_sd: qnx_fs_create
 	sudo chmod 777 -R $(QNX_SD_FS_ROOT_PATH)
 	rm -rf $(QNX_SD_FS_BOOT_PATH)/*
 	rm -rf $(QNX_SD_FS_ROOT_PATH)/*
 	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
-	cp -rfv $(QNX_AUX_FS_PATH)/* $(QNX_SD_FS_ROOT_PATH)/
 
 qnx_fs_install_firmware:
 	# copy remote core firmware's
