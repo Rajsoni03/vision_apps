@@ -234,11 +234,11 @@ uint32_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
     }
     /* Exit critical section */
     pthread_mutex_unlock(&obj->list_mutex);
+    #ifdef APP_MEM_DEBUG
     if (dmaBufFd < 0)
     {
         printf("MEM: ERROR: Failed to export dmaBufFd for virtPtr %p !!!\n", virPtr);
     }
-    #ifdef APP_MEM_DEBUG
     printf("MEM: Exported dmaBufFd %d @ offset = %d bytes !!!\n", dmaBufFd, *dmaBufFdOffset);
     #endif
 
@@ -352,11 +352,11 @@ uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
     }
     /* Exit critical section */
     pthread_mutex_unlock(&obj->list_mutex);
+    #ifdef APP_MEM_DEBUG
     if (phyPtr == 0)
     {
         printf("MEM: ERROR: Failed to get physical address of virt addr = %p !!!\n", (void*)virtPtr);
     }
-    #ifdef APP_MEM_DEBUG
     printf("MEM: Translated virt addr = %p -> phy addr = %lx !!!\n", (void*)virtPtr, phyPtr);
     #endif
 
