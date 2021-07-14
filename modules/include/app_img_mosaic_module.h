@@ -96,7 +96,7 @@ typedef struct {
   vx_object_array input_arr[TIVX_IMG_MOSAIC_MAX_INPUTS];
 
   /*! Buffer array of output images of mosaic node */
-  vx_image output_image[APP_MODULES_MAX_OBJ_NAME_SIZE];
+  vx_image output_image[APP_MODULES_MAX_BUFQ_DEPTH];
 
   /*! Mosaic node graph parameter index */
   vx_int32 graph_parameter_index;
