@@ -83,6 +83,11 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
 
 /* DHCP or static IP */
 #define ETHAPP_LWIP_USE_DHCP            (1)
+#if !ETHAPP_LWIP_USE_DHCP
+#define ETHFW_SERVER_IPADDR(addr)       IP4_ADDR((addr), 192,168,1,200)
+#define ETHFW_SERVER_GW(addr)           IP4_ADDR((addr), 192,168,1,1)
+#define ETHFW_SERVER_NETMASK(addr)      IP4_ADDR((addr), 255,255,255,0)
+#endif
 
 static EthAppObj gEthAppObj =
 {
@@ -146,8 +151,6 @@ static void EthApp_initLwip(void *arg);
 static void EthApp_initNetif(void);
 
 static void EthApp_netifStatusCb(struct netif *netif);
-
-static void EthApp_linkCb(struct netif *netif);
 
 static int32_t EthApp_initEthFw(void);
 
@@ -382,7 +385,9 @@ static void EthApp_initLwip(void *arg)
 static void EthApp_initNetif(void)
 {
     ip4_addr_t ipaddr, netmask, gw;
+#if ETHAPP_LWIP_USE_DHCP
     err_t err;
+#endif
 
     ip4_addr_set_zero(&gw);
     ip4_addr_set_zero(&ipaddr);
@@ -391,16 +396,15 @@ static void EthApp_initNetif(void)
 #if ETHAPP_LWIP_USE_DHCP
     appLogPrintf("Starting lwIP, local interface IP is dhcp-enabled\n");
 #else /* ETHAPP_LWIP_USE_DHCP */
-    LWIP_PORT_INIT_GW(&gw);
-    LWIP_PORT_INIT_IPADDR(&ipaddr);
-    LWIP_PORT_INIT_NETMASK(&netmask);
+    ETHFW_SERVER_GW(&gw);
+    ETHFW_SERVER_IPADDR(&ipaddr);
+    ETHFW_SERVER_NETMASK(&netmask);
     appLogPrintf("Starting lwIP, local interface IP is %s\n", ip4addr_ntoa(&ipaddr));
 #endif /* ETHAPP_LWIP_USE_DHCP */
 
     init_default_netif(&ipaddr, &netmask, &gw);
 
     netif_set_status_callback(netif_default, EthApp_netifStatusCb);
-    netif_set_link_callback(netif_default, EthApp_linkCb);
 
     dhcp_set_struct(netif_default, &gEthAppObj.dhcpNetif);
 
@@ -456,18 +460,6 @@ static void EthApp_netifStatusCb(struct netif *netif)
     else
     {
         appLogPrintf("Removed interface '%c%c%d'\n", netif->name[0], netif->name[1], netif->num);
-    }
-}
-
-static void EthApp_linkCb(struct netif *netif)
-{
-    if (netif_is_link_up(netif))
-    {
-        appLogPrintf("Link up\n");
-    }
-    else
-    {
-        appLogPrintf("Link down\n");
     }
 }
 
