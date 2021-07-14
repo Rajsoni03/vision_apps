@@ -30,6 +30,7 @@ endif
 
 qnx_fs_create:
 ifeq ($(BUILD_QNX_A72),yes)
+	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_clean       QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_create      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 
@@ -119,6 +120,8 @@ define MODIFY_QNX_SD_FS_WITH_ARG =
 endef
 
 define MODIFY_QNX_SD_FS =
+	# copy all staged files
+	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
 	# copy vision apps binaries
 	mkdir -p $(QNX_SD_FS_BOOT_PATH)/vision_apps
 	cp -r $(QNX_FS_PATH)/vision_apps $(QNX_SD_FS_BOOT_PATH)/
@@ -170,13 +173,13 @@ qnx_fs_install_tar: qnx_fs_install_nfs qnx_fs_install_nfs_test_data
 	cp -r $(QNX_FS_PATH) $(QNX_AUX_FS_PATH)/
 	cd  $(QNX_AUX_FS_PATH) && sudo tar cpzf $(VISION_APPS_PATH)/rootfs.tar.xz .
 
-qnx_fs_install_sd_sbl: qnx_fs_install sbl_bootimage_install_sd qnx_fs_install_firmware
+qnx_fs_install_sd_sbl: qnx_fs_install sbl_bootimage_install_sd
 	$(call MODIFY_QNX_SD_FS)
 
-qnx_fs_install_sd_sbl_hs: qnx_fs_install sbl_bootimage_hs_install_sd qnx_fs_install_firmware
+qnx_fs_install_sd_sbl_hs: qnx_fs_install sbl_bootimage_hs_install_sd
 	$(call MODIFY_QNX_SD_FS)
 
-qnx_fs_install_ospi: qnx_fs_install sbl_bootimage_install_ospi qnx_fs_install_firmware
+qnx_fs_install_ospi: qnx_fs_install sbl_bootimage_install_ospi
 	$(call MODIFY_QNX_SD_FS)
 
 qnx_fs_install_sd_test_data:
