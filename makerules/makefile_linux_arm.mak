@@ -118,6 +118,7 @@ ifeq ($(BUILD_CPU_C7x_1),yes)
 	#Build TIDL test case and copy binaries
 	#$(MAKE) -C $(TIDL_PATH)/../ run
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/tidl_test
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/notebooks
 	cp -P $(TIDL_PATH)/tfl_delegate/out/J7/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(TIDL_PATH)/rt/out/J7/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(TIDL_PATH)/onnxrt_EP/out/J7/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
@@ -147,6 +148,7 @@ define CLEAN_COPY_FROM_STAGE =
 	-rm -f $(1)/lib/firmware/j7-*-fw
 	-rm -rf $(1)/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	-rm -rf $(1)/opt/tidl_test/*
+	-rm -rf $(1)/opt/notebooks/*
 	-rm -rf $(1)/$(IPK_TARGET_INC_PATH)/*
 
 	# create new directories
