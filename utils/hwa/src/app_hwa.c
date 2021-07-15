@@ -218,6 +218,7 @@ int32_t appVhwaDmpacInit()
     SET_DEVICE_STATE_ON(TISCI_DEV_DMPAC0_SDE_0);
     #endif
 
+
 #ifdef ENABLE_DOF
     Vhwa_M2mDofSl2AllocPrms sl2AllocPrms;
     Vhwa_M2mDofInitParams   initPrms;
@@ -556,17 +557,17 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
         switch(cmd)
         {
             case APP_DMPAC_SDE_SL2_FREE:
-                // free SDE SL2 memory
+                /* free SDE SL2 memory */
                 status = Vhwa_m2mSdeFreeSl2();
                 break;
 
             case APP_DMPAC_DOF_SL2_FREE:
-                // free DOF SL2 memory
+                /* free DOF SL2 memory */
                 status = Vhwa_m2mDofFreeSl2();
                 break;
 
             case APP_DMPAC_SDE_SL2_REALLOC:
-                // realloc SDE SL2 for 2MP
+                /* realloc SDE SL2 for 2MP */
                 if (sizeof(Vhwa_M2mSdeSl2AllocPrms) == prm_size)
                 {
                     Vhwa_M2mSdeSl2AllocPrms *cmdPrms = (Vhwa_M2mSdeSl2AllocPrms *)prm;
@@ -579,7 +580,7 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 break;
 
             case APP_DMPAC_DOF_SL2_REALLOC:
-                // realloc DOF SL2 for 2MP
+                /* realloc DOF SL2 for 2MP */
                 if (sizeof(Vhwa_M2mDofSl2AllocPrms) == prm_size)
                 {
                     Vhwa_M2mDofSl2AllocPrms *cmdPrms = (Vhwa_M2mDofSl2AllocPrms *)prm;
@@ -588,6 +589,18 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 {
                     appLogPrintf(" VHWA Remote Service: ERROR: Invalid DOF SL2 parameters passed !!!\n");
                 }
+                break;
+
+            case APP_VPAC_720_DMPAC_480:
+                SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 480000000);
+                SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   720000000);
+                status = 0;
+                break;
+
+            case APP_VPAC_650_DMPAC_520:
+                SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   650000000);
+                SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 520000000);
+                status = 0;
                 break;
         }
 
@@ -634,3 +647,4 @@ int32_t appVhwaRemoteServiceDeInit()
 
     return status;
 }
+

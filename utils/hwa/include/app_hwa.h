@@ -84,6 +84,14 @@
  *  Remote service command to reallocate SL2 for DOF
  */
 #define APP_DMPAC_DOF_SL2_REALLOC     (0x0004)
+/**
+ *  Remote service command to set VPAC to 720 MHz and DMPAC to 480 MHz
+ */
+#define APP_VPAC_720_DMPAC_480        (0x0005)
+/**
+ *  Remote service command to set VPAC to 650 MHz and DMPAC to 520 MHz
+ */
+#define APP_VPAC_650_DMPAC_520        (0x0006)
 
 /**
  *  Identical to SDE_DEFAULT_DIS_BUFF_DEPTH 
