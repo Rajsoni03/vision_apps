@@ -311,6 +311,16 @@ uint32_t appIpcGetAppCpuId(char *name);
  */
 char *appIpcGetCpuName(uint32_t app_cpu_id);
 
+#ifdef FREERTOS
+
+/**
+ * \brief Create task to flush IPC trace buffer
+ *
+ */
+int32_t appIpcCreateTraceBufFlushTask(void);
+
+#endif
+
 /* @} */
 
 #endif

@@ -66,6 +66,7 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <ti/drv/ipc/ipc.h>
+#include <ti/osal/osal.h>
 #include <ti/osal/TaskP.h>
 #include <ti/osal/SemaphoreP.h>
 #include <ti/osal/HwiP.h>
@@ -118,6 +119,37 @@ static uint8_t g_app_rpmessage_ctrl_task_stack[APP_IPC_RPMESSAGE_CTRL_TASK_STACK
 __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
+
+#ifdef FREERTOS
+
+typedef struct
+{
+    /* IPC trace buffer address */
+    uint8_t *traceBufAddr;
+
+    /* IPC trace buffer size */
+    uint32_t traceBufSize;
+
+    /* Timestamp of last IPC trace buffer flush */
+    uint64_t traceBufLastFlushTicksInUsecs;
+
+} IpcObj;
+
+static IpcObj gIpcObj;
+
+#define IPC_TRACEBUF_TASK_STACKSIZE          (1U * 1024U)
+#define IPC_TRACEBUF_FLUSH_PERIOD_IN_MSEC    (500U)
+#define IPC_TRACEBUF_SIZE                    (0x80000U)
+
+extern char Ipc_traceBuffer[IPC_TRACEBUF_SIZE];
+
+static uint8_t gIpcTraceBufFlushBuf[IPC_TRACEBUF_TASK_STACKSIZE] __attribute__ ((section(".bss:taskStackSection"))) __attribute__((aligned(32)));
+
+static void traceBufFlush(void* arg0, void* arg1);
+
+static void traceBufCacheWb(void);
+
+#endif
 
 typedef struct {
 
@@ -788,3 +820,55 @@ char *appIpcGetCpuName(uint32_t app_cpu_id)
     }
     return name;
 }
+
+#ifdef FREERTOS
+
+static void traceBufFlush(void* arg0, void* arg1)
+{
+    while (1)
+    {
+        TaskP_sleepInMsecs(IPC_TRACEBUF_FLUSH_PERIOD_IN_MSEC);
+        traceBufCacheWb();
+    }
+}
+
+static void traceBufCacheWb(void)
+{
+    uint64_t newticksInUsecs = TimerP_getTimeInUsecs();
+
+    /* Don't keep flusing cache */
+    if ((newticksInUsecs - gIpcObj.traceBufLastFlushTicksInUsecs) >=
+        (uint64_t)(IPC_TRACEBUF_FLUSH_PERIOD_IN_MSEC * 1000))
+    {
+        gIpcObj.traceBufLastFlushTicksInUsecs = newticksInUsecs;
+
+        /* Flush the cache of the traceBuf buffer */
+        if (gIpcObj.traceBufAddr != NULL)
+        {
+            CacheP_wb((const void *)gIpcObj.traceBufAddr,
+                      gIpcObj.traceBufSize);
+        }
+    }
+}
+
+int32_t appIpcCreateTraceBufFlushTask(void)
+{
+    int32_t status = -1;
+    TaskP_Params taskParams;
+
+    gIpcObj.traceBufAddr = (uint8_t *)Ipc_traceBuffer;
+    gIpcObj.traceBufSize = IPC_TRACEBUF_SIZE;
+    gIpcObj.traceBufLastFlushTicksInUsecs = 0ULL;
+
+    /* Task to flush IPC traceBuf */
+    TaskP_Params_init(&taskParams);
+    taskParams.priority  = 0;
+    taskParams.stack     = &gIpcTraceBufFlushBuf[0];
+    taskParams.stacksize = sizeof(gIpcTraceBufFlushBuf);
+    taskParams.name      = "IPC tracebuf flush";
+
+    TaskP_create(traceBufFlush, &taskParams);
+
+    return status;
+}
+#endif
