@@ -179,18 +179,18 @@ static char menu[] = {
 static void app_run_task(void *app_var)
 {
     AppObj *obj = (AppObj *)app_var;
-
-    while(!obj->stop_task)
+    vx_status status = VX_SUCCESS;
+    while(!obj->stop_task && (status == VX_SUCCESS))
     {
-        app_run_graph(obj);
+        status = app_run_graph(obj);
     }
     obj->stop_task_done = 1;
 }
 
-static int32_t app_run_task_create(AppObj *obj)
+static vx_status app_run_task_create(AppObj *obj)
 {
     tivx_task_create_params_t params;
-    int32_t status;
+    vx_status status;
 
     tivxTaskSetDefaultCreateParams(&params);
     params.task_main = app_run_task;
@@ -208,7 +208,7 @@ static void app_run_task_delete(AppObj *obj)
 {
     while(obj->stop_task_done==0)
     {
-         tivxTaskWaitMsecs(100);
+        tivxTaskWaitMsecs(100);
     }
 
     tivxTaskDelete(&obj->task);
@@ -216,7 +216,7 @@ static void app_run_task_delete(AppObj *obj)
 
 static vx_status app_run_graph_interactive(AppObj *obj)
 {
-    vx_status status;
+    vx_status status = VX_SUCCESS;
     uint32_t done = 0;
 
     char ch;
@@ -224,14 +224,14 @@ static vx_status app_run_graph_interactive(AppObj *obj)
     app_perf_point_t *perf_arr[1];
 
     status = app_run_task_create(obj);
-    if(status!=0)
+    if(status != VX_SUCCESS)
     {
         printf("app_tidl: ERROR: Unable to create task\n");
     }
     else
     {
         appPerfStatsResetAll();
-        while(!done)
+        while(!done && (status == VX_SUCCESS))
         {
             printf(menu);
             ch = getchar();
@@ -241,11 +241,12 @@ static vx_status app_run_graph_interactive(AppObj *obj)
             {
                 case 'p':
                     appPerfStatsPrintAll();
-                    tivx_utils_graph_perf_print(obj->graph);
+                    status = tivx_utils_graph_perf_print(obj->graph);
                     appPerfPointPrint(&obj->fileio_perf);
                     appPerfPointPrint(&obj->total_perf);
                     printf("\n");
                     appPerfPointPrintFPS(&obj->total_perf);
+                    appPerfPointReset(&obj->total_perf);
                     printf("\n");
 
                     break;
@@ -255,7 +256,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                     if (NULL != fp)
                     {
                         appPerfStatsExportAll(fp, perf_arr, 1);
-                        tivx_utils_graph_perf_export(fp, obj->graph);
+                        status = tivx_utils_graph_perf_export(fp, obj->graph);
                         appPerfStatsExportCloseFile(fp);
                         appPerfStatsResetAll();
                     }
@@ -311,7 +312,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
     if(fp==NULL)
     {
         printf("# ERROR: Unable to open config file [%s]\n", cfg_file_name);
-        exit(0);
+        exit(-1);
     }
 
     while(fgets(line_str, sizeof(line_str), fp)!=NULL)
@@ -327,35 +328,35 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
         token = strtok(line_str, s);
         if(token != NULL)
         {
-          if(strcmp(token, "sensor_index")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                obj->sensorObj.sensor_index = atoi(token);
-              }
-          }
-          else
-          if(strcmp(token, "is_interactive")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                obj->is_interactive = atoi(token);
-                if(obj->is_interactive > 1)
-                  obj->is_interactive = 1;
-              }
-              obj->sensorObj.is_interactive = obj->is_interactive;
-          }
-          else
+            if(strcmp(token, "sensor_index")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    obj->sensorObj.sensor_index = atoi(token);
+                }
+            }
+            else
+            if(strcmp(token, "is_interactive")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->is_interactive = atoi(token);
+                    if(obj->is_interactive > 1)
+                    obj->is_interactive = 1;
+                }
+                obj->sensorObj.is_interactive = obj->is_interactive;
+            }
+            else
             if(strcmp(token, "tidl_config")==0)
             {
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                  token[strlen(token)-1]=0;
-                  strcpy(obj->tidlObj.config_file_path, token);
+                    token[strlen(token)-1]=0;
+                    strcpy(obj->tidlObj.config_file_path, token);
                 }
             }
             else
@@ -364,8 +365,8 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                  token[strlen(token)-1]=0;
-                  strcpy(obj->tidlObj.network_file_path, token);
+                    token[strlen(token)-1]=0;
+                    strcpy(obj->tidlObj.network_file_path, token);
                 }
             }
             else
@@ -376,18 +377,18 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                  width =  atoi(token);
-                  obj->scalerObj.output[0].width   = width;
+                    width =  atoi(token);
+                    obj->scalerObj.output[0].width   = width;
 
-                  token = strtok(NULL, s);
-                  if(token != NULL)
-                  {
-                    if(token[strlen(token)-1] == '\n')
-                      token[strlen(token)-1]=0;
+                    token = strtok(NULL, s);
+                    if(token != NULL)
+                    {
+                        if(token[strlen(token)-1] == '\n')
+                        token[strlen(token)-1]=0;
 
-                    height =  atoi(token);
-                    obj->scalerObj.output[0].height  = height;
-                  }
+                        height =  atoi(token);
+                        obj->scalerObj.output[0].height  = height;
+                    }
                 }
             }
             else
@@ -398,18 +399,18 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                  width =  atoi(token);
-                  obj->scalerObj.output[1].width   = width;
+                    width =  atoi(token);
+                    obj->scalerObj.output[1].width   = width;
 
-                  token = strtok(NULL, s);
-                  if(token != NULL)
-                  {
-                    if(token[strlen(token)-1] == '\n')
-                      token[strlen(token)-1]=0;
+                    token = strtok(NULL, s);
+                    if(token != NULL)
+                    {
+                        if(token[strlen(token)-1] == '\n')
+                        token[strlen(token)-1]=0;
 
-                    height =  atoi(token);
-                    obj->scalerObj.output[1].height  = height;
-                  }
+                        height =  atoi(token);
+                        obj->scalerObj.output[1].height  = height;
+                    }
                 }
             }
             else
@@ -418,13 +419,12 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                  obj->drawDetectionsObj.params.viz_th = atof(token);
+                    obj->drawDetectionsObj.params.viz_th = atof(token);
                 }
             }
             else
             if(strcmp(token, "num_classes")==0)
             {
-
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
@@ -437,114 +437,114 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                  obj->displayObj.display_option = atoi(token);
+                    obj->displayObj.display_option = atoi(token);
                 }
             }
 #ifdef APP_WRITE_INTERMEDIATE_OUTPUTS
-          else
-          if(strcmp(token, "num_frames_to_run")==0)
-          {
-            token = strtok(NULL, s);
-            if(token != NULL)
+            else
+            if(strcmp(token, "num_frames_to_run")==0)
             {
-              token[strlen(token)-1]=0;
-              obj->num_frames_to_run = atoi(token);
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->num_frames_to_run = atoi(token);
+                }
             }
-          }
-          else
-          if(strcmp(token, "en_out_capture_write")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                obj->captureObj.en_out_capture_write = atoi(token);
-                if(obj->captureObj.en_out_capture_write > 1)
-                  obj->captureObj.en_out_capture_write = 1;
-              }
-          }
-          else
-          if(strcmp(token, "en_out_viss_write")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                obj->vissObj.en_out_viss_write = atoi(token);
-                if(obj->vissObj.en_out_viss_write > 1)
-                  obj->vissObj.en_out_viss_write = 1;
-              }
-          }
-          else
-          if(strcmp(token, "en_out_ldc_write")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                obj->ldcObj.en_out_ldc_write = atoi(token);
-                if(obj->ldcObj.en_out_ldc_write > 1)
-                  obj->ldcObj.en_out_ldc_write = 1;
-              }
-          }
-          else
-          if(strcmp(token, "en_out_scaler_write")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                obj->scalerObj.en_out_scaler_write = atoi(token);
-                if(obj->scalerObj.en_out_scaler_write > 1)
-                  obj->scalerObj.en_out_scaler_write = 1;
-              }
-          }
-          else
-          if(strcmp(token, "en_out_pre_proc_write")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                obj->preProcObj.en_out_pre_proc_write = atoi(token);
-                if(obj->preProcObj.en_out_pre_proc_write > 1)
-                  obj->preProcObj.en_out_pre_proc_write = 1;
-              }
-          }
-          else
-          if(strcmp(token, "output_file_path")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                token[strlen(token)-1]=0;
-                strcpy(obj->captureObj.output_file_path, token);
-                strcpy(obj->vissObj.output_file_path, token);
-                strcpy(obj->ldcObj.output_file_path, token);
-                strcpy(obj->scalerObj.output_file_path, token);
-                strcpy(obj->preProcObj.output_file_path, token);
-              }
-          }
-          else
-          if(strcmp(token, "num_frames_to_write")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                  token[strlen(token)-1]=0;
-                  obj->num_frames_to_write = atoi(token);
-              }
-          }
-          else
-          if(strcmp(token, "num_frames_to_skip")==0)
-          {
-              token = strtok(NULL, s);
-              if(token != NULL)
-              {
-                  token[strlen(token)-1]=0;
-                  obj->num_frames_to_skip = atoi(token);
-              }
-          }
+            else
+            if(strcmp(token, "en_out_capture_write")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->captureObj.en_out_capture_write = atoi(token);
+                    if(obj->captureObj.en_out_capture_write > 1)
+                    obj->captureObj.en_out_capture_write = 1;
+                }
+            }
+            else
+            if(strcmp(token, "en_out_viss_write")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->vissObj.en_out_viss_write = atoi(token);
+                    if(obj->vissObj.en_out_viss_write > 1)
+                    obj->vissObj.en_out_viss_write = 1;
+                }
+            }
+            else
+            if(strcmp(token, "en_out_ldc_write")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->ldcObj.en_out_ldc_write = atoi(token);
+                    if(obj->ldcObj.en_out_ldc_write > 1)
+                    obj->ldcObj.en_out_ldc_write = 1;
+                }
+            }
+            else
+            if(strcmp(token, "en_out_scaler_write")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->scalerObj.en_out_scaler_write = atoi(token);
+                    if(obj->scalerObj.en_out_scaler_write > 1)
+                        obj->scalerObj.en_out_scaler_write = 1;
+                }
+            }
+            else
+            if(strcmp(token, "en_out_pre_proc_write")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->preProcObj.en_out_pre_proc_write = atoi(token);
+                    if(obj->preProcObj.en_out_pre_proc_write > 1)
+                        obj->preProcObj.en_out_pre_proc_write = 1;
+                }
+            }
+            else
+            if(strcmp(token, "output_file_path")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    strcpy(obj->captureObj.output_file_path, token);
+                    strcpy(obj->vissObj.output_file_path, token);
+                    strcpy(obj->ldcObj.output_file_path, token);
+                    strcpy(obj->scalerObj.output_file_path, token);
+                    strcpy(obj->preProcObj.output_file_path, token);
+                }
+            }
+            else
+            if(strcmp(token, "num_frames_to_write")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->num_frames_to_write = atoi(token);
+                }
+            }
+            else
+            if(strcmp(token, "num_frames_to_skip")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->num_frames_to_skip = atoi(token);
+                }
+            }
 #endif
         }
     }
@@ -592,7 +592,7 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
     return;
 }
 
-vx_int32 app_tidl_od_cam_main(vx_int32 argc, vx_char* argv[])
+vx_status app_tidl_od_cam_main(vx_int32 argc, vx_char* argv[])
 {
     vx_status status = VX_SUCCESS;
 
@@ -605,6 +605,7 @@ vx_int32 app_tidl_od_cam_main(vx_int32 argc, vx_char* argv[])
     /*Config parameter reading*/
     app_parse_cmd_line_args(obj, argc, argv);
     APP_PRINTF("Parsed user params! \n");
+
     /* Querry sensor parameters */
     app_querry_sensor(&obj->sensorObj);
     APP_PRINTF("Sensor params queried! \n");
@@ -613,27 +614,30 @@ vx_int32 app_tidl_od_cam_main(vx_int32 argc, vx_char* argv[])
     app_update_param_set(obj);
     APP_PRINTF("Updated user params! \n");
 
-    app_init(obj);
+    status = app_init(obj);
     APP_PRINTF("App Init Done! \n");
-
-    app_create_graph(obj);
-    APP_PRINTF("App Create Graph Done! \n");
-
-    status = app_verify_graph(obj);
-    APP_PRINTF("App Verify Graph Done! \n");
 
     if(status == VX_SUCCESS)
     {
-        if(obj->is_interactive)
-        {
-            app_run_graph_interactive(obj);
-        }
-        else
-        {
-            app_run_graph(obj);
-        }
-        APP_PRINTF("App Run Graph Done! \n");
+        status = app_create_graph(obj);
+        APP_PRINTF("App Create Graph Done! \n");
     }
+    if(status == VX_SUCCESS)
+    {
+        status = app_verify_graph(obj);
+        APP_PRINTF("App Verify Graph Done! \n");
+    }
+    if(obj->is_interactive && (status == VX_SUCCESS))
+    {
+        status = app_run_graph_interactive(obj);
+    }
+    else
+    if (status == VX_SUCCESS)
+    {
+        status = app_run_graph(obj);
+    }
+
+    APP_PRINTF("App Run Graph Done! \n");
 
     app_delete_graph(obj);
     APP_PRINTF("App Delete Graph Done! \n");
@@ -641,7 +645,7 @@ vx_int32 app_tidl_od_cam_main(vx_int32 argc, vx_char* argv[])
     app_deinit(obj);
     APP_PRINTF("App De-init Done! \n");
 
-    return 0;
+    return status;
 }
 
 static vx_status app_init(AppObj *obj)
@@ -651,14 +655,16 @@ static vx_status app_init(AppObj *obj)
 
     /* Create OpenVx Context */
     obj->context = vxCreateContext();
-    APP_ASSERT_VALID_REF(obj->context);
+    status = vxGetStatus((vx_reference) obj->context);
     APP_PRINTF("Creating context done!\n");
-
-    tivxHwaLoadKernels(obj->context);
-    tivxImagingLoadKernels(obj->context);
-    tivxImgProcLoadKernels(obj->context);
-    tivxTIDLLoadKernels(obj->context);
-    tivxFileIOLoadKernels(obj->context);
+    if(status == VX_SUCCESS)
+    {
+        tivxHwaLoadKernels(obj->context);
+        tivxImagingLoadKernels(obj->context);
+        tivxImgProcLoadKernels(obj->context);
+        tivxTIDLLoadKernels(obj->context);
+        tivxFileIOLoadKernels(obj->context);
+    }
     APP_PRINTF("Kernel loading done!\n");
 
     /* Initialize modules */
@@ -713,9 +719,9 @@ static vx_status app_init(AppObj *obj)
     #ifndef x86_64
     if(obj->displayObj.display_option == 1)
     {
-      appGrpxInitParamsInit(&grpx_prms, obj->context);
-      grpx_prms.draw_callback = app_draw_graphics;
-      appGrpxInit(&grpx_prms);
+        appGrpxInitParamsInit(&grpx_prms, obj->context);
+        grpx_prms.draw_callback = app_draw_graphics;
+        appGrpxInit(&grpx_prms);
     }
     #endif
 
@@ -763,7 +769,7 @@ static void app_deinit(AppObj *obj)
     #ifndef x86_64
     if(obj->displayObj.display_option == 1)
     {
-      appGrpxDeInit();
+        appGrpxDeInit();
     }
     #endif
 
@@ -773,7 +779,6 @@ static void app_deinit(AppObj *obj)
     tivxImgProcUnLoadKernels(obj->context);
     tivxFileIOUnLoadKernels(obj->context);
     APP_PRINTF("Kernels unload done!\n");
-
 
     vxReleaseContext(&obj->context);
     APP_PRINTF("Release context done!\n");
@@ -864,14 +869,14 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-      app_create_graph_tidl(obj->context, obj->graph, &obj->tidlObj, obj->preProcObj.output_tensor_arr);
-      APP_PRINTF("TIDL graph done!\n");
+        app_create_graph_tidl(obj->context, obj->graph, &obj->tidlObj, obj->preProcObj.output_tensor_arr);
+        APP_PRINTF("TIDL graph done!\n");
     }
 
     if(status == VX_SUCCESS)
     {
-      app_create_graph_draw_detections(obj->graph, &obj->drawDetectionsObj, obj->tidlObj.output_tensor_arr[0], obj->scalerObj.output[1].arr);
-      APP_PRINTF("Draw detections graph done!\n");
+        app_create_graph_draw_detections(obj->graph, &obj->drawDetectionsObj, obj->tidlObj.output_tensor_arr[0], obj->scalerObj.output[1].arr);
+        APP_PRINTF("Draw detections graph done!\n");
     }
 
     vx_int32 idx = 0;
@@ -953,7 +958,7 @@ static vx_status app_verify_graph(AppObj *obj)
     #if 1
     if(VX_SUCCESS == status)
     {
-      status = tivxExportGraphToDot(obj->graph,".", "vx_app_tidl_od_cam");
+        status = tivxExportGraphToDot(obj->graph,".", "vx_app_tidl_od_cam");
     }
     #endif
 
@@ -974,48 +979,44 @@ static vx_status app_verify_graph(AppObj *obj)
 
 static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 frame_id)
 {
-  vx_status status = VX_SUCCESS;
+    vx_status status = VX_SUCCESS;
 
-  appPerfPointBegin(&obj->total_perf);
+    appPerfPointBegin(&obj->total_perf);
+    CaptureObj *captureObj = &obj->captureObj;
 
-  CaptureObj *captureObj = &obj->captureObj;
+    if(obj->pipeline <= 0)
+    {
+        /* Enqueue outpus */
+        /* Enqueue inputs during pipeup dont execute */
+        vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->enqueueCnt], 1);
 
-  if(obj->pipeline <= 0)
-  {
-    /* Enqueue outpus */
-
-    /* Enqueue inputs during pipeup dont execute */
-    vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->enqueueCnt], 1);
-
-    obj->enqueueCnt++;
-    obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-    obj->pipeline++;
-  }
+        obj->enqueueCnt++;
+        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
+        obj->pipeline++;
+    }
 
 
-  if(obj->pipeline > 0)
-  {
-    vx_image capture_input_image;
-    uint32_t num_refs;
+    if(obj->pipeline > 0)
+    {
+        vx_image capture_input_image;
+        uint32_t num_refs;
 
-    /* Dequeue input */
-    vxGraphParameterDequeueDoneRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_image, 1, &num_refs);
+        /* Dequeue input */
+        vxGraphParameterDequeueDoneRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_image, 1, &num_refs);
 
+        /* Enqueue input - start execution */
+        vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_image, 1);
 
-    /* Enqueue input - start execution */
-    vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_image, 1);
+        obj->enqueueCnt++;
+        obj->dequeueCnt++;
 
-    obj->enqueueCnt++;
-    obj->dequeueCnt++;
+        obj->enqueueCnt = (obj->enqueueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
+        obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
+    }
 
-    obj->enqueueCnt = (obj->enqueueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-    obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
+    appPerfPointEnd(&obj->total_perf);
 
-  }
-
-  appPerfPointEnd(&obj->total_perf);
-
-  return status;
+    return status;
 }
 
 
@@ -1025,6 +1026,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     SensorObj *sensorObj = &obj->sensorObj;
     vx_int32 frame_id;
+    int32_t ch_mask = obj->sensorObj.ch_mask;
 
     app_pipeline_params_defaults(obj);
 
@@ -1033,7 +1035,8 @@ static vx_status app_run_graph(AppObj *obj)
         printf("sensor name is NULL \n");
         return VX_FAILURE;
     }
-    status = appStartImageSensor(sensorObj->sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+    status = appStartImageSensor(sensorObj->sensor_name, ch_mask);
+    APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
 
     for(frame_id = 0; frame_id < obj->num_frames_to_run; frame_id++)
     {
@@ -1067,28 +1070,28 @@ static vx_status app_run_graph(AppObj *obj)
 
         /* user asked to stop processing */
         if(obj->stop_task)
-          break;
+            break;
     }
 
     vxWaitGraph(obj->graph);
 
     obj->stop_task = 1;
 
-    status = appStopImageSensor(obj->sensorObj.sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+    status = appStopImageSensor(obj->sensorObj.sensor_name, ch_mask);
 
     return status;
 }
 
 static void set_display_defaults(DisplayObj *displayObj)
 {
-  displayObj->display_option = 1;
+    displayObj->display_option = 1;
 }
 
 static void app_pipeline_params_defaults(AppObj *obj)
 {
-  obj->pipeline       = -APP_BUFFER_Q_DEPTH + 1;
-  obj->enqueueCnt     = 0;
-  obj->dequeueCnt     = 0;
+    obj->pipeline       = -APP_BUFFER_Q_DEPTH + 1;
+    obj->enqueueCnt     = 0;
+    obj->dequeueCnt     = 0;
 }
 
 static void set_sensor_defaults(SensorObj *sensorObj)
@@ -1102,7 +1105,7 @@ static void set_sensor_defaults(SensorObj *sensorObj)
     sensorObj->sensor_wdr_enabled = 0;
     sensorObj->sensor_exp_control_enabled = 0;
     sensorObj->sensor_gain_control_enabled = 0;
-
+    sensorObj->ch_mask = 1;
     sensorObj->enable_ldc = 1;
     sensorObj->num_cameras_enabled = 1;
     sensorObj->usecase_option = APP_SENSOR_FEATURE_CFG_UC0;
@@ -1123,13 +1126,17 @@ static void set_pre_proc_defaults(PreProcObj *preProcObj)
         preProcObj->params.pad_pixel[i] = 0;
     }
 
-    for(i = 0; i< 3 ; i++){
-      preProcObj->params.scale_val[i] = 1.0;
-      preProcObj->params.mean_pixel[i] = 0.0;
+    for(i = 0; i< 3 ; i++)
+    {
+        preProcObj->params.scale_val[i] = 1.0;
+        preProcObj->params.mean_pixel[i] = 0.0;
     }
 
     preProcObj->params.ip_rgb_or_yuv = 1; /* YUV-NV12 default */
     preProcObj->params.color_conv_flag = TIADALG_COLOR_CONV_YUV420_BGR;
+
+    /* Number of time to clear the output buffer before it gets reused */
+    preProcObj->params.clear_count  = 4;
 }
 
 static void app_default_param_set(AppObj *obj)
@@ -1148,7 +1155,6 @@ static void app_default_param_set(AppObj *obj)
     obj->is_interactive = 1;
     obj->write_file = 0;
     obj->num_frames_to_run = 1000000000;
-
 }
 
 static vx_int32 calc_grid_size(vx_uint32 ch)
@@ -1172,7 +1178,8 @@ static vx_int32 calc_grid_size(vx_uint32 ch)
     else if(16>=ch)
     {
         return 4;
-    }else
+    }
+    else
     {
         return -1;
     }
@@ -1254,9 +1261,7 @@ static void app_update_param_set(AppObj *obj)
     obj->sensorObj.sensor_index = 0; /* App works only for IMX390 2MP cameras */
 
     update_draw_detections_defaults(obj, &obj->drawDetectionsObj);
-
     update_img_mosaic_defaults(&obj->imgMosaicObj, obj->scalerObj.output[1].width, obj->scalerObj.output[1].height, obj->sensorObj.num_cameras_enabled);
-
 }
 
 /*
@@ -1270,22 +1275,19 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
     vxReleaseParameter(&parameter);
 }
 
-
 #ifndef x86_64
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
+    appGrpxDrawDefault(handle, draw2dBufInfo, update_type);
 
-  appGrpxDrawDefault(handle, draw2dBufInfo, update_type);
+    if(update_type == 0)
+    {
+        Draw2D_FontPrm sHeading;
 
-  if(update_type == 0)
-  {
-    Draw2D_FontPrm sHeading;
+        sHeading.fontIdx = 4;
+        Draw2D_drawString(handle, 580, 5, "TIDL - Object Detection Demo", &sHeading);
+    }
 
-    sHeading.fontIdx = 4;
-    Draw2D_drawString(handle, 580, 5, "TIDL - Object Detection Demo", &sHeading);
-
-  }
-
-  return;
+    return;
 }
 #endif

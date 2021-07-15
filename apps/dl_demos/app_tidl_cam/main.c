@@ -184,18 +184,18 @@ static char menu[] = {
 static void app_run_task(void *app_var)
 {
     AppObj *obj = (AppObj *)app_var;
-
-    while(!obj->stop_task)
+    vx_status status = VX_SUCCESS;
+    while(!obj->stop_task && (status == VX_SUCCESS))
     {
-        app_run_graph(obj);
+        status = app_run_graph(obj);
     }
     obj->stop_task_done = 1;
 }
 
-static int32_t app_run_task_create(AppObj *obj)
+static vx_status app_run_task_create(AppObj *obj)
 {
     tivx_task_create_params_t params;
-    int32_t status;
+    vx_status status;
 
     tivxTaskSetDefaultCreateParams(&params);
     params.task_main = app_run_task;
@@ -399,8 +399,8 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                token[strlen(token)-1]=0;
-                obj->num_frames_to_run = atoi(token);
+                    token[strlen(token)-1]=0;
+                    obj->num_frames_to_run = atoi(token);
                 }
             }
             else
@@ -411,8 +411,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 {
                     token[strlen(token)-1]=0;
                     obj->captureObj.en_out_capture_write = atoi(token);
+
                     if(obj->captureObj.en_out_capture_write > 1)
-                    obj->captureObj.en_out_capture_write = 1;
+                        obj->captureObj.en_out_capture_write = 1;
                 }
             }
             else
@@ -423,8 +424,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 {
                     token[strlen(token)-1]=0;
                     obj->vissObj.en_out_viss_write = atoi(token);
+
                     if(obj->vissObj.en_out_viss_write > 1)
-                    obj->vissObj.en_out_viss_write = 1;
+                        obj->vissObj.en_out_viss_write = 1;
                 }
             }
             else
@@ -435,8 +437,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 {
                     token[strlen(token)-1]=0;
                     obj->ldcObj.en_out_ldc_write = atoi(token);
+
                     if(obj->ldcObj.en_out_ldc_write > 1)
-                    obj->ldcObj.en_out_ldc_write = 1;
+                        obj->ldcObj.en_out_ldc_write = 1;
                 }
             }
             else
@@ -447,8 +450,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 {
                     token[strlen(token)-1]=0;
                     obj->scalerObj.en_out_scaler_write = atoi(token);
+
                     if(obj->scalerObj.en_out_scaler_write > 1)
-                    obj->scalerObj.en_out_scaler_write = 1;
+                        obj->scalerObj.en_out_scaler_write = 1;
                 }
             }
             else
@@ -459,8 +463,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 {
                     token[strlen(token)-1]=0;
                     obj->preProcObj.en_out_pre_proc_write = atoi(token);
+
                     if(obj->preProcObj.en_out_pre_proc_write > 1)
-                    obj->preProcObj.en_out_pre_proc_write = 1;
+                        obj->preProcObj.en_out_pre_proc_write = 1;
                 }
             }
             else
@@ -653,6 +658,7 @@ static vx_status app_init(AppObj *obj)
         tivxHwaLoadKernels(obj->context);
         tivxImagingLoadKernels(obj->context);
         tivxImgProcLoadKernels(obj->context);
+        tivxTIDLLoadKernels(obj->context);
         tivxFileIOLoadKernels(obj->context);
         APP_PRINTF("Kernel loading done!\n");
     }
@@ -802,6 +808,7 @@ static void app_deinit(AppObj *obj)
     }
     #endif
 
+    tivxTIDLUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
     tivxImagingUnLoadKernels(obj->context);
     tivxImgProcUnLoadKernels(obj->context);
@@ -1205,6 +1212,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     SensorObj *sensorObj = &obj->sensorObj;
     vx_int32 frame_id;
+    int32_t ch_mask = obj->sensorObj.ch_mask;
 
     app_pipeline_params_defaults(obj);
 
@@ -1213,7 +1221,8 @@ static vx_status app_run_graph(AppObj *obj)
         printf("sensor name is NULL \n");
         return VX_FAILURE;
     }
-    status = appStartImageSensor(sensorObj->sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+    status = appStartImageSensor(sensorObj->sensor_name, ch_mask);
+    APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
 
     for(frame_id = 0; frame_id < obj->num_frames_to_run; frame_id++)
     {
@@ -1247,14 +1256,14 @@ static vx_status app_run_graph(AppObj *obj)
 
         /* user asked to stop processing */
         if(obj->stop_task)
-          break;
+            break;
     }
 
     vxWaitGraph(obj->graph);
 
     obj->stop_task = 1;
 
-    status = appStopImageSensor(obj->sensorObj.sensor_name, ((1 << sensorObj->num_cameras_enabled) - 1));
+    status = appStopImageSensor(obj->sensorObj.sensor_name, ch_mask);
 
     return status;
 }
@@ -1287,7 +1296,7 @@ static void set_sensor_defaults(SensorObj *sensorObj)
     sensorObj->sensor_wdr_enabled = 0;
     sensorObj->sensor_exp_control_enabled = 0;
     sensorObj->sensor_gain_control_enabled = 0;
-
+    sensorObj->ch_mask = 1;
     sensorObj->enable_ldc = 1;
     sensorObj->num_cameras_enabled = 1;
     sensorObj->usecase_option = APP_SENSOR_FEATURE_CFG_UC0;
@@ -1355,7 +1364,6 @@ static void app_update_param_set(AppObj *obj)
     obj->postProcObj.params.num_top_results = 5;
 
     set_img_mosaic_params(obj, &obj->imgMosaicObj);
-
 }
 
 /*
@@ -1372,7 +1380,6 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
 #ifndef x86_64
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
-
     appGrpxDrawDefault(handle, draw2dBufInfo, update_type);
 
     if(update_type == 0)
