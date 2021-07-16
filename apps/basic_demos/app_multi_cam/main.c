@@ -64,6 +64,7 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
+#include <utils/hwa/include/app_hwa_api.h>
 #include <VX/vx_khr_pipelining.h>
 
 #include "app_common.h"
@@ -124,6 +125,9 @@ typedef struct {
     int32_t dequeueCnt;
 
     int32_t write_file;
+
+    vx_uint32 enable_configure_hwa_freq;
+    vx_uint32 hwa_freq_config;
 
 } AppObj;
 
@@ -351,6 +355,24 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 }
             }
             else
+            if(strcmp(token, "enable_configure_hwa_freq")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    obj->enable_configure_hwa_freq = atoi(token);
+                }
+            }
+            else
+            if(strcmp(token, "hwa_freq_config")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    obj->hwa_freq_config = atoi(token);
+                }
+            }
+            else
             if(strcmp(token, "enable_ldc")==0)
             {
                 token = strtok(NULL, s);
@@ -568,6 +590,8 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
         obj->test_mode = 1;
         obj->captureObj.test_mode = 1;
         obj->is_interactive = 0;
+        obj->enable_configure_hwa_freq = 0;
+        obj->hwa_freq_config = 0;
         obj->sensorObj.is_interactive = 0;
         // set the number of test cams from cmd line
         if (num_test_cams != 0xFF)
@@ -680,10 +704,35 @@ static vx_status app_init(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
 
-    /* Create OpenVx Context */
-    obj->context = vxCreateContext();
-    status = vxGetStatus((vx_reference)obj->context);
-    APP_PRINTF("Creating context done!\n");
+    if (1U == obj->enable_configure_hwa_freq)
+    {
+        APP_PRINTF("Configuring VPAC frequency!\n");
+        if (0U == obj->hwa_freq_config)
+        {
+            APP_PRINTF("Configuring VPAC frequency to 650 MHz and DMPAC to 520 MHz!\n");
+            status = appVhwaConfigureFreq(APP_HWA_CONFIGURE_FREQ_VPAC_650_DMPAC_520);
+            APP_PRINTF("Configuring VPAC frequency done!\n");
+        }
+        else if (1U == obj->hwa_freq_config)
+        {
+            APP_PRINTF("Configuring VPAC frequency to 720 MHz and DMPAC to 480 MHz!\n");
+            status = appVhwaConfigureFreq(APP_HWA_CONFIGURE_FREQ_VPAC_720_DMPAC_480);
+            APP_PRINTF("Configuring VPAC frequency done!\n");
+        }
+        else
+        {
+            APP_PRINTF("Invalid option for VPAC frequency configuration!\n");
+        }
+    }
+
+    if (status == VX_SUCCESS)
+    {
+        /* Create OpenVx Context */
+        obj->context = vxCreateContext();
+        status = vxGetStatus((vx_reference)obj->context);
+        APP_PRINTF("Creating context done!\n");
+    }
+
     if (status == VX_SUCCESS)
     {
         tivxHwaLoadKernels(obj->context);
@@ -693,7 +742,10 @@ static vx_status app_init(AppObj *obj)
     }
 
     /* Initialize modules */
-    app_init_sensor(&obj->sensorObj, "sensor_obj");
+    if (status == VX_SUCCESS)
+    {
+        app_init_sensor(&obj->sensorObj, "sensor_obj");
+    }
 
     if (status == VX_SUCCESS)
     {
