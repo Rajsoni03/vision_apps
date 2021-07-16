@@ -642,8 +642,8 @@ Sensor driver does not support metadata yet.
             status = tivxSetNodeParameterNumBufByIndex(obj->node_ldc, 7u, obj->num_cap_buf);
         }
 
-        /*Check is resizing is needed for display*/
-        if((obj->table_width != obj->display_params.outWidth) || (obj->table_height != obj->display_params.outHeight))
+        /*Check if resizing is needed for display*/
+        if((obj->table_width > obj->display_params.outWidth) && (obj->table_height > obj->display_params.outHeight))
         {
             vx_uint16 scaler_out_w, scaler_out_h;
             obj->scaler_enable = vx_true_e;
@@ -661,6 +661,12 @@ Sensor driver does not support metadata yet.
         {
             obj->scaler_enable = vx_false_e;
             obj->display_image = obj->ldc_out;
+
+            /* MSC can only downsize. If ldc resolution is lower, 
+               display resolution must be set accordingly
+            */
+            obj->display_params.outWidth = obj->table_width;
+            obj->display_params.outHeight = obj->table_height;
         }
     }
     else /*ldc_enable*/
@@ -670,9 +676,21 @@ Sensor driver does not support metadata yet.
             /*MSC does not support YUV422 input*/
             obj->scaler_enable = vx_false_e;
         }
-        else if ((image_width != obj->display_params.outWidth) || (image_height != obj->display_params.outHeight))
+        else
         {
-            obj->scaler_enable = vx_true_e;
+            if ((image_width > obj->display_params.outWidth) && (image_height > obj->display_params.outHeight))
+            {
+                obj->scaler_enable = vx_true_e;
+            }
+            else
+            {
+                obj->scaler_enable = vx_false_e;
+                /* MSC can only downsize. If viss resolution is lower, 
+                   display resolution must be set accordingly
+                */
+                obj->display_params.outWidth = image_width;
+                obj->display_params.outHeight = image_height;
+            }
         }
 
         if(vx_true_e == obj->scaler_enable)
