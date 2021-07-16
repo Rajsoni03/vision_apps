@@ -215,6 +215,8 @@ static app_udma_ch_handle_t gAppUdmaDefaultChHandle;
 
 static app_udma_ch_handle_t gAppUdmaNDChHandle[APP_UDMA_ND_CHANNELS_MAX];
 
+static int32_t gAppUdmaNDChRequest[APP_UDMA_ND_CHANNELS_MAX];
+
 /* ========================================================================== */
 /*                          Function Definitions                              */
 /* ========================================================================== */
@@ -280,6 +282,7 @@ int32_t appUdmaInit(void)
     for(i=0; i<APP_UDMA_ND_CHANNELS_MAX; i++)
     {
         gAppUdmaNDChHandle[i] = NULL;
+        gAppUdmaNDChRequest[i] = 0;
     }
 
 
@@ -370,9 +373,47 @@ app_udma_ch_handle_t appUdmaCopyNDGetHandle(uint32_t ch_idx)
             #endif
         }
         ch_handle = gAppUdmaNDChHandle[ch_idx];
+        gAppUdmaNDChRequest[ch_idx]++;
     }
     return ch_handle;
 }
+
+int32_t appUdmaCopyNDReleaseHandle(uint32_t ch_idx)
+{
+    int32_t  retVal = UDMA_SOK;
+
+    if(ch_idx < APP_UDMA_ND_CHANNELS_MAX)
+    {
+        gAppUdmaNDChRequest[ch_idx]--;
+
+        if(gAppUdmaNDChRequest[ch_idx] < 0)
+        {
+            appLogPrintf("UDMA : ERROR: Channel %d not allocated !!!\n", ch_idx);
+            gAppUdmaNDChRequest[ch_idx] = 0;
+            return UDMA_EFAIL;
+        }
+
+        if(gAppUdmaNDChRequest[ch_idx] == 0)
+        {
+            retVal = appUdmaCopyDelete(gAppUdmaNDChHandle[ch_idx]);
+            if(UDMA_SOK != retVal)
+            {
+                appLogPrintf("UDMA : ERROR: Unable to delete channel %d handle!!!\n", ch_idx);
+            }
+            else
+            {
+                gAppUdmaNDChHandle[ch_idx] = NULL;
+            }
+        }
+    }
+    else
+    {
+        appLogPrintf("UDMA : ERROR: Invalid Channel %d !!!\n", ch_idx);
+    }
+
+    return retVal;
+}
+
 app_udma_ch_handle_t appUdmaCopyCreate(const app_udma_create_prms_t *prms)
 {
     int32_t             retVal = UDMA_SOK;
@@ -740,7 +781,7 @@ int32_t appUdmaCopyNDWait(
                 /* Clear interrupt */
                 CSL_REG64_WR(eventPrms->intrClearReg, eventPrms->intrMask);
                 /* Work-around for K3_OPEN_SI-213 */
-                /* We need to ensure that status clear is written to IA 
+                /* We need to ensure that status clear is written to IA
                    before re-submitting on the same channel */
 #if defined (_TMS320C6X)
                 _mfence();
@@ -775,7 +816,7 @@ int32_t appUdmaCopyNDWait(
             /* Clear interrupt */
             CSL_REG64_WR(eventPrms->intrClearReg, eventPrms->intrMask);
             /* Work-around for K3_OPEN_SI-213 */
-            /* We need to ensure that status clear is written to IA 
+            /* We need to ensure that status clear is written to IA
                before re-submitting on the same channel */
 #if defined (_TMS320C6X)
             _mfence();
@@ -1233,21 +1274,21 @@ static void appUdmaTrpdInit(app_udma_ch_obj_t *ch_obj, uint32_t copy_mode)
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EVENT_SIZE, CSL_UDMAP_TR_FLAGS_EVENT_SIZE_ICNT1_DEC);
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER0, CSL_UDMAP_TR_FLAGS_TRIGGER_GLOBAL0);
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER0_TYPE, CSL_UDMAP_TR_FLAGS_TRIGGER_TYPE_ICNT1_DEC);
-        pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EOL, CSL_UDMAP_TR_FLAGS_EOL_ICNT0); 
+        pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EOL, CSL_UDMAP_TR_FLAGS_EOL_ICNT0);
     }
     else if(copy_mode == 2)
     {
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EVENT_SIZE, CSL_UDMAP_TR_FLAGS_EVENT_SIZE_ICNT2_DEC);
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER0, CSL_UDMAP_TR_FLAGS_TRIGGER_GLOBAL0);
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER0_TYPE, CSL_UDMAP_TR_FLAGS_TRIGGER_TYPE_ICNT2_DEC);
-        pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EOL, CSL_UDMAP_TR_FLAGS_EOL_ICNT0_ICNT1); 
+        pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EOL, CSL_UDMAP_TR_FLAGS_EOL_ICNT0_ICNT1);
     }
     else if(copy_mode == 3)
     {
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EVENT_SIZE, CSL_UDMAP_TR_FLAGS_EVENT_SIZE_ICNT3_DEC);
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER0, CSL_UDMAP_TR_FLAGS_TRIGGER_GLOBAL0);
         pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER0_TYPE, CSL_UDMAP_TR_FLAGS_TRIGGER_TYPE_ICNT3_DEC);
-        pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EOL, CSL_UDMAP_TR_FLAGS_EOL_ICNT0_ICNT1_ICNT2); 
+        pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_EOL, CSL_UDMAP_TR_FLAGS_EOL_ICNT0_ICNT1_ICNT2);
     }
 
     pTr->flags |= CSL_FMK(UDMAP_TR_FLAGS_TRIGGER1, CSL_UDMAP_TR_FLAGS_TRIGGER_NONE);

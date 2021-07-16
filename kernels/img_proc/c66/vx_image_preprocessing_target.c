@@ -83,6 +83,8 @@
 #define EXEC_PIPELINE_STAGE2(x) ((x) & 0x00000002)
 #define EXEC_PIPELINE_STAGE3(x) ((x) & 0x00000004)
 
+#define J721E_C66X_DSP_L2_SRAM_SIZE  (224) /* in Kb */
+
 static tivx_target_kernel vx_img_preproc_target_kernel = NULL;
 
 typedef enum {
@@ -102,6 +104,8 @@ typedef struct {
     vx_uint32 icnt1_next;
     vx_uint32 icnt2_next;
     vx_uint32 icnt3_next;
+
+    vx_uint32 dma_ch;
 
 }DMAObj;
 
@@ -139,22 +143,24 @@ static vx_status dma_create(DMAObj *dmaObj, vx_size transfer_type, vx_uint32 dma
     dmaObj->transfer_type = transfer_type;
 
     memset(&dmaObj->tfrPrms, 0, sizeof(app_udma_copy_nd_prms_t));
-    
+
     dmaObj->icnt1_next = 0;
     dmaObj->icnt2_next = 0;
     dmaObj->icnt3_next = 0;
+
+    dmaObj->dma_ch = dma_ch;
 
     if(transfer_type == DATA_COPY_DMA)
     {
 #ifndef x86_64
         dmaObj->udmaChHdl = appUdmaCopyNDGetHandle(dma_ch);
-#endif        
+#endif
     }
     else
     {
         dmaObj->udmaChHdl = NULL;
     }
-    
+
     return status;
 }
 
@@ -182,7 +188,7 @@ static vx_status dma_transfer_trigger(DMAObj *dmaObj)
 
         /* As C66 is a 32b processor, address will be truncated to use only lower 32b address */
         /* So user is responsible for providing correct address */
-#ifndef x86_64        
+#ifndef x86_64
         vx_uint8 *pSrcNext = (vx_uint8 *)((uint32_t)tfrPrms->src_addr + (icnt3 * tfrPrms->dim3) + (icnt2 * tfrPrms->dim2));
         vx_uint8 *pDstNext = (vx_uint8 *)((uint32_t)tfrPrms->dest_addr + (icnt3 * tfrPrms->ddim3) + (icnt2 * tfrPrms->ddim2));
 #else
@@ -269,6 +275,20 @@ static vx_status dma_delete(DMAObj *dmaObj)
 {
     vx_status status = VX_SUCCESS;
 
+    dmaObj->udmaChHdl = NULL;
+
+    if(dmaObj->transfer_type == DATA_COPY_DMA)
+    {
+#ifndef x86_64
+        int32_t retVal = appUdmaCopyNDReleaseHandle(dmaObj->dma_ch);
+        if(retVal != 0)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to release DMA handle %d\n", dmaObj->dma_ch);
+            status = VX_FAILURE;
+        }
+#endif
+    }
+
     return status;
 }
 
@@ -309,10 +329,13 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
         tivx_obj_desc_image_t *in_img_desc  = (tivx_obj_desc_image_t *)obj_desc[TIVX_KERNEL_IMG_PREPROCESS_INPUT_IMAGE_IDX];
 
         vx_imagepatch_addressing_t *pIn = (vx_imagepatch_addressing_t *)&in_img_desc->imagepatch_addr[0];
+        vx_uint32 in_width  = pIn->dim_x;
         vx_uint32 in_height = pIn->dim_y;
         vx_int32  in_stride = pIn->stride_y;
+
         vx_uint32 num_bytes = 1;
 
+        /* Input is always 8bit, output can be either 8bit or 16bit */
         if(nodeParams->tidl_8bit_16bit_flag == 0)
         {
             num_bytes = 1;
@@ -322,7 +345,7 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
             num_bytes = 2;
         }
 
-        vx_uint32 blk_width, blk_height, rem_height, mblk_height;
+        vx_uint32 blk_width, rem_height, mblk_height;
         vx_uint32 in_size, out_size, total_size, req_size, avail_size, num_sets;
         blk_width = in_stride / sizeof(vx_uint8);
 
@@ -331,35 +354,50 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
         tivxMemStats(&l2_stats, (vx_enum)TIVX_MEM_INTERNAL_L2);
 
         avail_size = l2_stats.free_size;
-        req_size = 224 * 1024; /* Out of available 288KB - 64KB is cache and 224KB is SRAM */
+        req_size = J721E_C66X_DSP_L2_SRAM_SIZE * 1024; /* Out of available 288KB - 64KB is cache and 224KB is SRAM */
 
         if(req_size > avail_size)
             req_size = avail_size;
 
+        /* This logic tries to find optimum block height which is a
+           multiple of 2. It is assumed that DMA will fetch a minimum of
+           Width x block_height */
         total_size = 0;
-        mblk_height = 1;
-        blk_height = mblk_height;
+        mblk_height = 2;
         rem_height = 0;
-
         in_size = 0;
         out_size = 0;
         while((total_size < req_size) && (rem_height == 0))
         {
             kernelParams->blkWidth = blk_width;
-            kernelParams->blkHeight = blk_height;
+            kernelParams->blkHeight = mblk_height;
             kernelParams->remHeight = rem_height;
 
-            blk_height = mblk_height;
+            /* Increment mblk_height by 2 */
             mblk_height *= 2;
-            /* For YUV420SP, 2 luma, 1 chroma lines will produce 2 RGB planar lines */
-            in_size  = (blk_width * mblk_height) + blk_width;
-            out_size = (blk_width * mblk_height * 3 * num_bytes);
+
+            if(nodeParams->color_conv_flag == TIADALG_COLOR_CONV_RGBINTERLEAVE_RGB ||
+               nodeParams->color_conv_flag == TIADALG_COLOR_CONV_RGBINTERLEAVE_BGR)
+            {
+                /* Here 1 RGB interleaved line produces 1 RGB planar line */
+                in_size  = (blk_width * mblk_height);
+                /* Here output can be 8bit or 16bit hence multiplied by num_bytes */
+                out_size = (in_size * num_bytes);
+            }
+            else if(nodeParams->color_conv_flag == TIADALG_COLOR_CONV_YUV420_RGB ||
+                    nodeParams->color_conv_flag == TIADALG_COLOR_CONV_YUV420_BGR)
+            {
+                /* For YUV420SP, 2 luma, 1 chroma lines will produce 2 RGB planar lines */
+                in_size  = (blk_width * mblk_height) + (blk_width * (mblk_height >> 1));
+                /* Here output can be 8bit or 16bit hence multiplied by num_bytes */
+                out_size = (blk_width * mblk_height * 3 * num_bytes);
+            }
             /* Double buffer inputs and outputs*/
             in_size = in_size * 2;
             out_size = out_size * 2;
+
             total_size = in_size + out_size;
             rem_height = in_height % mblk_height;
-            
         }
 
         num_sets = in_height / kernelParams->blkHeight;
@@ -367,9 +405,21 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
         kernelParams->avail_size = avail_size;
         kernelParams->req_size = req_size;
 
-        /* For YUV420SP, 2 luma, 1 chroma lines will produce 2 RGB planar lines */
-        in_size  = (kernelParams->blkWidth * kernelParams->blkHeight) + kernelParams->blkWidth;
-        out_size = (kernelParams->blkWidth * kernelParams->blkHeight * 3 * num_bytes);
+        if(nodeParams->color_conv_flag == TIADALG_COLOR_CONV_RGBINTERLEAVE_RGB ||
+            nodeParams->color_conv_flag == TIADALG_COLOR_CONV_RGBINTERLEAVE_BGR)
+        {
+            /* Here 1 RGB interleaved line produces 1 RGB planar line */
+            in_size  = (kernelParams->blkWidth * kernelParams->blkHeight);
+            out_size = (in_size * num_bytes);
+        }
+        else if(nodeParams->color_conv_flag == TIADALG_COLOR_CONV_YUV420_RGB ||
+                nodeParams->color_conv_flag == TIADALG_COLOR_CONV_YUV420_BGR)
+        {
+            /* For YUV420SP, 2 luma, 1 chroma lines will produce 2 RGB planar lines */
+            in_size  = (kernelParams->blkWidth * kernelParams->blkHeight) + (kernelParams->blkWidth * (kernelParams->blkHeight >> 1));
+            out_size = (kernelParams->blkWidth * kernelParams->blkHeight * 3 * num_bytes);
+        }
+
         /* Double buffer inputs and outputs*/
         in_size = in_size * 2;
         out_size = out_size * 2;
@@ -391,7 +441,7 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
 
         if(kernelParams->l2_heap_id==TIVX_MEM_INTERNAL_L2)
         {
-#ifndef x86_64                
+#ifndef x86_64
             if(appIpcGetSelfCpuId()==APP_IPC_CPU_C6x_1)
             {
                 kernelParams->l2_global_base = 0x4D80000000;
@@ -556,7 +606,7 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcProcess
             memset(out_tensor_target_ptr, 0, out_tensor_desc->mem_size);
             prms->nodeParams.clear_count--;
         }
-        
+
         if(prms->nodeParams.tidl_8bit_16bit_flag == 0)
         {
             status = img_proc_execute_8bit(prms, in_img_desc, out_tensor_desc, (void **)in_image_target_ptr, out_tensor_target_ptr);
@@ -693,8 +743,7 @@ static vx_status img_proc_execute_8bit(tivxImgPreProcKernelParams *prms,
 
     /* L2 Y and C pong instance */
     pCL2[0] = (vx_uint8 *)pYL2[1] + (blk_stride * blk_height);
-    pCL2[1] = (vx_uint8 *)pCL2[0] + (blk_stride * (blk_height>>1));
-
+    pCL2[1] = (vx_uint8 *)pCL2[0] + (blk_stride * (blk_height >> 1));
 
     if(prms->nodeParams.color_conv_flag == TIADALG_COLOR_CONV_YUV420_RGB)
     {
@@ -985,7 +1034,7 @@ static vx_status img_proc_execute_16bit(tivxImgPreProcKernelParams *prms,
 
     /* L2 Y and C pong instance */
     pCL2[0] = (vx_uint8 *)pYL2[1] + (blk_stride * blk_height);
-    pCL2[1] = (vx_uint8 *)pCL2[0] + (blk_stride * (blk_height>>1));
+    pCL2[1] = (vx_uint8 *)pCL2[0] + (blk_stride * (blk_height >> 1));
 
 
     if(prms->nodeParams.color_conv_flag == TIADALG_COLOR_CONV_YUV420_RGB)

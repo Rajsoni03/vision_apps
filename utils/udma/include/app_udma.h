@@ -379,7 +379,6 @@ int32_t appUdmaFill2D(
     const app_udma_copy_2d_prms_t *prms_2d,
     uint32_t num_transfers);
 
-
 /**
  *  \brief Return handle to ND copy channel, if not already created, CH is created here
  *
@@ -388,6 +387,15 @@ int32_t appUdmaFill2D(
  *  \return  Pointer to channel object, if unable to create CH then NULL is returned;
  */
 app_udma_ch_handle_t appUdmaCopyNDGetHandle(uint32_t ch_idx);
+
+/**
+ *  \brief Releases reference to channel handle, if found to be last reference deletes the handle
+ *
+ *  \param  ch_idx [IN] channel index to use, upto APP_UDMA_ND_CHANNELS_MAX are allowed
+ *
+ *  \return  0 incase of success else returns failure code
+ */
+int32_t appUdmaCopyNDReleaseHandle(uint32_t ch_idx);
 
 /**
  *  \brief DMA copy ND init function.
