@@ -74,6 +74,7 @@ VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 VISION_APPS_UTILS_LIBS += app_utils_console_io
 VISION_APPS_UTILS_LIBS += app_utils_grpx
+VISION_APPS_UTILS_LIBS += app_utils_hwa
 
 VISION_APPS_SRV_LIBS  =
 VISION_APPS_SRV_LIBS  += vx_kernels_sample vx_target_kernels_sample_a72

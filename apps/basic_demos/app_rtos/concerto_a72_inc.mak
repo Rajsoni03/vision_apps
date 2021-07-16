@@ -31,6 +31,7 @@ STATIC_LIBS += app_utils_sciclient
 STATIC_LIBS += app_utils_misc
 STATIC_LIBS += app_utils_perf_stats
 STATIC_LIBS += app_utils_iss
+STATIC_LIBS += app_utils_hwa
 
 STATIC_LIBS += vx_app_c7x_kernel
 STATIC_LIBS += app_utils_draw2d

@@ -15,6 +15,7 @@ STATIC_LIBS += app_utils_console_io
 STATIC_LIBS += app_utils_mmc_sd
 STATIC_LIBS += app_utils_perf_stats
 STATIC_LIBS += app_utils_remote_service
+STATIC_LIBS += app_utils_hwa
 
 SYS_STATIC_LIBS += stdc++ gcc m c nosys
 
