@@ -329,7 +329,6 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
         tivx_obj_desc_image_t *in_img_desc  = (tivx_obj_desc_image_t *)obj_desc[TIVX_KERNEL_IMG_PREPROCESS_INPUT_IMAGE_IDX];
 
         vx_imagepatch_addressing_t *pIn = (vx_imagepatch_addressing_t *)&in_img_desc->imagepatch_addr[0];
-        vx_uint32 in_width  = pIn->dim_x;
         vx_uint32 in_height = pIn->dim_y;
         vx_int32  in_stride = pIn->stride_y;
 
