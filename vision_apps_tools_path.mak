@@ -25,7 +25,7 @@ BUILD_OS ?= Linux
 
 # QNX Paths
 export PSDK_QNX_PATH ?= $(PSDK_PATH)/psdkqa
-export PSDK_LINUX_PATH ?= /home/$(USER)/ti-processor-sdk-linux-j7-evm-08_00_00_24
+export PSDK_LINUX_PATH ?= /home/$(USER)/ti-processor-sdk-linux-j7-evm-08_00_00_32
 export QNX_SDP_VERSION ?= 710
 ifeq ($(QNX_SDP_VERSION),700)
   export QNX_BASE ?= /home/$(USER)/qnx700
