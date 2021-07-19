@@ -102,6 +102,8 @@ void appDssDualDisplayDefaultSetDefaultPrm(app_dss_dual_display_default_prm_t *d
     dual_display_prm->vid_pipe_to_display_map[APP_DSS_VID_PIPE_ID_VIDL1] = 1; /* map to display 1 */
     dual_display_prm->vid_pipe_to_display_map[APP_DSS_VID_PIPE_ID_VID2]  = 1; /* map to display 1 */
     dual_display_prm->vid_pipe_to_display_map[APP_DSS_VID_PIPE_ID_VIDL2] = 1; /* map to display 1 */
+
+    dual_display_prm->enableM2m = false; /* by default m2m is disabled */
 }
 
 int32_t appDssDualDisplayDefaultInit(app_dss_dual_display_default_prm_t *dual_display_prm)
@@ -170,6 +172,22 @@ int32_t appDssDualDisplayDefaultInit(app_dss_dual_display_default_prm_t *dual_di
         {
             dssParams.isDpAvailable = true;
         }
+    }
+
+    if(dual_display_prm->enableM2m == TRUE)
+    {
+        appLogPrintf("DSS: M2M Path is enabled !!!\n");
+        dual_display_obj->m2m.enableM2m     = true;
+        dual_display_obj->m2m.nodeOverlayId = APP_DCTRL_NODE_OVERLAY4;
+        dual_display_obj->m2m.overlayId     = APP_DSS_OVERLAY_ID_4;
+        dual_display_obj->m2m.pipeId        = APP_DCTRL_NODE_VIDL2;
+        dual_display_obj->m2m.vpId          = APP_DSS_VP_ID_4;
+        dual_display_obj->m2m.nodeVpId      = APP_DCTRL_NODE_VP4;
+
+        dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL2] = true;
+
+        dssParams.isOverlayAvailable[dual_display_obj->m2m.overlayId] = true;
+        dssParams.isPortAvailable[dual_display_obj->m2m.vpId] = true;
     }
 
     retVal = appDssInit(&dssParams);
@@ -361,6 +379,17 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
     pathInfo.edgeInfo[pathInfo.numEdges].startNode = dual_display_obj->display[1].nodeVpId;
     pathInfo.edgeInfo[pathInfo.numEdges].endNode   = dual_display_obj->display[1].nodeDpiId;
     pathInfo.numEdges++;
+
+    if (true == dual_display_obj->m2m.enableM2m)
+    {
+        pathInfo.edgeInfo[pathInfo.numEdges].startNode = dual_display_obj->m2m.pipeId;
+        pathInfo.edgeInfo[pathInfo.numEdges].endNode   = dual_display_obj->m2m.nodeOverlayId;
+        pathInfo.numEdges++;
+
+        pathInfo.edgeInfo[pathInfo.numEdges].startNode = dual_display_obj->m2m.nodeOverlayId;
+        pathInfo.edgeInfo[pathInfo.numEdges].endNode   = dual_display_obj->m2m.nodeVpId;
+        pathInfo.numEdges++;
+    }
 
     retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_REGISTER_HANDLE, &doHpd, sizeof(doHpd), 0U);
     retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_PATH, &pathInfo, sizeof(pathInfo), 0U);

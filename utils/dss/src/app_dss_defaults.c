@@ -83,6 +83,7 @@ void appDssDefaultSetDefaultPrm(app_dss_default_prm_t *prm)
     prm->timings.vSyncLen     = 5U;
     prm->timings.pixelClock   = 148500000ULL;
 
+    prm->enableM2m            = false;
 }
 
 int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
@@ -125,15 +126,16 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
         obj->vpId          = APP_DSS_VP_ID_3;
         obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
     }
-    else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_M2M)
+
+    if(prm->enableM2m == TRUE)
     {
-        appLogPrintf("DSS: Display type is M2M !!!\n");
-        obj->nodeOverlayId = APP_DCTRL_NODE_OVERLAY2;
-        obj->nodeVpId      = APP_DCTRL_NODE_VP2;
-        obj->nodeDpiId     = APP_DCTRL_NODE_DPI_DPI0;
-        obj->overlayId     = APP_DSS_OVERLAY_ID_2;
-        obj->vpId          = APP_DSS_VP_ID_2;
-        obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
+        appLogPrintf("DSS: M2M Path is enabled !!!\n");
+        obj->m2m.enableM2m     = true;
+        obj->m2m.nodeOverlayId = APP_DCTRL_NODE_OVERLAY4;
+        obj->m2m.overlayId     = APP_DSS_OVERLAY_ID_4;
+        obj->m2m.pipeId        = APP_DCTRL_NODE_VIDL2;
+        obj->m2m.vpId          = APP_DSS_VP_ID_4;
+        obj->m2m.nodeVpId      = APP_DCTRL_NODE_VP4;
     }
 
     appDssConfigurePm(prm);
@@ -153,9 +155,24 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
     dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VID1] = true;
     dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VID2] = true;
     dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL1] = true;
-    dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL2] = false;
+
+    if(prm->enableM2m == TRUE)
+    {
+        dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL2] = true;
+    }
+    else
+    {
+        dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL2] = false;
+    }
     dssParams.isOverlayAvailable[obj->overlayId] = true;
     dssParams.isPortAvailable[obj->vpId] = true;
+
+    if(prm->enableM2m == TRUE)
+    {
+        dssParams.isOverlayAvailable[obj->m2m.overlayId] = true;
+        dssParams.isPortAvailable[obj->m2m.vpId] = true;
+    }
+
     if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
     {
         dssParams.isDpAvailable = true;
@@ -171,26 +188,20 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
         appLogPrintf("DSS: ERROR: Dss init failed !!!\n");
     }
 
-    if (prm->display_type != APP_DSS_DEFAULT_DISPLAY_TYPE_M2M)
+    if (FVID2_SOK == retVal)
     {
-        /* Do not configure Overlay and VP in case of M2M
-           VP should not be configured in M2M node and
-           M2M Node will take care of configuring overlay. */
-        if (FVID2_SOK == retVal)
+        retVal = appDctrlInit();
+        if(retVal!=FVID2_SOK)
         {
-            retVal = appDctrlInit();
-            if(retVal!=FVID2_SOK)
-            {
-                appLogPrintf("DSS: ERROR: Dctrl init failed !!!\n");
-            }
+            appLogPrintf("DSS: ERROR: Dctrl init failed !!!\n");
         }
-        if (FVID2_SOK == retVal)
+    }
+    if (FVID2_SOK == retVal)
+    {
+        retVal = appDctrlDefaultInit(obj);
+        if(retVal!=FVID2_SOK)
         {
-            retVal = appDctrlDefaultInit(obj);
-            if(retVal!=FVID2_SOK)
-            {
-                appLogPrintf("DSS: ERROR: Dctrl default init failed !!!\n");
-            }
+            appLogPrintf("DSS: ERROR: Dctrl default init failed !!!\n");
         }
     }
 
@@ -265,6 +276,17 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
     pathInfo.edgeInfo[pathInfo.numEdges].startNode = obj->nodeVpId;
     pathInfo.edgeInfo[pathInfo.numEdges].endNode   = obj->nodeDpiId;
     pathInfo.numEdges++;
+
+    if (true == obj->m2m.enableM2m)
+    {
+        pathInfo.edgeInfo[pathInfo.numEdges].startNode = obj->m2m.pipeId;
+        pathInfo.edgeInfo[pathInfo.numEdges].endNode   = obj->m2m.nodeOverlayId;
+        pathInfo.numEdges++;
+
+        pathInfo.edgeInfo[pathInfo.numEdges].startNode = obj->m2m.nodeOverlayId;
+        pathInfo.edgeInfo[pathInfo.numEdges].endNode   = obj->m2m.nodeVpId;
+        pathInfo.numEdges++;
+    }
 
     vpParams.vpId             = obj->vpId;
 

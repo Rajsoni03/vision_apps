@@ -93,9 +93,6 @@ extern "C" {
 /** \brief Enables DSI output on AOU LCD Display */
 #define APP_DSS_DEFAULT_DISPLAY_TYPE_DSI         (2u)
 
-/** \brief Enables Display M2M */
-#define APP_DSS_DEFAULT_DISPLAY_TYPE_M2M         (3u)
-
 /* ========================================================================== */
 /*                         Structure Declarations                             */
 /* ========================================================================== */
@@ -125,6 +122,7 @@ typedef struct {
     uint32_t display_type; /**< value of type, APP_DSS_DEFAULT_DISPLAY_TYPE_* */
     app_dss_default_timings_prm_t timings; /**< Default timings imformation */
 
+    uint32_t enableM2m;
 } app_dss_default_prm_t;
 
 
@@ -137,6 +135,7 @@ typedef struct {
 
     uint32_t vid_pipe_to_display_map[APP_DSS_VID_PIPE_ID_MAX]; /**< 0: vid pipe mapped to display 0, 1: vid pipe mapped to display 1 */
 
+    uint32_t enableM2m;
 } app_dss_dual_display_default_prm_t;
 
 /* ========================================================================== */

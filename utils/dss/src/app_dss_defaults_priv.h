@@ -73,6 +73,16 @@
 
 typedef struct {
 
+    uint32_t enableM2m;
+    uint32_t nodeOverlayId;
+    uint32_t overlayId;
+    uint32_t pipeId;
+    uint32_t vpId;
+    uint32_t nodeVpId;
+} app_dss_default_m2m_obj_t;
+
+typedef struct {
+
     app_dss_default_prm_t initPrm;
     uint32_t overlayId;
     uint32_t vpId;
@@ -81,6 +91,7 @@ typedef struct {
     uint32_t nodeDpiId;
     uint32_t videoIfWidth;
 
+    app_dss_default_m2m_obj_t m2m;
 } app_dss_default_obj_t;
 
 typedef struct {
@@ -89,6 +100,7 @@ typedef struct {
 
     uint32_t vid_pipe_to_display_map[APP_DSS_VID_PIPE_ID_MAX];
 
+    app_dss_default_m2m_obj_t m2m;
 } app_dss_dual_display_default_obj_t;
 
 void appDssConfigurePm(app_dss_default_prm_t *prm);
