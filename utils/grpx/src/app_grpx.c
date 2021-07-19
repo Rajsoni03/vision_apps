@@ -160,6 +160,7 @@ int32_t appGrpxInit(app_grpx_init_prms_t *prm)
     {
         tivx_display_params_t disp_config_prm;
 
+        memset(&disp_config_prm, 0, sizeof(tivx_display_params_t));
         disp_config_prm.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
         disp_config_prm.pipeId = prm->display_pipe;
         disp_config_prm.outWidth = prm->width;
