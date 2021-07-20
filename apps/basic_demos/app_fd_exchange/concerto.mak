@@ -7,7 +7,7 @@ include $(PRELUDE)
 
 TARGET      := vx_app_arm_fd_exchange_producer
 TARGETTYPE  := exe
-CSOURCES    := main_producer.c apputils_net.c
+CSOURCES    := main_producer.c apputils_net.c app_common.c
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
 SYS_SHARED_LIBS += socket
@@ -23,7 +23,7 @@ include $(PRELUDE)
 
 TARGET      := vx_app_arm_fd_exchange_consumer
 TARGETTYPE  := exe
-CSOURCES    := main_consumer.c apputils_net.c
+CSOURCES    := main_consumer.c apputils_net.c app_common.c
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
 SYS_SHARED_LIBS += socket

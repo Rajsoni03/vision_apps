@@ -38,6 +38,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include <tivx_utils_ipc_ref_xfer.h>
+
 #include <apputils_net.h>
 
 #ifdef __cplusplus
@@ -57,8 +59,7 @@ extern "C" {
 #define APP_MSGTYPE_IMAGE_BUF_CMD   (2U)
 #define APP_MSGTYPE_IMAGE_BUF_RSP   (2U)
 
-#define APP_MAX_IMAGE_PLANE_MAX     (4U)
-#define APP_MAX_IMAGE_INFO          (4U)
+#define APP_MAX_NUM_REFS            (32U)
 
 #define APP_CMD_STATUS_SUCCESS      (0U)
 #define APP_CMD_STATUS_FAILURE      (1U)
@@ -88,43 +89,19 @@ typedef struct
 
 typedef struct
 {
-    /** Image width. */
-    uint32_t    width;
-
-    /** Image height. */
-    uint32_t    height;
-
-    uint64_t    fd[APP_MAX_IMAGE_PLANE_MAX];
-
-    uint32_t    numFd;
-
-    /** Image format. */
-    vx_df_image format;
-
-} App_ImageParams;
-
-typedef struct
-{
-    /** Image Meta information. */
-    App_ImageParams imgParams;
-
-    /** Size of the exported handles. */
-    uint32_t        size[APP_MAX_IMAGE_PLANE_MAX];
-
-} App_ImageDesc;
-
-typedef struct
-{
     /** Type of message. */
-    uint8_t         msgId;
+    uint8_t                     msgId;
 
     /** Flag to indicate if this is the last object. */
-    uint8_t         lastObj;
+    uint8_t                     lastObj;
 
-    /** 'numValid' number of 'App_ImageDesc' elements will follow. */
-    App_ImageDesc   info;
+    tivx_utils_ref_ipc_msg_t    ipcMsg;
 
-} App_ImageBuffDesc;
+} App_BuffDesc;
+
+vx_reference App_Common_MemAllocObject(vx_context context, vx_enum type, uint32_t  aux);
+
+int32_t App_Common_DeAllocImageObjects(vx_reference  ref[], uint32_t numRefs);
 
 #ifdef __cplusplus
 }

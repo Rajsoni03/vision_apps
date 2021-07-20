@@ -70,7 +70,7 @@ typedef struct
     uint32_t                numValidObjs;
 
     /** Image objects. */
-    vx_image                images[APP_MAX_IMAGE_INFO];
+    vx_reference            refs[APP_MAX_NUM_REFS];
 
     /* Command buffer memory. */
     uint8_t                 cmdBuff[APP_MAX_MSG_BUFF_SIZE];
@@ -82,182 +82,92 @@ typedef struct
 
 static App_Context gAppCntxt;
 
-static uint32_t App_getNumPlanes(vx_df_image format)
+static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
+                                         App_BuffDesc  *appBuffDesc,
+                                         int32_t       *fd,
+                                         uint32_t       numFd)
 {
-    uint32_t numPlanes = 0;
+    tivx_utils_ref_ipc_msg_t   *ipcMsg;
+    vx_reference                ref;
+    int32_t                     status;
+    vx_status                   vxStatus;
+    uint32_t                    objNum;
+    uint32_t                    i;
 
-    switch (format)
-    {
-        case VX_DF_IMAGE_U8:
-        case VX_DF_IMAGE_U16:
-        case VX_DF_IMAGE_S16:
-        case VX_DF_IMAGE_U32:
-        case VX_DF_IMAGE_S32:
-        case VX_DF_IMAGE_RGB:
-        case VX_DF_IMAGE_RGBX:
-        case VX_DF_IMAGE_YUYV:
-        case VX_DF_IMAGE_UYVY:
-            numPlanes = 1;
-            break;
+    status = 0;
+    objNum = appCntxt->numValidObjs;
+    ipcMsg = &appBuffDesc->ipcMsg;
 
-        case VX_DF_IMAGE_NV12:
-        case VX_DF_IMAGE_NV21:
-            numPlanes = 2;
-            break;
-
-        case VX_DF_IMAGE_YUV4:
-        case VX_DF_IMAGE_IYUV:
-            numPlanes = 3;
-            break;
-
-        default:
-            break;
-    }
-
-    return numPlanes;
-}
-
-static int32_t App_DeAllocImageObjects(App_Context *appCntxt)
-{
-    uint32_t    i;
-
-    for (i = 0; i < appCntxt->numValidObjs; i++)
-    {
-        vxReleaseImage(&appCntxt->images[i]);
-    }
-
-    return 0;
-}
-
-int32_t App_createObjFromBuffInfo(App_Context              *appCntxt,
-                                  const App_ImageBuffDesc  *imgBuffDesc,
-                                  int32_t                  *fd,
-                                  uint32_t                  numFd)
-{
-    const App_ImageDesc    *imgDesc;
-    const App_ImageParams  *imgParams;
-    void                   *phyAddr;
-    void                   *ptrs[APP_MAX_IMAGE_PLANE_MAX];
-    int32_t                 status;
-    vx_status               vxStatus;
-    uint32_t                objNum;
-    uint32_t                numPlanes;
-    uint32_t                j;
-
-    status    = 0;
-    objNum    = appCntxt->numValidObjs;
-    imgDesc   = &imgBuffDesc->info;
-    imgParams = &imgDesc->imgParams;
-    numPlanes = App_getNumPlanes(imgParams->format);
     #ifdef QNX
-    numFd     = imgParams->numFd;
+    numFd  = ipcMsg->numFd;
     #endif
 
-    if (numPlanes != numFd)
+    /* Update the FD information with the kernel translated values. */
+    for (i = 0; i < numFd; i++)
     {
-        VX_PRINT(VX_ZONE_ERROR, "NumFd and numPlane mis-match\n");
+        ipcMsg->fd[i] = fd[i];
+    }
+
+    /* Create a new object. */
+    ref = NULL;
+    vxStatus = tivx_utils_import_ref_from_ipc_xfer(appCntxt->vxContext,
+                                                   ipcMsg,
+                                                   &ref);
+
+    appCntxt->refs[objNum] = ref;
+
+    if (vxStatus != (vx_status)VX_SUCCESS)
+    {
+        VX_PRINT(VX_ZONE_ERROR,
+                 "tivx_utils_import_ref_from_ipc_xfer() failed for Obj [%d]\n",
+                 objNum);
         status = -1;
     }
-
-    if (status == 0)
+    else
     {
-         /* Create a new image. */
-         appCntxt->images[objNum] = vxCreateImage(appCntxt->vxContext,
-                                                  imgParams->width,
-                                                  imgParams->height,
-                                                  imgParams->format);
+        /* Export the handles and check test pattern. */
+        void       *ptrs[VX_IPC_MAX_VX_PLANES];
+        uint32_t    handleSizes[VX_IPC_MAX_VX_PLANES];
+        uint32_t    numPlanes;
+        uint32_t    j;
 
-         if (appCntxt->images[objNum] == NULL)
-         {
-             VX_PRINT(VX_ZONE_ERROR,
-                      "vxCreateImage() failed for Obj [%d]\n", objNum);
-             status = -1;
-         }
-    }
-
-    if (status == 0)
-    {
-        appCntxt->numValidObjs++;
-
-        VX_PRINT(VX_ZONE_INFO, "Consumer app: OBJ [%d]\n", objNum);
-        VX_PRINT(VX_ZONE_INFO, "\tWidth     = %d\n", imgParams->width);
-        VX_PRINT(VX_ZONE_INFO, "\tHeight    = %d\n", imgParams->height);
-        VX_PRINT(VX_ZONE_INFO, "\tFormat    = %d\n", imgParams->format);
-        VX_PRINT(VX_ZONE_INFO, "\tNumPlanes = %d\n", numPlanes);
-
-        for (j = 0; j < numPlanes; j++)
-        {
-            #ifdef QNX
-            vxStatus = tivxMemTranslateFd((uint64_t)imgParams->fd[j],
-                              imgDesc->size[j],
-                              &ptrs[j],
-                              &phyAddr);
-            #else
-            vxStatus = tivxMemTranslateFd((uint64_t)fd[j],
-                                          imgDesc->size[j],
-                                          &ptrs[j],
-                                          &phyAddr);
-            #endif
-            if (vxStatus != (vx_status)VX_SUCCESS)
-            {
-                VX_PRINT(VX_ZONE_ERROR, "tivxMemTranslateFd() failed for "
-                         "image [%d] plane [%d]\n", objNum, j);
-                status = -1;
-                break;
-            }
-
-            VX_PRINT(VX_ZONE_INFO, "\tPLANE [%d]:\n", j);
-            #ifdef QNX
-            VX_PRINT(VX_ZONE_INFO, "\t\tFD        = %p\n", imgParams->fd[j]);
-            #else
-            VX_PRINT(VX_ZONE_INFO, "\t\tFD        = %ld\n", fd[j]);
-            #endif
-            VX_PRINT(VX_ZONE_INFO, "\t\tVIRT ADDR = %p\n", ptrs[j]);
-            VX_PRINT(VX_ZONE_INFO, "\t\tPHY ADDR  = %p\n", phyAddr);
-            VX_PRINT(VX_ZONE_INFO, "==================\n\n");
-
-            /* Check the pattern. */
-            {
-                uint32_t   *t = (uint32_t*)ptrs[j];
-
-                if (*t != appCntxt->testPattern)
-                {
-                    VX_PRINT(VX_ZONE_ERROR,
-                             "\tPattern mismatch. "
-                             "Expected [0x%8.8X] Got [0x%8.8x]\n",
-                             appCntxt->testPattern, *t);
-                    status = -1;
-                    break;
-                }
-
-                appCntxt->testPattern *= (j+1);
-            }
-
-        }
-    }
-
-    if (status == 0)
-    {
-        /* Import the reference handles. */
-        vxStatus =
-            tivxReferenceImportHandle((vx_reference)appCntxt->images[objNum],
-                                      (const void **)ptrs,
-                                      (const uint32_t *)imgDesc->size,
-                                      numPlanes);
+        vxStatus = tivxReferenceExportHandle(appCntxt->refs[objNum],
+                                             ptrs,
+                                             handleSizes,
+                                             VX_IPC_MAX_VX_PLANES,
+                                             &numPlanes);
 
         if (vxStatus != (vx_status)VX_SUCCESS)
         {
             VX_PRINT(VX_ZONE_ERROR,
-                     "tivxReferenceImportHandle() failed for image [%d]\n",
-                     objNum);
-            status = -1;
+                     "tivxReferenceExportHandle() failed.\n");
         }
         else
         {
-            VX_PRINT(VX_ZONE_INFO,
-                     "tivxReferenceImportHandle() success for image [%d]\n",
-                     objNum);
+            for (j = 0; j < numPlanes; j++)
+            {
+                uint32_t    expected;
+
+                expected = appCntxt->testPattern * (objNum + j + 1);
+
+                if (expected != *(uint32_t*)ptrs[j])
+                {
+                    VX_PRINT(VX_ZONE_ERROR,
+                             "Data validation check for Obj [%d] plane [%d] "
+                             "failed. Expected = 0x8.8X Received = 0x%8.8X\n",
+                             objNum, j, expected, *(uint32_t*)ptrs[j]);
+                }
+                else
+                {
+                    VX_PRINT(VX_ZONE_INFO,
+                             "Data validation check for Obj [%d] plane [%d] "
+                             "passed. Expected = 0x%8.8X Received = 0x%8.8X\n",
+                             objNum, j, expected, *(uint32_t*)ptrs[j]);
+                }
+            }
         }
+
+        appCntxt->numValidObjs++;
     }
 
     return status;
@@ -348,7 +258,7 @@ static int32_t App_deInit(App_Context *appCntxt)
 
 int32_t App_msgProcThread(App_Context  *appCntxt)
 {
-    int32_t             fd[APP_MAX_IMAGE_PLANE_MAX];
+    int32_t             fd[VX_IPC_MAX_VX_PLANES];
     uint32_t            numFd;
     uint32_t           *numFdPtr;
     App_GenericRspMsg  *rspMsg;
@@ -386,7 +296,7 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
                          "CONSUMER::Received [APP_MSGTYPE_HELLO_CMD]\n");
                 status = 0;
                 numFdPtr = &numFd;
-                size = sizeof(App_ImageBuffDesc);
+                size = sizeof(App_BuffDesc);
                 break;
 
             case APP_MSGTYPE_IMAGE_BUF_CMD:
@@ -394,15 +304,21 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
                          "CONSUMER::Received [APP_MSGTYPE_IMAGE_BUF_CMD]\n");
 
                 {
-                    App_ImageBuffDesc  *imgBuffDesc;
+                    App_BuffDesc  *appBuffDesc;
 
-                    imgBuffDesc = (App_ImageBuffDesc *)appCntxt->cmdBuff;
+                    appBuffDesc = (App_BuffDesc *)appCntxt->cmdBuff;
 
                     status = App_createObjFromBuffInfo(appCntxt,
-                                                       imgBuffDesc,
+                                                       appBuffDesc,
                                                        fd,
                                                        numFd);
-                    if (imgBuffDesc->lastObj)
+                    if (status < 0)
+                    {
+                        VX_PRINT(VX_ZONE_ERROR,
+                                 "App_createObjFromBuffInfo() failed.\n");
+                    }
+
+                    if (appBuffDesc->lastObj)
                     {
                         numFdPtr = NULL;
                         done = 1;
@@ -411,7 +327,7 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
                 break;
 
             default:
-                VX_PRINT(VX_ZONE_INFO,
+                VX_PRINT(VX_ZONE_ERROR,
                          "CONSUMER::Received [UNKNOWN MESSAGE]\n");
                 status = -1;
                 break;
@@ -420,10 +336,12 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
         if (status < 0)
         {
             rspMsg->status = APP_CMD_STATUS_FAILURE;
+            VX_PRINT(VX_ZONE_ERROR, "TEST STATUS: FAILED.\n");
         }
         else
         {
             rspMsg->status = APP_CMD_STATUS_SUCCESS;
+            VX_PRINT(VX_ZONE_INFO, "TEST STATUS: PASSED.\n");
         }
 
         /* Send the response. */
@@ -529,8 +447,10 @@ int main(int argc, char *argv[])
         VX_PRINT(VX_ZONE_ERROR, "App_msgProcThread() failed.\n");
     }
 
-    /* Deallocate any allocated objects. */
-    App_DeAllocImageObjects(appCntxt);
+    /* De-allocate any allocated objects. */
+    status = App_Common_DeAllocImageObjects(appCntxt->refs,
+                                            appCntxt->numValidObjs);
+
 
     /* Do not collect return status here unless already passing */
     if (status != 0)
@@ -539,12 +459,12 @@ int main(int argc, char *argv[])
     }
 
     status = App_deInit(appCntxt);
+
     if (status < 0)
     {
         VX_PRINT(VX_ZONE_ERROR, "App_deInit() failed.\n");
     }
-    else
-    if (status_before_deinit)
+    else if (status_before_deinit)
     {
         status = status_before_deinit;
     }

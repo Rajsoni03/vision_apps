@@ -49,6 +49,36 @@
 #define APP_STATE_CLI_CONNECTED         (1U)
 #define APP_STATE_CLI_OBJINFO_XFERD     (2U)
 
+#define TEST_ENTRY(X, v)   {#X, X, (v)}
+
+typedef struct
+{
+    const char *name;
+    vx_enum     type;
+    uint32_t    aux;
+} TestArg;
+
+static TestArg gTestTbl[] =
+{
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_RGB),
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_RGBX),
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_NV12),
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_NV21),
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_UYVY),
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_IYUV),
+    TEST_ENTRY(VX_TYPE_IMAGE, VX_DF_IMAGE_U8),
+    TEST_ENTRY(VX_TYPE_TENSOR, 1),
+    TEST_ENTRY(VX_TYPE_TENSOR, 2),
+    TEST_ENTRY(VX_TYPE_TENSOR, 3),
+    TEST_ENTRY(VX_TYPE_TENSOR, 4),
+    TEST_ENTRY(VX_TYPE_USER_DATA_OBJECT, 1024),
+    TEST_ENTRY(VX_TYPE_ARRAY, 100),
+    TEST_ENTRY(VX_TYPE_CONVOLUTION, 9),
+    TEST_ENTRY(VX_TYPE_MATRIX, 8),
+    TEST_ENTRY(VX_TYPE_DISTRIBUTION, 100),
+    TEST_ENTRY(TIVX_TYPE_RAW_IMAGE, 100)
+};
+
 typedef struct
 {
     /** Verbose flag. */
@@ -79,11 +109,8 @@ typedef struct
     /** Number of image objects. */
     uint32_t                numValidObjs;
 
-    /** Image format information.*/
-    App_ImageParams         imgFormat[APP_MAX_IMAGE_INFO];
-
     /** Image objects. */
-    vx_image                images[APP_MAX_IMAGE_INFO];
+    vx_reference            refs[APP_MAX_NUM_REFS];
 
     /* Command buffer memory. */
     uint8_t                 cmdBuff[APP_MAX_MSG_BUFF_SIZE];
@@ -259,150 +286,121 @@ static int32_t App_deInit(App_Context *appCntxt)
     return status;
 }
 
-static int32_t App_DeAllocImageObjects(App_Context *appCntxt)
+static int32_t App_allocObjects(App_Context *appCntxt)
 {
-    uint32_t    i;
+    uint32_t    numRefs;
     int32_t     status = 0;
-
-    for (i = 0; i < appCntxt->numValidObjs; i++)
-    {
-        vxReleaseImage(&appCntxt->images[i]);
-    }
-
-    return status;
-}
-
-static int32_t App_allocImageObjects(App_Context *appCntxt)
-{
-    uint32_t    width;
-    uint32_t    height;
-    int32_t     status;
-    vx_df_image format;
     uint32_t    i;
 
-    status    = 0;
-    width     = 1280;
-    height    = 720;
-    format    = VX_DF_IMAGE_YUV4;
+    extern vx_status ownReferenceAllocMem(vx_reference);
 
-    for (i = 0; i < APP_MAX_IMAGE_INFO; i++, width /= 2, height /= 2)
+    numRefs = sizeof(gTestTbl)/sizeof(TestArg);
+
+    if (numRefs > APP_MAX_NUM_REFS)
     {
-        appCntxt->imgFormat[i].width  = width;
-        appCntxt->imgFormat[i].height = height;
-        appCntxt->imgFormat[i].format = format;
+        VX_PRINT(VX_ZONE_ERROR,
+                 "Number of objects [%d] exceed limit [%d].\n",
+                 numRefs, APP_MAX_NUM_REFS);
 
-        appCntxt->images[i] =
-            vxCreateImage(appCntxt->vxContext, width, height, format);
-
-        if (appCntxt->images[i] == NULL)
+        status = -1;
+    }
+    else
+    {
+        for (i = 0; i < numRefs; i++)
         {
-            status = -1;
-            break;
-        }
+            TestArg    *e = &gTestTbl[i];
+            vx_status   vxStatus;
 
-        appCntxt->numValidObjs++;
+            appCntxt->refs[i] = App_Common_MemAllocObject(appCntxt->vxContext,
+                                                          e->type,
+                                                          e->aux);
+
+            if (appCntxt->refs[i] == NULL)
+            {
+                status = -1;
+                break;
+            }
+
+            /* Force internal handle allocation by mapping one of the planes. */
+            vxStatus = ownReferenceAllocMem(appCntxt->refs[i]);
+
+            /* Export the handles and write test pattern. */
+            {
+                void       *ptrs[VX_IPC_MAX_VX_PLANES];
+                uint32_t    handleSizes[VX_IPC_MAX_VX_PLANES];
+                uint32_t    numPlanes;
+                uint32_t    j;
+
+                vxStatus = tivxReferenceExportHandle(appCntxt->refs[i],
+                                                     ptrs,
+                                                     handleSizes,
+                                                     VX_IPC_MAX_VX_PLANES,
+                                                     &numPlanes);
+
+                if (vxStatus != (vx_status)VX_SUCCESS)
+                {
+                    VX_PRINT(VX_ZONE_ERROR,
+                             "tivxReferenceExportHandle() failed.\n");
+                    break;
+                }
+
+                for (j = 0; j < numPlanes; j++)
+                {
+                    *(uint32_t*)ptrs[j] = appCntxt->testPattern *
+                                          (appCntxt->numValidObjs + j + 1);
+                }
+
+                VX_PRINT(VX_ZONE_INFO,
+                         "[PRODUCER CREATED] OBJECT[%d]: "
+                         "TYPE: %s NUM DIMS/PLANES: %d\n",
+                         appCntxt->numValidObjs, e->name, numPlanes);
+            }
+
+            appCntxt->numValidObjs++;
+        }
     }
 
     return status;
 }
 
-static int32_t App_sendObjInfo(App_Context         *appCntxt,
-                               App_ImageBuffDesc   *imgBuffDesc)
+static int32_t App_sendObjInfo(App_Context     *appCntxt,
+                               App_BuffDesc    *appBuffDesc)
 {
     #ifdef LINUX
-    int32_t     fd32[APP_MAX_IMAGE_PLANE_MAX];
+    int32_t     fd32[VX_IPC_MAX_VX_PLANES];
     #endif
-    uint32_t    numEntries;
     int32_t     status;
     uint32_t    i;
 
     status = 0;
 
-    imgBuffDesc->msgId   = APP_MSGTYPE_IMAGE_BUF_CMD;
-    imgBuffDesc->lastObj = 0;
+    appBuffDesc->msgId   = APP_MSGTYPE_IMAGE_BUF_CMD;
+    appBuffDesc->lastObj = 0;
 
     for (i = 0; i < appCntxt->numValidObjs; i++)
     {
-        App_ImageDesc      *imgDesc;
-        App_ImageParams    *imgParams;
-        void               *phyAddr;
-        void               *ptrs[APP_MAX_IMAGE_PLANE_MAX];
-        uint64_t            fd64;
-        vx_status           vxStatus;
-        uint32_t            j;
+        tivx_utils_ref_ipc_msg_t   *ipcMsg;
+        vx_reference                ref;
+        vx_status                   vxStatus;
 
-        imgDesc           = &imgBuffDesc->info;
-        imgParams         = &imgDesc->imgParams;
-        imgParams->width  = appCntxt->imgFormat[i].width;
-        imgParams->height = appCntxt->imgFormat[i].height;
-        imgParams->format = appCntxt->imgFormat[i].format;
+        ipcMsg  = &appBuffDesc->ipcMsg;
 
-        /* Export the handles. */
-        vxStatus = tivxReferenceExportHandle((vx_reference)appCntxt->images[i],
-                                             ptrs,
-                                             imgDesc->size,
-                                             APP_MAX_IMAGE_PLANE_MAX,
-                                             &numEntries);
+        ref = appCntxt->refs[i];
+
+        /* Create data to transport it over IPC to a different process. */
+        vxStatus = tivx_utils_export_ref_for_ipc_xfer(ref, ipcMsg);
 
         if (vxStatus != (vx_status)VX_SUCCESS)
         {
-            VX_PRINT(VX_ZONE_ERROR, "tivxReferenceExportHandle() failed for "
-                     "image [%d]\n", i);
-            status = -1;
+            VX_PRINT(VX_ZONE_ERROR, "tivx_utils_export_ref_for_ipc_xfer() failed for "
+                     "object [%d]\n", i);
             break;
         }
         
         if (i == (appCntxt->numValidObjs - 1))
         {
-            imgBuffDesc->lastObj = 1;
+            appBuffDesc->lastObj = 1;
         }
-
-        VX_PRINT(VX_ZONE_INFO, "Producer app: OBJ [%d]\n", i);
-        VX_PRINT(VX_ZONE_INFO, "\tWidth     = %d\n", imgParams->width);
-        VX_PRINT(VX_ZONE_INFO, "\tHeight    = %d\n", imgParams->height);
-        VX_PRINT(VX_ZONE_INFO, "\tFormat    = %d\n", imgParams->format);
-        VX_PRINT(VX_ZONE_INFO, "\tNumPlanes = %d\n", numEntries);
-
-        for (j = 0; j < numEntries; j++)
-        {
-            uint32_t   *p;
-
-            /* Translate the virtual addresses to 'fd'. */
-            p = (uint32_t *)ptrs[j];
-
-            *p = appCntxt->testPattern;
-            appCntxt->testPattern *= (j+1);
-
-            status = tivxMemTranslateVirtAddr(ptrs[j],
-                                              &fd64,
-                                              &phyAddr);
-
-            if (status < 0)
-            {
-                VX_PRINT(VX_ZONE_ERROR,
-                         "tivxMemTranslateVirtAddr() failed for "
-                         "image [%d] plane [%d]\n", i, j);
-                break;
-            }
-
-            imgParams->fd[j] = fd64;
-            #ifdef LINUX
-            fd32[j] = (int32_t)fd64;
-            #endif
-
-            VX_PRINT(VX_ZONE_INFO, "\tPLANE [%d]:\n", j);
-            #ifdef QNX
-            VX_PRINT(VX_ZONE_INFO, "\t\tFD        = %p\n", imgParams->fd[j]);
-            #else
-            VX_PRINT(VX_ZONE_INFO, "\t\tFD        = %ld\n", fd32[j]);
-            #endif
-            VX_PRINT(VX_ZONE_INFO, "\t\tVIRT ADDR = %p\n", ptrs[j]);
-            VX_PRINT(VX_ZONE_INFO, "\t\tPHY ADDR  = %p\n", phyAddr);
-            VX_PRINT(VX_ZONE_INFO, "==================\n\n");
-
-        } /* for (j = 0; j < numEntries; j++) */
-
-        imgParams->numFd = numEntries;
 
         if (status == 0)
         {
@@ -411,18 +409,27 @@ static int32_t App_sendObjInfo(App_Context         *appCntxt,
 
             #ifdef QNX
             status = App_sendMsg(appCntxt,
-                                 (uint8_t *)imgBuffDesc,
-                                 sizeof(App_ImageBuffDesc),
+                                 (uint8_t *)appBuffDesc,
+                                 sizeof(App_BuffDesc),
                                  NULL,
                                  0,
                                  appCntxt->rspBuff);
             #else
-            status = App_sendMsg(appCntxt,
-                                 (uint8_t *)imgBuffDesc,
-                                 sizeof(App_ImageBuffDesc),
-                                 fd32,
-                                 numEntries,
-                                 appCntxt->rspBuff);
+            {
+                uint32_t    j;
+
+                for (j = 0; j < ipcMsg->numFd; j++)
+                {
+                    fd32[j] = (int32_t)ipcMsg->fd[j];
+                }
+
+                status = App_sendMsg(appCntxt,
+                                     (uint8_t *)appBuffDesc,
+                                     sizeof(App_BuffDesc),
+                                     fd32,
+                                     ipcMsg->numFd,
+                                     appCntxt->rspBuff);
+            }
             #endif
             if (status == 0)
             {
@@ -432,7 +439,7 @@ static int32_t App_sendObjInfo(App_Context         *appCntxt,
             }
         }
 
-    } /* for (i = 0; i < imgBuffDesc->numObjs; i++) */
+    } /* for (i = 0; i < appBuffDesc->numObjs; i++) */
 
     return status;
 }
@@ -457,11 +464,11 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
         }
         else if (appCntxt->state == APP_STATE_CLI_CONNECTED)
         {
-            App_ImageBuffDesc  *imgBuffDesc;
+            App_BuffDesc  *appBuffDesc;
 
-            imgBuffDesc = (App_ImageBuffDesc *)appCntxt->cmdBuff;
+            appBuffDesc = (App_BuffDesc *)appCntxt->cmdBuff;
 
-            status = App_sendObjInfo(appCntxt, imgBuffDesc);
+            status = App_sendObjInfo(appCntxt, appBuffDesc);
 
             if (status < 0)
             {
@@ -584,7 +591,7 @@ int main(int argc, char *argv[])
     /* Create image objects. */
     if (status == 0)
     {
-        status = App_allocImageObjects(appCntxt);
+        status = App_allocObjects(appCntxt);
     }
 
     if (status == 0)
@@ -592,22 +599,23 @@ int main(int argc, char *argv[])
         AppUtil_netIterSvr(&appCntxt->svrCntxt);
     }
 
-    /* Deallocate any allocated objects. */
-    App_DeAllocImageObjects(appCntxt);
+    /* De-allocate any allocated objects. */
+    status = App_Common_DeAllocImageObjects(appCntxt->refs,
+                                            appCntxt->numValidObjs);
 
     /* Do not collect return status here unless already passing */
     if (status != 0)
     {
         status_before_deinit = status;
     }
+
     status = App_deInit(appCntxt);
 
     if (status < 0)
     {
         VX_PRINT(VX_ZONE_ERROR, "App_deInit() failed.\n");
     }
-    else
-    if (status_before_deinit)
+    else if (status_before_deinit)
     {
         status = status_before_deinit;
     }
