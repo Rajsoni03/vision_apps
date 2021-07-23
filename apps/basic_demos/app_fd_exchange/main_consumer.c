@@ -102,11 +102,13 @@ static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
     numFd  = ipcMsg->numFd;
     #endif
 
+    #ifdef LINUX
     /* Update the FD information with the kernel translated values. */
     for (i = 0; i < numFd; i++)
     {
         ipcMsg->fd[i] = fd[i];
     }
+    #endif
 
     /* Create a new object. */
     ref = NULL;
