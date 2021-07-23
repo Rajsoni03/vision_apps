@@ -494,6 +494,12 @@ static uint8_t is_viss_plugin(uint32_t plugin_id)
         case DCC_ID_IPIPE_CFA:
         case DCC_ID_VISS_GLBCE:
         case DCC_ID_VISS_LSC:
+#ifdef VPAC3
+        case DCC_ID_VISS_CFAI3_A:
+        case DCC_ID_VISS_CFAI3_B:
+        case DCC_ID_VISS_CAC:
+        case DCC_ID_VISS_RAWHIST:
+#endif
             return 1U;
             break;
         default:
