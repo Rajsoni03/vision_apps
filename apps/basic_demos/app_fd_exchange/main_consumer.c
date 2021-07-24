@@ -92,7 +92,9 @@ static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
     int32_t                     status;
     vx_status                   vxStatus;
     uint32_t                    objNum;
+    #ifdef LINUX
     uint32_t                    i;
+    #endif
 
     status = 0;
     objNum = appCntxt->numValidObjs;
