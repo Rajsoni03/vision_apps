@@ -643,7 +643,7 @@ Sensor driver does not support metadata yet.
         }
 
         /*Check if resizing is needed for display*/
-        if((obj->table_width > obj->display_params.outWidth) && (obj->table_height > obj->display_params.outHeight))
+        if((obj->table_width >= obj->display_params.outWidth) && (obj->table_height >= obj->display_params.outHeight))
         {
             vx_uint16 scaler_out_w, scaler_out_h;
             obj->scaler_enable = vx_true_e;
@@ -678,7 +678,7 @@ Sensor driver does not support metadata yet.
         }
         else
         {
-            if ((image_width > obj->display_params.outWidth) && (image_height > obj->display_params.outHeight))
+            if ((image_width >= obj->display_params.outWidth) && (image_height >= obj->display_params.outHeight))
             {
                 obj->scaler_enable = vx_true_e;
             }
