@@ -98,17 +98,17 @@ static void x86_app_init(AppObj *obj)
     APP_ASSERT_VALID_REF(obj->context);
 
     tivxHwaLoadKernels(obj->context);
-	tivxImagingLoadKernels(obj->context);
+    tivxImagingLoadKernels(obj->context);
     APP_PRINTF("tivxImagingLoadKernels done\n");
 }
 static void x86_app_deinit(AppObj *obj)
 {
     tivxHwaUnLoadKernels(obj->context);
     APP_PRINTF("tivxHwaUnLoadKernels done\n");
-	
-	tivxImagingUnLoadKernels(obj->context);
+    
+    tivxImagingUnLoadKernels(obj->context);
     APP_PRINTF("tivxImagingUnLoadKernels done\n");
-	
+    
     vxReleaseContext(&obj->context);
     APP_PRINTF("vxReleaseContext done\n");
 
@@ -153,10 +153,10 @@ static vx_status x86_app_create_graph(AppObj *obj)
     obj->ae_awb_result = NULL;
     obj->raw = NULL;
     obj->y12 = NULL;
-	obj->uv12_c1 = NULL;
-	obj->y8_r8_c2 = NULL;
-	obj->uv8_g8_c3 = NULL;
-	obj->s8_b8_c4 = NULL;
+    obj->uv12_c1 = NULL;
+    obj->y8_r8_c2 = NULL;
+    obj->uv8_g8_c3 = NULL;
+    obj->s8_b8_c4 = NULL;
     obj->histogram = NULL;
     obj->h3a_aew_af = NULL;
 
@@ -233,8 +233,8 @@ static vx_status x86_app_create_graph(AppObj *obj)
 
     if (obj->ldc_enable)
     {
-    	vx_image ldc_in_image = obj->y8_r8_c2;
-		app_create_ldc(obj, ldc_in_image);
+        vx_image ldc_in_image = obj->y8_r8_c2;
+        app_create_ldc(obj, ldc_in_image);
     }
 
     status = vxVerifyGraph(obj->graph);
@@ -274,7 +274,7 @@ static vx_status x86_app_run_graph(AppObj *obj)
     char input_file_name[APP_MAX_FILE_PATH];
     char output_file_name_img[APP_MAX_FILE_PATH];
     vx_int32 numBytesFileIO;
-	vx_uint8 i;
+    vx_uint8 i;
     char dir_name[APP_MAX_FILE_PATH];
     FILE* fp_aewb_res = NULL;
     char aewb_csv_file_name[APP_MAX_FILE_PATH];
@@ -324,6 +324,24 @@ static vx_status x86_app_run_graph(AppObj *obj)
         fprintf(fp_aewb_dbg, "frame_num,ae_valid,ae_converged,awb_valid,awb_converged \n");
     }
 
+    appUpdateVpacDcc(obj->fs_dcc_buf_viss, obj->fs_dcc_numbytes_viss, obj->context, 
+        obj->node_viss, 0, 
+        NULL, 0,
+        NULL, 0
+    );
+
+    appUpdateVpacDcc(obj->fs_dcc_buf_2a, obj->fs_dcc_numbytes_2a, obj->context, 
+        NULL, 0, 
+        obj->node_aewb, 0,
+        NULL, 0
+    );
+
+    appUpdateVpacDcc(obj->fs_dcc_buf_ldc, obj->fs_dcc_numbytes_ldc, obj->context, 
+        NULL, 0, 
+        NULL, 0,
+        obj->node_ldc, 0
+    );
+
 /*The application reads and  processes NUM_FRAMES_TO_PROCESS images 
 AEWB result is available after 1 frame and is applied after 2 frames
 Therefore, first 2 output images will have wrong colors 
@@ -333,13 +351,13 @@ Therefore, first 2 output images will have wrong colors
     for(i=obj->start_seq; i<obj->num_frames_to_process; i++)
     {
         snprintf(input_file_name, APP_MAX_FILE_PATH, "%s/input/img_%04d.raw", obj->test_folder_root, i);
-		
-	    APP_PRINTF(" : Loading [%s] ...\n", input_file_name);
-    	if(-1 == read_test_image_raw(input_file_name, obj->raw, 2))
-		{
-			printf("Failed to read file %s\n", input_file_name);
-			return -1;
-		}
+        
+        APP_PRINTF(" : Loading [%s] ...\n", input_file_name);
+        if(-1 == read_test_image_raw(input_file_name, obj->raw, 2))
+        {
+            printf("Failed to read file %s\n", input_file_name);
+            return -1;
+        }
 
         APP_PRINTF(" Running graph ...\n");
         status = vxScheduleGraph(obj->graph);
@@ -353,12 +371,12 @@ Therefore, first 2 output images will have wrong colors
         snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/viss/img_viss_%04d.yuv", obj->test_folder_root, i);
         APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
         numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->y8_r8_c2);
-		APP_ASSERT(numBytesFileIO >= 0);
+        APP_ASSERT(numBytesFileIO >= 0);
 
         snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/h3a/img_h3a_%04d.bin", obj->test_folder_root, i);
         APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
         numBytesFileIO = write_h3a_image(output_file_name_img, obj->h3a_aew_af);
-		APP_ASSERT(numBytesFileIO >= 0);
+        APP_ASSERT(numBytesFileIO >= 0);
 
         if(fp_aewb_res)
         {
@@ -391,7 +409,7 @@ Therefore, first 2 output images will have wrong colors
             snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/ldc/img_ldc_%04d.yuv", obj->test_folder_root, i);
             APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
             numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->ldc_out);
-    		APP_ASSERT(numBytesFileIO >= 0);
+            APP_ASSERT(numBytesFileIO >= 0);
         }
     }
 
@@ -446,18 +464,18 @@ static void x86_app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
         token = strtok(line_str, s);
         if(strcmp(token, "test_folder_root")==0)
         {
-        	struct stat FileAttrib;
+            struct stat FileAttrib;
             token = strtok(NULL, s);
             token[strlen(token)-1]=0;
             strcpy(obj->test_folder_root, token);
             snprintf(obj->dcc_path, APP_MAX_FILE_PATH, "%s/%s", obj->test_folder_root, "dcc_bins");
             APP_PRINTF(" Test folder root = [%s]\n", obj->test_folder_root);
-			if (stat((const char*)obj->test_folder_root, &FileAttrib))
-			{
-				printf("Test root path %s does not exist. \n Please update cfg file and try again. Exiting program \n", obj->test_folder_root);
-				exit(-1);
-			}
-			
+            if (stat((const char*)obj->test_folder_root, &FileAttrib))
+            {
+                printf("Test root path %s does not exist. \n Please update cfg file and try again. Exiting program \n", obj->test_folder_root);
+                exit(-1);
+            }
+            
         }
         else if(strcmp(token, "raw_width")==0)
         {
