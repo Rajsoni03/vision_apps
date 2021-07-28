@@ -163,10 +163,10 @@ c7x_1_l1_size  = 16*KB;
 # Main OCRAM memory allocation
 #
 mcu2_0_main_ocram_addr = main_ocram_mem_addr;
-mcu2_0_main_ocram_size = 128*KB;
+mcu2_0_main_ocram_size = 256*KB;
 
 mcu2_1_main_ocram_addr = mcu2_0_main_ocram_addr + mcu2_0_main_ocram_size;
-mcu2_1_main_ocram_size = 128*KB;
+mcu2_1_main_ocram_size = 256*KB;
 
 #
 # DDR memory allocation for various CPUs

@@ -75,13 +75,13 @@
 #define L2RAM_C66x_2_ADDR (0x00800000u)
 #define L2RAM_C66x_2_SIZE (0x00038000u)
 
-/* Main OCRAM for MCU2_0 [ size 128.00 KB ] */
+/* Main OCRAM for MCU2_0 [ size 256.00 KB ] */
 #define MAIN_OCRAM_MCU2_0_ADDR (0x03600000u)
-#define MAIN_OCRAM_MCU2_0_SIZE (0x00020000u)
+#define MAIN_OCRAM_MCU2_0_SIZE (0x00040000u)
 
-/* Main OCRAM for MCU2_1 [ size 128.00 KB ] */
-#define MAIN_OCRAM_MCU2_1_ADDR (0x03620000u)
-#define MAIN_OCRAM_MCU2_1_SIZE (0x00020000u)
+/* Main OCRAM for MCU2_1 [ size 256.00 KB ] */
+#define MAIN_OCRAM_MCU2_1_ADDR (0x03640000u)
+#define MAIN_OCRAM_MCU2_1_SIZE (0x00040000u)
 
 /* L2 for C7x_1 [ size 480.00 KB ] */
 #define L2RAM_C7x_1_ADDR (0x64800000u)
