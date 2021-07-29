@@ -144,6 +144,7 @@ int32_t appCsi2RxInit(void)
 int32_t appCsi2TxInit(void)
 {
     int32_t status = FVID2_SOK;
+    uint32_t regVal = 0U, unlocked = 0U;
     Csitx_InitParams initPrmsCsitx;
 
     appLogPrintf("CSI2TX: Init ... !!!\n");
@@ -152,10 +153,33 @@ int32_t appCsi2TxInit(void)
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF0);
     SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_TX0);
 
+    regVal = CSL_REG32_RD(CSL_CTRL_MMR0_CFG0_BASE +
+                          CSL_MAIN_CTRL_MMR_CFG0_LOCK1_KICK0);
+    if (regVal & 0x1 == 0U)
+    {
+        /* Unlock MMR */
+        unlocked = 1U;
+        CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
+                     CSL_MAIN_CTRL_MMR_CFG0_LOCK1_KICK0,
+                     0x68EF3490U);
+        CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
+                     CSL_MAIN_CTRL_MMR_CFG0_LOCK1_KICK1,
+                     0xD172BC5AU);
+        appLogPrintf("Unlocked MMR to program CSITX DPHY register ... !!!\n");
+    }
+
     /* Select CSITX0 as the source for DPHYTX0 */
     CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
                     CSL_MAIN_CTRL_MMR_CFG0_DPHY_TX0_CTRL,
                     0x1);
+    /* Lock MMR back if unlocked here */
+    if (unlocked == 1U)
+    {
+        CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
+                     CSL_MAIN_CTRL_MMR_CFG0_LOCK1_KICK0,
+                     0U);
+        appLogPrintf("Locked MMR after programming CSITX DPHY register ... !!!\n");
+    }
 
     Csitx_initParamsInit(&initPrmsCsitx);
     initPrmsCsitx.drvHandle = appUdmaGetObj();
@@ -301,7 +325,7 @@ int32_t appVhwaDmpacInit()
 
     appLogPrintf("VHWA: DMPAC: Init ... Done !!!\n");
     return (status);
-    
+
 }
 
 int32_t appVhwaVpacInit()
@@ -485,7 +509,7 @@ int32_t appVhwaVpacInit()
         else
         {
             int32_t cnt;
-            
+
             Vhwa_m2mVissSl2ParamsInit(&sl2AllocPrms);
 
             sl2AllocPrms.inDepth = 3U; /* Minimum 3 */
@@ -612,12 +636,12 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
         {
             appLogPrintf(" VHWA Remote Service: ERROR: VHWA configuration failed !!!\n");
         }
-    }    
+    }
     else
     {
         appLogPrintf(" VHWA Remote Service: ERROR: Invalid parameters passed !!!\n");
     }
- 
+
 
     return status;
 }
@@ -638,7 +662,7 @@ int32_t appVhwaRemoteServiceInit()
 int32_t appVhwaRemoteServiceDeInit()
 {
     int32_t status;
-    
+
     status = appRemoteServiceUnRegister(APP_VHWA_SERVICE_NAME);
     if(status!=0)
     {
