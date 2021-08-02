@@ -124,6 +124,9 @@ typedef struct
     vx_uint32               max_msc_instances;
     vx_uint32               msc_instance;
 
+    /** Number of times to clear the output buffer */
+    vx_uint32               clear_count;
+
 } tivxImgMosaicMscObj;
 
 
@@ -377,6 +380,8 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
             msc_obj->msc_instance = params->msc_instance;
         }
 
+        msc_obj->clear_count= params->clear_count;
+
         tivxMemBufferUnmap(
             config_target_ptr,
             config_desc->mem_size,
@@ -519,7 +524,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
             VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
         params = (tivxImgMosaicParams *) config_target_ptr;
 
-        if((params->enable_overlay==1) && (params->clear_count > 0U))
+        if((params->enable_overlay==1) && (msc_obj->clear_count > 0U))
         {
             io_mem_type = VX_MEMORY_TYPE_HOST;
         }
@@ -546,7 +551,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
         }
 
         /* Memset output buffers for initial count */
-        if(params->clear_count > 0U)
+        if(msc_obj->clear_count > 0U)
         {
               memset(output_image_target_ptr[0U], 0U, out_img_desc->mem_size[0U]);
 
@@ -577,7 +582,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
               {
                   appMemCacheWb(output_image_target_ptr[1U], out_img_desc->mem_size[1U]);
               }
-              params->clear_count--;
+              msc_obj->clear_count--;
         }
 
         /* 0 - config, 1 - output image, 2 onwards is array of inputs */
@@ -713,7 +718,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
             tivxMemBufferUnmap(
                 output_image_target_ptr[1U],
                 out_img_desc->mem_size[1U],
-                io_mem_type, VX_READ_ONLY);
+                io_mem_type, VX_WRITE_ONLY);
         }
     }
 
