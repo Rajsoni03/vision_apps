@@ -63,6 +63,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <pthread.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/ipc/include/app_ipc.h>
@@ -78,7 +79,61 @@
 #include <sys/mman.h>
 #include <sys/neutrino.h>
 
+/* Mutex for controlling access to Init/De-Init. */
+static pthread_mutex_t gMutex = PTHREAD_MUTEX_INITIALIZER;
+
+/* Counter for tracking the {init, de-init} calls. This is also used to
+ * guarantee a single init/de-init operation.
+ */
+static uint32_t gInitCount = 0U;
+
+static int32_t appCommonInitLocal();
+static int32_t appCommonDeInitLocal();
+
 int32_t appCommonInit()
+{
+    int32_t status = 0;
+
+    pthread_mutex_lock(&gMutex);
+
+    if (gInitStatus == 0U)
+    {
+        status = appCommonInitLocal();
+    }
+
+    gInitCount++;
+
+    pthread_mutex_unlock(&gMutex);
+
+    return status;
+}
+
+int32_t appCommonDeInit()
+{
+    int32_t status = 0;
+
+    pthread_mutex_lock(&gMutex);
+
+    if (gInitCount != 0U)
+    {
+        gInitCount--;
+
+        if (gInitCount == 0U)
+        {
+            status = appCommonDeInitLocal();
+        }
+    }
+    else
+    {
+        status = -1;
+    }
+
+    pthread_mutex_unlock(&gMutex);
+
+    return status;
+}
+
+static int32_t appCommonInitLocal()
 {
     int32_t status = 0;
     app_log_init_prm_t log_init_prm;
@@ -206,7 +261,7 @@ int32_t appCommonInit()
     return status;
 }
 
-int32_t appCommonDeInit()
+static int32_t appCommonDeInitLocal()
 {
     int32_t status = 0;
 

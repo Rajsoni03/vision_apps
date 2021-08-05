@@ -60,9 +60,6 @@
  *
  */
 #include <TI/tivx.h>
-#if !defined(TARGET_X86_64)
-#include <app_init.h>
-#endif
 #include "app_ptk_demo_common.h"
 
 #define PTKDEMO_MAX_NUM_TIVX_OBJ_HANDLES    (4U)
@@ -193,51 +190,6 @@ const char *app_common_get_coreName(const char *appCoreName)
     }
 
     return NULL;
-}
-
-#if defined(TARGET_X86_64)
-int32_t appCommonInit()
-{
-    return 0;
-}
-
-int32_t appCommonDeInit()
-{
-    return 0;
-}
-
-#endif // defined(TARGET_X86_64)
-
-int32_t appInit()
-{
-    int32_t status = 0;
-
-    status = appCommonInit();
-
-    if(status==0)
-    {
-        tivxInit();
-
-#if !defined(TARGET_X86_64)
-        tivxHostInit();
-#endif // !defined(TARGET_X86_64)
-    }
-
-    return status;
-}
-
-int32_t appDeInit()
-{
-    int32_t status = 0;
-
-#if !defined(TARGET_X86_64)
-    tivxHostDeInit();
-#endif // !defined(TARGET_X86_64)
-
-    tivxDeInit();
-    appCommonDeInit();
-
-    return status;
 }
 
 vx_status ptkdemo_addParamByNodeIndex(vx_graph  graph,

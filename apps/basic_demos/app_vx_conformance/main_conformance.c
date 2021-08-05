@@ -65,7 +65,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <TI/tivx.h>
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 
 #ifdef QNX
 #include <hw/inout.h>
@@ -74,31 +74,6 @@
 #include <sys/neutrino.h>
 #include <unistd.h>
 #endif
-
-int32_t appInit()
-{
-    int32_t status = 0;
-
-    status = appCommonInit();
-
-    if(status==0)
-    {
-        tivxInit();
-        tivxHostInit();
-    }
-    return status;
-}
-
-int32_t appDeInit()
-{
-    int32_t status = 0;
-
-    tivxHostDeInit();
-    tivxDeInit();
-    appCommonDeInit();
-
-    return status;
-}
 
 int vx_conformance_test_main(int argc, char* argv[]);
 void TestModuleRegister();

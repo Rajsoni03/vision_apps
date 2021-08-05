@@ -62,10 +62,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>
-#include <stdint.h>
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 
 #if defined (QNX)
 #include <hw/inout.h>
@@ -156,7 +156,7 @@ int main(void)
 {
     int32_t status = 0;
 
-    status = appCommonInit();;
+    status = appCommonInit();
 #if defined (QNX)
     /* Get IO privileges */
     if (ThreadCtl(_NTO_TCTL_IO, NULL) == -1) {

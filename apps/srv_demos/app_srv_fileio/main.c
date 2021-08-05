@@ -53,7 +53,7 @@
 #include <tivx_utils_graph_perf.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #ifdef J7
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 #endif
 #include "app_common.h"
 

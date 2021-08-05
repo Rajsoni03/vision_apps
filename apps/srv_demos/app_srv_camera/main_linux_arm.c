@@ -65,43 +65,22 @@
 #include <assert.h>
 #include <stdint.h>
 #include <TI/tivx.h>
-#include <app_init.h>
-
-
-int32_t appInit()
-{
-    int32_t status = 0;
-
-    return status;
-}
-
-int32_t appDeInit()
-{
-    int32_t status = 0;
-
-    return status;
-}
+#include <utils/app_init/include/app_init.h>
 
 int main(int argc, char *argv[])
 {
     int status = VX_SUCCESS;
 
-    status = appInit();
+    int app_linux_opengl_integrated_srv(int argc, char* argv[]);
+    int app_linux_opengl_integrated_srv_file_read(int argc, char* argv[]);
 
-    if(status == VX_SUCCESS)
+    if (NULL != argv)
     {
-        int app_linux_opengl_integrated_srv(int argc, char* argv[]);
-        int app_linux_opengl_integrated_srv_file_read(int argc, char* argv[]);
-
-        if (NULL != argv)
-        {
-            status = app_linux_opengl_integrated_srv(argc, argv);
-        }
-        else
-        {
-            printf("invalid arguments!!\n");
-        }
-        appDeInit();
+        status = app_linux_opengl_integrated_srv(argc, argv);
+    }
+    else
+    {
+        printf("invalid arguments!!\n");
     }
 
     return status;

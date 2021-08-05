@@ -63,7 +63,15 @@
 #ifndef APP_INIT_MPU1_H
 #define APP_INIT_MPU1_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 int32_t appCommonInit();
 int32_t appCommonDeInit();
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif /* APP_INIT_MPU1_H */

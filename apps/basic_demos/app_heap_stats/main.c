@@ -64,29 +64,11 @@
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
-#include <app_init.h>
 #include <VX/vx.h>
+#include <utils/app_init/include/app_init.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
-
-vx_status appInit()
-{
-    vx_status status = 0;
-
-    status = appCommonInit();
-
-    return status;
-}
-
-vx_status appDeInit()
-{
-    vx_status status = 0;
-
-    status = appCommonDeInit();
-
-    return status;
-}
 
 int32_t appPerfStatsMemStatsPrintAll()
 {
@@ -124,7 +106,7 @@ int main(int argc, char *argv[])
 {
     vx_status status = 0;
 
-    status = appInit();
+    status = appCommonInit();
 
     if(status == VX_SUCCESS)
     {
@@ -132,7 +114,7 @@ int main(int argc, char *argv[])
 
         if(status == VX_SUCCESS)
         {
-            status = appDeInit();
+            status = appCommonDeInit();
         }
     }
     printf("APP HEAP STATS: Done !!!\n");

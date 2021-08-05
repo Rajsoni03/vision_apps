@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017 Texas Instruments Incorporated
+ * Copyright (c) 2021 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,27 +59,45 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <stdint.h>
 #include <TI/tivx.h>
 #include <utils/app_init/include/app_init.h>
 
-int main(int argc, char *argv[])
+#if defined(TARGET_X86_64)
+int32_t appCommonInit()
 {
-    int status = 0;
+    return 0;
+}
 
-    status = appInit();
+int32_t appCommonDeInit()
+{
+    return 0;
+}
+#endif // defined(TARGET_X86_64)
 
-    if(status==0)
+int32_t appInit()
+{
+    int32_t status;
+
+    status = appCommonInit();
+
+    if (status == 0)
     {
-        int app_srv_calibration_main(int argc, char* argv[]);
-
-        status = app_srv_calibration_main(argc, argv);
-        appDeInit();
+        tivxInit();
+        tivxHostInit();
     }
 
     return status;
 }
+
+int32_t appDeInit()
+{
+    int32_t status;
+
+    tivxHostDeInit();
+    tivxDeInit();
+
+    status = appCommonDeInit();
+
+    return status;
+}
+

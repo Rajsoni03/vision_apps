@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017 Texas Instruments Incorporated
+ * Copyright (c) 2021 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,26 +60,51 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#ifndef _APP_INIT_H_
+#define _APP_INIT_H_
+
 #include <stdint.h>
-#include <TI/tivx.h>
-#include <utils/app_init/include/app_init.h>
 
-int main(int argc, char *argv[])
-{
-    int status = 0;
+/**
+ * \defgroup group_vision_apps_utils_init Application Initialization APIs
+ *
+ * \brief This section contains APIs for application initialization
+ *        and de-initialization.
+ *
+ * \ingroup group_vision_apps_utils
+ *
+ * @{
+ */
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
-    status = appInit();
+extern int32_t appCommonInit();
+extern int32_t appCommonDeInit();
 
-    if(status==0)
-    {
-        int app_srv_calibration_main(int argc, char* argv[]);
+/**
+ * \brief Initialize the following modules
+ *  - TIVX
+ *  - IPC
+ *  - Remote services
+ *  - Performance Stats
+ *
+ * \return 0 on success else failure
+ */
+int32_t appInit();
 
-        status = app_srv_calibration_main(argc, argv);
-        appDeInit();
-    }
+/**
+ * \brief De-initializes the modules initialized by appInit() function.
+ *
+ * \return 0 on success else failure
+ */
+int32_t appDeInit();
 
-    return status;
+#ifdef __cplusplus
 }
+#endif // __cplusplus
+
+/* @} */
+
+#endif
+

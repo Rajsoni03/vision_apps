@@ -71,6 +71,7 @@
 #include <TI/j7_tidl.h>
 #include <itidl_ti.h>
 
+#include <utils/app_init/include/app_init.h>
 #include <perception/perception.h>
 
 /* SDE Header size in byte */
@@ -108,8 +109,6 @@ int32_t ptkdemo_get_file_path(char        **filePath,
                               uint32_t      maxPathLen);
 
 const char *app_common_get_coreName(const char *appCoreName);
-int32_t appInit();
-int32_t appDeInit();
 
 vx_status ptkdemo_addParamByNodeIndex(vx_graph  graph,
                                       vx_node   node,

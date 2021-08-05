@@ -64,7 +64,7 @@
 #include <TI/tivx_task.h>
 #include <TI/tivx_target_kernel.h>
 #include "tivx_kernels_host_utils.h"
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 
 #include <TI/j7.h>
 #include <TI/j7_tidl.h>

@@ -42,7 +42,7 @@
 #include <VX/vx.h>
 #include <TI/tivx.h>
 
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 #include "app_common.h"
 
 typedef struct
@@ -207,7 +207,7 @@ static int32_t App_init(App_Context *appCntxt)
 
         if (status == 0)
         {
-            status = appCommonInit();
+            status = appInit();
         }
 
         if (status == 0)
@@ -239,16 +239,10 @@ static int32_t App_deInit(App_Context *appCntxt)
 
     if (appCntxt->initDone == 1)
     {
-        status = vxReleaseContext(&appCntxt->vxContext);
-        if (status == 0)
-        {
-            tivxHostDeInit();
-            tivxDeInit();
-        }
-        if (status == 0)
-        {
-            status = appCommonDeInit();
-        }
+        vxReleaseContext(&appCntxt->vxContext);
+
+        status = appDeInit();
+
         if (appCntxt->sockId >= 0)
         {
             close(appCntxt->sockId);

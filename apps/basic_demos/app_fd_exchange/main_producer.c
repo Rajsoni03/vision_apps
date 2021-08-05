@@ -42,7 +42,7 @@
 #include <VX/vx.h>
 #include <TI/tivx.h>
 
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 #include "app_common.h"
 
 #define APP_STATE_CLI_NOT_CONNECTED     (0U)
@@ -237,14 +237,11 @@ static int32_t App_init(App_Context *appCntxt)
 
         if (status == 0)
         {
-            status = appCommonInit();
+            status = appInit();
         }
 
         if (status == 0)
         {
-            tivxInit();
-            tivxHostInit();
-
             appCntxt->vxContext = vxCreateContext();
 
             if (appCntxt->vxContext == NULL)
@@ -270,10 +267,8 @@ static int32_t App_deInit(App_Context *appCntxt)
     if (appCntxt->initDone == 1)
     {
         vxReleaseContext(&appCntxt->vxContext);
-        tivxHostDeInit();
-        tivxDeInit();
 
-        appCommonDeInit();
+        status = appDeInit();
 
         if (appCntxt->cliSockId >= 0)
         {

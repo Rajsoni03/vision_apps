@@ -62,33 +62,11 @@
 
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/app_init/include/app_init.h>
 #include "app_common.h"
 
 #define NUM_MSGS        (16u)
 #define NUM_ITERATIONS  (4u)
-
-vx_status appInit()
-{
-    vx_status status = 0;
-
-    status = appCommonInit();
-
-    if(status == VX_SUCCESS)
-    {
-        tivxInit();
-        tivxHostInit();
-    }
-    return status;
-}
-
-void appDeInit()
-{
-    tivxHostDeInit();
-    tivxDeInit();
-    appCommonDeInit();
-
-    return;
-}
 
 int main(int argc, char *argv[])
 {

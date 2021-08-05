@@ -66,8 +66,8 @@
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
-#include <app_init.h>
 #include <VX/vx.h>
+#include <utils/app_init/include/app_init.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
@@ -76,24 +76,6 @@
 #define R5F_FAMILY 4
 #define C6X_FAMILY 5
 #define C7X_FAMILY 2
-
-vx_status appInit()
-{
-    vx_status status = 0;
-
-    status = appCommonInit();
-
-    return status;
-}
-
-vx_status appDeInit()
-{
-    vx_status status = 0;
-
-    status = appCommonDeInit();
-
-    return status;
-}
 
 vx_status appCpuLoadPrint(uint32_t cpu_id)
 {
@@ -126,7 +108,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    status = appInit();
+    status = appCommonInit();
 
     core = atoi(argv[1]);
     load = atoi(argv[2]);
@@ -187,7 +169,7 @@ int main(int argc, char *argv[])
         }
         if(status == VX_SUCCESS)
         {
-            status = appDeInit();
+            status = appCommonDeInit();
         }
     }
     printf("APP IPC TIOVX: Done !!!\n");

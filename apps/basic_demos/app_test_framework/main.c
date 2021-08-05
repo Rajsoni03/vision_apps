@@ -89,7 +89,7 @@
 
 #include "test_engine/test.h"
 #ifdef J7
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 #endif
 
 #ifdef HAVE_VERSION_INC
