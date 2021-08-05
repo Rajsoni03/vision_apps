@@ -76,14 +76,24 @@
 #include <stdint.h>
 
 /** \brief Sciserver init
- * 
+ *
  */
 int32_t appSciserverInit();
 
-/** \brief Sciserver de-init
- * 
+/** \brief Sciclient init for MCU1_0
+ *
  */
-int32_t appSciserverDeInit();
+int32_t appSciserverSciclientInit();
+
+/** \brief Sciserver de-init
+ *
+ */
+void appSciserverDeInit();
+
+/** \brief Sciclient init for MCU1_0
+ *
+ */
+int32_t appSciserverSciclientDeInit();
 
 /* @} */
 

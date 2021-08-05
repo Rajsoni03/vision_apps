@@ -52,7 +52,9 @@
 #if defined(BUILD_MCU)
 #pragma DATA_SECTION(Ipc_traceBuffer, ".tracebuf");
 #endif
-char Ipc_traceBuffer[IPC_TRACE_BUFFER_MAX_SIZE];
+char Ipc_traceBuffer[IPC_TRACE_BUFFER_MAX_SIZE]
+__attribute__ ((section(".tracebuf")))
+;
 
 static uint32_t gTraceBufIndex = 0U;
 

@@ -69,8 +69,34 @@
 #include <ti/osal/TaskP.h>
 #include <app_ipc_rsctable.h>
 
+/**< SCI Server Init Task stack size */
+#define APP_SCISERVER_INIT_TSK_STACK        (32U * 1024U)
+/* SCI Server Init Task Priority - must be higher than High priority Sciserver task */
+#define INIT_SCISERVER_TASK_PRI         (6)
+
+/* Sciserver Init Task stack */
+static uint8_t  gSciserverInitTskStack[APP_SCISERVER_INIT_TSK_STACK]
+__attribute__ ((aligned(8192)));
+
 static void appMain(void* arg0, void* arg1)
 {
+    TaskP_Handle sciserverInitTask;
+    TaskP_Params sciserverInitTaskParams;
+
+    appSciserverSciclientInit();
+
+    /* Initialize SCI Client Server */
+    TaskP_Params_init(&sciserverInitTaskParams);
+    sciserverInitTaskParams.priority     = INIT_SCISERVER_TASK_PRI;
+    sciserverInitTaskParams.stack        = gSciserverInitTskStack;
+    sciserverInitTaskParams.stacksize    = sizeof (gSciserverInitTskStack);
+
+    sciserverInitTask = TaskP_create(appSciserverInit, &sciserverInitTaskParams);
+    if(NULL == sciserverInitTask)
+    {
+        OS_stop();
+    }
+
     appInit();
     appRun();
     #if 1
@@ -91,7 +117,7 @@ void StartupEmulatorWaitFxn (void)
     }while (enableDebug);
 }
 
-static uint8_t gTskStackMain[8*1024]
+static uint8_t gTskStackMain[64*1024]
 __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
@@ -101,25 +127,30 @@ int main(void)
     TaskP_Params tskParams;
     TaskP_Handle task;
 
+#if defined FREERTOS
+    /* Relocate FreeRTOS Reset Vectors from BTCM*/
+    void _freertosresetvectors (void);
+    memcpy((void *)0x0, (void *)_freertosresetvectors, 0x40);
+#endif
+
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
 
-    appSciserverInit();
-
     OS_init();
 
+    /* Initialize the task params */
     TaskP_Params_init(&tskParams);
-    /* Setting this task priority to 3 and make Sciserver 
-       priority lo as 3+1 and high as 3+2 */
-    tskParams.priority = 3u;
-    tskParams.stack = gTskStackMain;
-    tskParams.stacksize = sizeof (gTskStackMain);
+    /* Set the task priority higher than the default priority (1) */
+    tskParams.priority     = 2;
+    tskParams.stack        = gTskStackMain;
+    tskParams.stacksize    = sizeof (gTskStackMain);
+
     task = TaskP_create(appMain, &tskParams);
     if(NULL == task)
     {
         OS_stop();
     }
-    OS_start();
+    OS_start();    /* does not return */
 
     return 0;
 }

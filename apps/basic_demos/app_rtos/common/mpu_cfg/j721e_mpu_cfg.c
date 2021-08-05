@@ -43,6 +43,8 @@
  * This structure specifies the entries for mpu configuration to override the
  * default MPU configuration which is part of the CSL init.
  */
+#pragma DATA_SECTION(gCslR5MpuCfg, ".mpu_cfg");
+
 const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
 {
     {
@@ -54,7 +56,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 1U,
+        .shareable        = 0U,
         .cacheable        = (uint32_t)FALSE,
         .cachePolicy      = 0U,
         .memAttr          = 0U,
@@ -106,7 +108,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .regionId         = 4U,
         .enable           = 1U,
         .baseAddr         = 0x41C00000,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_512KB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 0U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,

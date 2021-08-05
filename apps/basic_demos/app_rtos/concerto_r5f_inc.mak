@@ -70,19 +70,26 @@ IMAGING_LIBS += ti_imaging_ittsrvr
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS)
 SYS_STATIC_LIBS += $(IMAGING_LIBS)
-SYS_STATIC_LIBS += rtsv7R4_T_le_v3D16_eabi
 
-ifeq ($(RTOS),FREERTOS)
-	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
-	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
-endif
-ADDITIONAL_STATIC_LIBS += ti.osal.aer5f
-ADDITIONAL_STATIC_LIBS += ti.csl.aer5f
 ADDITIONAL_STATIC_LIBS += ti.board.aer5f
 ADDITIONAL_STATIC_LIBS += ti.drv.uart.aer5f
 ADDITIONAL_STATIC_LIBS += ipc.aer5f
 ADDITIONAL_STATIC_LIBS += fvid2.aer5f
 ADDITIONAL_STATIC_LIBS += udma.aer5f
 ADDITIONAL_STATIC_LIBS += ti.drv.i2c.aer5f
+
+ADDITIONAL_STATIC_LIBS += ti.osal.aer5f
+
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
+endif
+
+ADDITIONAL_STATIC_LIBS += ti.csl.aer5f
+
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
+endif
+
+SYS_STATIC_LIBS += rtsv7R4_T_le_v3D16_eabi
 
 endif

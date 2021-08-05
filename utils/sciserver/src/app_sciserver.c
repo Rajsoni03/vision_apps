@@ -68,7 +68,16 @@
 /** \brief Aligned address at which the X509 header is placed. */
 #define SCISERVER_COMMON_X509_HEADER_ADDR (0x41cffb00)
 
-int32_t appSciserverInit()
+/* High Priority for SCI Server - must be higher than Low priority task */
+#define SETUP_SCISERVER_TASK_PRI_HIGH   (5)
+/*
+ * Low Priority for SCI Server - must be higher than IPC echo test tasks
+ * to prevent delay in handling Sciserver requests when test is performing
+ * multicore ping/pong.
+ */
+#define SETUP_SCISERVER_TASK_PRI_LOW    (4)
+
+int32_t appSciserverSciclientInit()
 {
     int32_t retVal = CSL_PASS;
 
@@ -88,12 +97,31 @@ int32_t appSciserverInit()
         retVal = Sciclient_init(&clientParams);
     }
 
+    return retVal;
+}
+
+int32_t appSciserverSciclientDeInit()
+{
+    int32_t retVal = 0;
+
+    retVal = Sciclient_deinit();
+    if(retVal!=0)
+    {
+        appLogPrintf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
+    }
+
+    return retVal;
+}
+
+int32_t appSciserverInit()
+{
+    int32_t retVal = CSL_PASS;
     Sciserver_TirtosCfgPrms_t serverParams;
 
     retVal = Sciserver_tirtosInitPrms_Init(&serverParams);
 
-    serverParams.taskPriority[SCISERVER_TASK_USER_LO] = 4;
-    serverParams.taskPriority[SCISERVER_TASK_USER_HI] = 5;
+    serverParams.taskPriority[SCISERVER_TASK_USER_LO] = SETUP_SCISERVER_TASK_PRI_LOW;
+    serverParams.taskPriority[SCISERVER_TASK_USER_HI] = SETUP_SCISERVER_TASK_PRI_HIGH;
 
     if(retVal==CSL_PASS)
     {
@@ -101,4 +129,11 @@ int32_t appSciserverInit()
     }
 
     return retVal;
+}
+
+void appSciserverDeInit()
+{
+    Sciserver_tirtosDeinit();
+
+    return;
 }

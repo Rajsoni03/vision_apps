@@ -48,6 +48,7 @@ SECTIONS
 
     .text               : {} palign(8)      > DDR_MCU3_1
     .const              : {} palign(8)      > DDR_MCU3_1
+    .mpu_cfg                                > DDR_MCU3_1
     .cinit              : {} palign(8)      > DDR_MCU3_1
     .pinit              : {} palign(8)      > R5F_TCMA
     .bss                : {} align(4)       > DDR_MCU3_1
