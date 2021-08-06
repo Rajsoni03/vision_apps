@@ -66,8 +66,8 @@
 
 MEMORY
 {
-    /* L2 for C7x_1 [ size 480.00 KB ] */
-    L2RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64800000 , LENGTH = 0x00078000
+    /* L2 for C7x_1 [ size 448.00 KB ] */
+    L2RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64800000 , LENGTH = 0x00070000
     /* L1 for C7x_1 [ size 16.00 KB ] */
     L1RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64E00000 , LENGTH = 0x00004000
     /* MSMC for C7x_1 [ size  7.78 MB ] */

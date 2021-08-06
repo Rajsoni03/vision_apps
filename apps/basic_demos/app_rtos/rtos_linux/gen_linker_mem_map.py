@@ -100,15 +100,15 @@ GB = KB*MB;
 # higher DDR address starts at 0x0008_8000_0000
 #
 # As the address is non-contiguous it requires MMU to remap the address
-# Currently the upper 2GB is accessed by either ARM (user space) 
+# Currently the upper 2GB is accessed by either ARM (user space)
 # C7x DSP heap/scratch space, as 32-bit cores like R5F and C66 cannot access it
-# 
-# The upper DDR address is mapped contiguously from lower DDR address 
+#
+# The upper DDR address is mapped contiguously from lower DDR address
 # but remapped to actual physical address using MMU
 #
 # physical lower DDR address range 0x0000_8000_0000
 # virtual lower DDR address range 0x0000_8000_0000
-# 
+#
 # physical lower DDR address range 0x0008_8000_0000
 # virtual lower DDR address range 0x0001_0000_0000
 #
@@ -153,9 +153,9 @@ c66x_2_l2_size  = (288 - 64)*KB;
 #
 # C7x L1, L2 memory allocation
 # L1 - 32KB $, 16KB SRAM
-# L2 - 32KB $, 480KB SRAM
+# L2 - 64KB $, 448KB SRAM
 c7x_1_l2_addr  = 0x64800000;
-c7x_1_l2_size  = (512 - 32)*KB;
+c7x_1_l2_size  = (512 - 64)*KB;
 c7x_1_l1_addr  = 0x64E00000;
 c7x_1_l1_size  = 16*KB;
 

@@ -83,9 +83,9 @@
 #define MAIN_OCRAM_MCU2_1_ADDR (0x03640000u)
 #define MAIN_OCRAM_MCU2_1_SIZE (0x00040000u)
 
-/* L2 for C7x_1 [ size 480.00 KB ] */
+/* L2 for C7x_1 [ size 448.00 KB ] */
 #define L2RAM_C7x_1_ADDR (0x64800000u)
-#define L2RAM_C7x_1_SIZE (0x00078000u)
+#define L2RAM_C7x_1_SIZE (0x00070000u)
 
 /* L1 for C7x_1 [ size 16.00 KB ] */
 #define L1RAM_C7x_1_ADDR (0x64E00000u)
