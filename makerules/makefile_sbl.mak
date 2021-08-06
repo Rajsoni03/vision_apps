@@ -6,14 +6,16 @@
 
 #OSPI DATA
 OSPI_LOCATION_SBL_IMAGE=0
-OSPI_LOCATION_SYSFW_BIN=40000
-OSPI_LOCATION_BOOT_APP=A0000
-OSPI_LOCATION_MULTI_CORE_IMAGE_1=1800000
-OSPI_LOCATION_MULTI_CORE_IMAGE_2=2400000
-OSPI_LOCATION_ATF_IMAGE=E0000
-OSPI_LOCATION_LINUX_DTB=16C0000
-OSPI_LOCATION_HLOS_KERNEL_IMAGE=6C0000
+OSPI_LOCATION_SYSFW_BIN=80000
+OSPI_LOCATION_BOOT_APP=100000
+OSPI_LOCATION_MULTI_CORE_IMAGE_1=1FC0000
+OSPI_LOCATION_MULTI_CORE_IMAGE_2=27C0000
+OSPI_LOCATION_ATF_IMAGE=1C0000
+OSPI_LOCATION_LINUX_DTB=1EC0000
+OSPI_LOCATION_HLOS_KERNEL_IMAGE=7C0000
+OSPI_PATTERN=3FE0000
 OSPI_BINARIES_PATH=$(VISION_APPS_PATH)/out/sbl_bootfiles
+OSPI_PATTERN_FILE=$(PDK_PATH)/packages/ti/board/src/flash/nor/ospi/nor_spi_patterns.bin
 
 #UNIFLASH INFO
 UNIFLASH_VERSION=uniflash_6.0.0
@@ -183,7 +185,6 @@ ifeq ($(BUILD_CPU_MCU2_1),yes)
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1 $(REMOTE_CORE_LIST_LATEAPP1)
-# 	$(CERT_SCRIPT) -b $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1 -o $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1.signed -c R5 -l 0x0 -k $(PDK_PATH)/packages/ti/build/makerules/k3_dev_mpk.pem
 
 sbl_vision_apps_bootimage_hs_1:
 	$(MAKE) sbl_vision_apps_bootimage_1
@@ -255,7 +256,7 @@ sbl_bootimage_hs: sbl_bootimage_sd_hs sbl_bootimage_ospi_hs sbl_atf_optee sbl_vi
 
 sbl_bootimage_flash_uniflash_programmer:
 ifeq ($(UNIFLASH_FOUND), yes)
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(UNIFLASH_DIR)/processors/FlashWriter/j721e_evm/uart_j721e_evm_flash_programmer_release.tiimage -i 0
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(UNIFLASH_DIR)/processors/FlashWriter/j721e_evm/uart_j721e_evm_flash_programmer_release.tiimage -i 0 || true
 else
 	echo "Uniflash not found! Please install uniflash or update the uniflash path in makefile"
 endif
@@ -263,11 +264,13 @@ endif
 sbl_bootimage_flash_sbl_sysfw_bootapp:
 ifeq ($(UNIFLASH_FOUND), yes)
 	#SBL Image
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/sbl_cust_img_mcu1_0_release.tiimage -d 3 -o $(OSPI_LOCATION_SBL_IMAGE)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/sbl_cust_img_mcu1_0_release.tiimage -d 3 -o $(OSPI_LOCATION_SBL_IMAGE) || true
+	#OSPI Patten file
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_PATTERN_FILE) -d 3 -o $(OSPI_PATTERN) || true
 	#SYSFW BIN
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/tifs.bin -d 3 -o $(OSPI_LOCATION_SYSFW_BIN)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/tifs.bin -d 3 -o $(OSPI_LOCATION_SYSFW_BIN) || true
 	#Boot App
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/can_boot_app_mcu_rtos_mcu1_0_release_ospi.appimage -d 3 -o $(OSPI_LOCATION_BOOT_APP)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/can_boot_app_mcu_rtos_mcu1_0_release_ospi.appimage -d 3 -o $(OSPI_LOCATION_BOOT_APP) || true
 else
 	echo "Uniflash not found! Please install uniflash or update the uniflash path in makefile"
 endif
@@ -275,9 +278,9 @@ endif
 sbl_bootimage_flash_hlos:
 ifeq ($(UNIFLASH_FOUND), yes)
 	#ATF Image
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/atf_optee.appimage -d 3 -o $(OSPI_LOCATION_ATF_IMAGE)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/atf_optee.appimage -d 3 -o $(OSPI_LOCATION_ATF_IMAGE) || true
 	#HLOS Image
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/ifs_qnx.appimage -d 3 -o $(OSPI_LOCATION_HLOS_KERNEL_IMAGE)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/ifs_qnx.appimage -d 3 -o $(OSPI_LOCATION_HLOS_KERNEL_IMAGE) || true
 else
 	echo "Uniflash not found! Please install uniflash or update the uniflash path in makefile"
 endif
@@ -285,9 +288,9 @@ endif
 sbl_bootimage_flash_rtosapp:
 ifeq ($(UNIFLASH_FOUND), yes)
 	#Multicore Image 1
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp1 -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_1)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp1 -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_1) || true
 	#Multicore Image 2
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp2 -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_2)
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp2 -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_2) || true
 else
 	echo "Uniflash not found! Please install uniflash or update the uniflash path in makefile"
 endif
