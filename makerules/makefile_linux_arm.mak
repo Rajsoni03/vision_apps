@@ -12,6 +12,7 @@ LINUX_APP_PROFILE=release
 endif
 
 FIRMWARE_SUBFOLDER?=vision_apps_evm
+UENV_NAME?=uEnv_vision_apps.txt
 LINUX_FS_STAGE_PATH = /tmp/tivision_apps_targetfs_stage
 
 linux_fs_stage:
@@ -133,8 +134,9 @@ endif
 # $2 : bootfs path
 define MODIFY_FS =
 	# copy uEnv.txt and sysfw.itb for PSDK RTOS
-	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/uEnv.txt $(2)/
-	#cp $(2)/sysfw-psdkra.itb $(2)/sysfw.itb
+	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/uEnv_vision_apps.txt $(2)/
+	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/uEnv_edgeai_apps.txt $(2)/
+	cp $(2)/$(UENV_NAME) $(2)/uEnv.txt
 	# update any additional files specific to PSDK RTOS in the filesystem
 	-cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/limits.conf $(1)/etc/security/limits.conf 2> /dev/null
 	sync

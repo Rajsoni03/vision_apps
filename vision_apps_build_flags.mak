@@ -21,6 +21,8 @@ BUILD_CPU_C7x_1?=yes
 
 BUILD_ENABLE_ETHFW?=yes
 
+BUILD_EDGEAI?=no
+
 # If set to no, then MCU core firmware will be built with NO board dependencies
 # (such as I2C, board specific PINMUX, DSS, HDMI, I2C, ETHFW, CSIRX, CSITX).  Most of
 # the packaged vision_apps require these interfaces on the MCU for the EVM, but
@@ -28,6 +30,12 @@ BUILD_ENABLE_ETHFW?=yes
 # these interfaces from the HLOS on A72 (such as EdgeAI kit), then this should be set
 # to 'no'.
 BUILD_MCU_BOARD_DEPENDENCIES?=yes
+
+ifeq ($(BUILD_EDGEAI), yes)
+BUILD_MCU_BOARD_DEPENDENCIES=no
+FIRMWARE_SUBFOLDER=vision_apps_eaik
+UENV_NAME=uEnv_edgeai_apps.txt
+endif
 
 ifeq ($(BUILD_MCU_BOARD_DEPENDENCIES),no)
 BUILD_ENABLE_ETHFW=no
