@@ -155,6 +155,21 @@ extern "C" {
  */
 #define TIVX_KERNEL_SFM_NAME     "com.ti.img_proc.sfm"
 
+/*! \brief Kernel Name: DL Pre processing
+ *  \see group_vision_apps_kernels_dl_pre_proc
+ */
+#define TIVX_KERNEL_DL_PRE_PROC_NAME     "com.ti.img_proc.dl.pre.proc"
+
+/*! \brief Kernel Name: DL color blend
+ *  \see group_vision_apps_kernels_dl_color_blend
+ */
+#define TIVX_KERNEL_DL_COLOR_BLEND_NAME     "com.ti.img_proc.dl.color.blend"
+
+/*! \brief Kernel Name: DL draw box
+ *  \see group_vision_apps_kernels_dl_draw_box
+ */
+#define TIVX_KERNEL_DL_DRAW_BOX_NAME     "com.ti.img_proc.dl.draw.box"
+
 /*!
  * \brief
  * \ingroup group_vision_apps_kernels_img_proc
@@ -180,6 +195,14 @@ extern "C" {
 /* Send this control command to reset the background image in app_tild_vl */
 #define TIVX_IMG_PROC_POSE_VIZ_RESET_BACKGROUND    (0xF00F)
 #define TIVX_IMG_PROC_VIZ_LOC_RESET_POSE           (0xFFEF)
+
+#define TIVX_DL_DRAW_BOX_MAX_OUTPUTS       (4U)
+#define TIVX_DL_DRAW_BOX_MAX_CLASSES       (256U)
+#define TIVX_DL_DRAW_BOX_MAX_COLORS        (3U)
+
+#define TIVX_DL_COLOR_BLEND_MAX_OUTPUTS    (4U)
+#define TIVX_DL_COLOR_BLEND_MAX_CLASSES    (256U)
+#define TIVX_DL_COLOR_BLEND_MAX_COLORS     (3U)
 
 /*!
  * \brief
@@ -650,6 +673,69 @@ typedef struct {
 
 }tivxSFMParams;
 
+/*!
+ * \brief DL Pre processing to be used with DL-RT
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+typedef struct {
+
+  /** Skip processing */
+  vx_int32 skip_flag;
+
+  /* Scale values to be applied per channel in the range of 0.0 to 1.0 */
+  vx_float32 scale[3];
+
+  /* Mean value per channel to be subtracted, range depends on channel bit-depth */
+  vx_float32 mean[3];
+
+  /* Channel ordering, 0-NCHW, 1-NHWC */
+  vx_int32 channel_order;
+
+  /* Crop values to be applied, 0-Top, 1-Bottom, 2-Right, 3-Left */
+  vx_int32 crop[4];
+
+}tivxDLPreProcParams;
+
+/*!
+ * \brief DL color blend to be used with DL-RT
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+typedef struct {
+
+    /** Skip processing */
+    vx_int32 skip_flag;
+
+    /** Number of outputs to blend not to exceed TIVX_DL_COLOR_BLEND_MAX_OUTPUTS */
+    vx_int32 num_outputs;
+
+    /** Number of classes per output not to exceed TIVX_DL_COLOR_BLEND_MAX_CLASSES*/
+    vx_int32 num_classes[TIVX_DL_COLOR_BLEND_MAX_OUTPUTS];
+
+    /** Color map for each output, number of colors not to exceed TIVX_DL_COLOR_BLEND_MAX_COLORS */
+    vx_uint8 color_map[TIVX_DL_COLOR_BLEND_MAX_OUTPUTS][TIVX_DL_COLOR_BLEND_MAX_CLASSES][TIVX_DL_COLOR_BLEND_MAX_COLORS];
+
+}tivxDLColorBlendParams;
+
+/*!
+ * \brief DL draw box to be used with DL-RT
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+typedef struct {
+
+    /** Skip processing */
+    vx_int32 skip_flag;
+
+    /** Number of outputs to blend not to exceed TIVX_DL_DRAW_BOX_MAX_OUTPUTS */
+    vx_int32 num_outputs;
+
+    /** Number of classes per output not to exceed TIVX_DL_DRAW_BOX_MAX_CLASSES*/
+    vx_int32 num_classes[TIVX_DL_DRAW_BOX_MAX_OUTPUTS];
+
+    /** Color map for each output, number of colors not to exceed TIVX_DL_DRAW_BOX_MAX_COLORS */
+    vx_uint8 color_map[TIVX_DL_DRAW_BOX_MAX_OUTPUTS][TIVX_DL_DRAW_BOX_MAX_CLASSES][TIVX_DL_DRAW_BOX_MAX_COLORS];
+
+}tivxDLDrawBoxParams;
+
 /*********************************
  *      Functions
  *********************************/
@@ -726,6 +812,17 @@ vx_kernel tivxAddKernelPixelViz(vx_context context, vx_int32 num_output_tensors)
  */
 vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs);
 
+/*!
+ * \brief Used by the application to create the DL color convert kernel from the context.
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+vx_kernel tivxAddKernelDLColorBlend(vx_context context, vx_int32 num_outputs);
+
+/*!
+ * \brief Used by the application to create the DL draw box kernel from the context.
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+vx_kernel tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs);
 
 /*!
  * \brief Set default parameters for tivxImgMosaicParams

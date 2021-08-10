@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2019 Texas Instruments Incorporated
+ * Copyright (c) 2021 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,64 +60,24 @@
  *
  */
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#ifndef _TIVX_DL_COLOR_BLEND_HOST_
+#define _TIVX_DL_COLOR_BLEND_HOST_
 
-void tivxAddTargetKernelImgPreProc(void);
-void tivxAddTargetKernelOCPreProc(void);
-void tivxAddTargetKernelOCPostProc(void);
-void tivxAddTargetKernelODPostProc(void);
-void tivxAddTargetKernelDofPlaneSep(void);
-void tivxAddTargetKernelPixelViz(void);
-void tivxAddTargetKernelPoseViz(void);
-void tivxAddTargetKernelVisualLocalization(void);
-void tivxAddTargetKernelImgMosaic(void);
-void tivxAddTargetKernelDrawKeypointDetections(void);
-void tivxAddTargetKernelDrawBoxDetections(void);
-void tivxAddTargetKernelDLPreProc(void);
-void tivxAddTargetKernelDLColorBlend(void);
-void tivxAddTargetKernelDLDrawBox(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void tivxRemoveTargetKernelImgPreProc(void);
-void tivxRemoveTargetKernelOCPreProc(void);
-void tivxRemoveTargetKernelOCPostProc(void);
-void tivxRemoveTargetKernelODPostProc(void);
-void tivxRemoveTargetKernelDofPlaneSep(void);
-void tivxRemoveTargetKernelPixelViz(void);
-void tivxRemoveTargetKernelPoseViz(void);
-void tivxRemoveTargetKernelVisualLocalization(void);
-void tivxRemoveTargetKernelImgMosaic(void);
-void tivxRemoveTargetKernelDrawKeypointDetections(void);
-void tivxRemoveTargetKernelDrawBoxDetections(void);
-void tivxRemoveTargetKernelDLPreProc(void);
-void tivxRemoveTargetKernelDLColorBlend(void);
-void tivxRemoveTargetKernelDLDrawBox(void);
+#define TIVX_DL_COLOR_BLEND_CONFIG_IDX        (0U)
+#define TIVX_DL_COLOR_BLEND_INPUT_IMAGE_IDX   (1U)
+#define TIVX_DL_COLOR_BLEND_INPUT_TENSOR_IDX  (2U)
+#define TIVX_DL_COLOR_BLEND_OUTPUT_START_IDX  (3U)
 
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgPreProc, &tivxRemoveTargetKernelImgPreProc},
-    {&tivxAddTargetKernelOCPreProc, &tivxRemoveTargetKernelOCPreProc},
-    {&tivxAddTargetKernelOCPostProc, &tivxRemoveTargetKernelOCPostProc},
-    {&tivxAddTargetKernelODPostProc, &tivxRemoveTargetKernelODPostProc},
-    {&tivxAddTargetKernelDofPlaneSep, &tivxRemoveTargetKernelDofPlaneSep},
-    {&tivxAddTargetKernelPixelViz, &tivxRemoveTargetKernelPixelViz},
-    {&tivxAddTargetKernelPoseViz, &tivxRemoveTargetKernelPoseViz},
-    {&tivxAddTargetKernelVisualLocalization, &tivxRemoveTargetKernelVisualLocalization},
-    {&tivxAddTargetKernelImgMosaic, &tivxRemoveTargetKernelImgMosaic},
-    {&tivxAddTargetKernelDrawKeypointDetections, &tivxRemoveTargetKernelDrawKeypointDetections},
-    {&tivxAddTargetKernelDrawBoxDetections, &tivxRemoveTargetKernelDrawBoxDetections},
-    {&tivxAddTargetKernelDLPreProc, &tivxRemoveTargetKernelDLPreProc},
-    {&tivxAddTargetKernelDLColorBlend, &tivxRemoveTargetKernelDLColorBlend},
-    {&tivxAddTargetKernelDLDrawBox, &tivxRemoveTargetKernelDLDrawBox},
-};
+#define TIVX_DL_COLOR_BLEND_BASE_PARAMS       (3U)
+#define TIVX_DL_COLOR_BLEND_MAX_PARAMS        (TIVX_DL_COLOR_BLEND_BASE_PARAMS + TIVX_DL_COLOR_BLEND_MAX_OUTPUTS)
 
-void tivxRegisterImgProcTargetC66Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
+#ifdef __cplusplus
 }
+#endif
 
-void tivxUnRegisterImgProcTargetC66Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
+
+#endif /* _TIVX_DL_COLOR_BLEND_HOST_ */

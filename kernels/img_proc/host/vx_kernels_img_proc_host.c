@@ -82,6 +82,7 @@ vx_status tivxAddKernelDrawKeypointDetections(vx_context context);
 vx_status tivxAddKernelDrawBoxDetections(vx_context context);
 vx_status tivxAddKernelImgHist(vx_context context);
 vx_status tivxAddKernelSFM(vx_context context);
+vx_status tivxAddKernelDLPreProc(vx_context context);
 
 vx_status tivxRemoveKernelODPostProc(vx_context context);
 vx_status tivxRemoveKernelImgPreProc(vx_context context);
@@ -94,6 +95,7 @@ vx_status tivxRemoveKernelDrawKeypointDetections(vx_context context);
 vx_status tivxRemoveKernelDrawBoxDetections(vx_context context);
 vx_status tivxRemoveKernelImgHist(vx_context context);
 vx_status tivxRemoveKernelSFM(vx_context context);
+vx_status tivxRemoveKernelDLPreProc(vx_context context);
 
 static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelImgPreProc, &tivxRemoveKernelImgPreProc},
@@ -107,6 +109,7 @@ static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelDrawBoxDetections, &tivxRemoveKernelDrawBoxDetections},
     {&tivxAddKernelImgHist, &tivxRemoveKernelImgHist},
     {&tivxAddKernelSFM, &tivxRemoveKernelSFM},
+    {&tivxAddKernelDLPreProc, &tivxRemoveKernelDLPreProc}
 };
 
 static vx_status VX_CALLBACK publishKernels(vx_context context)

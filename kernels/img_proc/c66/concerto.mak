@@ -17,6 +17,9 @@ CSOURCES    += vx_visual_localization_target.c
 CSOURCES    += vx_img_mosaic_target.c
 CSOURCES    += vx_draw_keypoint_detections_target.c
 CSOURCES    += vx_draw_box_detections_target.c
+CSOURCES    += vx_dl_pre_proc_target.c
+CSOURCES    += vx_dl_color_blend_target.c
+CSOURCES    += vx_dl_draw_box_target.c
 
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/host
