@@ -79,8 +79,6 @@
 <li>
 <a href="#Known_Issues">Known Issues</a> </li>
 <li>
-<a href="#Change_Requests">Change Requests</a> </li>
-<li>
 <a href="#Support">Technical Support</a> </li>
 <li>
 <a href="#Versioning">Package Versioning</a> </li>
@@ -136,7 +134,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li>TI-RTOS on C7x and C6x, <strong>Free RTOS</strong> on R5F and Linux or QNX on A72</li>
+    <li>TI-RTOS on C7x, C6x, R5F and Linux on A72</li>
     <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C6x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
     <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
     </ul>
@@ -191,7 +189,7 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
-    <li>C7x algorithm offload demo (with DMA acceleration)</li>
+    <li>C7x algorithm offload demo (<strong>with DMA acceleration</strong>)</li>
     </ul>
 </li>
 
@@ -203,11 +201,11 @@ New features in this release are highlighted in <strong>bold</strong>
     </ul>
 </li>
 
-<li>CV Demos
+<li><strong>CV Demos
     <ul>
-    <li>Structure from motion</li>
+    <li><strong>Structure from motion</strong></li>
     </ul>
-</li>
+</strong></li>
 
 <li>OpenVX target nodes
     <ul>
@@ -256,36 +254,28 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-4797</td>
-<td align="left"><span>vx_image_preprocessing_target.c does not release DMA memory</span></td>
+<td align="center">ADASVISION-4680</td>
+<td align="left"><span>VisionApps: QNX: Remove the use of _NTO_TCTL_IO_PRIV in ThreadCtl calls</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4786</td>
-<td align="left"><span>Number of items not set in GPU LUT kernel</span></td>
+<td align="center">ADASVISION-4653</td>
+<td align="left"><span>psdk_rtos: setup script uses sudo command even when passing –skip_sudo</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4771</td>
-<td align="left"><span>[ImgPreProc]: Node hangs for RGB-Interleaved to RGB-Planar conversion</span></td>
+<td align="center">ADASVISION-4578</td>
+<td align="left"><span>DMPAC (SDE/DOF) performance stat has some issues</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4744</td>
-<td align="left"><span>writeScalerOutput does not honor stride parameter</span></td>
+<td align="center">ADASVISION-4547</td>
+<td align="left"><span>Open Klocwork bugs remaining in 7.2 SDK</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4743</td>
-<td align="left"><span>QNX: VisionApps MCU1_0 IPC Not Working in SPL Boot</span></td>
+<td align="center">ADASVISION-4150</td>
+<td align="left"><span>CSI output corrupted when run for 4 ch @ 30fps or 1ch @60fps</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4738</td>
-<td align="left"><span>multicam app : Incorrect mapping of camera channels to CSI2 virtual channels</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4737</td>
-<td align="left"><span>Broken link in the vision apps documentation to logs</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4577</td>
-<td align="left"><span>PTK SFM/Valet parking demos throw error</span></td>
+<td align="center">ADASVISION-2344</td>
+<td align="left"><span>Utils: UDMA init error intermittently on C7x when running in Linux+RTOS mode</span></td>
 </tr>
 </tbody>
 </table>
@@ -303,52 +293,12 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-4925</td>
-<td align="left"><span>Bandwidth performance values in certain applications are incorrect</span></td>
+<td align="center">ADASVISION-4583</td>
+<td align="left"><span>C6x Memory Leak in TIDL Demos</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4923</td>
-<td align="left"><span>Frozen frame running OpenVX graphs back to back </span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4911</td>
-<td align="left"><span>C7x L2RAM heap size incorrect</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4906</td>
-<td align="left"><span>Python tool for updating memory map does not generate free RTOS files</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4902</td>
-<td align="left"><span>Mosaic node performance inefficiency</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4876</td>
-<td align="left"><span>Performance degradation observed on some vision apps demos</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4874</td>
-<td align="left"><span>8-camera use case fails with FreeRTOS</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4873</td>
-<td align="left"><span>[IMGPreProcNode]: BT601 limited range CSC coefficients causes clipping</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4864</td>
-<td align="left"><span>Instability in heterogeneous camera</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4799</td>
-<td align="left"><span>QNX: SRV Broadcast Mode Unreliable</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4777</td>
-<td align="left"><span>DOF app output differs between release vs debug on PC mode</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4776</td>
-<td align="left"><span>SFM apps output differs for each run on PC mode</span></td>
+<td align="center">ADASVISION-4577</td>
+<td align="left"><span>PTK SFM/Valet parking demos throw error</span></td>
 </tr>
 <tr class="odd">
 <td align="center">ADASVISION-4422</td>
@@ -364,7 +314,7 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-4386</td>
-<td align="left"><span>QNX SBL debug binaries not working on R5F</span></td>
+<td align="left"><span>Exception in IPC on R5's with QNX SBL debug binaries</span></td>
 </tr>
 <tr class="odd">
 <td align="center">ADASVISION-4199</td>
@@ -380,11 +330,15 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-4080</td>
-<td align="left"><span>QNX: SRV File I/O failing</span></td>
+<td align="left"><span>SRV File I/O is failing</span></td>
 </tr>
 <tr class="odd">
 <td align="center">ADASVISION-4039</td>
 <td align="left"><span>Frame drops in 8 camera, 30 fps demo</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-4570</td>
+<td align="left"><span>Open Klocwork bugs in video codec library</span></td>
 </tr>
 </tbody>
 </table>
@@ -409,44 +363,7 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </tbody>
 </table>
-</table>
-<h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
-<table>
-<thead>
-<tr class="header">
-<th align="center">ID</th>
-<th align="left">Headline</th>
-<th align="left">Original Fix Version</th>
-<th align="left">New Fix Version</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">JACINTOREQ-1540</a></td>
-<td align="left"><span>J7ES Flex connect scope change</span></td>
-<td align="left"><span>08.00.00</span></td>
-<td align="left"><span>08.01.00</span></td>
-</tr>
-<tr class="even">
-<td align="center">JACINTOREQ-1465</a></td>
-<td align="left"><span>Descope Windows build/installer for J7ES RTOS SDK</span></td>
-<td align="left"><span>08.00.00</span></td>
-<td align="left"><span>Descoped</span></td>
-</tr>
-<tr class="odd">
-<td align="center">JACINTOREQ-1444</a></td>
-<td align="left"><span>Vision apps firmware inclusion in yocto build</span></td>
-<td align="left"><span>08.00.00</span></td>
-<td align="left"><span>Descoped</span></td>
-</tr>
-<tr class="even">
-<td align="center">JACINTOREQ-1244</a></td>
-<td align="left"><span>Descope RTOS-Based Codecs and OpenVX codec nodes</span></td>
-<td align="left"><span>08.00.00</span></td>
-<td align="left"><span>Descoped</span></td>
-</tr>
-</tbody>
-</table>
+
 <p>
 <hr>
 <p>
