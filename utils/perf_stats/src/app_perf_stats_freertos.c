@@ -311,6 +311,15 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
 
                 appPerfStatsLock(obj);
 
+                static uint32_t is_first_time_load = 1;
+
+                if (is_first_time_load)
+                {
+                    LoadP_reset();
+
+                    is_first_time_load = 0;
+                }
+
                 /* Multiplying by 100 to show decimal points when printing */
                 cpu_load->cpu_load = 100 * LoadP_getCPULoad();
 
