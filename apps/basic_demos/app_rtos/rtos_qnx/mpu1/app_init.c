@@ -96,7 +96,7 @@ int32_t appCommonInit()
 
     pthread_mutex_lock(&gMutex);
 
-    if (gInitStatus == 0U)
+    if (gInitCount == 0U)
     {
         status = appCommonInitLocal();
     }
