@@ -13,7 +13,7 @@ endif
 
 FIRMWARE_SUBFOLDER?=vision_apps_evm
 UENV_NAME?=uEnv_vision_apps.txt
-LINUX_FS_STAGE_PATH = /tmp/tivision_apps_targetfs_stage
+LINUX_FS_STAGE_PATH?=/tmp/tivision_apps_targetfs_stage
 
 linux_fs_stage:
 	@rm -rf $(LINUX_FS_STAGE_PATH)
