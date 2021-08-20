@@ -664,7 +664,13 @@ static int app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
           obj->is_interactive = 0;
           /* display_option must be set to 1 in order for the checksums
               to come out correctly */
+#ifndef x86_64
+          printf("Turning display option on ... \n");
           obj->display_option = 1;
+#else
+          printf("Turning display option off ... \n");
+          obj->display_option = 0;
+#endif
         }
     }
 
@@ -719,6 +725,7 @@ static int app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
     }
 
     #ifdef x86_64
+    printf("Turning display option off ... \n");
     obj->display_option = 0;
     obj->is_interactive = 0;
     #endif
@@ -1111,14 +1118,17 @@ static vx_status app_run_graph_for_one_frame(AppObj *obj, char *curFileName, vx_
             {
                 test_result = vx_false_e;
             }
+            /* in case test fails and needs to change */
+            populate_gatherer(0 + (obj->test_case*2), counter, tensor_actual_checksum);
+#ifndef x86_64
             if(vx_false_e == app_test_check_image(obj->disp_image, checksums_expected[1+(2*obj->test_case)][counter],
                                                     &display_actual_checksum))
             {
                 test_result = vx_false_e;
             }
-            /* in case test fails and needs to change */
-            populate_gatherer(0 + (obj->test_case*2), counter, tensor_actual_checksum);
             populate_gatherer(1 + (obj->test_case*2), counter, display_actual_checksum);
+#endif
+
         }
     }
 

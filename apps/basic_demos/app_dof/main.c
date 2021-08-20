@@ -309,7 +309,7 @@ static vx_status app_init(AppObj *obj)
     {
         status = app_init_display2( obj->context, &obj->displayObj , "display2Obj");
     }
-    if (1 == obj->displayObj.display_option && (!obj->test_mode))
+    if (1 == obj->displayObj.display_option)
     {
         appGrpxInitParamsInit(&grpx_prms, obj->context);
         grpx_prms.draw_callback = app_draw_graphics;
@@ -1385,7 +1385,6 @@ static void app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 #else
         obj->displayObj.display_option = 0;
 #endif
-	obj->displayObj.display_option = 1;
         /* starting file number + 2 frames required to queue up dof
             + the number of checksums availble */
         obj->end_fileno = (obj->start_fileno+1) + 2 +

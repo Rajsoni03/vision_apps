@@ -148,6 +148,7 @@ static void populate_gatherer(vx_uint32 set_idx, vx_uint32 sample_idx, vx_uint32
 }
 
 // #define CHECK_MIDDLE
+#ifndef x86_64
 static vx_bool app_test_check_image(vx_image img, vx_uint32 expected_checksum,
                              vx_uint32 *actual_checksum)
 {
@@ -199,6 +200,7 @@ static vx_bool app_test_check_image(vx_image img, vx_uint32 expected_checksum,
     }
     return return_bool;
 }
+#endif
 
 static vx_bool app_test_check_tensor(vx_tensor output_tensor, vx_size data_type,
                                 vx_uint32 out_width, vx_uint32 out_pad_left,
