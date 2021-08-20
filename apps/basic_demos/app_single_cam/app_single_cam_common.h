@@ -195,6 +195,9 @@ typedef struct {
     uint8_t* fs_dcc_buf_ldc;
     uint32_t fs_dcc_numbytes_ldc;
 #endif
+#ifdef VPAC3
+    uint32_t vpac3_dual_fcp_enable;
+#endif
 } AppObj;
 
 vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode);

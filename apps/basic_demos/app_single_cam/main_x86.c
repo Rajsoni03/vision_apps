@@ -374,10 +374,13 @@ Therefore, first 2 output images will have wrong colors
         APP_ASSERT(numBytesFileIO >= 0);
 
 #ifdef VPAC3
-        snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/viss/img_viss_%04d.yuv12", obj->test_folder_root, i);
-        APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
-        numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->y12);
-        APP_ASSERT(numBytesFileIO >= 0);
+        if (obj->vpac3_dual_fcp_enable)
+        {
+            snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/viss/img_viss_%04d.yuv12", obj->test_folder_root, i);
+            APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
+            numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->y12);
+            APP_ASSERT(numBytesFileIO >= 0);
+        }
 #endif
         snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/h3a/img_h3a_%04d.bin", obj->test_folder_root, i);
         APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
@@ -550,6 +553,14 @@ static void x86_app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
             obj->ldc_enable = atoi(token);
             APP_PRINTF(" ldc_enable = [%d]\n", obj->ldc_enable);
         }
+#ifdef VPAC3
+        else if(strcmp(token, "vpac3_dual_fcp_enable")==0)
+        {
+            token = strtok(NULL, s);
+            obj->vpac3_dual_fcp_enable = atoi(token);
+            APP_PRINTF(" vpac3_dual_fcp_enable = [%d]\n", obj->vpac3_dual_fcp_enable);
+        }
+#endif
     }
 
     fclose(fp);
