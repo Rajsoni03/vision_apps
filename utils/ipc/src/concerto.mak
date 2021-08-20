@@ -24,6 +24,7 @@ DEFS+=SOC_J7
 endif
 
 ifeq ($(TARGET_OS), QNX)
+IDIRS += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx
 IDIRS += $(PDK_QNX_PATH)/packages/ti/drv/ipc/
 IDIRS += $(PDK_QNX_PATH)/packages/
 CSOURCES += app_ipc_qnx.c
