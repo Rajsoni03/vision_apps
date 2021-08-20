@@ -115,7 +115,7 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
     vx_rectangle_t rect;
     vx_map_id map_id1, map_id2;
     void *data_ptr1, *data_ptr2;
-    vx_uint32 num_bytes_per_pixel = 1;
+    vx_uint32 num_bytes_per_pixel4;
     vx_uint32 num_luma_bytes_written_to_file=0;
     vx_uint32 num_chroma_bytes_written_to_file=0;
     vx_uint32 num_bytes_written_to_file=0;
@@ -129,11 +129,15 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
 
     if(VX_DF_IMAGE_NV12 == df)
     {
-        num_bytes_per_pixel = 1;
+        num_bytes_per_pixel4 = 4;
+    }
+    else if(TIVX_DF_IMAGE_NV12_P12 == df)
+    {
+        num_bytes_per_pixel4 = 6;
     }
     else
     {
-        num_bytes_per_pixel = 2;
+        num_bytes_per_pixel4 = 8;
     }
 
     rect.start_x = 0;
@@ -171,7 +175,7 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
 
     for(i=0;i<height;i++)
     {
-        num_luma_bytes_written_to_file  += fwrite(data_ptr1, 1, width*num_bytes_per_pixel, fp);
+        num_luma_bytes_written_to_file  += fwrite(data_ptr1, 1, width*num_bytes_per_pixel4/4, fp);
         data_ptr1 += imgaddr_stride;
     }
     vxUnmapImagePatch(out_image, map_id1);
@@ -179,7 +183,7 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
     fflush(fp);
 
 
-    if(VX_DF_IMAGE_NV12 == df)
+    if(VX_DF_IMAGE_NV12 == df || TIVX_DF_IMAGE_NV12_P12 == df)
     {
         vxMapImagePatch(out_image,
             &rect,
@@ -205,7 +209,7 @@ vx_int32 write_output_image_fp(FILE * fp, vx_image out_image)
         num_chroma_bytes_written_to_file = 0;
         for(i=0;i<imgaddr_height/2;i++)
         {
-            num_chroma_bytes_written_to_file  += fwrite(data_ptr2, 1, imgaddr_width*num_bytes_per_pixel, fp);
+            num_chroma_bytes_written_to_file  += fwrite(data_ptr2, 1, imgaddr_width*num_bytes_per_pixel4/4, fp);
             data_ptr2 += imgaddr_stride;
         }
 
@@ -706,9 +710,13 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->num_viss_out_buf = 3;
     obj->y8_r8_c2 = vxCreateImage(obj->context, image_width, image_height, VX_DF_IMAGE_NV12);
     obj->uv8_g8_c3 = NULL;
-
+#ifndef VPAC3
     obj->y12 = NULL;
     obj->uv12_c1 = NULL;
+#else // YUV12 output for dual CC for MV
+    obj->y12 = vxCreateImage(obj->context, image_width, image_height, TIVX_DF_IMAGE_NV12_P12);
+    obj->uv12_c1 = NULL;
+#endif
     obj->s8_b8_c4 = NULL;
     obj->histogram = NULL;
 
@@ -725,8 +733,29 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->viss_params.h3a_in = 3;
     obj->viss_params.h3a_aewb_af_mode = 0;
     obj->viss_params.channel_id = obj->selectedCam;
-
     obj->viss_params.fcp[0].chroma_mode = 0;
+
+#ifdef VPAC3 // turn on CAC, dual FCP, and YUV12 output
+    obj->viss_params.bypass_cac = 0;  //CAC on
+    obj->viss_params.fcp1_config = 1; //RAWFE --> FCP1
+    obj->viss_params.fcp[0].mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
+
+    obj->viss_params.output_fcp_mapping[0] = 1;
+    obj->viss_params.output_fcp_mapping[1] = 1;
+    obj->viss_params.output_fcp_mapping[2] = 2;
+    obj->viss_params.output_fcp_mapping[3] = 2;
+    obj->viss_params.output_fcp_mapping[4] = 1;
+
+    obj->viss_params.fcp[1].mux_output0 = TIVX_VPAC_VISS_MUX0_NV12_P12;
+    obj->viss_params.fcp[1].mux_output1 = TIVX_VPAC_VISS_MUX0_NV12_P12;
+    obj->viss_params.fcp[1].mux_output2 = 4;
+    obj->viss_params.fcp[1].mux_output3 = 0;
+    obj->viss_params.fcp[1].mux_output4 = 3;
+
+    obj->viss_params.fcp[1].ee_mode = 0;
+    obj->viss_params.fcp[1].chroma_mode = 0;
+#endif
+
     if(sensor_wdr_enabled == 1)
     {
         obj->viss_params.bypass_glbce = 0;
@@ -815,7 +844,11 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
                                 obj->configuration,
                                 NULL,
                                 obj->dcc_param_viss,
+#ifndef VPAC3
                                 obj->raw, NULL, NULL,
+#else // YUV12 output for dual CC MV
+                                obj->raw, obj->y12, NULL,
+#endif
                                 obj->y8_r8_c2, NULL, NULL,
                                 obj->h3a_aew_af, NULL, NULL, NULL
             );
@@ -876,7 +909,13 @@ vx_status app_delete_viss(AppObj *obj)
         APP_PRINTF("releasing y8_r8_c2\n");
         status |= vxReleaseImage(&obj->y8_r8_c2);
     }
-
+#ifdef VPAC3
+    if(NULL != obj->y12)
+    {
+        APP_PRINTF("releasing y12\n");
+        status |= vxReleaseImage(&obj->y12);
+    }
+#endif
     if(NULL != obj->uv8_g8_c3)
     {
         APP_PRINTF("releasing uv8_g8_c3\n");

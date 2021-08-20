@@ -496,11 +496,13 @@ static uint8_t is_viss_plugin(uint32_t plugin_id)
         case DCC_ID_VISS_LSC:
         case DCC_ID_VISS_DPC:
         case DCC_ID_VISS_YEE:
+        case DCC_ID_RAWFE_WB1_VS:
 #ifdef VPAC3
         case DCC_ID_VISS_CFAI3_A:
         case DCC_ID_VISS_CFAI3_B:
         case DCC_ID_VISS_CAC:
         case DCC_ID_VISS_RAWHIST:
+        case DCC_ID_VISS_CCMV:
 #endif
             return 1U;
             break;

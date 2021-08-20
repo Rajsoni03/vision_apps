@@ -373,6 +373,12 @@ Therefore, first 2 output images will have wrong colors
         numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->y8_r8_c2);
         APP_ASSERT(numBytesFileIO >= 0);
 
+#ifdef VPAC3
+        snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/viss/img_viss_%04d.yuv12", obj->test_folder_root, i);
+        APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
+        numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->y12);
+        APP_ASSERT(numBytesFileIO >= 0);
+#endif
         snprintf(output_file_name_img, APP_MAX_FILE_PATH, "%s/output/h3a/img_h3a_%04d.bin", obj->test_folder_root, i);
         APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
         numBytesFileIO = write_h3a_image(output_file_name_img, obj->h3a_aew_af);
