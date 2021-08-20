@@ -124,7 +124,6 @@ ifeq ($(BUILD_CPU_C7x_1),yes)
 	cp -P $(TIDL_PATH)/onnxrt_EP/out/J7/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp $(TIDL_PATH)/rt/out/J7/A72/LINUX/$(LINUX_APP_PROFILE)/*.out  $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 	cp -r $(TIDL_PATH)/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
-	cp -r $(TIDL_PATH)/test/notebooks/ $(LINUX_FS_STAGE_PATH)/opt/notebooks/
 endif
 	sync
 
