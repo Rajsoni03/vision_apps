@@ -201,11 +201,912 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
             tivxMemBufferMap(in_img_target_ptr[1], in_img_desc->mem_size[1], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
         }
 
-        VX_PRINT(VX_ZONE_ERROR, "DL Pre-proc target kernel not implemented!...\n");
-
         out_tensor_desc = (tivx_obj_desc_tensor_t *)obj_desc[TIVX_KERNEL_DL_PRE_PROC_OUTPUT_TENSOR_IDX];
         out_tensor_target_ptr = tivxMemShared2TargetPtr(&out_tensor_desc->mem_ptr);
         tivxMemBufferMap(out_tensor_target_ptr, out_tensor_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
+
+        tivxDLPreProcParams *dlParams = (tivxDLPreProcParams *)config_target_ptr;
+
+        vx_df_image image_format = in_img_desc->format;
+        uint32_t tensor_format = dlParams->tensor_format;
+        uint32_t channel_order = dlParams->channel_order;
+        uint32_t tensor_data_type = out_tensor_desc->data_type;
+
+        if(image_format == VX_DF_IMAGE_RGB)
+        {
+            if(channel_order == TIVX_DL_PRE_PROC_CHANNEL_ORDER_NHWC)
+            {
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_RGB)
+                {
+                    /* Case 1 */
+                    /* Input is RGB, Output is RGB (NHWC) bit-depth unsigned 8-bit */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            uint8_t *pOut = (uint8_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[offset + 0] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            int16_t *pOut = (int16_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int16_t R = pIn[offset + 0];
+                                int16_t G = pIn[offset + 1];
+                                int16_t B = pIn[offset + 2];
+
+                                pOut[offset + 0] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            uint16_t *pOut = (uint16_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint16_t R = pIn[offset + 0];
+                                uint16_t G = pIn[offset + 1];
+                                uint16_t B = pIn[offset + 2];
+
+                                pOut[offset + 0] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            int32_t *pOut = (int32_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int32_t R = pIn[offset + 0];
+                                int32_t G = pIn[offset + 1];
+                                int32_t B = pIn[offset + 2];
+
+                                pOut[offset + 0] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            uint32_t *pOut = (uint32_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint32_t R = pIn[offset + 0];
+                                uint32_t G = pIn[offset + 1];
+                                uint32_t B = pIn[offset + 2];
+
+                                pOut[offset + 0] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            float *pOut = (float *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R = pIn[offset + 0] * 1.0f;
+                                float G = pIn[offset + 1] * 1.0f;
+                                float B = pIn[offset + 2] * 1.0f;
+
+                                pOut[offset + 0] = (float)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (float)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (float)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                }
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR)
+                {
+                    /* Case 2 */
+                    /* Input is RGB, Output is BGR (NHWC) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            uint8_t *pOut = (uint8_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[offset + 2] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            int16_t *pOut = (int16_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int16_t R = pIn[offset + 0];
+                                int16_t G = pIn[offset + 1];
+                                int16_t B = pIn[offset + 2];
+
+                                pOut[offset + 2] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            uint16_t *pOut = (uint16_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint16_t R = pIn[offset + 0];
+                                uint16_t G = pIn[offset + 1];
+                                uint16_t B = pIn[offset + 2];
+
+                                pOut[offset + 2] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            int32_t *pOut = (int32_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int32_t R = pIn[offset + 0];
+                                int32_t G = pIn[offset + 1];
+                                int32_t B = pIn[offset + 2];
+
+                                pOut[offset + 2] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            uint32_t *pOut = (uint32_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint32_t R = pIn[offset + 0];
+                                uint32_t G = pIn[offset + 1];
+                                uint32_t B = pIn[offset + 2];
+
+                                pOut[offset + 2] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t pos_x, pos_y;
+
+                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            float *pOut = (float *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R = pIn[offset + 0] * 1.0f;
+                                float G = pIn[offset + 1] * 1.0f;
+                                float B = pIn[offset + 2] * 1.0f;
+
+                                pOut[offset + 2] = (float)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (float)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (float)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                }
+            }
+            if(channel_order == TIVX_DL_PRE_PROC_CHANNEL_ORDER_NCHW)
+            {
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_RGB)
+                {
+                    /* Case 3 */
+                    /* Input is RGB Output is RGB (NCHW) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pOut = (uint8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            int16_t *pOut = (int16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int16_t R = pIn[offset + 0];
+                                int16_t G = pIn[offset + 1];
+                                int16_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint16_t *pOut = (uint16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint16_t R = pIn[offset + 0];
+                                uint16_t G = pIn[offset + 1];
+                                uint16_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            int32_t *pOut = (int32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int32_t R = pIn[offset + 0];
+                                int32_t G = pIn[offset + 1];
+                                int32_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint32_t *pOut = (uint32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint32_t R = pIn[offset + 0];
+                                uint32_t G = pIn[offset + 1];
+                                uint32_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            float *pOut = (float *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R = pIn[offset + 0];
+                                float G = pIn[offset + 1];
+                                float B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (float)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (float)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (float)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                }
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR)
+                {
+                    /* Case 4 */
+                    /* Input is RGB Output is BGR (NCHW) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pOut = (uint8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            int16_t *pOut = (int16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int16_t R = pIn[offset + 0];
+                                int16_t G = pIn[offset + 1];
+                                int16_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint16_t *pOut = (uint16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint16_t R = pIn[offset + 0];
+                                uint16_t G = pIn[offset + 1];
+                                uint16_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            int32_t *pOut = (int32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                int32_t R = pIn[offset + 0];
+                                int32_t G = pIn[offset + 1];
+                                int32_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint32_t *pOut = (uint32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint32_t R = pIn[offset + 0];
+                                uint32_t G = pIn[offset + 1];
+                                uint32_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+                        uint32_t pos_x, pos_y;
+
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            float *pOut = (float *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R = pIn[offset + 0];
+                                float G = pIn[offset + 1];
+                                float B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (float)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (float)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (float)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(image_format == VX_DF_IMAGE_NV12)
+        {
+            if(channel_order == TIVX_DL_PRE_PROC_CHANNEL_ORDER_NHWC)
+            {
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_RGB)
+                {
+                    /* Case 1 */
+                    /* Input is NV12, Output is RGB (NHWC) */
+                }
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR)
+                {
+                    /* Case 2 */
+                    /* Input is NV12,  Output is BGR (NHWC) */
+                }
+            }
+            if(channel_order == TIVX_DL_PRE_PROC_CHANNEL_ORDER_NCHW)
+            {
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_RGB)
+                {
+                    /* Case 3 */
+                    /* Input is NV12, Output is RGB (NCHW) */
+                }
+                if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR)
+                {
+                    /* Case 4 */
+                    /* Input is NV12, Output is BGR (NCHW) */
+                }
+            }
+        }
+
 
         /* Write DL pre proc operation here */
         tivxMemBufferUnmap(out_tensor_target_ptr, out_tensor_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);

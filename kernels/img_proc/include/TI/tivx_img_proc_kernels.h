@@ -196,10 +196,26 @@ extern "C" {
 #define TIVX_IMG_PROC_POSE_VIZ_RESET_BACKGROUND    (0xF00F)
 #define TIVX_IMG_PROC_VIZ_LOC_RESET_POSE           (0xFFEF)
 
+/* Supported tensor formats in dl-pre-proc */
+#define TIVX_DL_PRE_PROC_TENSOR_FORMAT_RGB   (0)
+#define TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR   (1)
+
+/* Supported channel ordering in dl-pre-proc */
+#define TIVX_DL_PRE_PROC_CHANNEL_ORDER_NCHW   (0)
+#define TIVX_DL_PRE_PROC_CHANNEL_ORDER_NHWC   (1)
+
+/* Supported crop indexes in dl-pre-proc */
+#define TIVX_DL_PRE_PROC_IMAGE_CROP_TOP     (0)
+#define TIVX_DL_PRE_PROC_IMAGE_CROP_BOTTOM  (1)
+#define TIVX_DL_PRE_PROC_IMAGE_CROP_LEFT    (2)
+#define TIVX_DL_PRE_PROC_IMAGE_CROP_RIGHT   (3)
+
+/* Macros to indicate max outputs, classes and colors in dl-draw-box */
 #define TIVX_DL_DRAW_BOX_MAX_OUTPUTS       (4U)
 #define TIVX_DL_DRAW_BOX_MAX_CLASSES       (256U)
 #define TIVX_DL_DRAW_BOX_MAX_COLORS        (3U)
 
+/* Macros to indicate max outputs, classes and colors in dl-color-blend */
 #define TIVX_DL_COLOR_BLEND_MAX_OUTPUTS    (4U)
 #define TIVX_DL_COLOR_BLEND_MAX_CLASSES    (256U)
 #define TIVX_DL_COLOR_BLEND_MAX_COLORS     (3U)
@@ -690,6 +706,9 @@ typedef struct {
 
   /* Channel ordering, 0-NCHW, 1-NHWC */
   vx_int32 channel_order;
+
+  /* Tensor format, 0-RGB, 1-BGR */
+  vx_int32 tensor_format;
 
   /* Crop values to be applied, 0-Top, 1-Bottom, 2-Right, 3-Left */
   vx_int32 crop[4];
