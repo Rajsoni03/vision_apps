@@ -718,7 +718,7 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->uv12_c1 = NULL;
 
 #ifdef VPAC3
-    // YUV12 output from dual CC for MV
+    /* YUV12 output from dual CC for MV */
     if (obj->vpac3_dual_fcp_enable)
     {
         obj->y12 = vxCreateImage(obj->context, image_width, image_height, TIVX_DF_IMAGE_NV12_P12);
@@ -744,11 +744,12 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->viss_params.channel_id = obj->selectedCam;
     obj->viss_params.fcp[0].chroma_mode = 0;
 
-#ifdef VPAC3 // turn on CAC, dual FCP, and YUV12 output
+#ifdef VPAC3
+    /* turn on CAC, dual FCP, and YUV12 output */
     if (obj->vpac3_dual_fcp_enable)
     {
-        obj->viss_params.bypass_cac = 0;  //CAC on
-        obj->viss_params.fcp1_config = 1; //RAWFE --> FCP1
+        obj->viss_params.bypass_cac = 0;  /* CAC on */
+        obj->viss_params.fcp1_config = 1; /* RAWFE --> FCP1 */
         obj->viss_params.fcp[0].mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
 
         obj->viss_params.output_fcp_mapping[0] = 1;
