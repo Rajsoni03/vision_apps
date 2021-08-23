@@ -90,6 +90,10 @@ ipk_package: linux_fs_install
 		(cd $(PSDK_PATH)/$$folder && find . -name '*.h' -print | tar --create --files-from -) | (cd $(IPK_TMP_PATH)/$(IPK_TARGET_INC_PATH)/$$folder && tar xfp -); \
 	done
 
+	@#Pull up the kernels_j7 folder at tiovx level and remove tiovx_dev similar to release package
+	mv $(IPK_TMP_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev/kernels_j7 $(IPK_TMP_PATH)/$(IPK_TARGET_INC_PATH)/tiovx
+	rm -rf $(IPK_TMP_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev
+
 	# form data.tar
 	tar czf $(VISION_APPS_TMP_PATH)/data.tar.gz -C $(IPK_TMP_PATH) .
 
