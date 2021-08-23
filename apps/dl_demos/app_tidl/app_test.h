@@ -76,8 +76,13 @@ static vx_bool test_result = vx_true_e;
 #define NUM_CHECKSUM_SETS 2*NUM_TEST_CASES
 #define NUM_CHECKSUM_SAMPLES 8
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
+#ifndef x86_64
   {0x4dac6e90,0x80f4d058,0x6986ebc3,0x39ae9c27,
   0x152fa7fa,0xe0701ed0,0xcc262697,0x7b081fc4},
+#else
+  {0x4dac6e90,0x80f4d058,0x6986ebc3,0x39ae9c27,
+  0x152fa7fa,0xe0701ed0,0xcc262697,0x89ca86ff},
+#endif
   {0x6845d031,0xe776ef6c,0x8dc6215b,0xc68e2cbe,
   0x4b937760,0x27aee47f,0xbfb13f72,0xa4e3bc17},
   {0x01800000,0x47ba55e9,0x47da47d4,0x39c4ecc5,

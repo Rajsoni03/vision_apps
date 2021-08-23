@@ -1104,7 +1104,7 @@ static vx_status app_run_graph_for_one_frame(AppObj *obj, char *curFileName, vx_
         /* Check that you are within the first n frames, where n is the number
             of samples in the checksums_expected */
         if ((obj->test_mode == 1) &&
-            (counter < (sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0]))))
+            (counter < ((sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0]))-1)))
         {
             /* numOutputbuf is 1 here, but for the sake of generalizing
                 in the future, the loop will remain */
