@@ -60,7 +60,10 @@
  *
  */
 
-#include "app_single_cam_common.h"
+// #include "app_single_cam_common.h"
+#define APP_DEBUG_SINGLE_CAM
+
+#include "app_test.h"
 
 static AppObj g_AppObj;
 IssAeDynamicParams g_ae_dynPrms=
@@ -77,17 +80,42 @@ static void x86_app_delete_graph(AppObj *obj);
 int main(int argc, char* argv[])
 {
     AppObj *obj = &g_AppObj;
-    x86_app_parse_cmd_line_args(obj, argc, argv);
-    x86_app_init(obj);
-    APP_PRINTF("x86_app_init done\n");
-    x86_app_create_graph(obj);
-    APP_PRINTF("x86_app_create_graph done\n");
-    x86_app_run_graph(obj);
-    APP_PRINTF("x86_app_run_graph done\n");
+    vx_status status = VX_SUCCESS;
+    if(status == VX_SUCCESS)
+    {
+        x86_app_parse_cmd_line_args(obj, argc, argv);
+        x86_app_init(obj);
+        APP_PRINTF("x86_app_init done\n");
+    }
+    if(status == VX_SUCCESS)
+    {
+        status = x86_app_create_graph(obj);
+        APP_PRINTF("x86_app_create_graph done\n");
+    }
+    if(status == VX_SUCCESS)
+    {
+        status = x86_app_run_graph(obj);
+        APP_PRINTF("x86_app_run_graph done\n");
+    }
     x86_app_delete_graph(obj);
     APP_PRINTF("x86_app_delete_graph done\n");
     x86_app_deinit(obj);
     APP_PRINTF("x86_app_deinit done\n");
+    printf("obj->test_mode = %d\n", obj->test_mode);
+    printf("obj->sensor_sel = %d\n", obj->sensor_sel);
+    if(obj->test_mode == 1)
+    {
+        if((test_result == vx_false_e) || (status == VX_FAILURE))
+        {
+            printf("\n\nTEST FAILED\n\n");
+            print_new_checksum_structs();
+            status = (status == VX_SUCCESS) ? VX_FAILURE : status;
+        }
+        else
+        {
+            printf("\n\nTEST PASSED\n\n");
+        }
+    }
     return 0;
 }
 static void x86_app_init(AppObj *obj)
@@ -350,8 +378,14 @@ Therefore, first 2 output images will have wrong colors
 
     for(i=obj->start_seq; i<obj->num_frames_to_process; i++)
     {
-        snprintf(input_file_name, APP_MAX_FILE_PATH, "%s/input/img_%04d.raw", obj->test_folder_root, i);
-        
+        if (obj->test_mode == 1)
+        {
+            snprintf(input_file_name, APP_MAX_FILE_PATH, "%s/input2.raw", obj->test_folder_root);
+        }
+        else
+        {
+            snprintf(input_file_name, APP_MAX_FILE_PATH, "%s/input/img_%04d.raw", obj->test_folder_root, i);
+        }
         APP_PRINTF(" : Loading [%s] ...\n", input_file_name);
         if(-1 == read_test_image_raw(input_file_name, obj->raw, 2))
         {
@@ -419,6 +453,27 @@ Therefore, first 2 output images will have wrong colors
             APP_PRINTF(" : Saving [%s] ...\n", output_file_name_img);
             numBytesFileIO = write_output_image_nv12_8bit(output_file_name_img, obj->ldc_out);
             APP_ASSERT(numBytesFileIO >= 0);
+            if((obj->test_mode == 1) && (i > TEST_BUFFER) && (status == VX_SUCCESS))
+            {
+                vx_uint32 actual_checksum = 0;
+                if(app_test_check_image(obj->ldc_out, checksums_expected[obj->sensor_sel][0], &actual_checksum) == vx_false_e)
+                {
+                    test_result = vx_false_e;
+                }
+                populate_gatherer(obj->sensor_sel, 0, actual_checksum);
+            }
+        }
+        else
+        {
+            if((obj->test_mode == 1) && (i > TEST_BUFFER) && (status == VX_SUCCESS))
+            {
+                vx_uint32 actual_checksum = 0;
+                if(app_test_check_image(obj->y8_r8_c2, checksums_expected[obj->sensor_sel][0], &actual_checksum) == vx_false_e)
+                {
+                    test_result = vx_false_e;
+                }
+                populate_gatherer(obj->sensor_sel, 0, actual_checksum);
+            }
         }
     }
 
@@ -579,7 +634,9 @@ static void x86_app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
 static void x86_app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 {
     int i;
+    vx_int8 sensor_override = 0xFF;
 
+    vx_bool set_test_mode = vx_false_e;
     app_set_cfg_default(obj);
 
     if(argc==1)
@@ -598,14 +655,37 @@ static void x86_app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
                 app_show_usage(argc, argv);
             }
             x86_app_parse_cfg_file(obj, argv[i]);
-
-            break;
         }
         else
         if(strcmp(argv[i], "--help")==0)
         {
             app_show_usage(argc, argv);
             exit(0);
+        }
+        else
+        if(strcmp(argv[i], "--test")==0)
+        {
+            set_test_mode = vx_true_e;
+        }
+        if(strcmp(argv[i], "--sensor")==0)
+        {
+            // check to see if there is another argument following --sensor
+            if (argc > i+1)
+            {
+                sensor_override = atoi(argv[i+1]);
+                // increment i again to avoid this arg
+                i++;
+            }
+        }
+    }
+    if(set_test_mode == vx_true_e)
+    {
+        obj->test_mode = 1;
+        obj->num_frames_to_process = 10;
+        obj->start_seq = 0;
+        if (sensor_override != 0xFF)
+        {
+            obj->sensor_sel = sensor_override;
         }
     }
 }

@@ -59,7 +59,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#include "app_single_cam_main.h"
+#ifdef x86_64
+#include "app_single_cam_common.h"
+#endif
 #include "tivx_utils_checksum.h"
 
 /* checksums for each of the particular sensors */
@@ -67,11 +69,17 @@ static vx_bool test_result = vx_true_e;
 #define NUM_CHECKSUM_SETS 2
 #define NUM_CHECKSUM_SAMPLES 1
 #define NUM_FRAMES 60
+#ifndef x86_64
 #define TEST_BUFFER 30
+#else
+#define TEST_BUFFER 5
+#endif
+#define _APP_DEBUG_
+#define APP_DEBUG
 
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
-  {0xd0d87252},
-  {0xd7067b54}
+  {0x4d0a61d6},
+  {0x4a4e3720}
 };
 
 /* use this to get new checksums if the input data
