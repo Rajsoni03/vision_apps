@@ -71,6 +71,25 @@
 #include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>
 
+
+#define DL_PRE_PROC_8BIT_UNSIGNED_MIN (   0.0f)
+#define DL_PRE_PROC_8BIT_UNSIGNED_MAX ( 255.0f)
+#define DL_PRE_PROC_8BIT_SIGNED_MIN   (-128.0f)
+#define DL_PRE_PROC_8BIT_SIGNED_MAX   ( 127.0f)
+
+#define DL_PRE_PROC_16BIT_UNSIGNED_MIN (   0.0f)
+#define DL_PRE_PROC_16BIT_UNSIGNED_MAX ( 255.0f)
+#define DL_PRE_PROC_16BIT_SIGNED_MIN   (-128.0f)
+#define DL_PRE_PROC_16BIT_SIGNED_MAX   ( 127.0f)
+
+#define DL_PRE_PROC_32BIT_UNSIGNED_MIN (   0.0f)
+#define DL_PRE_PROC_32BIT_UNSIGNED_MAX ( 255.0f)
+#define DL_PRE_PROC_32BIT_SIGNED_MIN   (-128.0f)
+#define DL_PRE_PROC_32BIT_SIGNED_MAX   ( 127.0f)
+
+#define DL_PRE_PROC_FLOAT_MIN (   0.0f)
+#define DL_PRE_PROC_FLOAT_MAX ( 255.0f)
+
 static tivx_target_kernel vx_dl_pre_proc_target_kernel = NULL;
 
 static vx_status VX_CALLBACK tivxKernelDLPreProcCreate
@@ -141,6 +160,30 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcDelete(
     return (status);
 }
 
+static inline void convertYCbCrToRGB(int32_t Y, int32_t Cb, int32_t Cr, float *R, float *G, float *B, float min_val, float max_val)
+{
+    Y  = Y - 16;
+    Cb = Cb - 128;
+    Cr = Cr - 128;
+
+    float R_ = (float)((298*Y + 409*Cr) >> 8);
+    float G_ = (float)((298*Y - 100*Cb - 208*Cr) >> 8);
+    float B_ = (float)((298*Y + 516*Cb) >> 8);
+
+    if(R_ < min_val) { R_ = min_val; }
+    if(R_ > max_val) { R_ = max_val; }
+
+    if(G_ < min_val) { G_ = min_val; }
+    if(G_ > max_val) { G_ = max_val; }
+
+    if(B_ < min_val) { B_ = min_val; }
+    if(B_ > max_val) { B_ = max_val; }
+
+    *R = R_;
+    *G = G_;
+    *B = B_;
+}
+
 static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 (
     tivx_target_kernel_instance kernel,
@@ -205,12 +248,45 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
         out_tensor_target_ptr = tivxMemShared2TargetPtr(&out_tensor_desc->mem_ptr);
         tivxMemBufferMap(out_tensor_target_ptr, out_tensor_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
 
+        VX_PRINT(VX_ZONE_INFO, "Image channel 0\n");
+        VX_PRINT(VX_ZONE_INFO, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
+        VX_PRINT(VX_ZONE_INFO, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
+        VX_PRINT(VX_ZONE_INFO, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
+        VX_PRINT(VX_ZONE_INFO, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
+        VX_PRINT(VX_ZONE_INFO, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
+        VX_PRINT(VX_ZONE_INFO, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
+
+        if(in_img_target_ptr[1] != NULL)
+        {
+            VX_PRINT(VX_ZONE_INFO, "Image channel 1\n");
+            VX_PRINT(VX_ZONE_INFO, "dim_x = %d\n", in_img_desc->imagepatch_addr[1].dim_x);
+            VX_PRINT(VX_ZONE_INFO, "dim_y = %d\n", in_img_desc->imagepatch_addr[1].dim_y);
+            VX_PRINT(VX_ZONE_INFO, "stride_y = %d\n", in_img_desc->imagepatch_addr[1].stride_y);
+            VX_PRINT(VX_ZONE_INFO, "stride_x = %d\n", in_img_desc->imagepatch_addr[1].stride_x);
+            VX_PRINT(VX_ZONE_INFO, "step_x = %d\n", in_img_desc->imagepatch_addr[1].step_x);
+            VX_PRINT(VX_ZONE_INFO, "step_y = %d\n", in_img_desc->imagepatch_addr[1].step_y);
+        }
+
+        VX_PRINT(VX_ZONE_INFO, "Tensor input \n");
+        VX_PRINT(VX_ZONE_INFO, "stride[0] = %d\n", out_tensor_desc->stride[0]);
+        VX_PRINT(VX_ZONE_INFO, "stride[1] = %d\n", out_tensor_desc->stride[1]);
+        VX_PRINT(VX_ZONE_INFO, "stride[2] = %d\n", out_tensor_desc->stride[2]);
+        VX_PRINT(VX_ZONE_INFO, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
+        VX_PRINT(VX_ZONE_INFO, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
+        VX_PRINT(VX_ZONE_INFO, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
+
         tivxDLPreProcParams *dlParams = (tivxDLPreProcParams *)config_target_ptr;
 
         vx_df_image image_format = in_img_desc->format;
         uint32_t tensor_format = dlParams->tensor_format;
         uint32_t channel_order = dlParams->channel_order;
         uint32_t tensor_data_type = out_tensor_desc->data_type;
+
+        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
+        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
+        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
+        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
+        uint32_t pos_x, pos_y;
 
         if(image_format == VX_DF_IMAGE_RGB)
         {
@@ -222,11 +298,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     /* Input is RGB, Output is RGB (NHWC) bit-depth unsigned 8-bit */
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -251,25 +322,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -294,25 +346,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -337,25 +370,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -380,25 +394,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -423,25 +418,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_FLOAT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -471,11 +447,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     /* Input is RGB, Output is BGR (NHWC) */
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -500,25 +471,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -543,25 +495,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -586,25 +519,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -629,25 +543,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -672,25 +567,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_FLOAT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t pos_x, pos_y;
-
-                        VX_PRINT(VX_ZONE_ERROR, "dim_x = %d\n", in_img_desc->imagepatch_addr[0].dim_x);
-                        VX_PRINT(VX_ZONE_ERROR, "dim_y = %d\n", in_img_desc->imagepatch_addr[0].dim_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_y = %d\n", in_img_desc->imagepatch_addr[0].stride_y);
-                        VX_PRINT(VX_ZONE_ERROR, "stride_x = %d\n", in_img_desc->imagepatch_addr[0].stride_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_x = %d\n", in_img_desc->imagepatch_addr[0].step_x);
-                        VX_PRINT(VX_ZONE_ERROR, "step_y = %d\n", in_img_desc->imagepatch_addr[0].step_y);
-
-                        VX_PRINT(VX_ZONE_ERROR, "stride[0] = %d\n", out_tensor_desc->stride[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[1] = %d\n", out_tensor_desc->stride[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "stride[2] = %d\n", out_tensor_desc->stride[2]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[0] = %d\n", out_tensor_desc->dimensions[0]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[1] = %d\n", out_tensor_desc->dimensions[1]);
-                        VX_PRINT(VX_ZONE_ERROR, "dimensions[2] = %d\n", out_tensor_desc->dimensions[2]);
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -723,12 +599,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     /* Input is RGB Output is RGB (NCHW) */
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -752,12 +622,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -781,12 +645,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -810,12 +668,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -839,12 +691,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -868,12 +714,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_FLOAT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -902,12 +742,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     /* Input is RGB Output is BGR (NCHW) */
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -931,12 +765,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -960,12 +788,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT16)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -989,12 +811,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_INT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -1018,12 +834,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_UINT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -1047,12 +857,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                     }
                     if(tensor_data_type == VX_TYPE_FLOAT32)
                     {
-                        uint32_t in_stride_y = in_img_desc->imagepatch_addr[0].stride_y;
-                        uint32_t input_width = in_img_desc->imagepatch_addr[0].dim_x;
-                        uint32_t input_height = in_img_desc->imagepatch_addr[0].dim_y;
-                        uint32_t ch_offset = out_tensor_desc->dimensions[0] * out_tensor_desc->dimensions[1];
-                        uint32_t pos_x, pos_y;
-
                         for(pos_y = 0; pos_y < input_height; pos_y++)
                         {
                             uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
@@ -1085,11 +889,359 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 1 */
                     /* Input is NV12, Output is RGB (NHWC) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        uint8_t *pOut = (uint8_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 0] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        int16_t *pOut = (int16_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_SIGNED_MIN, DL_PRE_PROC_16BIT_SIGNED_MAX);
+
+                                pOut[offset + 0] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        uint16_t *pOut = (uint16_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_UNSIGNED_MIN, DL_PRE_PROC_16BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 0] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        int32_t *pOut = (int32_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_SIGNED_MIN, DL_PRE_PROC_32BIT_SIGNED_MAX);
+
+                                pOut[offset + 0] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        uint32_t *pOut = (uint32_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_UNSIGNED_MIN, DL_PRE_PROC_32BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 0] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        float *pOut = (float *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_FLOAT_MIN, DL_PRE_PROC_FLOAT_MAX);
+
+                                pOut[offset + 0] = (R - dlParams->mean[0]) * dlParams->scale[0];
+                                pOut[offset + 1] = (G - dlParams->mean[1]) * dlParams->scale[1];
+                                pOut[offset + 2] = (B - dlParams->mean[2]) * dlParams->scale[2];
+
+                                offset += 3;
+                            }
+                        }
+                    }
                 }
                 if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR)
                 {
                     /* Case 2 */
                     /* Input is NV12,  Output is BGR (NHWC) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        uint8_t *pOut = (uint8_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 2] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        int16_t *pOut = (int16_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_SIGNED_MIN, DL_PRE_PROC_16BIT_SIGNED_MAX);
+
+                                pOut[offset + 2] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        uint16_t *pOut = (uint16_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_UNSIGNED_MIN, DL_PRE_PROC_16BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 2] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        int32_t *pOut = (int32_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_SIGNED_MIN, DL_PRE_PROC_32BIT_SIGNED_MAX);
+
+                                pOut[offset + 2] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        uint32_t *pOut = (uint32_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_UNSIGNED_MIN, DL_PRE_PROC_32BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 2] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        float *pOut = (float *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_FLOAT_MIN, DL_PRE_PROC_FLOAT_MAX);
+
+                                pOut[offset + 2] = (R - dlParams->mean[0]) * dlParams->scale[0];
+                                pOut[offset + 1] = (G - dlParams->mean[1]) * dlParams->scale[1];
+                                pOut[offset + 0] = (B - dlParams->mean[2]) * dlParams->scale[2];
+
+                                offset += 3;
+                            }
+                        }
+                    }
                 }
             }
             if(channel_order == TIVX_DL_PRE_PROC_CHANNEL_ORDER_NCHW)
@@ -1098,15 +1250,302 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 3 */
                     /* Input is NV12, Output is RGB (NCHW) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            uint8_t *pOut  = (uint8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            int16_t *pOut  = (int16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_SIGNED_MIN, DL_PRE_PROC_16BIT_SIGNED_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            uint16_t *pOut  = (uint16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_UNSIGNED_MIN, DL_PRE_PROC_16BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            int32_t *pOut  = (int32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_SIGNED_MIN, DL_PRE_PROC_32BIT_SIGNED_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            uint32_t *pOut  = (uint32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_UNSIGNED_MIN, DL_PRE_PROC_32BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            float   *pOut  = (float   *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_FLOAT_MIN, DL_PRE_PROC_FLOAT_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (R - dlParams->mean[0]) * dlParams->scale[0];
+                                pOut[(ch_offset * 1) + pos_x] = (G - dlParams->mean[1]) * dlParams->scale[1];
+                                pOut[(ch_offset * 2) + pos_x] = (B - dlParams->mean[2]) * dlParams->scale[2];
+                            }
+                        }
+                    }
                 }
                 if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_BGR)
                 {
                     /* Case 4 */
                     /* Input is NV12, Output is BGR (NCHW) */
+                    if(tensor_data_type == VX_TYPE_UINT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            uint8_t *pOut  = (uint8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT16)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            int16_t *pOut  = (int16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_SIGNED_MIN, DL_PRE_PROC_16BIT_SIGNED_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT16)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            uint16_t *pOut  = (uint16_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_UNSIGNED_MIN, DL_PRE_PROC_16BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_INT32)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            int32_t *pOut  = (int32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_SIGNED_MIN, DL_PRE_PROC_32BIT_SIGNED_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_UINT32)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            uint32_t *pOut  = (uint32_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_UNSIGNED_MIN, DL_PRE_PROC_32BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
+                    if(tensor_data_type == VX_TYPE_FLOAT32)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            float   *pOut  = (float   *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_FLOAT_MIN, DL_PRE_PROC_FLOAT_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (R - dlParams->mean[0]) * dlParams->scale[0];
+                                pOut[(ch_offset * 1) + pos_x] = (G - dlParams->mean[1]) * dlParams->scale[1];
+                                pOut[(ch_offset * 0) + pos_x] = (B - dlParams->mean[2]) * dlParams->scale[2];
+                            }
+                        }
+                    }
                 }
             }
         }
-
 
         /* Write DL pre proc operation here */
         tivxMemBufferUnmap(out_tensor_target_ptr, out_tensor_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);

@@ -211,9 +211,11 @@ extern "C" {
 #define TIVX_DL_PRE_PROC_IMAGE_CROP_RIGHT   (3)
 
 /* Macros to indicate max outputs, classes and colors in dl-draw-box */
-#define TIVX_DL_DRAW_BOX_MAX_OUTPUTS       (4U)
-#define TIVX_DL_DRAW_BOX_MAX_CLASSES       (256U)
-#define TIVX_DL_DRAW_BOX_MAX_COLORS        (3U)
+#define TIVX_DL_DRAW_BOX_MAX_OUTPUTS     (4U)
+#define TIVX_DL_DRAW_BOX_MAX_CLASSES     (256U)
+#define TIVX_DL_DRAW_BOX_MAX_COLORS      (3U)
+#define TIVX_DL_DRAW_BOX_MAX_CLASS_NAME  (64U)
+#define TIVX_DL_DRAW_BOX_MAX_RECTANGLES  (256U)
 
 /* Macros to indicate max outputs, classes and colors in dl-color-blend */
 #define TIVX_DL_COLOR_BLEND_MAX_OUTPUTS    (4U)
@@ -724,6 +726,9 @@ typedef struct {
     /** Skip processing */
     vx_int32 skip_flag;
 
+    /** Flag to indicate, if 1 - use color map, 0 - auto assign colors to each class */
+    vx_int32 use_color_map;
+
     /** Number of outputs to blend not to exceed TIVX_DL_COLOR_BLEND_MAX_OUTPUTS */
     vx_int32 num_outputs;
 
@@ -736,6 +741,29 @@ typedef struct {
 }tivxDLColorBlendParams;
 
 /*!
+ * \brief DL rectangles to be used with DL Draw Box
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+typedef struct {
+
+    /** Array of 4 values, which could be either
+     *  output_type = 0 -> [xmin, ymin], [xmax, ymax]
+     *  output_type = 1 -> [x, y], [width height]
+     *  output_type is defined in tivxDLDrawBoxParams
+     */
+    vx_int32 pos[4];
+
+    /** Confidence score in % value [0.0f - 100.0f]*/
+    vx_float32 score;
+
+    /** class_id of detected object which indexes into
+     * array of class_names defined in tivxDLDrawBoxParams
+    */
+    vx_int32 class_id;
+
+}tivxDLRectangle;
+
+/*!
  * \brief DL draw box to be used with DL-RT
  * \ingroup group_vision_apps_kernels_img_proc
  */
@@ -743,6 +771,9 @@ typedef struct {
 
     /** Skip processing */
     vx_int32 skip_flag;
+
+    /** Flag to indicate, if 1 - use color map, 0 - auto assign colors to each class */
+    vx_int32 use_color_map;
 
     /** Number of outputs to blend not to exceed TIVX_DL_DRAW_BOX_MAX_OUTPUTS */
     vx_int32 num_outputs;
@@ -752,6 +783,16 @@ typedef struct {
 
     /** Color map for each output, number of colors not to exceed TIVX_DL_DRAW_BOX_MAX_COLORS */
     vx_uint8 color_map[TIVX_DL_DRAW_BOX_MAX_OUTPUTS][TIVX_DL_DRAW_BOX_MAX_CLASSES][TIVX_DL_DRAW_BOX_MAX_COLORS];
+
+    /** Dictionary of class names not to exceed TIVX_DL_DRAW_BOX_MAX_CLASSES
+     * and each class name not to exceed TIVX_DL_DRAW_BOX_MAX_CLASS_NAME
+     */
+    vx_uint8 class_names[TIVX_DL_DRAW_BOX_MAX_CLASSES][TIVX_DL_DRAW_BOX_MAX_CLASS_NAME];
+
+    /** Array of tivxDLRectangle not to exceed TIVX_DL_DRAW_BOX_MAX_CLASSES
+     * and number of rectangles per class not to exceed TIVX_DL_DRAW_BOX_MAX_RECTANGLES
+     */
+    tivxDLRectangle rectangle[TIVX_DL_DRAW_BOX_MAX_CLASSES][TIVX_DL_DRAW_BOX_MAX_RECTANGLES];
 
 }tivxDLDrawBoxParams;
 
