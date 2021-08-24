@@ -60,9 +60,6 @@
  *
  */
 
-// #include "app_single_cam_common.h"
-#define APP_DEBUG_SINGLE_CAM
-
 #include "app_test.h"
 
 static AppObj g_AppObj;
@@ -681,7 +678,7 @@ static void x86_app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
     if(set_test_mode == vx_true_e)
     {
         obj->test_mode = 1;
-        obj->num_frames_to_process = 10;
+        obj->num_frames_to_process = 3;
         obj->start_seq = 0;
         if (sensor_override != 0xFF)
         {

@@ -92,7 +92,7 @@
 #define LDC_PIXEL_PAD               (1)
 
 /*Define this macro to enable prints*/
-#define APP_DEBUG_SINGLE_CAM
+// #define APP_DEBUG_SINGLE_CAM
 
 #ifdef APP_DEBUG_SINGLE_CAM
 #define APP_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)

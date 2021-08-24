@@ -72,7 +72,7 @@ static vx_bool test_result = vx_true_e;
 #ifndef x86_64
 #define TEST_BUFFER 30
 #else
-#define TEST_BUFFER 5
+#define TEST_BUFFER 2
 #endif
 #define _APP_DEBUG_
 #define APP_DEBUG
