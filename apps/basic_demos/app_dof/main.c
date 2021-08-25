@@ -1387,7 +1387,7 @@ static void app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 #endif
         /* starting file number + 2 frames required to queue up dof
             + the number of checksums availble */
-        obj->end_fileno = (obj->start_fileno+1) + 2 +
+        obj->end_fileno = (obj->start_fileno) + 2 +
                 sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0]);
         obj->num_iterations = 1;
     }

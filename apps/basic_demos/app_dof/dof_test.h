@@ -67,8 +67,8 @@
     the video whereas field vectore changes */
 static vx_bool test_result = vx_true_e;
 #define NUM_CHECKSUM_SETS 2
-#define NUM_CHECKSUM_SAMPLES 16
 #ifndef x86_64
+#define NUM_CHECKSUM_SAMPLES 16
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
   {0x3017c570,0x06dbcce0,0x53d00370,0xe920ee90,
   0x085477b0,0x43ecee50,0x6b2f3b50,0x323e18a0,
@@ -80,15 +80,12 @@ static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
   0x6a2d50ae,0xef0e6101,0x2b971d19,0x366e31d5}
 };
 #else
+#define NUM_CHECKSUM_SAMPLES 7
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
-  {0x28996c40,0x5f5f8660,0x9a484ac0,0x22bc30d0,
-  0x15bffbf0,0xff69b1c0,0x8defd830,0x39a932f0,
-  0x0bbd0880,0x731bb940,0x51317de0,0x250d8690,
-  0xdbcc3210,0x3e98f4f0,0xaf5f5ab0,0x3dd8e620},
-  {0xc4dfb09f,0x70a8bbb6,0xd09c0c2f,0x32a52780,
-  0x4f8f7160,0x8efbdd77,0x3275ed30,0x00000000,
-  0xab9530f0,0xca11c0dc,0x9b34553b,0x263b7e01,
-  0x0160009f,0x5af5e9bf,0xd42389de,0x2840ddcd}
+  {0x5d4831e0,0x60b02b10,0xe41763c0,0xe31675f0,
+  0x24aec0d0,0x06507b60,0x7a7e8460},
+  {0x3e61c9ca,0xe9ced7e7,0xe5cc03cc,0xeeba18b8,
+  0x2dc251a8,0x6711af7d,0x804bb420}
 };
 #endif
 
