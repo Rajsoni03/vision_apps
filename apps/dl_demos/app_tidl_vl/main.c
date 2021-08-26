@@ -913,7 +913,7 @@ static vx_int32 app_init(AppObj *obj)
 
     obj->context = vxCreateContext();
     APP_ASSERT_VALID_REF(obj->context);
-  
+
     tivxHwaLoadKernels(obj->context);
     tivxImgProcLoadKernels(obj->context);
     tivxTIDLLoadKernels(obj->context);
@@ -922,7 +922,7 @@ static vx_int32 app_init(AppObj *obj)
     vx_image input  = vxCreateImage(obj->context, obj->input.width, obj->input.height, VX_DF_IMAGE_NV12);
     status = vxGetStatus((vx_reference)input);
     if(status == VX_SUCCESS)
-    {   
+    {
         vx_int32 q;
         for(q = 0; q < APP_BUFFER_Q_DEPTH; q++)
         {
@@ -966,7 +966,7 @@ static vx_int32 app_init(AppObj *obj)
 
     app_init_img_mosaic(obj->context, &obj->imgMosaicObj, "sw_mosaic_obj", APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Img Mosaic Init Done! \n");
-	
+
 #ifdef ENABLE_DISPLAY
     app_init_display(obj->context, &obj->displayObj, "display_obj");
     APP_PRINTF("Display Init Done! \n");
@@ -1011,10 +1011,10 @@ static void app_deinit(AppObj *obj)
 
     app_deinit_pose_viz(&obj->poseVizObj, APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Pose Viz deinit Done! \n");
-	
+
     app_deinit_img_mosaic(&obj->imgMosaicObj, APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Img Mosaic deinit Done! \n");
-	
+
 #ifdef ENABLE_DISPLAY
     app_deinit_display(&obj->displayObj);
     #ifndef x86_64
@@ -1047,7 +1047,7 @@ static void app_delete_graph(AppObj *obj)
 
     app_delete_pose_viz(&obj->poseVizObj);
     APP_PRINTF("Pose Viz delete Done! \n");
-	
+
     app_delete_img_mosaic(&obj->imgMosaicObj);
     APP_PRINTF("Img Mosaic delete Done! \n");
 
@@ -1091,7 +1091,7 @@ static vx_status app_create_graph(AppObj *obj)
     obj->imgMosaicObj.input_arr[idx++] = obj->scalerObj.output[1].arr;
     obj->imgMosaicObj.num_inputs = idx;
 
-    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
 
 #ifdef ENABLE_DISPLAY
     app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);
@@ -1124,7 +1124,7 @@ static vx_status app_create_graph(AppObj *obj)
             graph_parameters_queue_params_list);
 
     tivxSetGraphPipelineDepth(obj->graph, APP_PIPELINE_DEPTH);
-    
+
     tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 1, APP_BUFFER_Q_DEPTH);
     tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 2, APP_MAX_BUFQ_DEPTH);
 

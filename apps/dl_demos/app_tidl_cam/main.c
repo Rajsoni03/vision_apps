@@ -926,7 +926,7 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+        status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
         APP_PRINTF("Img Mosaic graph done!\n");
     }
 
@@ -1346,7 +1346,6 @@ static void set_img_mosaic_params(AppObj *obj, ImgMosaicObj *imgMosaicObj)
 
     /* Number of time to clear the output buffer before it gets reused */
     imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
-    imgMosaicObj->params.enable_overlay = 0;
 }
 
 static void app_update_param_set(AppObj *obj)

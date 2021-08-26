@@ -150,9 +150,10 @@ void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj);
  *
  * \param [in]     graph         OpenVX graph that has been created using \ref vxCreateGraph and where the mosaic node is created
  * \param [in,out] imgMosaicObj  Mosaic Module object which contains mosaic node which is created in this function
+ * \param [in]     background    Background image provided in NV12 format will be used. If NULL, background will be black
  *
  */
-vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj);
+vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj, vx_image background);
 
 /** \brief Mosaic module write image helper function
  *

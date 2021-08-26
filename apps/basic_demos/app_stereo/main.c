@@ -561,6 +561,7 @@ static vx_status app_create_graph(AppObj *obj)
                                         obj->mosaic_kernel,
                                         obj->mosaic_config,
                                         obj->mosaic_output_image[0],
+                                        NULL,
                                         obj->input_arr,
                                         2);
 

@@ -1074,30 +1074,30 @@ static vx_status app_create_graph(AppObj *obj)
         }
     }
 
-    if(obj->enable_sem_seg == 1) 
+    if(obj->enable_sem_seg == 1)
     {
-        if(VX_SUCCESS == status) 
+        if(VX_SUCCESS == status)
         {
             status = app_create_graph_tidl_pc(obj->context, obj->graph, &obj->pcTIDLObj, obj->dofPreProcObj.output_tensor_arr, obj->preProcObj.output_tensor_arr);
         }
     }
 
-    if((obj->enable_psd == 1) || (obj->enable_vd == 1)) 
+    if((obj->enable_psd == 1) || (obj->enable_vd == 1))
     {
         app_create_graph_post_proc_od(obj->graph, &obj->odPostProcObj, obj->odTIDLObj.output_tensor_arr[0]);
     }
 
-    if(obj->enable_sem_seg == 1) 
+    if(obj->enable_sem_seg == 1)
     {
         app_create_graph_post_proc_pc(obj->graph, &obj->pcPostProcObj, obj->scalerObj.output.arr[0], obj->pcTIDLObj.out_args_arr, obj->pcTIDLObj.output_tensor_arr);
     }
 
-    if((obj->enable_psd == 1) && (status == VX_SUCCESS)) 
+    if((obj->enable_psd == 1) && (status == VX_SUCCESS))
     {
         status = app_create_graph_draw_detections(obj->graph, &obj->psdDrawDetectionsObj, obj->odPostProcObj.kp_tensor_arr, obj->odPostProcObj.kp_valid_arr, obj->odTIDLObj.output_tensor_arr[0], obj->scalerObj.output.arr[0]);
     }
 
-    if((obj->enable_vd == 1) && (status == VX_SUCCESS)) 
+    if((obj->enable_vd == 1) && (status == VX_SUCCESS))
     {
         status = app_create_graph_draw_detections(obj->graph, &obj->vdDrawDetectionsObj, obj->odPostProcObj.kp_tensor_arr, obj->odPostProcObj.kp_valid_arr, obj->odTIDLObj.output_tensor_arr[0], obj->scalerObj.output.arr[0]);
     }
@@ -1119,15 +1119,15 @@ static vx_status app_create_graph(AppObj *obj)
     }
 
     vx_int32 idx = 0;
-    if(obj->enable_psd == 1) 
+    if(obj->enable_psd == 1)
     {
         obj->imgMosaicObj.input_arr[idx++] = obj->psdDrawDetectionsObj.output_image_arr; //PSD output
     }
-    if(obj->enable_vd == 1) 
+    if(obj->enable_vd == 1)
     {
         obj->imgMosaicObj.input_arr[idx++] = obj->vdDrawDetectionsObj.output_image_arr; //VD output
     }
-    if(obj->enable_sem_seg == 1) 
+    if(obj->enable_sem_seg == 1)
     {
         obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[0]; //Seg output
         obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[1]; //Motion output
@@ -1137,7 +1137,7 @@ static vx_status app_create_graph(AppObj *obj)
 
     obj->imgMosaicObj.num_inputs = idx;
 
-    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
 
     if(status == VX_SUCCESS)
     {
@@ -1382,32 +1382,32 @@ static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 fr
         snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/pre_proc_output_%010d", obj->output_file_path, frame_id);
         writePreProcOutput(output_file_name, obj->preProcObj.output_tensor_arr);
 
-        if(obj->enable_psd == 1) 
+        if(obj->enable_psd == 1)
         {
             writeTIDLOutput(obj->odTIDLObj.output_tensor_arr[0], "Parking Spot Detection");
         }
 
-        if(obj->enable_vd == 1) 
+        if(obj->enable_vd == 1)
         {
             writeTIDLOutput(obj->odTIDLObj.output_tensor_arr[0], "Vehicle Detection");
         }
-        
+
         snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_1920x1080.yuv", obj->output_file_path, frame_id);
         writeMosaicOutput(output_file_name, obj->imgMosaicObj.output_image[0]);
-        
-        if(obj->enable_psd == 1) 
+
+        if(obj->enable_psd == 1)
         {
             snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/psd_output_%010d", obj->output_file_path, frame_id);
             writePostProcOutput(output_file_name, obj->psdDrawDetectionsObj.output_image_arr);
         }
 
-        if(obj->enable_vd == 1) 
+        if(obj->enable_vd == 1)
         {
             snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/vd_output_%010d", obj->output_file_path, frame_id);
             writePostProcOutput(output_file_name, obj->vdDrawDetectionsObj.output_image_arr);
         }
 
-        if(obj->enable_sem_seg == 1) 
+        if(obj->enable_sem_seg == 1)
         {
             snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/sem_seg_output_%010d_768x384.yuv", obj->output_file_path, frame_id);
             writeScalerOutput(output_file_name, obj->pcPostProcObj.output_image_arr);
@@ -2084,7 +2084,7 @@ static void set_dof_proc_defaults(DofProcObj *dofProcObj)
      *    - This enables external delay object and loops back the flow vector output
      *      to the input through the delay.
      * 3) enable_temporal_predicton_flow_vector = 1 && enable_flow_vec_delay_obj = 0
-     *    - This disables the external delay object and based on the DOF node 
+     *    - This disables the external delay object and based on the DOF node
      *      configuration parameter, flow_vector_internal_delay_num, an internal
      *      history mechanism will be setup. This internal mechanism will maintain
      *      a history of previous flow vectors to use.

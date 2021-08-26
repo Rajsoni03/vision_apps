@@ -471,7 +471,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
             /*
                 num_cameras_enabled from cfg file is ignored
                 Instead channel_mask is read. num_cameras_enabled = number of 1 bits in mask
-                For e.g. channel_mask = 15 (0x0F) indicates that first 4 cameras are enabled  
+                For e.g. channel_mask = 15 (0x0F) indicates that first 4 cameras are enabled
             */
             if(strcmp(token, "channel_mask")==0)
             {
@@ -937,10 +937,10 @@ static vx_status app_create_graph(AppObj *obj)
     if(obj->enable_mosaic == 1)
     {
         obj->imgMosaicObj.num_inputs = idx;
-    
+
         if(status == VX_SUCCESS)
         {
-            status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+            status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
             APP_PRINTF("Img Mosaic graph done!\n");
         }
         display_in_image = obj->imgMosaicObj.output_image[0];
@@ -1341,7 +1341,6 @@ static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width
 
     /* Number of time to clear the output buffer before it gets reused */
     imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
-    imgMosaicObj->params.enable_overlay = 0;
 }
 
 static void app_update_param_set(AppObj *obj)

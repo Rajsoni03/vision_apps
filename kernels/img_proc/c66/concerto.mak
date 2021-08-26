@@ -14,7 +14,6 @@ CSOURCES    += vx_od_postprocessing_target.c
 CSOURCES    += vx_pixel_visualization_target.c
 CSOURCES    += vx_pose_visualization_target.c
 CSOURCES    += vx_visual_localization_target.c
-CSOURCES    += vx_img_mosaic_target.c
 CSOURCES    += vx_draw_keypoint_detections_target.c
 CSOURCES    += vx_draw_box_detections_target.c
 CSOURCES    += vx_dl_pre_proc_target.c

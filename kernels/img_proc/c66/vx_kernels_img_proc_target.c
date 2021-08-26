@@ -73,7 +73,6 @@ void tivxAddTargetKernelDofPlaneSep(void);
 void tivxAddTargetKernelPixelViz(void);
 void tivxAddTargetKernelPoseViz(void);
 void tivxAddTargetKernelVisualLocalization(void);
-void tivxAddTargetKernelImgMosaic(void);
 void tivxAddTargetKernelDrawKeypointDetections(void);
 void tivxAddTargetKernelDrawBoxDetections(void);
 void tivxAddTargetKernelDLPreProc(void);
@@ -88,7 +87,6 @@ void tivxRemoveTargetKernelDofPlaneSep(void);
 void tivxRemoveTargetKernelPixelViz(void);
 void tivxRemoveTargetKernelPoseViz(void);
 void tivxRemoveTargetKernelVisualLocalization(void);
-void tivxRemoveTargetKernelImgMosaic(void);
 void tivxRemoveTargetKernelDrawKeypointDetections(void);
 void tivxRemoveTargetKernelDrawBoxDetections(void);
 void tivxRemoveTargetKernelDLPreProc(void);
@@ -104,7 +102,6 @@ static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
     {&tivxAddTargetKernelPixelViz, &tivxRemoveTargetKernelPixelViz},
     {&tivxAddTargetKernelPoseViz, &tivxRemoveTargetKernelPoseViz},
     {&tivxAddTargetKernelVisualLocalization, &tivxRemoveTargetKernelVisualLocalization},
-    {&tivxAddTargetKernelImgMosaic, &tivxRemoveTargetKernelImgMosaic},
     {&tivxAddTargetKernelDrawKeypointDetections, &tivxRemoveTargetKernelDrawKeypointDetections},
     {&tivxAddTargetKernelDrawBoxDetections, &tivxRemoveTargetKernelDrawBoxDetections},
     {&tivxAddTargetKernelDLPreProc, &tivxRemoveTargetKernelDLPreProc},

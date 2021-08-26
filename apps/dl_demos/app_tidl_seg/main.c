@@ -680,7 +680,7 @@ static vx_status app_init(AppObj *obj)
     vx_image input  = vxCreateImage(obj->context, obj->input.width, obj->input.height, VX_DF_IMAGE_NV12);
     status = vxGetStatus((vx_reference)input);
     if(status == VX_SUCCESS)
-    {   
+    {
         vx_int32 q;
         for(q = 0; q < APP_BUFFER_Q_DEPTH; q++)
         {
@@ -826,7 +826,7 @@ static vx_status app_create_graph(AppObj *obj)
     obj->imgMosaicObj.input_arr[idx++] = obj->postProcObj.output_image_arr;
     obj->imgMosaicObj.num_inputs = idx;
 
-    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
 
     app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);
 

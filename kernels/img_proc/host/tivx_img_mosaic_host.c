@@ -83,8 +83,12 @@ static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
     vx_size configuration_size;
 
     vx_image output = NULL;
-    vx_uint32 width, height;
+    vx_uint32 output_width, output_height;
     vx_df_image output_fmt;
+
+    vx_image background = NULL;
+    vx_uint32 background_width, background_height;
+    vx_df_image background_fmt;
 
     if (   (NULL == parameters[TIVX_IMG_MOSAIC_HOST_CONFIG_IDX])
         || (NULL == parameters[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX])
@@ -100,6 +104,7 @@ static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
     {
         configuration = (vx_user_data_object)parameters[TIVX_IMG_MOSAIC_HOST_CONFIG_IDX];
         output = (vx_image)parameters[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX];
+        background = (vx_image)parameters[TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX];
     }
 
     /* PARAMETER ATTRIBUTE FETCH */
@@ -109,9 +114,16 @@ static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
         tivxCheckStatus(&status, vxQueryUserDataObject(configuration, VX_USER_DATA_OBJECT_NAME, &configuration_name, sizeof(configuration_name)));
         tivxCheckStatus(&status, vxQueryUserDataObject(configuration, VX_USER_DATA_OBJECT_SIZE, &configuration_size, sizeof(configuration_size)));
 
-        tivxCheckStatus(&status, vxQueryImage(output, VX_IMAGE_WIDTH, &width, sizeof(width)));
-        tivxCheckStatus(&status, vxQueryImage(output, VX_IMAGE_HEIGHT, &height, sizeof(height)));
+        tivxCheckStatus(&status, vxQueryImage(output, VX_IMAGE_WIDTH, &output_width, sizeof(output_width)));
+        tivxCheckStatus(&status, vxQueryImage(output, VX_IMAGE_HEIGHT, &output_height, sizeof(output_height)));
         tivxCheckStatus(&status, vxQueryImage(output, VX_IMAGE_FORMAT, &output_fmt, sizeof(output_fmt)));
+
+        if(NULL != parameters[TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX])
+        {
+            tivxCheckStatus(&status, vxQueryImage(background, VX_IMAGE_WIDTH, &background_width, sizeof(background_width)));
+            tivxCheckStatus(&status, vxQueryImage(background, VX_IMAGE_HEIGHT, &background_height, sizeof(background_height)));
+            tivxCheckStatus(&status, vxQueryImage(background, VX_IMAGE_FORMAT, &background_fmt, sizeof(background_fmt)));
+        }
     }
 
     if (VX_SUCCESS == status)
@@ -134,6 +146,26 @@ static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
         }
     }
 
+    if ((VX_SUCCESS == status) && (NULL != parameters[TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX]))
+    {
+        if ( !( (VX_DF_IMAGE_NV12 == background_fmt) ||
+                (VX_DF_IMAGE_U8   == background_fmt) ||
+                (VX_DF_IMAGE_U16  == background_fmt) ) )
+        {
+            status = VX_ERROR_INVALID_PARAMETERS;
+            VX_PRINT(VX_ZONE_ERROR, "'background' should be an image of type:\n VX_DF_IMAGE_NV12 or \n VX_DF_IMAGE_U8 or \n VX_DF_IMAGE_U16\n");
+        }
+    }
+
+    if ((VX_SUCCESS == status) && (NULL != parameters[TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX]))
+    {
+        if ((output_width != background_width) || (output_height != background_height))
+        {
+            status = VX_ERROR_INVALID_PARAMETERS;
+            VX_PRINT(VX_ZONE_ERROR, " 'output' width x height and 'background' width x height should exactly match!\n");
+        }
+    }
+
     return status;
 }
 
@@ -153,8 +185,8 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
 
     if (status == VX_SUCCESS)
     {
-        /* Number of parameters are config + output_image + coordinate list + input list */
-        uint32_t num_params = 2 + num_inputs;
+        /* Number of parameters are configuration + output_image + background_image + input list */
+        uint32_t num_params = TIVX_IMG_MOSAIC_BASE_PARAMS + num_inputs;
         kernel = vxAddUserKernel(
                     context,
                     TIVX_KERNEL_IMG_MOSAIC_NAME,
@@ -187,6 +219,15 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                         VX_PARAMETER_STATE_REQUIRED);
        index++;
     }
+    if (status == VX_SUCCESS)
+    {
+       status = vxAddParameterToKernel(kernel,
+                        index,
+                        VX_INPUT,
+                        VX_TYPE_IMAGE,
+                        VX_PARAMETER_STATE_OPTIONAL);
+       index++;
+    }
     for(i = 0; i < num_inputs; i++)
     {
         if (status == VX_SUCCESS)
@@ -202,8 +243,6 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
     if (status == VX_SUCCESS)
     {
         /* add supported target's */
-        tivxAddKernelTarget(kernel, TIVX_TARGET_DSP1);
-        tivxAddKernelTarget(kernel, TIVX_TARGET_DSP2);
         tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC1);
         tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC2);
     }
@@ -224,7 +263,6 @@ void tivxImgMosaicParamsSetDefaults(tivxImgMosaicParams *prms)
 {
     memset(prms, 0, sizeof(tivxImgMosaicParams));
 
-    prms->enable_overlay    = 0;
     prms->num_msc_instances = 2;
     prms->msc_instance      = 0;
 }

@@ -126,23 +126,19 @@ void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj)
     return;
 }
 
-void app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj)
+void app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj, vx_image background)
 {
     imgMosaicObj->node = tivxImgMosaicNode(graph,
                                             imgMosaicObj->kernel,
                                             imgMosaicObj->config,
                                             imgMosaicObj->output_image[0],
+                                            background,
                                             imgMosaicObj->input_arr,
                                             imgMosaicObj->num_inputs);
 
     APP_ASSERT_VALID_REF(imgMosaicObj->node);
 
-#ifdef x86_64
-    vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP1);
-#else
     vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
-#endif
-
     vxSetReferenceName((vx_reference)imgMosaicObj->node, "MosaicNode");
 
     return;

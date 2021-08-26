@@ -110,6 +110,8 @@ typedef struct {
     vx_context context;
     vx_graph   graph;
 
+    vx_image   background;
+
     vx_int32 en_out_img_write;
 
     vx_float32 viz_th_pd;
@@ -810,6 +812,128 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
     vxReleaseParameter(&parameter);
 }
 #endif
+static vx_status fill_background_image(vx_image background)
+{
+    vx_status status = VX_SUCCESS;
+
+    Draw2D_Handle  handle;
+    Draw2D_BufInfo draw2dBufInfo;
+
+    Draw2D_FontPrm sHeading;
+    Draw2D_FontPrm sLabel;
+    Draw2D_BmpPrm  bmpPrm;
+
+    status = vxGetStatus((vx_reference)background);
+
+    if(status == VX_SUCCESS)
+    {
+        vx_rectangle_t rect;
+        vx_imagepatch_addressing_t luma_addr;
+        vx_imagepatch_addressing_t cbcr_addr;
+        vx_map_id luma_map_id;
+        vx_map_id cbcr_map_id;
+        void * luma_ptr;
+        void * cbcr_ptr;
+        vx_uint32  img_width;
+        vx_uint32  img_height;
+
+        vxQueryImage(background, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+        vxQueryImage(background, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = img_width;
+        rect.end_y = img_height;
+        status = vxMapImagePatch(background,
+                                &rect,
+                                0,
+                                &luma_map_id,
+                                &luma_addr,
+                                &luma_ptr,
+                                VX_WRITE_ONLY,
+                                VX_MEMORY_TYPE_HOST,
+                                VX_NOGAP_X);
+
+        memset(luma_ptr, 0, (img_width * img_height));
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = img_width;
+        rect.end_y = img_height / 2;
+
+        status = vxMapImagePatch(background,
+                                &rect,
+                                1,
+                                &cbcr_map_id,
+                                &cbcr_addr,
+                                &cbcr_ptr,
+                                VX_WRITE_ONLY,
+                                VX_MEMORY_TYPE_HOST,
+                                VX_NOGAP_X);
+
+        memset(cbcr_ptr, 128, (img_width * img_height/2));
+
+        draw2dBufInfo.bufAddr[0]  = luma_ptr;
+        draw2dBufInfo.bufAddr[1]  = cbcr_ptr;
+        draw2dBufInfo.bufWidth    = img_width;
+        draw2dBufInfo.bufHeight   = img_height;
+        draw2dBufInfo.bufPitch[0] = luma_addr.stride_y;
+        draw2dBufInfo.bufPitch[1] = cbcr_addr.stride_y;
+        draw2dBufInfo.dataFormat  = DRAW2D_DF_YUV420SP_UV;
+        draw2dBufInfo.transperentColor = 0x00000000;
+        draw2dBufInfo.transperentColorFormat = DRAW2D_DF_BGR16_565;
+
+        status = Draw2D_create(&handle);
+
+        if(status==0)
+        {
+            if (luma_ptr != NULL && cbcr_ptr != NULL)
+            {
+                Draw2D_setBufInfo(handle, &draw2dBufInfo);
+
+                bmpPrm.bmpIdx = DRAW2D_BMP_IDX_TI_LOGO_2;
+
+                Draw2D_drawBmp(handle, 20, 0, &bmpPrm);
+
+                sHeading.fontIdx = 10;
+
+                Draw2D_drawString(handle, 560, 5, "Analytics for Auto Valet Parking", &sHeading);
+
+                sLabel.fontIdx = 12;
+                Draw2D_drawString(handle, 340, 90, "Left  camera", &sLabel);
+                Draw2D_drawString(handle, 920, 90, "Front camera", &sLabel);
+                Draw2D_drawString(handle, 1520,90, "Right camera", &sLabel);
+
+                sLabel.fontIdx = 13;
+                Draw2D_drawString(handle, 20, 244, "Semantic", &sLabel);
+                Draw2D_drawString(handle, 0 , 264, "Segmentation", &sLabel);
+                Draw2D_drawString(handle, 0 , 284, "  (768x384) ", &sLabel);
+
+                Draw2D_drawString(handle, 20, 526, "Parking", &sLabel);
+                Draw2D_drawString(handle, 35, 546, "Spot", &sLabel);
+                Draw2D_drawString(handle, 10, 566, "Detection", &sLabel);
+                Draw2D_drawString(handle, 10, 586, "(768x384)", &sLabel);
+
+                Draw2D_drawString(handle, 25, 828, "Vehicle", &sLabel);
+                Draw2D_drawString(handle, 15, 848, "Detection", &sLabel);
+                Draw2D_drawString(handle, 15, 868, "(768x384)", &sLabel);
+
+                sLabel.fontIdx = 12;
+                Draw2D_drawString(handle, 340, 1000, "Camera resolution : 1280 x 720 (1 MP) , Analytics resolution : 768 x 384 (0.3 MP)", &sLabel);
+
+                sLabel.fontIdx = 12;
+                Draw2D_drawString(handle, 596, 1040, "Analytics performance : 3 CH, 3 algorithm, 15 FPS", &sLabel);
+            }
+
+            Draw2D_delete(handle);
+        }
+
+        vxUnmapImagePatch(background, luma_map_id);
+        vxUnmapImagePatch(background, cbcr_map_id);
+    }
+
+    return (status);
+}
 
 static vx_status app_init(AppObj *obj)
 {
@@ -823,6 +947,10 @@ static vx_status app_init(AppObj *obj)
     tivxHwaLoadKernels(obj->context);
     tivxImgProcLoadKernels(obj->context);
     tivxTIDLLoadKernels(obj->context);
+
+    /* Create a background image for display */
+    obj->background = vxCreateImage(obj->context, DISPLAY_WIDTH, DISPLAY_HEIGHT, VX_DF_IMAGE_NV12);
+    status = vxGetStatus((vx_reference)obj->background);
 
     /* Initialize modules */
     if(status == VX_SUCCESS)
@@ -931,6 +1059,9 @@ static void app_deinit(AppObj *obj)
     }
 #endif
 
+    /* Release reference to background image */
+    vxReleaseImage(&obj->background);
+
     tivxTIDLUnLoadKernels(obj->context);
     tivxImgProcUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
@@ -959,7 +1090,7 @@ static void app_delete_graph(AppObj *obj)
     app_delete_img_mosaic(&obj->imgMosaicObj);
 
     app_delete_display(&obj->displayObj);
-    
+
 #ifdef APP_TIVX_LOG_RT_ENABLE
     tivxLogRtTraceExportToFile("app_tidl_avp2.bin");
     tivxLogRtTraceDisable(obj->graph);
@@ -1036,7 +1167,15 @@ static vx_status app_create_graph(AppObj *obj)
 
     obj->imgMosaicObj.num_inputs = idx;
 
-    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+    if(obj->enable_gui==0)
+    {
+        app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, obj->background);
+    }
+    else
+    {
+        app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
+    }
+
     if(status == VX_SUCCESS)
     {
         status = app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);
@@ -1176,6 +1315,12 @@ static vx_status app_verify_graph(AppObj *obj)
     if(status != VX_SUCCESS)
     {
         printf("MSC: Node send command failed!\n");
+    }
+
+    /* Fill background image */
+    if((status == VX_SUCCESS) && (obj->enable_gui == 0))
+    {
+        fill_background_image(obj->background);
     }
 
     /* wait a while for prints to flush */
@@ -1645,7 +1790,7 @@ static void set_img_mosaic_defaults(AppObj *obj, ImgMosaicObj *imgMosaicObj)
     if(obj->enable_gui==0)
     {
         /* if GUI is disabled on HOST side then enable static overlay in SW mosaic node */
-        imgMosaicObj->params.enable_overlay = 1;
+
     }
 
     in = 0;

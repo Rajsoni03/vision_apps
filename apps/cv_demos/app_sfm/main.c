@@ -938,7 +938,7 @@ static vx_status app_create_graph(AppObj *obj)
 
         obj->imgMosaicObj.num_inputs = idx;
 
-        status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+        status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
         APP_PRINTF("Mosaic Node added!\n");
     }
     if(status == VX_SUCCESS)

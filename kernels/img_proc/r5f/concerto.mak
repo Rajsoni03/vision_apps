@@ -7,7 +7,6 @@ TARGETTYPE  := library
 
 CSOURCES    := vx_kernels_img_proc_target.c
 CSOURCES    += vx_img_mosaic_msc_target.c
-CSOURCES    += vx_img_mosaic_draw_overlay_avp2.c
 
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/host

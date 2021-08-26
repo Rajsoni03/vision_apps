@@ -103,7 +103,7 @@ typedef struct {
     ImgMosaicObj imgMosaicObj;
     DisplayObj displayObj;
     InputObj input;
-    
+
     /* Arrray of 0th index reference of input.arr */
     vx_image input_images[APP_MAX_BUFQ_DEPTH];
 
@@ -684,7 +684,7 @@ static vx_status app_init(AppObj *obj)
     vx_image input  = vxCreateImage(obj->context, obj->input.width, obj->input.height, VX_DF_IMAGE_NV12);
     status = vxGetStatus((vx_reference)input);
     if(status == VX_SUCCESS)
-    {   
+    {
         vx_int32 q;
         for(q = 0; q < APP_BUFFER_Q_DEPTH; q++)
         {
@@ -795,7 +795,7 @@ static void app_deinit(AppObj *obj)
 
     tivxImgProcUnLoadKernels(obj->context);
     APP_PRINTF("ImgProc unload Done! \n");
-    
+
     tivxHwaUnLoadKernels(obj->context);
     APP_PRINTF("HWA unload Done! \n");
 
@@ -853,7 +853,7 @@ static vx_status app_create_graph(AppObj *obj)
     obj->imgMosaicObj.input_arr[idx++] = obj->drawDetectionsObj.output_image_arr;
     obj->imgMosaicObj.num_inputs = idx;
 
-    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
     if(status == VX_SUCCESS)
     {
         status = app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);

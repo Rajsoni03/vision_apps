@@ -249,8 +249,9 @@ VX_API_ENTRY vx_node VX_API_CALL tivxVisualLocalizationNode(vx_graph graph,
 
 VX_API_ENTRY vx_node VX_API_CALL tivxImgMosaicNode(vx_graph             graph,
                                                    vx_kernel            kernel,
-                                                   vx_user_data_object  configuration,
+                                                   vx_user_data_object  config,
                                                    vx_image             output_image,
+                                                   vx_image             background_image,
                                                    vx_object_array      input_arr[],
                                                    vx_uint32            num_inputs)
 {
@@ -259,8 +260,9 @@ VX_API_ENTRY vx_node VX_API_CALL tivxImgMosaicNode(vx_graph             graph,
 
     vx_int32 num_params = TIVX_IMG_MOSAIC_BASE_PARAMS + num_inputs;
 
-    prms[0] = (vx_reference)configuration;
+    prms[0] = (vx_reference)config;
     prms[1] = (vx_reference)output_image;
+    prms[2] = (vx_reference)background_image;
 
     for(i = 0; i < num_inputs; i++){
         prms[TIVX_IMG_MOSAIC_INPUT_START_IDX + i] = (vx_reference)input_arr[i];

@@ -586,11 +586,6 @@ typedef struct {
   /** Number of times to clear the output buffer */
   vx_uint32 clear_count;
 
-  /** 0: static overlay on SW mosaic is disabled
-   *  1: AVP2 demo static overlay
-   * */
-  vx_uint32 enable_overlay;
-
   /** Number of MSC instances to use */
   vx_uint32 num_msc_instances;
 

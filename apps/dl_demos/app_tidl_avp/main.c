@@ -1158,7 +1158,7 @@ static vx_status app_create_graph(AppObj *obj)
 
     obj->imgMosaicObj.num_inputs = idx;
 
-    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+    app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
 
     if(status == VX_SUCCESS)
     {

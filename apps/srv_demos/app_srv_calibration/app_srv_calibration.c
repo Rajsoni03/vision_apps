@@ -1116,6 +1116,7 @@ static vx_status app_create_graph_img_mosaic(SrvCalibAppObj *obj)
                                          obj->mosaic_kernel,
                                          obj->mosaic_config,
                                          obj->output_image[0],
+                                         NULL,
                                          obj->input_arr,
                                          num_inputs);
 

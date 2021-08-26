@@ -120,7 +120,7 @@ typedef struct
     tivx_obj_desc_image_t        *in_img_desc[TIVX_IMAGE_MOSAIC_MSC_MAX_INST][TIVX_OBJECT_ARRAY_MAX_ITEMS];
 
     app_perf_hwa_id_t       app_hwa_inst_id[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
-  
+
     vx_uint32               max_msc_instances;
     vx_uint32               msc_instance;
 
@@ -271,7 +271,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
 
     for(i = 0U; i < num_params; i++)
     {
-        if(NULL == obj_desc[i])
+        if ((NULL == obj_desc[i]) && (i != TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX))
         {
             status = VX_FAILURE;
             break;
@@ -294,8 +294,8 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
 
     if(VX_SUCCESS == status)
     {
-        /* 0 - config, 1 - output image, 2 onwards is array of inputs */
-        num_inputs = num_params - 2U;
+        /* 0 - config, 1 - output image, 2 - background image, 3 onwards is array of inputs */
+        num_inputs = num_params - TIVX_IMG_MOSAIC_BASE_PARAMS;
 
         config_desc = (tivx_obj_desc_user_data_object_t *)
             obj_desc[TIVX_IMG_MOSAIC_HOST_CONFIG_IDX];
@@ -358,10 +358,10 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
                 }
             }
         }
-        
+
         VX_PRINT(VX_ZONE_INFO, "num_msc_instance = %d \n", params->num_msc_instances);
         VX_PRINT(VX_ZONE_INFO, "msc_instance = %d \n", params->msc_instance);
-        
+
         if (params->num_msc_instances < TIVX_IMAGE_MOSAIC_MSC_MAX_INST)
         {
             msc_obj->max_msc_instances = params->num_msc_instances;
@@ -460,7 +460,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscDelete(
 
     for(i = 0U; i < num_params; i++)
     {
-        if(NULL == obj_desc[i])
+        if ((NULL == obj_desc[i]) && (i != TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX))
         {
             status = VX_FAILURE;
             break;
@@ -504,7 +504,6 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
     tivxImgMosaicMscObj              *msc_obj = NULL;
     vx_uint32                         size, num_inst;
     uint32_t                         do_process[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
-    vx_enum                          io_mem_type;
 
     status = tivxGetTargetKernelInstanceContext(kernel, (void **)&msc_obj, &size);
     if((VX_SUCCESS != status) || (NULL == msc_obj) ||  (sizeof(tivxImgMosaicMscObj) != size))
@@ -515,78 +514,114 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
     if(VX_SUCCESS == status)
     {
         /* Map config data - index 0 */
-        config_desc = (tivx_obj_desc_user_data_object_t *)
-            obj_desc[TIVX_IMG_MOSAIC_HOST_CONFIG_IDX];
+        config_desc = (tivx_obj_desc_user_data_object_t *)obj_desc[TIVX_IMG_MOSAIC_HOST_CONFIG_IDX];
         config_target_ptr = tivxMemShared2TargetPtr(&config_desc->mem_ptr);
-        tivxMemBufferMap(
-            config_target_ptr,
-            config_desc->mem_size,
-            VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
+        tivxMemBufferMap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
         params = (tivxImgMosaicParams *) config_target_ptr;
-
-        if((params->enable_overlay==1) && (msc_obj->clear_count > 0U))
-        {
-            io_mem_type = VX_MEMORY_TYPE_HOST;
-        }
-        else
-        {
-            io_mem_type = TIVX_MEMORY_TYPE_DMA;
-        }
-
-        /* Map output image - index 1 */
-        out_img_desc = (tivx_obj_desc_image_t *)
-            obj_desc[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX];
-        output_image_target_ptr[0U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[0U]);
-        tivxMemBufferMap(
-            output_image_target_ptr[0U],
-            out_img_desc->mem_size[0U],
-            io_mem_type,VX_WRITE_ONLY);
-        if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
-        {
-            output_image_target_ptr[1U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[1U]);
-            tivxMemBufferMap(
-                output_image_target_ptr[1U],
-                out_img_desc->mem_size[1U],
-                io_mem_type,VX_WRITE_ONLY);
-        }
 
         /* Memset output buffers for initial count */
         if(msc_obj->clear_count > 0U)
         {
-              memset(output_image_target_ptr[0U], 0U, out_img_desc->mem_size[0U]);
+            /* Map output image luma buffer */
+            out_img_desc = (tivx_obj_desc_image_t *) obj_desc[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX];
+            output_image_target_ptr[0U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[0U]);
+            tivxMemBufferMap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
 
-              if(output_image_target_ptr[1U] != NULL)
-              {
-                  memset(output_image_target_ptr[1U], 0x80U, out_img_desc->mem_size[1U]);
-              }
+            /* Map output image CbCr buffer */
+            if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+            {
+                output_image_target_ptr[1U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[1U]);
+                tivxMemBufferMap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
+            }
 
-              if(params->enable_overlay==1)
-              {
-                void vx_img_mosaic_draw_overlay_avp2(void *addr[], uint32_t pitch[], uint32_t width, uint32_t height);
-                void *addr[2];
-                uint32_t pitch[2];
-                uint32_t width, height;
+            if (NULL != obj_desc[TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX])
+            {
+                tivx_obj_desc_image_t *background_img_desc;
+                void *backgroud_image_target_ptr[2U];
 
-                addr[0] = output_image_target_ptr[0];
-                addr[1] = output_image_target_ptr[1];
-                width   = out_img_desc->width;
-                height  = out_img_desc->height;
-                pitch[0]= out_img_desc->imagepatch_addr[0].stride_y;
-                pitch[1]= out_img_desc->imagepatch_addr[1].stride_y;
+                /* Map background luma buffer */
+                background_img_desc = (tivx_obj_desc_image_t *)obj_desc[TIVX_IMG_MOSAIC_HOST_BACKGROUND_IMAGE_IDX];
+                backgroud_image_target_ptr[0U] = tivxMemShared2TargetPtr(&background_img_desc->mem_ptr[0U]);
+                tivxMemBufferMap(backgroud_image_target_ptr[0U], background_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
 
-                vx_img_mosaic_draw_overlay_avp2(addr, pitch, width, height);
-              }
+                /* Map background CbCr buffer */
+                if(background_img_desc->mem_ptr[1U].shared_ptr != NULL)
+                {
+                    backgroud_image_target_ptr[1U] = tivxMemShared2TargetPtr(&background_img_desc->mem_ptr[1U]);
+                    tivxMemBufferMap(backgroud_image_target_ptr[1U], background_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+                }
 
-              appMemCacheWb(output_image_target_ptr[0U], out_img_desc->mem_size[0U]);
-              if(output_image_target_ptr[1U] != NULL)
-              {
-                  appMemCacheWb(output_image_target_ptr[1U], out_img_desc->mem_size[1U]);
-              }
-              msc_obj->clear_count--;
+                /* Copy luma data */
+                if ((output_image_target_ptr[0U] != NULL) && (backgroud_image_target_ptr[0U] != NULL))
+                {
+                    /* Copy only if the sizes match */
+                    if(out_img_desc->mem_size[0U] == background_img_desc->mem_size[0U])
+                    {
+                        memcpy(output_image_target_ptr[0U], backgroud_image_target_ptr[0U], out_img_desc->mem_size[0U]);
+                    }
+                    else
+                    {
+                        VX_PRINT(VX_ZONE_ERROR, "Background luma size %d and output luma size %d do not match!\n", background_img_desc->mem_size[0U], out_img_desc->mem_size[0U]);
+                    }
+                }
+
+                /* Copy cbcr data */
+                if ((output_image_target_ptr[1U] != NULL) && (backgroud_image_target_ptr[1U] != NULL))
+                {
+                    /* Copy only if the sizes match */
+                    if(out_img_desc->mem_size[1U] == background_img_desc->mem_size[1U])
+                    {
+                        memcpy(output_image_target_ptr[1U], backgroud_image_target_ptr[1U], out_img_desc->mem_size[1U]);
+                    }
+                    else
+                    {
+                        VX_PRINT(VX_ZONE_ERROR, "Background cbcr size %d and output cbcr size %d do not match!\n", background_img_desc->mem_size[1U], out_img_desc->mem_size[1U]);
+                    }
+                }
+
+                /* Unmap background luma buffer */
+                tivxMemBufferUnmap(backgroud_image_target_ptr[0U], background_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+
+                /* Unmap background cbcr buffer */
+                if(background_img_desc->mem_ptr[1U].shared_ptr != NULL)
+                {
+                    tivxMemBufferUnmap(backgroud_image_target_ptr[1U], background_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+                }
+            }
+            else
+            {
+                memset(output_image_target_ptr[0U], 0U, out_img_desc->mem_size[0U]);
+
+                if(output_image_target_ptr[1U] != NULL)
+                {
+                    memset(output_image_target_ptr[1U], 0x80U, out_img_desc->mem_size[1U]);
+                }
+            }
+
+            /* unmap output buffer */
+            tivxMemBufferUnmap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
+            if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+            {
+                tivxMemBufferUnmap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
+            }
+
+            msc_obj->clear_count--;
         }
 
-        /* 0 - config, 1 - output image, 2 onwards is array of inputs */
-        num_inputs = num_params - 2U;
+        /* Map output image luma buffer */
+        out_img_desc = (tivx_obj_desc_image_t *) obj_desc[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX];
+        output_image_target_ptr[0U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[0U]);
+        tivxMemBufferMap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
+
+        /* Map output image CbCr buffer */
+        if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+        {
+            output_image_target_ptr[1U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[1U]);
+            tivxMemBufferMap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
+        }
+
+        /* 0 - config, 1 - output image, 2 - background image, 3 onwards is array of inputs */
+        num_inputs = num_params - TIVX_IMG_MOSAIC_BASE_PARAMS;
 
         /* Perform scale operation for each of the output mosaic window */
         for(win = 0U; win < params->num_windows; win += msc_obj->max_msc_instances)
@@ -692,7 +727,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
                         in_img_desc->imagepatch_addr[0].dim_y) +
                         (in_img_desc->imagepatch_addr[1].dim_x *
                         in_img_desc->imagepatch_addr[1].dim_y);
-                    
+
                     appPerfStatsHwaUpdateLoad(msc_obj->app_hwa_inst_id[msc_cnt],
                         msc_obj->inst_obj[msc_cnt].time, size/* pixels processed */);
                 }
@@ -704,21 +739,14 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
             }
         }
 
-        /* unmap config and output image buffer */
-        tivxMemBufferUnmap(
-            config_target_ptr,
-            config_desc->mem_size,
-            VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
-        tivxMemBufferUnmap(
-            output_image_target_ptr[0U],
-            out_img_desc->mem_size[0U],
-            io_mem_type, VX_WRITE_ONLY);
+        /* unmap config buffer */
+        tivxMemBufferUnmap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+
+        /* unmap output buffer */
+        tivxMemBufferUnmap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
         if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
         {
-            tivxMemBufferUnmap(
-                output_image_target_ptr[1U],
-                out_img_desc->mem_size[1U],
-                io_mem_type, VX_WRITE_ONLY);
+            tivxMemBufferUnmap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
         }
     }
 

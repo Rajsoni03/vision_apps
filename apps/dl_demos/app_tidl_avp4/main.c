@@ -929,7 +929,7 @@ vx_int32 app_tidl_avp4_main(vx_int32 argc, vx_char* argv[])
 
     /* Querry sensor parameters */
     app_querry_sensor(&obj->sensorObj);
-        
+
     /*Update of parameters are config file read*/
     app_update_param_set(obj);
 
@@ -1044,7 +1044,7 @@ static vx_status app_init(AppObj *obj)
     {
 #ifdef ENABLE_DOF_PYRAMID
         app_init_pyramid(obj->context, &obj->pyramidObj, "pyramid_obj", obj->sensorObj.num_cameras_enabled);
-#endif        
+#endif
         app_init_dof_proc(obj->context, &obj->dofProcObj, "dof_proc_obj", obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("DOF init done!\n");
     }
@@ -1092,7 +1092,7 @@ static vx_status app_init(AppObj *obj)
     {
         app_init_display(obj->context, &obj->displayObj, "display_obj");
         APP_PRINTF("Display init done!\n");
- 
+
         #ifndef x86_64
         if(obj->displayObj.display_option == 1)
         {
@@ -1154,7 +1154,7 @@ static void app_deinit(AppObj *obj)
     {
 #ifdef ENABLE_DOF_PYRAMID
         app_deinit_pyramid(&obj->pyramidObj);
-#endif        
+#endif
         app_deinit_dof_proc(&obj->dofProcObj);
         APP_PRINTF("DOF deinit done!\n");
     }
@@ -1428,7 +1428,7 @@ static vx_status app_create_graph(AppObj *obj)
             obj->imgMosaicObj.num_inputs = idx;
         }
 
-        status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj);
+        status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
         APP_PRINTF("Img Mosaic graph done!\n");
     }
 
@@ -1920,7 +1920,6 @@ static void set_img_mosaic_params(AppObj *obj, ImgMosaicObj *imgMosaicObj)
 
     /* Number of time to clear the output buffer before it gets reused */
     imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
-    imgMosaicObj->params.enable_overlay = 0;
     imgMosaicObj->params.num_msc_instances = 1;
     imgMosaicObj->params.msc_instance = 1; /* Use MSC1 instance as MSC0 is used for scaler */
 }

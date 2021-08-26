@@ -263,9 +263,10 @@ VX_API_ENTRY vx_node VX_API_CALL tivxPoseVizNode(vx_graph graph,
  * \param [in] graph             The reference to the graph.
  * \param [in] kernel            The reference to the openvx kernel
  * \param [in] config            Mosaic configuration of type tivxImgMosaicParams
- * \param [out] output_image     Output image of type vx_image
- * \param [in]  input_arr        Array of inputs
- * \param [in]  num_inputs       Number of inputs, i.e number of elements in input_arr[]
+ * \param [out] output_image     Output image of type vx_image, only VX_DF_IMAGE_NV12, VX_DF_IMAGE_U8, VX_DF_IMAGE_U16 supported
+ * \param [in] background_image  Optional background image of type vx_image, only VX_DF_IMAGE_NV12, VX_DF_IMAGE_U8, VX_DF_IMAGE_U16 supported
+ * \param [in] input_arr         Array of inputs of type vx_image, only VX_DF_IMAGE_NV12, VX_DF_IMAGE_U8, VX_DF_IMAGE_U16 supported
+ * \param [in] num_inputs        Number of inputs, i.e number of elements in input_arr[]
  *
  * \ingroup group_vision_apps_kernels_img_proc
  *
@@ -275,6 +276,7 @@ VX_API_ENTRY vx_node VX_API_CALL tivxImgMosaicNode(vx_graph             graph,
                                                    vx_kernel            kernel,
                                                    vx_user_data_object  config,
                                                    vx_image             output_image,
+                                                   vx_image             background_image,
                                                    vx_object_array      input_arr[],
                                                    vx_uint32            num_inputs);
 

@@ -86,7 +86,7 @@ typedef struct {
 vx_status app_init_img_mosaic(vx_context context, ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth);
 void app_deinit_img_mosaic(ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth);
 void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj);
-void app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj);
+void app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj, vx_image background);
 
 vx_status writeMosaicOutput(char* file_name, vx_image out_img);
 vx_status clearImage(vx_image out_img);
