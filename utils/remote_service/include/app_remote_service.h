@@ -165,7 +165,7 @@ int32_t appRemoteServiceUnRegister(char *service_name);
  *
  * \return 0 on success, else failure
  */
-int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags);
+int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags);
 
 /**
  * \brief DeInit remote service task

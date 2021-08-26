@@ -132,7 +132,7 @@ static int32_t appRemoteServiceRunHandler(char *service_name, uint32_t cmd, void
     return status;
 }
 
-int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags)
+int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags)
 {
     app_remote_service_obj_t *obj = &g_app_remote_service_obj;
     int32_t status = 0;
@@ -153,7 +153,7 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, char *service_name, uint32_
         if(dst_app_cpu_id == appIpcGetSelfCpuId())
         {
             /* destination CPU is self CPU so call the handler locally */
-            status = appRemoteServiceRunHandler(service_name, cmd, prm, prm_size, flags);
+            status = appRemoteServiceRunHandler((char *)service_name, cmd, prm, prm_size, flags);
         }
         else
         {
