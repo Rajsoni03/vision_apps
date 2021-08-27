@@ -71,6 +71,7 @@
 #include <utils/mem/include/app_mem.h>
 
 #include <tivx_dl_draw_box_host.h>
+
 static tivx_target_kernel vx_dlDrawBox_kernel = NULL;
 
 static vx_status VX_CALLBACK tivxKernelDLDrawBoxCreate
@@ -190,6 +191,12 @@ static vx_status VX_CALLBACK tivxKernelDLDrawBoxProcess
         input_image_target_ptr[0] = NULL;
         input_image_target_ptr[1] = NULL;
 
+        tivx_obj_desc_image_t *output_image_desc;
+        void * output_image_target_ptr[2];
+
+        output_image_target_ptr[0] = NULL;
+        output_image_target_ptr[1] = NULL;
+
         config_desc = (tivx_obj_desc_user_data_object_t *)obj_desc[TIVX_DL_DRAW_BOX_CONFIG_IDX];
         config_target_ptr = tivxMemShared2TargetPtr(&config_desc->mem_ptr);
         tivxMemBufferMap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
@@ -207,49 +214,30 @@ static vx_status VX_CALLBACK tivxKernelDLDrawBoxProcess
             tivxMemBufferMap(input_image_target_ptr[1], input_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
         }
 
-        tivxDLDrawBoxParams *params  = (tivxDLDrawBoxParams *)config_target_ptr;
-
-        if(params->num_outputs > TIVX_DL_DRAW_BOX_MAX_OUTPUTS)
+        output_image_desc = (tivx_obj_desc_image_t *)obj_desc[TIVX_DL_DRAW_BOX_OUTPUT_IMAGE_IDX];
+        output_image_target_ptr[0] = tivxMemShared2TargetPtr(&output_image_desc->mem_ptr[0]);
+        tivxMemBufferMap(output_image_target_ptr[0], output_image_desc->mem_size[0], VX_MEMORY_TYPE_HOST,VX_WRITE_ONLY);
+        if(output_image_desc->mem_ptr[1].shared_ptr != 0)
         {
-            VX_PRINT(VX_ZONE_ERROR, "Num outputs %d greater than supported max %d\n", params->num_outputs, TIVX_DL_DRAW_BOX_MAX_OUTPUTS);
-            status = VX_FAILURE;
+            output_image_target_ptr[1] = tivxMemShared2TargetPtr(&output_image_desc->mem_ptr[1]);
+            tivxMemBufferMap(output_image_target_ptr[1], output_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST,VX_WRITE_ONLY);
         }
 
-        if(VX_SUCCESS == status)
-        {
-            int32_t out;
-            for(out = 0; out < params->num_outputs; out++)
-            {
-                tivx_obj_desc_image_t *output_image_desc;
-                void * output_image_target_ptr[2];
-
-                output_image_target_ptr[0] = NULL;
-                output_image_target_ptr[1] = NULL;
-
-                output_image_desc = (tivx_obj_desc_image_t *)obj_desc[TIVX_DL_DRAW_BOX_OUTPUT_START_IDX + out];
-                output_image_target_ptr[0] = tivxMemShared2TargetPtr(&output_image_desc->mem_ptr[0]);
-                tivxMemBufferMap(output_image_target_ptr[0], output_image_desc->mem_size[0], VX_MEMORY_TYPE_HOST,VX_WRITE_ONLY);
-                if(output_image_desc->mem_ptr[1].shared_ptr != 0)
-                {
-                    output_image_target_ptr[1] = tivxMemShared2TargetPtr(&output_image_desc->mem_ptr[1]);
-                    tivxMemBufferMap(output_image_target_ptr[1], output_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST,VX_WRITE_ONLY);
-                }
-
-
-                tivxMemBufferUnmap(output_image_target_ptr[0], output_image_desc->mem_size[0], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
-                if(output_image_target_ptr[1] != NULL)
-                {
-                    tivxMemBufferUnmap(output_image_target_ptr[1], output_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
-                }
-            }
-        }
+        // implement here
 
         tivxMemBufferUnmap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
         tivxMemBufferUnmap(in_tensor_target_ptr, in_tensor_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+
         tivxMemBufferUnmap(input_image_target_ptr[0], input_image_desc->mem_size[0], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
         if(input_image_target_ptr[1] != NULL)
         {
             tivxMemBufferUnmap(input_image_target_ptr[1], input_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+        }
+
+        tivxMemBufferUnmap(output_image_target_ptr[0], output_image_desc->mem_size[0], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
+        if(output_image_target_ptr[1] != NULL)
+        {
+            tivxMemBufferUnmap(output_image_target_ptr[1], output_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
         }
     }
 

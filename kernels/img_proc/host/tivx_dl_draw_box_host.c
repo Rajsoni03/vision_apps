@@ -67,10 +67,16 @@
 #include "tivx_kernels_host_utils.h"
 #include "tivx_dl_draw_box_host.h"
 
+static vx_kernel vx_DLDrawBox_kernel = NULL;
+
 static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxValidate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[]);
+
+static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxInitialize(vx_node node,
+            const vx_reference parameters[ ],
+            vx_uint32 num_params);
 
 static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxValidate(vx_node node,
             const vx_reference parameters[ ],
@@ -82,17 +88,21 @@ static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxValidate(vx_node node,
     vx_char config_name[VX_MAX_REFERENCE_NAME];
     vx_size config_size;
 
-    vx_image  image_input = NULL;
-    vx_uint32 width, height;
-    vx_df_image image_input_fmt;
+    vx_image  input_image = NULL;
+    vx_uint32 input_width, input_height;
+    vx_df_image input_image_fmt;
 
-    vx_tensor tensor_input = NULL;
-    vx_size out_tensor_dims;
+    vx_tensor input_tensor = NULL;
+    vx_size input_tensor_dims;
+
+    vx_image  output_image = NULL;
+    vx_uint32 output_width, output_height;
+    vx_df_image output_image_fmt;
 
     if (   (NULL == parameters[TIVX_DL_DRAW_BOX_CONFIG_IDX])
         || (NULL == parameters[TIVX_DL_DRAW_BOX_INPUT_IMAGE_IDX])
         || (NULL == parameters[TIVX_DL_DRAW_BOX_INPUT_TENSOR_IDX])
-        || (NULL == parameters[TIVX_DL_DRAW_BOX_OUTPUT_START_IDX])
+        || (NULL == parameters[TIVX_DL_DRAW_BOX_OUTPUT_IMAGE_IDX])
     )
     {
         status = VX_ERROR_INVALID_PARAMETERS;
@@ -103,22 +113,26 @@ static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxValidate(vx_node node,
     if (VX_SUCCESS == status)
     {
         config = (vx_user_data_object)parameters[TIVX_DL_DRAW_BOX_CONFIG_IDX];
-        image_input = (vx_image)parameters[TIVX_DL_DRAW_BOX_INPUT_IMAGE_IDX];
-        tensor_input = (vx_tensor)parameters[TIVX_DL_DRAW_BOX_INPUT_TENSOR_IDX];
+        input_image = (vx_image)parameters[TIVX_DL_DRAW_BOX_INPUT_IMAGE_IDX];
+        input_tensor = (vx_tensor)parameters[TIVX_DL_DRAW_BOX_INPUT_TENSOR_IDX];
+        output_image = (vx_image)parameters[TIVX_DL_DRAW_BOX_OUTPUT_IMAGE_IDX];
     }
 
     /* PARAMETER ATTRIBUTE FETCH */
-
     if (VX_SUCCESS == status)
     {
         tivxCheckStatus(&status, vxQueryUserDataObject(config, VX_USER_DATA_OBJECT_NAME, &config_name, sizeof(config_name)));
         tivxCheckStatus(&status, vxQueryUserDataObject(config, VX_USER_DATA_OBJECT_SIZE, &config_size, sizeof(config_size)));
 
-        tivxCheckStatus(&status, vxQueryImage(image_input, VX_IMAGE_WIDTH, &width, sizeof(width)));
-        tivxCheckStatus(&status, vxQueryImage(image_input, VX_IMAGE_HEIGHT, &height, sizeof(height)));
-        tivxCheckStatus(&status, vxQueryImage(image_input, VX_IMAGE_FORMAT, &image_input_fmt, sizeof(image_input_fmt)));
+        tivxCheckStatus(&status, vxQueryImage(input_image, VX_IMAGE_WIDTH, &input_width, sizeof(input_width)));
+        tivxCheckStatus(&status, vxQueryImage(input_image, VX_IMAGE_HEIGHT, &input_height, sizeof(input_height)));
+        tivxCheckStatus(&status, vxQueryImage(input_image, VX_IMAGE_FORMAT, &input_image_fmt, sizeof(input_image_fmt)));
 
-        tivxCheckStatus(&status, vxQueryTensor(tensor_input, VX_TENSOR_NUMBER_OF_DIMS, &out_tensor_dims, sizeof(out_tensor_dims)));
+        tivxCheckStatus(&status, vxQueryTensor(input_tensor, VX_TENSOR_NUMBER_OF_DIMS, &input_tensor_dims, sizeof(input_tensor_dims)));
+
+        tivxCheckStatus(&status, vxQueryImage(output_image, VX_IMAGE_WIDTH, &output_width, sizeof(output_width)));
+        tivxCheckStatus(&status, vxQueryImage(output_image, VX_IMAGE_HEIGHT, &output_height, sizeof(output_height)));
+        tivxCheckStatus(&status, vxQueryImage(output_image, VX_IMAGE_FORMAT, &output_image_fmt, sizeof(output_image_fmt)));
     }
 
     if (VX_SUCCESS == status)
@@ -132,26 +146,64 @@ static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxValidate(vx_node node,
 
     if (VX_SUCCESS == status)
     {
-        if ( !( (VX_DF_IMAGE_NV12 == image_input_fmt) ||
-                (VX_DF_IMAGE_U8   == image_input_fmt) ||
-                (VX_DF_IMAGE_S16  == image_input_fmt) ||
-                (VX_DF_IMAGE_U16  == image_input_fmt) ) )
+        if ( !( (VX_DF_IMAGE_NV12 == input_image_fmt) ||
+                (VX_DF_IMAGE_RGB  == input_image_fmt)))
         {
             status = VX_ERROR_INVALID_PARAMETERS;
-            VX_PRINT(VX_ZONE_ERROR, "'output' should be an image of type:\n VX_DF_IMAGE_NV12 or \n VX_DF_IMAGE_U8 or \n VX_DF_IMAGE_S16 or \n VX_DF_IMAGE_U16\n");
+            VX_PRINT(VX_ZONE_ERROR, "'input' should be an image of type:\n VX_DF_IMAGE_NV12 or \n VX_DF_IMAGE_RGB \n VX_DF_IMAGE_U8 or \n VX_DF_IMAGE_S16 or \n VX_DF_IMAGE_U16\n");
+        }
+    }
+
+    if (VX_SUCCESS == status)
+    {
+        if ( !( (VX_DF_IMAGE_NV12 == output_image_fmt) ||
+                (VX_DF_IMAGE_RGB  == output_image_fmt)))
+        {
+            status = VX_ERROR_INVALID_PARAMETERS;
+            VX_PRINT(VX_ZONE_ERROR, "'output' should be an image of type:\n VX_DF_IMAGE_NV12 or \n VX_DF_IMAGE_RGB \n VX_DF_IMAGE_U8 or \n VX_DF_IMAGE_S16 or \n VX_DF_IMAGE_U16\n");
+        }
+    }
+
+    if (VX_SUCCESS == status)
+    {
+        if ( !( (input_image_fmt == output_image_fmt) ||
+                (input_width     == output_width) ||
+                (input_height    == output_height)))
+        {
+            status = VX_ERROR_INVALID_PARAMETERS;
+            VX_PRINT(VX_ZONE_ERROR, "'input' and 'output' should be of the same width, height and color-format\n");
         }
     }
 
     return status;
 }
 
-vx_kernel tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs)
+static vx_status VX_CALLBACK tivxAddKernelDLDrawBoxInitialize(vx_node node,
+            const vx_reference parameters[ ],
+            vx_uint32 num_params)
 {
+    vx_status status = VX_SUCCESS;
+
+    if ( (num_params != TIVX_DL_DRAW_BOX_MAX_PARAMS)
+        || (NULL == parameters[TIVX_DL_DRAW_BOX_CONFIG_IDX])
+        || (NULL == parameters[TIVX_DL_DRAW_BOX_INPUT_IMAGE_IDX])
+        || (NULL == parameters[TIVX_DL_DRAW_BOX_INPUT_TENSOR_IDX])
+        || (NULL == parameters[TIVX_DL_DRAW_BOX_OUTPUT_IMAGE_IDX])
+    )
+    {
+        status = VX_ERROR_INVALID_PARAMETERS;
+        VX_PRINT(VX_ZONE_ERROR, "One or more REQUIRED parameters are set to NULL\n");
+    }
+    return status;
+}
+
+vx_status tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs)
+{
+    vx_status status = VX_SUCCESS;
+
     vx_kernel kernel;
-    vx_status status;
     vx_uint32 index;
     vx_enum kernel_id;
-    vx_int32 i;
 
     status = vxAllocateUserKernelId(context, &kernel_id);
     if(status != VX_SUCCESS)
@@ -161,16 +213,14 @@ vx_kernel tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs)
 
     if (status == VX_SUCCESS)
     {
-        /* Number of parameters are base params + output list */
-        uint32_t num_params = TIVX_DL_DRAW_BOX_BASE_PARAMS + num_outputs;
         kernel = vxAddUserKernel(
                     context,
                     TIVX_KERNEL_DL_DRAW_BOX_NAME,
                     kernel_id,
                     NULL,
-                    num_params,
+                    TIVX_DL_DRAW_BOX_MAX_PARAMS,
                     tivxAddKernelDLDrawBoxValidate,
-                    NULL,
+                    tivxAddKernelDLDrawBoxInitialize,
                     NULL);
 
         status = vxGetStatus((vx_reference)kernel);
@@ -204,17 +254,14 @@ vx_kernel tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs)
                         VX_PARAMETER_STATE_REQUIRED);
        index++;
     }
-    for(i = 0; i < num_outputs; i++)
+    if (status == VX_SUCCESS)
     {
-        if (status == VX_SUCCESS)
-        {
-              status = vxAddParameterToKernel(kernel,
-                          index,
-                          VX_OUTPUT,
-                          VX_TYPE_IMAGE,
-                          VX_PARAMETER_STATE_REQUIRED);
-              index++;
-        }
+            status = vxAddParameterToKernel(kernel,
+                        index,
+                        VX_OUTPUT,
+                        VX_TYPE_IMAGE,
+                        VX_PARAMETER_STATE_REQUIRED);
+            index++;
     }
     if (status == VX_SUCCESS)
     {
@@ -232,5 +279,18 @@ vx_kernel tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs)
         kernel = NULL;
     }
 
-    return kernel;
+    vx_DLDrawBox_kernel = kernel;
+
+    return status;
+}
+
+vx_status tivxRemoveKernelDLDrawBox(vx_context context)
+{
+    vx_status status;
+    vx_kernel kernel = vx_DLDrawBox_kernel;
+
+    status = vxRemoveKernel(kernel);
+    vx_DLDrawBox_kernel = NULL;
+
+    return status;
 }

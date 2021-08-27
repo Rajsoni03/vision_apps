@@ -395,57 +395,43 @@ VX_API_ENTRY vx_node VX_API_CALL tivxDLPreProcNode(vx_graph             graph,
 }
 
 VX_API_ENTRY vx_node VX_API_CALL tivxDLColorBlendNode(vx_graph             graph,
-                                                      vx_kernel            kernel,
                                                       vx_user_data_object  config,
                                                       vx_image             input_image,
                                                       vx_tensor            input_tensor,
-                                                      vx_image             output_images[],
-                                                      vx_int32             num_outputs)
+                                                      vx_image             output_image)
 {
-    vx_reference prms[TIVX_DL_COLOR_BLEND_MAX_PARAMS];
-    vx_int32 i;
+    vx_reference prms[] = {
+            (vx_reference)config,
+            (vx_reference)input_image,
+            (vx_reference)input_tensor,
+            (vx_reference)output_image
+    };
 
-    vx_int32 num_params = TIVX_DL_COLOR_BLEND_BASE_PARAMS + num_outputs;
-
-    prms[0] = (vx_reference)config;
-    prms[1] = (vx_reference)input_image;
-    prms[2] = (vx_reference)input_tensor;
-
-    for(i = 0; i < num_outputs; i++){
-        prms[TIVX_DL_COLOR_BLEND_OUTPUT_START_IDX + i] = (vx_reference)output_images[i];
-    }
-
-    vx_node node = tivxCreateNodeByKernelRef(graph,
-                                             kernel,
+    vx_node node = tivxCreateNodeByKernelName(graph,
+                                             TIVX_KERNEL_DL_COLOR_BLEND_NAME,
                                              prms,
-                                             num_params);
+                                             dimof(prms));
+
     return(node);
 }
 
 VX_API_ENTRY vx_node VX_API_CALL tivxDLDrawBoxNode(vx_graph             graph,
-                                                   vx_kernel            kernel,
                                                    vx_user_data_object  config,
                                                    vx_image             input_image,
                                                    vx_tensor            input_tensor,
-                                                   vx_image             output_images[],
-                                                   vx_int32             num_outputs)
+                                                   vx_image             output_image)
 {
-    vx_reference prms[TIVX_DL_DRAW_BOX_MAX_PARAMS];
-    vx_int32 i;
+    vx_reference prms[] = {
+            (vx_reference)config,
+            (vx_reference)input_image,
+            (vx_reference)input_tensor,
+            (vx_reference)output_image
+    };
 
-    vx_int32 num_params = TIVX_DL_DRAW_BOX_BASE_PARAMS + num_outputs;
-
-    prms[0] = (vx_reference)config;
-    prms[1] = (vx_reference)input_image;
-    prms[2] = (vx_reference)input_tensor;
-
-    for(i = 0; i < num_outputs; i++){
-        prms[TIVX_DL_DRAW_BOX_OUTPUT_START_IDX + i] = (vx_reference)output_images[i];
-    }
-
-    vx_node node = tivxCreateNodeByKernelRef(graph,
-                                             kernel,
+    vx_node node = tivxCreateNodeByKernelName(graph,
+                                             TIVX_KERNEL_DL_DRAW_BOX_NAME,
                                              prms,
-                                             num_params);
+                                             dimof(prms));
+
     return(node);
 }

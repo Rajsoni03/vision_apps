@@ -393,48 +393,40 @@ VX_API_ENTRY vx_node VX_API_CALL tivxDLPreProcNode(vx_graph             graph,
   * Takes the DL output and blends the provided color-map to the input image
   *
   * \param [in] graph              reference to the graph
-  * \param [in] kernel             reference to the kernel
   * \param [in] config             reference to tivxDLPreProcPrams
   * \param [in] input_image        Input image
   * \param [in] input_tensor       Input tensor
-  * \param [out] output_images     Array of vx_image output images
-  * \param [in] num_outputs        Number of output imgaes
+  * \param [out] output_image      Output image
   *
   * \ingroup group_vision_apps_kernels_img_proc
   *
   * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>vxGetStatus</tt>
   */
 VX_API_ENTRY vx_node VX_API_CALL tivxDLColorBlendNode(vx_graph             graph,
-                                                      vx_kernel            kernel,
                                                       vx_user_data_object  config,
                                                       vx_image             input_image,
                                                       vx_tensor            input_tensor,
-                                                      vx_image             output_images[],
-                                                      vx_int32             num_outputs);
+                                                      vx_image             output_image);
 
 /*! \brief DL Draw Box Node
   *
   * Takes the DL output and draws boxes around an object on input image
   *
   * \param [in] graph              reference to the graph
-  * \param [in] kernel             reference to the kernel
   * \param [in] config             reference to tivxDLPreProcPrams
   * \param [in] input_image        Input image
   * \param [in] input_tensor       Input tensor
-  * \param [out] output_images     Array of vx_image output images
-  * \param [in] num_outputs        Number of output imgaes
+  * \param [out] output_image      Output image
   *
   * \ingroup group_vision_apps_kernels_img_proc
   *
   * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>vxGetStatus</tt>
   */
 VX_API_ENTRY vx_node VX_API_CALL tivxDLDrawBoxNode(vx_graph             graph,
-                                                   vx_kernel            kernel,
                                                    vx_user_data_object  config,
                                                    vx_image             input_image,
                                                    vx_tensor            input_tensor,
-                                                   vx_image             output_images[],
-                                                   vx_int32             num_outputs);
+                                                   vx_image             output_image);
 
 #ifdef __cplusplus
 }

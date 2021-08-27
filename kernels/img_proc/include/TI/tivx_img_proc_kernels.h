@@ -724,14 +724,11 @@ typedef struct {
     /** Flag to indicate, if 1 - use color map, 0 - auto assign colors to each class */
     vx_int32 use_color_map;
 
-    /** Number of outputs to blend not to exceed TIVX_DL_COLOR_BLEND_MAX_OUTPUTS */
-    vx_int32 num_outputs;
-
     /** Number of classes per output not to exceed TIVX_DL_COLOR_BLEND_MAX_CLASSES*/
-    vx_int32 num_classes[TIVX_DL_COLOR_BLEND_MAX_OUTPUTS];
+    vx_int32 num_classes;
 
     /** Color map for each output, number of colors not to exceed TIVX_DL_COLOR_BLEND_MAX_COLORS */
-    vx_uint8 color_map[TIVX_DL_COLOR_BLEND_MAX_OUTPUTS][TIVX_DL_COLOR_BLEND_MAX_CLASSES][TIVX_DL_COLOR_BLEND_MAX_COLORS];
+    vx_uint8 color_map[TIVX_DL_COLOR_BLEND_MAX_CLASSES][TIVX_DL_COLOR_BLEND_MAX_COLORS];
 
 }tivxDLColorBlendParams;
 
@@ -770,14 +767,11 @@ typedef struct {
     /** Flag to indicate, if 1 - use color map, 0 - auto assign colors to each class */
     vx_int32 use_color_map;
 
-    /** Number of outputs to blend not to exceed TIVX_DL_DRAW_BOX_MAX_OUTPUTS */
-    vx_int32 num_outputs;
-
     /** Number of classes per output not to exceed TIVX_DL_DRAW_BOX_MAX_CLASSES*/
-    vx_int32 num_classes[TIVX_DL_DRAW_BOX_MAX_OUTPUTS];
+    vx_int32 num_classes;
 
     /** Color map for each output, number of colors not to exceed TIVX_DL_DRAW_BOX_MAX_COLORS */
-    vx_uint8 color_map[TIVX_DL_DRAW_BOX_MAX_OUTPUTS][TIVX_DL_DRAW_BOX_MAX_CLASSES][TIVX_DL_DRAW_BOX_MAX_COLORS];
+    vx_uint8 color_map[TIVX_DL_DRAW_BOX_MAX_CLASSES][TIVX_DL_DRAW_BOX_MAX_COLORS];
 
     /** Dictionary of class names not to exceed TIVX_DL_DRAW_BOX_MAX_CLASSES
      * and each class name not to exceed TIVX_DL_DRAW_BOX_MAX_CLASS_NAME
@@ -866,18 +860,6 @@ vx_kernel tivxAddKernelPixelViz(vx_context context, vx_int32 num_output_tensors)
  * \ingroup group_vision_apps_kernels_img_proc
  */
 vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs);
-
-/*!
- * \brief Used by the application to create the DL color convert kernel from the context.
- * \ingroup group_vision_apps_kernels_img_proc
- */
-vx_kernel tivxAddKernelDLColorBlend(vx_context context, vx_int32 num_outputs);
-
-/*!
- * \brief Used by the application to create the DL draw box kernel from the context.
- * \ingroup group_vision_apps_kernels_img_proc
- */
-vx_kernel tivxAddKernelDLDrawBox(vx_context context, vx_int32 num_outputs);
 
 /*!
  * \brief Set default parameters for tivxImgMosaicParams
