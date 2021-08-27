@@ -295,7 +295,31 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 if(tensor_format == TIVX_DL_PRE_PROC_TENSOR_FORMAT_RGB)
                 {
                     /* Case 1 */
-                    /* Input is RGB, Output is RGB (NHWC) bit-depth unsigned 8-bit */
+                    /* Input is RGB, Output is RGB (NHWC) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            int8_t *pOut = (int8_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[offset + 0] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         for(pos_y = 0; pos_y < input_height; pos_y++)
@@ -445,6 +469,30 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 2 */
                     /* Input is RGB, Output is BGR (NHWC) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            /* In this case output is simply a copy of input, so use the input stride_y */
+                            int8_t *pOut = (int8_t *)out_tensor_target_ptr + (pos_y * in_stride_y);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[offset + 2] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         for(pos_y = 0; pos_y < input_height; pos_y++)
@@ -597,6 +645,29 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 3 */
                     /* Input is RGB Output is RGB (NCHW) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            int8_t *pOut = (int8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 0) + pos_x] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         for(pos_y = 0; pos_y < input_height; pos_y++)
@@ -740,6 +811,29 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 4 */
                     /* Input is RGB Output is BGR (NCHW) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pIn  = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            int8_t *pOut = (int8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+                            uint32_t offset;
+
+                            offset = 0;
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                uint8_t R = pIn[offset + 0];
+                                uint8_t G = pIn[offset + 1];
+                                uint8_t B = pIn[offset + 2];
+
+                                pOut[(ch_offset * 2) + pos_x] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         for(pos_y = 0; pos_y < input_height; pos_y++)
@@ -889,6 +983,35 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 1 */
                     /* Input is NV12, Output is RGB (NHWC) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        int8_t *pOut = (int8_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 0] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 2] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         uint8_t *pOut = (uint8_t *)out_tensor_target_ptr;
@@ -1068,6 +1191,35 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 2 */
                     /* Input is NV12,  Output is BGR (NHWC) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        int8_t *pOut = (int8_t *)out_tensor_target_ptr;
+                        uint32_t offset;
+
+                        offset = 0;
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[offset + 2] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 1] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[offset + 0] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+
+                                offset += 3;
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         uint8_t *pOut = (uint8_t *)out_tensor_target_ptr;
@@ -1250,6 +1402,30 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 3 */
                     /* Input is NV12, Output is RGB (NCHW) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            int8_t *pOut   = (int8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 0) + pos_x] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 2) + pos_x] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         for(pos_y = 0; pos_y < input_height; pos_y++)
@@ -1399,6 +1575,30 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
                 {
                     /* Case 4 */
                     /* Input is NV12, Output is BGR (NCHW) */
+                    if(tensor_data_type == VX_TYPE_INT8)
+                    {
+                        for(pos_y = 0; pos_y < input_height; pos_y++)
+                        {
+                            uint8_t *pY    = (uint8_t *)in_img_target_ptr[0] + (pos_y * in_stride_y);
+                            uint8_t *pCbCr = (uint8_t *)in_img_target_ptr[1] + ((pos_y >> 1) * in_stride_y);
+                            int8_t *pOut   = (int8_t *)out_tensor_target_ptr + (pos_y * out_tensor_desc->dimensions[0]);
+
+                            for(pos_x = 0; pos_x < input_width; pos_x++)
+                            {
+                                float R, G, B;
+
+                                int32_t Y  = pY[pos_x];
+                                int32_t Cb = pCbCr[((pos_x>>1)<<1)];
+                                int32_t Cr = pCbCr[((pos_x>>1)<<1) + 1];
+
+                                convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
+
+                                pOut[(ch_offset * 2) + pos_x] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 1) + pos_x] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
+                                pOut[(ch_offset * 0) + pos_x] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                            }
+                        }
+                    }
                     if(tensor_data_type == VX_TYPE_UINT8)
                     {
                         for(pos_y = 0; pos_y < input_height; pos_y++)
