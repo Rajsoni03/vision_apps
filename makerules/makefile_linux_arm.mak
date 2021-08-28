@@ -50,7 +50,7 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	ln -sr $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$(tidl_dir) $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tidl_j7
 
 	@#Pull up the kernels_j7 folder at tiovx level and remove tiovx_dev similar to release package
-	mv $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev/kernels_j7 $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx
+	mv $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev/kernels_j7 $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx || true
 	rm -rf $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev
 
 endif
