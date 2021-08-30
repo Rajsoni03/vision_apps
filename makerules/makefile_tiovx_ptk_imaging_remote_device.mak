@@ -12,11 +12,36 @@ else
 	BUILD_PTK=no
 endif
 
+vxlib:
+ifeq ($(SOC),j721e)
+ifeq ($(PROFILE), $(filter $(PROFILE),release all))
+	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
+ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
+	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
+endif
+ifeq ($(SOC),j721e_test_aep)
+ifeq ($(PROFILE), $(filter $(PROFILE),release all))
+	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
+ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
+	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
+endif
+
+vxlib_scrub:
+	$(MAKE) -C $(VXLIB_PATH) scrub
+
 tiovx:
 	$(MAKE) -C $(TIOVX_PATH) -f tiovx_dev/Makefile
 
 tiovx_clean:
-	$(MAKE) -C $(TIOVX_PATH) -f tiovx_dev/Makefile clean 
+	$(MAKE) -C $(TIOVX_PATH) -f tiovx_dev/Makefile clean
 
 tiovx_scrub:
 	rm -rf $(TIOVX_PATH)/out

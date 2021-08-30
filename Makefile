@@ -165,7 +165,7 @@ vision_apps_scrub: sdk_check_paths
 
 vision_apps_docs: sdk_check_paths doxy_docs
 
-sdk: sdk_check_paths pdk ethfw remote_device imaging ptk tiovx tiadalg qnx
+sdk: sdk_check_paths pdk ethfw remote_device imaging ptk vxlib tiovx tiadalg qnx
 	$(MAKE) vision_apps
 	$(MAKE) tidl_rt
 ifeq ($(BUILD_CPU_MCU1_0),yes)

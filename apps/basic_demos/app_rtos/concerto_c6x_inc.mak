@@ -13,7 +13,7 @@ LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c66/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c66/$(TARGET_BUILD)/
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
-LDIRS += $(VXLIB_PATH)/packages/ti/vxlib/lib
+LDIRS += $(VXLIB_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/NO_OS/$(TARGET_BUILD)
 LDIRS += $(TIADALG_PATH)/lib/$(TARGET_CPU)/release
 LDIRS += $(MATHLIB_PATH)/packages/ti/mathlib/lib
 
@@ -53,7 +53,8 @@ STATIC_LIBS += vx_target_kernels_stereo
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS)
 
-ADDITIONAL_STATIC_LIBS += vxlib.ae66
+ADDITIONAL_STATIC_LIBS += vxlib_C66.lib
+
 ADDITIONAL_STATIC_LIBS += ti.osal.ae66
 ADDITIONAL_STATIC_LIBS += ipc.ae66
 ADDITIONAL_STATIC_LIBS += sciclient.ae66
