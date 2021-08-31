@@ -72,7 +72,43 @@
 
 #include <tivx_dl_color_blend_host.h>
 
+typedef struct {
+    tivxDLColorBlendParams prms;
+    
+    /** Color map for each output, number of colors not to exceed TIVX_DL_COLOR_BLEND_MAX_COLORS */
+    vx_uint8 color_map_yuv[TIVX_DL_COLOR_BLEND_MAX_CLASSES][TIVX_DL_COLOR_BLEND_MAX_COLORS];
+
+}tivxDLColorBlendObject;
+
 static tivx_target_kernel vx_dlColorBlend_kernel = NULL;
+
+static inline void convertRGBToYCbCr(int32_t R, int32_t G, int32_t B, int32_t *Y, int32_t *Cb, int32_t *Cr, int32_t min_val, int32_t max_val)
+{
+    int32_t Y_  = (( 66*R) + (129*G) +  (25*B));
+    int32_t Cb_ = ((-38*R) + (-74*G) + (112*B));
+    int32_t Cr_ = ((112*R) + (-94*G) + (-18*B));
+
+    Y_  = (Y_  + 128) >> 8;
+    Cb_ = (Cb_ + 128) >> 8;
+    Cr_ = (Cr_ + 128) >> 8;
+
+    Y_  = Y_  + 16;
+    Cb_ = Cb_ + 128;
+    Cr_ = Cr_ + 128;
+
+    if(Y_ < min_val) { Y_ = min_val; }
+    if(Y_ > max_val) { Y_ = max_val; }
+
+    if(Cb_ < min_val) { Cb_ = min_val; }
+    if(Cb_ > max_val) { Cb_ = max_val; }
+
+    if(Cr_ < min_val) { Cr_ = min_val; }
+    if(Cr_ > max_val) { Cr_ = max_val; }
+
+    *Y  = Y_;
+    *Cb = Cb_;
+    *Cr = Cr_;
+}
 
 static vx_status VX_CALLBACK tivxKernelDLColorBlendCreate
 (
@@ -94,16 +130,63 @@ static vx_status VX_CALLBACK tivxKernelDLColorBlendCreate
         }
     }
 
+    tivxDLColorBlendObject * obj = NULL;
     tivxDLColorBlendParams * prms = NULL;
 
-    prms = tivxMemAlloc(sizeof(tivxDLColorBlendParams), TIVX_MEM_EXTERNAL);
-    if (NULL == prms)
+    obj = tivxMemAlloc(sizeof(tivxDLColorBlendObject), TIVX_MEM_EXTERNAL);
+
+    if (NULL == obj)
     {
         status = VX_FAILURE;
     }
     else
     {
-        status = tivxSetTargetKernelInstanceContext(kernel, prms,  sizeof(tivxDLColorBlendParams));
+        int32_t n;
+
+        tivx_obj_desc_user_data_object_t* config_desc;
+        void * config_target_ptr = NULL;
+
+        config_desc = (tivx_obj_desc_user_data_object_t *)obj_desc[TIVX_DL_COLOR_BLEND_CONFIG_IDX];
+        config_target_ptr = tivxMemShared2TargetPtr(&config_desc->mem_ptr);
+        tivxMemBufferMap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
+
+        tivxDLColorBlendParams *params = (tivxDLColorBlendParams *)config_target_ptr;
+
+        prms = (tivxDLColorBlendParams *)&obj->prms;
+
+        memcpy(prms, params, sizeof(tivxDLColorBlendParams));
+
+        if(prms->use_color_map == 0)
+        {
+            /* Randomly assign RGB colors for N classes */
+            for(n = 0; n < prms->num_classes; n++)
+            {
+                prms->color_map[n][0] = rand() % 256;
+                prms->color_map[n][1] = rand() % 256;
+                prms->color_map[n][2] = rand() % 256;
+            }
+        }
+
+        /* Convert RGB color map to YUV */
+        for(n = 0; n < prms->num_classes; n++)
+        {
+            int32_t R = prms->color_map[n][0];
+            int32_t G = prms->color_map[n][1];
+            int32_t B = prms->color_map[n][2];
+
+            int32_t Y, Cb, Cr;
+
+            convertRGBToYCbCr(R, G, B, &Y, &Cb, &Cr, 0, 255);
+
+            obj->color_map_yuv[n][0] = (uint8_t)Y;
+            obj->color_map_yuv[n][1] = (uint8_t)Cb;
+            obj->color_map_yuv[n][2] = (uint8_t)Cr;
+
+        }
+
+        tivxMemBufferUnmap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+
+        status = tivxSetTargetKernelInstanceContext(kernel, obj,  sizeof(tivxDLColorBlendObject));
     }
 
     return (status);
@@ -128,20 +211,56 @@ static vx_status VX_CALLBACK tivxKernelDLColorBlendDelete(
     if (VX_SUCCESS == status)
     {
         uint32_t size;
-        tivxDLColorBlendParams *prms = NULL;
+        tivxDLColorBlendObject *obj = NULL;
 
         status = tivxGetTargetKernelInstanceContext(kernel,
-            (void **)&prms, &size);
+            (void **)&obj, &size);
 
         if (VX_SUCCESS == status)
         {
-            tivxMemFree(prms, sizeof(tivxDLColorBlendParams), TIVX_MEM_EXTERNAL);
+            tivxMemFree(obj, sizeof(tivxDLColorBlendObject), TIVX_MEM_EXTERNAL);
         }
     }
 
     return (status);
 }
 
+static inline int32_t get_class_id(void *tensor_data, vx_enum data_type, int32_t offset)
+{
+    int32_t class_id = 0;
+
+    if(data_type == VX_TYPE_INT8)
+    {
+        class_id = *((int8_t *)tensor_data + offset);
+    }
+    else if(data_type == VX_TYPE_UINT8)
+    {
+        class_id = *((uint8_t *)tensor_data + offset);
+    }
+    else if(data_type == VX_TYPE_INT16)
+    {
+        class_id = *((int16_t *)tensor_data + offset);
+    }
+    else if(data_type == VX_TYPE_UINT16)
+    {
+        class_id = *((uint16_t *)tensor_data + offset);
+    }
+    else if(data_type == VX_TYPE_INT32)
+    {
+        class_id = *((int32_t *)tensor_data + offset);
+    }
+    else if(data_type == VX_TYPE_UINT32)
+    {
+        class_id = *((uint32_t *)tensor_data + offset);
+    }
+    else if(data_type == VX_TYPE_FLOAT32)
+    {
+        class_id = *((float *)tensor_data + offset);
+    }
+
+    return class_id;
+
+}
 static vx_status VX_CALLBACK tivxKernelDLColorBlendProcess
 (
     tivx_target_kernel_instance kernel,
@@ -152,13 +271,14 @@ static vx_status VX_CALLBACK tivxKernelDLColorBlendProcess
 {
     vx_status status = VX_SUCCESS;
 
-    tivxDLColorBlendParams *prms = NULL;
+    tivxDLColorBlendObject *obj = NULL;
     vx_int32 i;
 
     for (i = 0U; i < num_params; i ++)
     {
         if (NULL == obj_desc[i])
         {
+            VX_PRINT(VX_ZONE_ERROR, "Object descriptor %d is NULL!\n", i);
             status = VX_FAILURE;
             break;
         }
@@ -169,19 +289,17 @@ static vx_status VX_CALLBACK tivxKernelDLColorBlendProcess
         uint32_t size;
 
         status = tivxGetTargetKernelInstanceContext(kernel,
-            (void **)&prms, &size);
-        if ((VX_SUCCESS != status) || (NULL == prms) ||
-            (sizeof(tivxDLColorBlendParams) != size))
+            (void **)&obj, &size);
+        if ((VX_SUCCESS != status) || (NULL == obj) ||
+            (sizeof(tivxDLColorBlendObject) != size))
         {
+            VX_PRINT(VX_ZONE_ERROR, "incorrect kernel context params in dl-color-blend process function!\n");
             status = VX_FAILURE;
         }
     }
 
     if(VX_SUCCESS == status)
     {
-        tivx_obj_desc_user_data_object_t* config_desc;
-        void * config_target_ptr = NULL;
-
         tivx_obj_desc_tensor_t *in_tensor_desc;
         void* in_tensor_target_ptr;
 
@@ -196,10 +314,6 @@ static vx_status VX_CALLBACK tivxKernelDLColorBlendProcess
 
         output_image_target_ptr[0] = NULL;
         output_image_target_ptr[1] = NULL;
-
-        config_desc = (tivx_obj_desc_user_data_object_t *)obj_desc[TIVX_DL_COLOR_BLEND_CONFIG_IDX];
-        config_target_ptr = tivxMemShared2TargetPtr(&config_desc->mem_ptr);
-        tivxMemBufferMap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST,VX_READ_ONLY);
 
         in_tensor_desc  = (tivx_obj_desc_tensor_t *)obj_desc[TIVX_DL_COLOR_BLEND_INPUT_TENSOR_IDX];
         in_tensor_target_ptr  = tivxMemShared2TargetPtr(&in_tensor_desc->mem_ptr);
@@ -223,9 +337,111 @@ static vx_status VX_CALLBACK tivxKernelDLColorBlendProcess
             tivxMemBufferMap(output_image_target_ptr[1], output_image_desc->mem_size[1], VX_MEMORY_TYPE_HOST,VX_WRITE_ONLY);
         }
 
-        // implement here ...
+        tivxDLColorBlendParams *prms = (tivxDLColorBlendParams *)&obj->prms;
+        if((input_image_desc->format == VX_DF_IMAGE_NV12) && 
+            (output_image_desc->format == VX_DF_IMAGE_NV12))
+        {
+            int32_t w, h;
 
-        tivxMemBufferUnmap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+            /* Copy luma plane, swap CbCr plane */
+            memcpy(output_image_target_ptr[0], input_image_target_ptr[0], input_image_desc->mem_size[0]);
+
+            /* Tensor output resolution might be different from image output resolution */
+            /* User nearest neighbor interpolation method select tensor class-ids to appropriate output color-map */
+
+            float tensor_width  = in_tensor_desc->dimensions[0];
+            float tensor_height = in_tensor_desc->dimensions[1];
+
+            float output_width  = output_image_desc->width;
+            float output_height = output_image_desc->height >> 1;
+
+            float w_ratio = tensor_width / (1.0 * output_width);
+            float h_ratio = tensor_height / (1.0 * output_height);
+
+            int32_t w_loc, h_loc, w_idx, h_idx;
+
+            uint8_t *pOut = output_image_target_ptr[1];
+
+            for (h = 0; h < output_height; h++)
+            {
+                h_loc = h_ratio * (h + 0.5) - 0.5;
+                h_loc = (h_loc < 0) ? 0 : h_loc;
+                h_idx = h_loc;
+                for (w = 0; w < output_width; w+=2)
+                {
+                    w_loc = w_ratio * (w + 0.5) - 0.5;
+                    w_loc = (w_loc < 0) ? 0 : w_loc;
+                    w_idx = w_loc;
+                    int32_t tensor_offset = (h_idx * tensor_width) + w_idx;
+                    int32_t output_offset = (h * output_width) + w;
+                    int32_t class_id = get_class_id(in_tensor_target_ptr, in_tensor_desc->data_type, tensor_offset);
+
+                    if((class_id >= 0) && (class_id < prms->num_classes))
+                    {
+                        pOut[output_offset + 0] = obj->color_map_yuv[class_id][1];
+                        pOut[output_offset + 1] = obj->color_map_yuv[class_id][2];
+                    }
+                }
+            }
+        }
+        else if((input_image_desc->format == VX_DF_IMAGE_RGB) &&
+                (output_image_desc->format == VX_DF_IMAGE_RGB))
+        {
+            int32_t w, h;
+
+            /* Tensor output resolution might be different from image output resolution */
+            /* User nearest neighbor interpolation method select tensor class-ids to appropriate output color-map */
+
+            float tensor_width  = in_tensor_desc->dimensions[0];
+            float tensor_height = in_tensor_desc->dimensions[1];
+
+            float output_width  = output_image_desc->width;
+            float output_height = output_image_desc->height;
+
+            float w_ratio = tensor_width / (1.0 * output_width);
+            float h_ratio = tensor_height / (1.0 * output_height);
+
+            int32_t w_loc, h_loc, w_idx, h_idx;
+
+            uint8_t *pIn = input_image_target_ptr[0];
+            uint8_t *pOut = output_image_target_ptr[0];
+
+            for (h = 0; h < output_height; h++)
+            {
+                h_loc = h_ratio * (h + 0.5) - 0.5;
+                h_loc = (h_loc < 0) ? 0 : h_loc;
+                h_idx = h_loc;
+                
+                int32_t k = 0;
+                for (w = 0; w < output_width; w++)
+                {
+                    w_loc = w_ratio * (w + 0.5) - 0.5;
+                    w_loc = (w_loc < 0) ? 0 : w_loc;
+                    w_idx = w_loc;
+                    int32_t tensor_offset = (h_idx * tensor_width) + w_idx;
+                    int32_t class_id = get_class_id(in_tensor_target_ptr, in_tensor_desc->data_type, tensor_offset);
+                    int32_t output_offset = (h * output_image_desc->imagepatch_addr[0].stride_y);
+
+                    if((class_id >= 0) && (class_id < prms->num_classes))
+                    {
+                        float R = pIn[output_offset + k + 0];
+                        float G = pIn[output_offset + k + 1];
+                        float B = pIn[output_offset + k + 2];
+                        
+                        float R_ = obj->prms.color_map[class_id][0];
+                        float G_ = obj->prms.color_map[class_id][1];
+                        float B_ = obj->prms.color_map[class_id][2];
+
+                        pOut[output_offset + k + 0] = (uint8_t)((R * 0.6f) + (R_ * 0.4f));
+                        pOut[output_offset + k + 1] = (uint8_t)((G * 0.6f) + (G_ * 0.4f));
+                        pOut[output_offset + k + 2] = (uint8_t)((B * 0.6f) + (B_ * 0.4f));
+
+                        k+=3;
+                    }
+                }
+            }
+        }
+
         tivxMemBufferUnmap(in_tensor_target_ptr, in_tensor_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
 
         tivxMemBufferUnmap(input_image_target_ptr[0], input_image_desc->mem_size[0], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
