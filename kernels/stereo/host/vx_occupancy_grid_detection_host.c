@@ -65,6 +65,7 @@
 #include "tivx_stereo_kernels_priv.h"
 #include "tivx_kernel_occupancy_grid_detection.h"
 #include "TI/tivx_target_kernel.h"
+#include "tivx_kernels_target_utils.h"
 
 static vx_kernel vx_occupancy_grid_detection_kernel = NULL;
 
@@ -253,8 +254,7 @@ vx_status tivxAddKernelOccupancyGridDetection(vx_context context)
         if (status == (vx_status)VX_SUCCESS)
         {
             /* add supported target's */
-            tivxAddKernelTarget(kernel, TIVX_TARGET_DSP1);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_DSP2);
+            tivxKernelsHostUtilsAddKernelTargetDsp(kernel);
             tivxAddKernelTarget(kernel, TIVX_TARGET_A72_0);
             tivxAddKernelTarget(kernel, TIVX_TARGET_A72_1);
             tivxAddKernelTarget(kernel, TIVX_TARGET_A72_2);
