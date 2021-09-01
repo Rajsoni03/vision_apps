@@ -330,21 +330,9 @@ static vx_status VX_CALLBACK tivxKernelOCPostProcProcess
 void tivxAddTargetKernelOCPostProc()
 {
     char target_name[TIVX_TARGET_MAX_NAME];
-    vx_enum self_cpu;
 
-    self_cpu = tivxGetSelfCpuId();
-
-    if ((self_cpu == TIVX_CPU_ID_DSP1) || (self_cpu == TIVX_CPU_ID_DSP2))
+    if( (vx_status)VX_SUCCESS == tivxKernelsTargetUtilsAssignTargetNameDsp(target_name))
     {
-        if (self_cpu == TIVX_CPU_ID_DSP1)
-        {
-            strncpy(target_name, TIVX_TARGET_DSP1, TIVX_TARGET_MAX_NAME);
-        }
-        else if (self_cpu == TIVX_CPU_ID_DSP2)
-        {
-            strncpy(target_name, TIVX_TARGET_DSP2, TIVX_TARGET_MAX_NAME);
-        }
-
         vx_oc_post_proc_target_kernel = tivxAddTargetKernelByName
                                         (
                                             TIVX_KERNEL_OC_POST_PROC_NAME,

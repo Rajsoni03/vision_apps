@@ -281,8 +281,7 @@ vx_kernel tivxAddKernelPixelViz(vx_context context, vx_int32 num_output_tensors)
     if (status == VX_SUCCESS)
     {
         /* add supported target's */
-        tivxAddKernelTarget(kernel, TIVX_TARGET_DSP1);
-        tivxAddKernelTarget(kernel, TIVX_TARGET_DSP2);
+        tivxKernelsHostUtilsAddKernelTargetDsp(kernel);
     }
     if (status == VX_SUCCESS)
     {

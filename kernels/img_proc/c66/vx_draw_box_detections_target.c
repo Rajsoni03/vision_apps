@@ -308,26 +308,24 @@ static vx_status VX_CALLBACK tivxKernelDrawBoxDetectionsProcess
 }
 void tivxAddTargetKernelDrawBoxDetections()
 {
+    vx_status status = (vx_status)VX_FAILURE;
     char target_name[TIVX_TARGET_MAX_NAME];
     vx_enum self_cpu;
 
     self_cpu = tivxGetSelfCpuId();
 
-    if ((self_cpu == TIVX_CPU_ID_DSP1) || (self_cpu == TIVX_CPU_ID_DSP2) || (self_cpu == TIVX_CPU_ID_A72_0))
+    if (self_cpu == TIVX_CPU_ID_A72_0)
     {
-        if (self_cpu == TIVX_CPU_ID_DSP1)
-        {
-            strncpy(target_name, TIVX_TARGET_DSP1, TIVX_TARGET_MAX_NAME);
-        }
-        else if (self_cpu == TIVX_CPU_ID_DSP2)
-        {
-            strncpy(target_name, TIVX_TARGET_DSP2, TIVX_TARGET_MAX_NAME);
-        }
-        else if (self_cpu == TIVX_CPU_ID_A72_0)
-        {
-            strncpy(target_name, TIVX_TARGET_A72_0, TIVX_TARGET_MAX_NAME);
-        }
+        strncpy(target_name, TIVX_TARGET_A72_0, TIVX_TARGET_MAX_NAME);
+        status = (vx_status)VX_SUCCESS;
+    }
+    else
+    {
+        status = tivxKernelsTargetUtilsAssignTargetNameDsp(target_name);
+    }
 
+    if( (vx_status)VX_SUCCESS == status)
+    {
         vx_DrawBoxDetections_kernel = tivxAddTargetKernelByName
                                      (
                                         TIVX_KERNEL_DRAW_BOX_DETECTIONS_NAME,
