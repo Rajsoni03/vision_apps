@@ -501,18 +501,6 @@ void tivxAddTargetKernelDofToTracks(void)
 
     self_cpu = tivxGetSelfCpuId();
 
-    if ( self_cpu == TIVX_CPU_ID_DSP1 )
-    {
-        strncpy(target_name[0], TIVX_TARGET_DSP1, TIVX_TARGET_MAX_NAME);
-        status = VX_SUCCESS;
-    }
-    else
-    if ( self_cpu == TIVX_CPU_ID_DSP2 )
-    {
-        strncpy(target_name[0], TIVX_TARGET_DSP2, TIVX_TARGET_MAX_NAME);
-        status = VX_SUCCESS;
-    }
-    else
     if ( self_cpu == TIVX_CPU_ID_A72_0 )
     {
         strncpy(target_name[0], TIVX_TARGET_A72_0, TIVX_TARGET_MAX_NAME);
@@ -523,14 +511,14 @@ void tivxAddTargetKernelDofToTracks(void)
         status = VX_SUCCESS;
     }
     else
-    if ( self_cpu == TIVX_CPU_ID_EVE1 )
+    if ( self_cpu == TIVX_CPU_ID_DSP_C7_1 )
     {
-        strncpy(target_name[0], TIVX_TARGET_EVE1, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[0], TIVX_TARGET_DSP_C7_1, TIVX_TARGET_MAX_NAME);
         status = VX_SUCCESS;
     }
     else
     {
-        status = VX_FAILURE;
+        status = tivxKernelsTargetUtilsAssignTargetNameDsp(target_name[0]);
     }
 
     if (status == VX_SUCCESS)

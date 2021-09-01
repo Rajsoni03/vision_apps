@@ -359,8 +359,7 @@ vx_status tivxAddKernelSfmOgmap(vx_context context)
         if (status == VX_SUCCESS)
         {
             /* add supported target's */
-            tivxAddKernelTarget(kernel, TIVX_TARGET_DSP1);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_DSP2);
+            tivxKernelsHostUtilsAddKernelTargetDsp(kernel);
             tivxAddKernelTarget(kernel, TIVX_TARGET_A72_0);
             tivxAddKernelTarget(kernel, TIVX_TARGET_A72_1);
             tivxAddKernelTarget(kernel, TIVX_TARGET_A72_2);
