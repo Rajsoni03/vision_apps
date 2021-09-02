@@ -31,7 +31,6 @@ SHARED_LIBS += GLESv2
 
 ifeq ($(TARGET_OS),QNX)
 SYS_SHARED_LIBS += screen
-CSOURCES := qnx_so_dep.c
 endif
 
 include $(FINALE)
