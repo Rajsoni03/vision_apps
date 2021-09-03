@@ -71,8 +71,17 @@
 #ifdef HOST_EMULATION
 #include "C6xSimulator.h"
 #else
-#include "c6x.h"
+#if defined (__C7100__)
+    #include <c7x.h>
+    #if defined (C6X_MIGRATION)
+        #include <c6x_migration.h>
+    #endif
+    #define RESTRICT restrict
+#else
+    #include <c6x.h>
 #endif
+#endif
+
 //#define DEBUG_1
 #define NUM_ELEMENTS (7)
 #ifdef DEBUG_1
