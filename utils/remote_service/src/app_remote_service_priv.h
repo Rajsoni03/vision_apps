@@ -73,7 +73,7 @@
 
 
 #define APP_REMOTE_SERVICE_NAME_MAX      ( 64u)
-#define IPC_RPMESSAGE_MSG_SIZE           (512u)
+#define IPC_RPMESSAGE_MSG_SIZE           (496U + 32U)
 #define APP_REMOTE_SERVICE_PRM_SIZE_MAX  (IPC_RPMESSAGE_MSG_SIZE-(sizeof(app_service_msg_header_t)))
 
 typedef struct {
