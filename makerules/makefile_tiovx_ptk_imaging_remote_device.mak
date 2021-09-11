@@ -38,16 +38,16 @@ vxlib_scrub:
 	$(MAKE) -C $(VXLIB_PATH) scrub
 
 tiovx:
-	$(MAKE) -C $(TIOVX_PATH) -f tiovx_dev/Makefile
+	$(MAKE) -C $(TIOVX_PATH)
 
 tiovx_clean:
-	$(MAKE) -C $(TIOVX_PATH) -f tiovx_dev/Makefile clean
+	$(MAKE) -C $(TIOVX_PATH) clean
 
 tiovx_scrub:
 	rm -rf $(TIOVX_PATH)/out
 
 tiovx_docs:
-	$(MAKE) -C $(TIOVX_PATH) -f tiovx_dev/Makefile doxy_docs
+	$(MAKE) -C $(TIOVX_PATH) doxy_docs
 
 ptk:
 ifeq ($(BUILD_PTK),yes)

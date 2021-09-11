@@ -49,12 +49,6 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	done
 	ln -sr $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$(tidl_dir) $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tidl_j7
 
-	@#Pull up the kernels_j7 folder at tiovx level and remove tiovx_dev similar to release package
-	if test ! -d $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/kernels_j7; then \
-		mv $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev/kernels_j7 $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx; \
-		rm -rf $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tiovx/tiovx_dev; \
-	fi
-
 endif
 
 ifeq ($(BUILD_CPU_MCU1_0),yes)
