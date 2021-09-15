@@ -9,7 +9,12 @@ IDIRS+=$(PTK_PATH)/include
 IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 
-LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c66/$(TARGET_BUILD)/
+ifeq ($(RTOS),SYSBIOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c66/$(TARGET_BUILD)/
+endif
+ifeq ($(RTOS),FREERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/c66/$(TARGET_BUILD)/
+endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c66/$(TARGET_BUILD)/
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -59,9 +64,17 @@ ADDITIONAL_STATIC_LIBS += ti.osal.ae66
 ADDITIONAL_STATIC_LIBS += ipc.ae66
 ADDITIONAL_STATIC_LIBS += sciclient.ae66
 ADDITIONAL_STATIC_LIBS += udma.ae66
-ADDITIONAL_STATIC_LIBS += ti.csl.ae66
-ADDITIONAL_STATIC_LIBS += libc.a
 ADDITIONAL_STATIC_LIBS += mathlib.ae66
+
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.ae66
+endif
+
+ADDITIONAL_STATIC_LIBS += ti.csl.ae66
+
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.csl.intc.ae66
+endif
 
 ADDITIONAL_STATIC_LIBS += libtiadalg_fisheye_transformation.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_image_preprocessing.a
@@ -72,4 +85,8 @@ ADDITIONAL_STATIC_LIBS += libtiadalg_visual_localization.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_solve_pnp.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_image_color_blending.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_image_recursive_nms.a
+ADDITIONAL_STATIC_LIBS += libc.a
+
+SYS_STATIC_LIBS += rts6600_elf
+
 endif

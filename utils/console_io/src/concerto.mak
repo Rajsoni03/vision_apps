@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_PLATFORM),J7)
+ifneq ($(TARGET_PLATFORM),PC)
 
 include $(PRELUDE)
 TARGET      := app_utils_console_io

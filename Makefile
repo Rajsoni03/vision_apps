@@ -37,7 +37,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += J7:$(RTOS):R5F:3:debug:TIARMCGT
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
-	TARGET_COMBOS += J7:SYSBIOS:C66:2:debug:CGT6X
+	TARGET_COMBOS += J7:$(RTOS):C66:2:debug:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
 	TARGET_COMBOS += J7:SYSBIOS:C71:1:debug:CGT7X
@@ -57,7 +57,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += J7:$(RTOS):R5F:3:release:TIARMCGT
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
-	TARGET_COMBOS += J7:SYSBIOS:C66:2:release:CGT6X
+	TARGET_COMBOS += J7:$(RTOS):C66:2:release:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
 	TARGET_COMBOS += J7:SYSBIOS:C71:1:release:CGT7X

@@ -10,7 +10,7 @@ ifeq ($(TARGET_PLATFORM),PC)
 CSOURCES    := app_iss_x86.c app_iss_common.c
 endif
 
-ifeq ($(TARGET_PLATFORM),J7)
+ifneq ($(TARGET_PLATFORM),PC)
 
 ifeq ($(SOC),j721e)
 DEFS=SOC_J721E

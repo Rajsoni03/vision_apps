@@ -66,17 +66,16 @@
 #include <string.h>
 #include <ti/osal/osal.h>
 #include <ti/osal/TaskP.h>
-#include <ti/sysbios/family/c66/Cache.h>
+#include <ti/osal/CacheP.h>
 #include <app_mem_map.h>
 #include <ti/drv/sciclient/sciclient.h>
 #include <app_ipc_rsctable.h>
+#ifdef SYSBIOS
+#include <ti/sysbios/family/c66/Cache.h>
+#endif
 
 void appTimerInterruptInit(void);
 void appCacheMarInit(void);
-
-void _system_post_cinit(void)
-{
-}
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -135,6 +134,7 @@ int main(void)
 
 void appCacheMarInit(void)
 {
+#ifdef SYSBIOS
     /* enable cache for cached sections */
     Cache_setMar((Ptr)DDR_C66x_1_DTS_ADDR, DDR_C66x_1_DTS_SIZE, Cache_Mar_ENABLE);
     Cache_setMar((Ptr)DDR_C66X_1_LOCAL_HEAP_ADDR, DDR_C66X_1_LOCAL_HEAP_SIZE, Cache_Mar_ENABLE);
@@ -146,7 +146,21 @@ void appCacheMarInit(void)
     Cache_setMar((Ptr)APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, Cache_Mar_DISABLE);
     Cache_setMar((Ptr)TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, Cache_Mar_DISABLE);
     Cache_setMar((Ptr)IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, Cache_Mar_DISABLE);
-    Cache_setMar((Ptr)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, Cache_Mar_DISABLE);    
+    Cache_setMar((Ptr)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, Cache_Mar_DISABLE);
+#else
+    /* enable cache for cached sections */
+    CacheP_setMar((void *)DDR_C66x_1_DTS_ADDR, DDR_C66x_1_DTS_SIZE, CacheP_Mar_ENABLE);
+    CacheP_setMar((void *)DDR_C66X_1_LOCAL_HEAP_ADDR, DDR_C66X_1_LOCAL_HEAP_SIZE, CacheP_Mar_ENABLE);
+    CacheP_setMar((void *)DDR_C66X_1_SCRATCH_ADDR, DDR_C66X_1_SCRATCH_SIZE, CacheP_Mar_ENABLE);
+    CacheP_setMar((void *)DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, CacheP_Mar_ENABLE);
+
+    /* disable cache for non-cached sections */
+    CacheP_setMar((void *)DDR_C66x_1_IPC_ADDR, DDR_C66x_1_IPC_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, CacheP_Mar_DISABLE);
+#endif
 }
 
 /* To set C66 timer interrupts */

@@ -1,4 +1,3 @@
-ifeq ($(TARGET_PLATFORM),J7)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 ifeq ($(TARGET_CPU),R5F)
 
@@ -14,6 +13,5 @@ endif
 
 include $(FINALE)
 
-endif
 endif
 endif

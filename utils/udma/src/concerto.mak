@@ -1,4 +1,4 @@
-ifeq ($(TARGET_PLATFORM),J7)
+ifneq ($(TARGET_PLATFORM),PC)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 
 include $(PRELUDE)

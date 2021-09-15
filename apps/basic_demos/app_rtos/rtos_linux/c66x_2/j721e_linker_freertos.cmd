@@ -60,27 +60,63 @@
  *
  */
 
-xdc.loadCapsule("bios_common.cfg");
+-stack  0x2000      /* SOFTWARE STACK SIZE */
+-heap   0x1000      /* HEAP AREA SIZE      */
+--symbol_map _Hwi_intcVectorTable=Hwi_intcVectorTable
 
-var BIOS        = xdc.useModule("ti.sysbios.BIOS");
-BIOS.libType = BIOS.LibType_Custom;
-BIOS.cpuFreq.lo = 1350000000;
-BIOS.cpuFreq.hi = 0;
+SECTIONS
+{
+    .hwi_vect: {. = align(32); } > DDR_C66x_2 ALIGN(0x400)
+    .text:csl_entry:{}           > DDR_C66x_2
+    .text:_c_int00          load > DDR_C66x_2 ALIGN(0x400)
+    .text:                       > DDR_C66x_2
+    .stack:                      > DDR_C66x_2
+    GROUP:                       > DDR_C66x_2
+    {
+        .bss:
+        .neardata:
+        .rodata:
+    }
+    .cio:                        > DDR_C66x_2
+    .const:                      > DDR_C66x_2
+    .data:                       > DDR_C66x_2
+    .switch:                     > DDR_C66x_2
+    .sysmem:                     > DDR_C66x_2
+    .far:                        > DDR_C66x_2
+    .args:                       > DDR_C66x_2
+    .ppinfo:                     > DDR_C66x_2
+    .ppdata:                     > DDR_C66x_2
+    .ti.decompress:              > DDR_C66x_2
+    .ti.handler_table:           > DDR_C66x_2
 
-/* Current Timer.xs uses eventId -1 for C66 on J7ES platform.
-   We need to change this to an arbitrary event number
-   that is also used in INTR_ROUTER mapping.
-   used timerSettings[1] since the Clock module is using timer #0.
-*/
-/* Disable Timer frequency check, workaround for QT test */
-var Timer = xdc.useModule('ti.sysbios.timers.dmtimer.Timer');
-Timer.checkFrequency = false;
-Timer.timerSettings[1].eventId = 20;
+    /* COFF sections */
+    .pinit:                      > DDR_C66x_2
+    .cinit:                      > DDR_C66x_2
 
-var Clock = xdc.useModule('ti.sysbios.knl.Clock');
-Clock.timerId = 1;
+    /* EABI sections */
+    .binit:                      > DDR_C66x_2
+    .init_array:                 > DDR_C66x_2
+    .fardata:                    > DDR_C66x_2
+    .c6xabi.exidx:               > DDR_C66x_2
+    .c6xabi.extab:               > DDR_C66x_2
 
-/* Enable EventCombiner for system interupts into C6x INTC */
-var ECM = xdc.useModule('ti.sysbios.family.c64p.EventCombiner');
+    .csl_vect:                   > DDR_C66x_2
+  
+    ipc_data_buffer:             > DDR_C66x_2 type=NOLOAD
+    .resource_table: 
+    { 
+        __RESOURCE_TABLE = .;
+    }                            > DDR_C66x_2_RESOURCE_TABLE
 
-xdc.print("# !!!  Clock TimerId [" + Clock.timerId + "] @ 0x" + Number(Timer.timerSettings[Clock.timerId].baseAddr).toString(16) + " and interrupt " + Timer.timerSettings[Clock.timerId].intNum + " and event ID " + Timer.timerSettings[Clock.timerId].eventId + " !!!" );
+    .tracebuf : {} align(1024)   > DDR_C66x_2
+
+    .bss:taskStackSection                 > DDR_C66x_2
+    .bss:ddr_shared_mem     (NOLOAD) : {} > DDR_C66X_2_LOCAL_HEAP
+    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C66X_2_SCRATCH
+    .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
+    .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
+    .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
+
+    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C66x_2
+}
+

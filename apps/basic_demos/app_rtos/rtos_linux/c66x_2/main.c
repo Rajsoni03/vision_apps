@@ -66,16 +66,15 @@
 #include <string.h>
 #include <ti/osal/osal.h>
 #include <ti/osal/TaskP.h>
-#include <ti/sysbios/family/c66/Cache.h>
+#include <ti/osal/CacheP.h>
 #include <ti/drv/sciclient/sciclient.h>
 #include <app_ipc_rsctable.h>
+#ifdef SYSBIOS
+#include <ti/sysbios/family/c66/Cache.h>
+#endif
 
 void appTimerInterruptInit(void);
 void appCacheMarInit(void);
-
-void _system_post_cinit(void)
-{
-}
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -134,6 +133,7 @@ int main(void)
 
 void appCacheMarInit(void)
 {
+#ifdef SYSBIOS
     /* enable cache for cached sections */
     Cache_setMar((Ptr)DDR_C66x_2_DTS_ADDR, DDR_C66x_2_DTS_SIZE, Cache_Mar_ENABLE);
     Cache_setMar((Ptr)DDR_C66X_2_LOCAL_HEAP_ADDR, DDR_C66X_2_LOCAL_HEAP_SIZE, Cache_Mar_ENABLE);
@@ -146,6 +146,20 @@ void appCacheMarInit(void)
     Cache_setMar((Ptr)TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, Cache_Mar_DISABLE);
     Cache_setMar((Ptr)IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, Cache_Mar_DISABLE);
     Cache_setMar((Ptr)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, Cache_Mar_DISABLE);
+#else
+    /* enable cache for cached sections */
+    CacheP_setMar((void *)DDR_C66x_2_DTS_ADDR, DDR_C66x_2_DTS_SIZE, CacheP_Mar_ENABLE);
+    CacheP_setMar((void *)DDR_C66X_2_LOCAL_HEAP_ADDR, DDR_C66X_2_LOCAL_HEAP_SIZE, CacheP_Mar_ENABLE);
+    CacheP_setMar((void *)DDR_C66X_2_SCRATCH_ADDR, DDR_C66X_2_SCRATCH_SIZE, CacheP_Mar_ENABLE);
+    CacheP_setMar((void *)DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, CacheP_Mar_ENABLE);
+
+    /* disable cache for non-cached sections */
+    CacheP_setMar((void *)DDR_C66x_2_IPC_ADDR, DDR_C66x_2_IPC_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, CacheP_Mar_DISABLE);
+    CacheP_setMar((void *)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, CacheP_Mar_DISABLE);
+#endif
 }
 
 /* To set C66 timer interrupts on J7ES VLAB */
@@ -163,7 +177,7 @@ void appTimerInterruptInit(void)
      */
     rmIrqReq.valid_params           = TISCI_MSG_VALUE_RM_DST_ID_VALID |
                                       TISCI_MSG_VALUE_RM_DST_HOST_IRQ_VALID;
-    rmIrqReq.src_id                 = TISCI_DEV_TIMER0;
+    rmIrqReq.src_id                 = TISCI_DEV_TIMER1;
     rmIrqReq.src_index              = 0U;
     rmIrqReq.dst_id                 = TISCI_DEV_C66SS1_CORE0;
     rmIrqReq.dst_host_irq           = 20U;

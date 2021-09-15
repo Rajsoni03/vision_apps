@@ -1,4 +1,3 @@
-ifeq ($(TARGET_PLATFORM),J7)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 ifeq ($(TARGET_CPU),R5F)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
@@ -18,7 +17,6 @@ DEFS+=BUILD_MCU
 
 include $(FINALE)
 
-endif
 endif
 endif
 endif

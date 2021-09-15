@@ -1,4 +1,4 @@
-ifeq ($(TARGET_PLATFORM),J7)
+ifneq ($(TARGET_PLATFORM),PC)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 
 include $(PRELUDE)
@@ -22,6 +22,11 @@ endif
 ifeq ($(TARGET_OS),FREERTOS)
 IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include/
 CSOURCES += app_cpu_hz_freertos.c
+endif
+
+ifeq ($(TARGET_CPU),C66)
+IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/c66
+IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/c66
 endif
 
 ifeq ($(TARGET_CPU),R5F)
