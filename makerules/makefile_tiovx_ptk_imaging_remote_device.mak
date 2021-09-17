@@ -44,7 +44,7 @@ tiovx_clean:
 	$(MAKE) -C $(TIOVX_PATH) clean
 
 tiovx_scrub:
-	rm -rf $(TIOVX_PATH)/out
+	$(MAKE) -C $(TIOVX_PATH) scrub
 
 tiovx_docs:
 	$(MAKE) -C $(TIOVX_PATH) doxy_docs
@@ -73,7 +73,7 @@ endif
 
 ptk_scrub:
 ifeq ($(BUILD_PTK),yes)
-	rm -rf $(PTK_PATH)/out
+	$(MAKE) -C $(PTK_PATH) scrub
 endif
 
 imaging:
@@ -83,7 +83,7 @@ imaging_clean:
 	$(MAKE) -C $(IMAGING_PATH) clean
 
 imaging_scrub:
-	rm -rf $(IMAGING_PATH)/out
+	$(MAKE) -C $(IMAGING_PATH) scrub
 
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
@@ -94,6 +94,6 @@ remote_device_clean:
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) RTOS=$(RTOS) clean
 
 remote_device_scrub:
-	rm -rf $(REMOTE_DEVICE_PATH)/out
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) scrub
 
 .PHONY: tiovx tiovx_clean ptk ptk_clean imaging imaging_clean remote_device remote_device_clean
