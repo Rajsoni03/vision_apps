@@ -604,7 +604,7 @@ static vx_status app_create_graph(AppObj *obj)
             * enqueuable */
         if(status == VX_SUCCESS)
         {
-            status = add_graph_parameter_by_node_index(obj->graph_sde, obj->mosaic_node, 2); //input_arr_left
+            status = add_graph_parameter_by_node_index(obj->graph_sde, obj->mosaic_node, 3); //input_arr_left
             obj->input_arr_left_graph_parameter_index = graph_parameter_num;
             graph_parameters_queue_params_list[graph_parameter_num].graph_parameter_index = graph_parameter_num;
             graph_parameters_queue_params_list[graph_parameter_num].refs_list_size = obj->num_buf;
@@ -613,7 +613,7 @@ static vx_status app_create_graph(AppObj *obj)
         }
         if(status == VX_SUCCESS)
         {
-            status = add_graph_parameter_by_node_index(obj->graph_sde, obj->mosaic_node, 3); //input_arr_right
+            status = add_graph_parameter_by_node_index(obj->graph_sde, obj->mosaic_node, 4); //input_arr_right
             obj->input_arr_right_graph_parameter_index = graph_parameter_num;
             graph_parameters_queue_params_list[graph_parameter_num].graph_parameter_index = graph_parameter_num;
             graph_parameters_queue_params_list[graph_parameter_num].refs_list_size = obj->num_buf;
