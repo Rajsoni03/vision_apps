@@ -22,6 +22,16 @@ ifeq ($(BUILD_CONFORMANCE_TEST),yes)
 BUILD_DEFS += BUILD_CONFORMANCE_TEST
 endif
 
+ifeq ($(SOC),j721e)
+    BUILD_DEFS += SOC_J721E
+else ifeq ($(SOC),j721s2)
+    BUILD_DEFS += SOC_J721S2
+endif
+
+ifeq ($(BUILD_VPAC3),yes)
+    BUILD_DEFS += VPAC3
+endif
+
 DIRECTORIES :=
 DIRECTORIES += utils
 DIRECTORIES += kernels
