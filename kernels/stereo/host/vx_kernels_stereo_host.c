@@ -102,11 +102,11 @@ static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelSdeTriangulation,           &tivxRemoveKernelSdeTriangulation},
     {&tivxAddKernelPointCloudCreation,         &tivxRemoveKernelPointCloudCreation},
     {&tivxAddKernelOccupancyGridDetection,     &tivxRemoveKernelOccupancyGridDetection},
-	{&tivxAddKernelDisparityMerge,             &tivxRemoveKernelDisparityMerge},
+    {&tivxAddKernelDisparityMerge,             &tivxRemoveKernelDisparityMerge},
     {&tivxAddKernelMedianFilter,               &tivxRemoveKernelMedianFilter},
-    {&tivxAddKernelHoleFilling,                &tivxRemoveKernelHoleFilling},	
+    {&tivxAddKernelHoleFilling,                &tivxRemoveKernelHoleFilling},
     {&tivxAddKernelExtractDisparityConfidence, &tivxRemoveKernelExtractDisparityConfidence},
-    {&tivxAddKernelGroundEstimation,           &tivxRemoveKernelGroundEstimation},	
+    {&tivxAddKernelGroundEstimation,           &tivxRemoveKernelGroundEstimation},
     {&tivxAddKernelObstacleDetection,          &tivxRemoveKernelObstacleDetection},
     {&tivxAddKernelSdeDisparityVisualize,      &tivxRemoveKernelSdeDisparityVisualize},
 };
@@ -149,7 +149,7 @@ void tivxStereoLoadKernels(vx_context context)
         tivxRegisterStereoTargetKernels();
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
         tivxRegisterStereoTargetKernels();
-        tivxSetSelfCpuId(TIVX_CPU_ID_EVE1);
+        tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);
         tivxRegisterStereoTargetKernels();
 #endif
 
