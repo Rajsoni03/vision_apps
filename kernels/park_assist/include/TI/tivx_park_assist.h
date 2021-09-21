@@ -64,7 +64,6 @@
 #define TIVX_PARK_ASSIST_H_
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_park_assist_kernels.h>
 #include <TI/tivx_park_assist_nodes.h>
 

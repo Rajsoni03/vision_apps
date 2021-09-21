@@ -66,9 +66,7 @@
 #include <math.h>
 
 #include <TI/tivx.h>
-#include <TI/tivx_debug.h>
 #include <TI/tivx_target_kernel.h>
-#include <TI/j7.h>
 #include <perception/algos/alg_common.h>
 #include <perception/utils/api_memory_if.h>
 

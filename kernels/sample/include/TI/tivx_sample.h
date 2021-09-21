@@ -64,7 +64,6 @@
 #define TIVX_SAMPLE_H_
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_sample_kernels.h>
 #include <TI/tivx_sample_nodes.h>
 

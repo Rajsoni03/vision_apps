@@ -64,9 +64,8 @@
 #define _FUSED_OGAPP_APPLIB_H_
 
 #include <TI/tivx.h>
-#include <TI/tivx_debug.h>
 #include <TI/tivx_mutex.h>
-#include <TI/j7.h>
+
 #include <TI/tivx_park_assist.h>
 
 #include <perception/dbtools/c/dbtools.h>

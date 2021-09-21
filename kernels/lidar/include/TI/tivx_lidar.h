@@ -64,7 +64,6 @@
 #define TIVX_LIDAR_H_
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_lidar_kernels.h>
 #include <TI/tivx_lidar_nodes.h>
 

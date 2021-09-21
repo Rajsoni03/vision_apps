@@ -64,7 +64,6 @@
 #define TIVX_IMG_PROC_H_
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_img_proc_kernels.h>
 #include <TI/tivx_img_proc_nodes.h>
 

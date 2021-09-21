@@ -72,7 +72,6 @@
 
 #include <TI/tivx.h>
 #include <TI/tivx_debug.h>
-#include <TI/j7.h>
 
 #include <perception/perception.h>
 #include <perception/utils/ptk_semaphore.h>

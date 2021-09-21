@@ -68,7 +68,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <assert.h>
-#include <TI/j7.h>
+#include <TI/tivx.h>
 #include <TI/tivx_stereo.h>
 
 

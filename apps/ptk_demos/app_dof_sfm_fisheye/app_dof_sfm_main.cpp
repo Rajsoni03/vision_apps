@@ -80,7 +80,6 @@
 #include <getopt.h>
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_park_assist.h>
 
 #include <stdio.h>

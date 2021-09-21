@@ -89,7 +89,6 @@
 #include <stdio.h>
 #include <VX/vx.h>
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include "app_c7x_kernel.h"
 
 static vx_status VX_CALLBACK app_c7x_kernel_img_add_kernel_validate(vx_node node,

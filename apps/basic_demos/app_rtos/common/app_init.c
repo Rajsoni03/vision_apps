@@ -89,7 +89,6 @@
 
 /* TIOVX header files */
 #include <TI/tivx.h>
-#include <TI/j7.h>
 
 /* Vision_apps custom kernel header files */
 #include <TI/tivx_img_proc.h>

@@ -64,7 +64,6 @@
 #define TIVX_SRV_H_
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_srv_kernels.h>
 #include <TI/tivx_srv_nodes.h>
 

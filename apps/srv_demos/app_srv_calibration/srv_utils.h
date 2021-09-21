@@ -62,7 +62,6 @@
  */
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/j7_imaging_aewb.h>
 #include <TI/tivx_task.h>
 #include <tivx_utils_graph_perf.h>

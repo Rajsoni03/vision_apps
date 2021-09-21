@@ -68,7 +68,6 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <stdio.h>
 #include <TI/tivx_task.h>
-#include <TI/j7.h>
 
 #define APP_GRPX_STRING_MAX (32u)
 

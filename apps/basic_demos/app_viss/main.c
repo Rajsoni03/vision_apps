@@ -66,7 +66,6 @@
 #include "tivx_kernels_host_utils.h"
 #include <utils/app_init/include/app_init.h>
 
-#include <TI/j7.h>
 #include <TI/j7_tidl.h>
 #include <tivx_utils_file_rd_wr.h>
 #include <tivx_utils_graph_perf.h>

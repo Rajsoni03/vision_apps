@@ -61,7 +61,6 @@
  */
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <tivx_utils_file_rd_wr.h>
 
 #include <stdio.h>

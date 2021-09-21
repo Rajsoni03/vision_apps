@@ -64,7 +64,6 @@
 #define TIVX_STEREO_H_
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_stereo_kernels.h>
 #include <TI/tivx_stereo_nodes.h>
 

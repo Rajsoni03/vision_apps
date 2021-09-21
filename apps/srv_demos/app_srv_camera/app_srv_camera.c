@@ -39,10 +39,8 @@
 #include <assert.h>
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/j7_imaging_aewb.h>
 
-#include <VX/vx.h>
 #include <VX/vxu.h>
 #include <VX/vx_khr_pipelining.h>
 #include "math.h"

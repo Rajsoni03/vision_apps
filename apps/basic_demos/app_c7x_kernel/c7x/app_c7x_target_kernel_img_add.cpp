@@ -88,7 +88,6 @@
  */
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_target_kernel.h>
 #include "../app_c7x_kernel.h"
 #include "VXLIB_add_i8u_i8u_o8u_cn.h"

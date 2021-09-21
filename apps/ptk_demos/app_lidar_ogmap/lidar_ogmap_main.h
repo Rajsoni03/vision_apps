@@ -74,8 +74,6 @@
 #include <perception/utils/ptk_semaphore.h>
 
 #include <TI/tivx.h>
-#include <TI/tivx_debug.h>
-#include <TI/j7.h>
 #include <TI/tivx_lidar.h>
 #include <TI/tivx_park_assist.h>
 

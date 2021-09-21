@@ -67,7 +67,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <assert.h>
-#include <TI/j7.h>
+#include <TI/tivx.h>
 #include <TI/j7_tidl.h>
 #include <itidl_ti.h>
 

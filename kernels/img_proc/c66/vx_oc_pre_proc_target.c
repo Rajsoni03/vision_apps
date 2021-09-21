@@ -61,7 +61,6 @@
 */
 
 #include <TI/tivx.h>
-#include <TI/j7.h>
 #include <TI/tivx_img_proc.h>
 #include <TI/tivx_target_kernel.h>
 #include "tivx_kernels_target_utils.h"
