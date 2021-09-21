@@ -90,6 +90,4 @@ ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
 endif
 
-SYS_STATIC_LIBS += rtsv7R4_T_le_v3D16_eabi
-
 endif

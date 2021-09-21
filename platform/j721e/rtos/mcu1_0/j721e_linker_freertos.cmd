@@ -34,11 +34,11 @@ __SVC_STACK_SIZE   = 0x0100;
 SECTIONS
 {
     .freertosrstvectors : {} palign(8)      > R5F_TCMB0_VECS
-    
+
     .bootCode           : {} palign(8)      > R5F_TCMB0
     .startupCode        : {} palign(8)      > R5F_TCMB0
     .startupData        : {} palign(8)      > R5F_TCMB0, type = NOINIT
-    GROUP 
+    GROUP
     {
         .text.hwi       : palign(8)
         .text.cache     : palign(8)
@@ -49,6 +49,7 @@ SECTIONS
 
     .text               : {} palign(8)      > DDR_MCU1_0
     .const              : {} palign(8)      > DDR_MCU1_0
+    .rodata             : {} palign(8)      > DDR_MCU1_0
     .cinit              : {} palign(8)      > DDR_MCU1_0
     .bss                : {} align(4)       > DDR_MCU1_0
     .far                : {} align(4)       > DDR_MCU1_0
@@ -60,7 +61,7 @@ SECTIONS
     .boardcfg_data      : {} align(4)       > DDR_MCU1_0
     .bss:taskStackSection            : {}   > DDR_MCU1_0
 
-    .resource_table          : 
+    .resource_table          :
     {
         __RESOURCE_TABLE = .;
     }                                           > DDR_MCU1_0_RESOURCE_TABLE

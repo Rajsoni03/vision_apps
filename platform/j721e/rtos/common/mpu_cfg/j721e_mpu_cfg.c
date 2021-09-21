@@ -43,7 +43,8 @@
  * This structure specifies the entries for mpu configuration to override the
  * default MPU configuration which is part of the CSL init.
  */
-#pragma DATA_SECTION(gCslR5MpuCfg, ".mpu_cfg");
+const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX]
+__attribute__ ((section(".mpu_cfg")));
 
 const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
 {

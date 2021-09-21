@@ -45,7 +45,7 @@ TARGET_COMBOS :=
 ifeq ($(BUILD_TARGET_MODE),yes)
   ifeq ($(PROFILE), $(filter $(PROFILE), debug all))
 	ifeq ($(BUILD_ISA_R5F),yes)
-	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):R5F:3:debug:TIARMCGT
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):R5F:3:debug:TIARMCGT_LLVM
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:debug:CGT6X
@@ -65,7 +65,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 
   ifeq ($(PROFILE), $(filter $(PROFILE), release all))
 	ifeq ($(BUILD_ISA_R5F),yes)
-	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):R5F:3:release:TIARMCGT
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):R5F:3:release:TIARMCGT_LLVM
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:release:CGT6X

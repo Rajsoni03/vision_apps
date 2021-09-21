@@ -34,11 +34,11 @@ __SVC_STACK_SIZE   = 0x0100;
 SECTIONS
 {
     .freertosrstvectors : {} palign(8)      > R5F_TCMA_VECS
-    
+
     .bootCode           : {} palign(8)      > R5F_TCMA
     .startupCode        : {} palign(8)      > R5F_TCMA
     .startupData        : {} palign(8)      > R5F_TCMA, type = NOINIT
-    GROUP 
+    GROUP
     {
         .text.hwi       : palign(8)
         .text.cache     : palign(8)
@@ -48,6 +48,7 @@ SECTIONS
 
     .text               : {} palign(8)      > DDR_MCU3_0
     .const              : {} palign(8)      > DDR_MCU3_0
+    .rodata             : {} palign(8)      > DDR_MCU3_0
     .mpu_cfg                                > DDR_MCU3_0
     .cinit              : {} palign(8)      > DDR_MCU3_0
     .pinit              : {} palign(8)      > R5F_TCMA
@@ -63,7 +64,7 @@ SECTIONS
     .const.devgroup*    : {} align(4)       > DDR_MCU3_0
     .boardcfg_data      : {} align(4)       > DDR_MCU3_0
 
-    .resource_table          : 
+    .resource_table          :
     {
         __RESOURCE_TABLE = .;
     }                                           > DDR_MCU3_0_RESOURCE_TABLE

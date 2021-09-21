@@ -15,7 +15,7 @@
 
 ifeq ($(BUILD_DEBUG),1)
 $(info TI_TOOLS_ROOT=$(TI_TOOLS_ROOT))
-$(info TIARMCGT_ROOT=$(TIARMCGT_ROOT))
+$(info TIARMCGT_LLVM_ROOT=$(TIARMCGT_LLVM_ROOT))
 endif
 
 # DEP_PROJECTS does not need to be set as the dependencies are contained in the build.
@@ -49,8 +49,8 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2))
             INSTALL_BIN := /usr/bin
             INSTALL_INC := /usr/include
         else
-            SYSIDIRS += $(TIARMCGT_ROOT)/include
-            SYSLDIRS += $(TIARMCGT_ROOT)/lib
+            SYSIDIRS += $(TIARMCGT_LLVM_ROOT)/include
+            SYSLDIRS += $(TIARMCGT_LLVM_ROOT)/lib
         endif
     else ifeq ($(TARGET_FAMILY),DSP)
         ifeq ($(TARGET_CPU),C66)
