@@ -10,7 +10,7 @@ IMAGING_IDIRS += $(IMAGING_PATH)/sensor_drv/include
 IMAGING_IDIRS += $(VISION_APPS_PATH)/utils/itt_server/include
 IMAGING_IDIRS += $(VISION_APPS_PATH)/utils/network_api/include
 
-TIADALG_IDIRS = 
+TIADALG_IDIRS =
 TIADALG_IDIRS = $(TIADALG_PATH)/include
 
 VISION_APPS_KERNELS_IDIRS =
@@ -55,6 +55,34 @@ endif
 
 CFLAGS+=-Wno-format-truncation
 
+ifeq ($(TARGET_OS), QNX)
+
+ifeq ($(TARGET_BUILD), release)
+    BUILD_PROFILE_QNX_SO = so.le
+    BUILD_PROFILE_QNX_A = a.le
+    BUILD_PROFILE_QNX_SUFFIX =
+endif
+ifeq ($(TARGET_BUILD), debug)
+    BUILD_PROFILE_QNX_SO = so.le.g
+    BUILD_PROFILE_QNX_A = a.le.g
+    BUILD_PROFILE_QNX_SUFFIX = _g
+endif
+
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/pdk/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/sciclient/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/udmalld/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
+
+SHARED_LIBS += sharedmemallocator$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += tiipc-usr$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += tiudma-usr$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += ti-pdk$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += ti-sciclient$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += ti-udmalld$(BUILD_PROFILE_QNX_SUFFIX)
+
+endif # ifeq ($(TARGET_OS), QNX)
 
 # This section is for apps to link against tivision_apps library instead of static libs
 ifeq ($(LINK_SHARED_OBJ)$(TARGETTYPE),yesexe)
@@ -74,18 +102,7 @@ TEST_LIBS =
 # Also used to create tivision_apps library (so we can maintain lib list in one place
 else   # ifeq ($(LINK_SHARED_OBJ),yes)
 
-ifeq ($(TARGET_OS), QNX)
-  ifeq ($(TARGET_BUILD), $(filter $(TARGET_BUILD),release))
-    BUILD_PROFILE_QNX_SO = so.le
-    BUILD_PROFILE_QNX_A = a.le
-    BUILD_PROFILE_QNX_SUFFIX =
-  endif
-  ifeq ($(TARGET_BUILD), $(filter $(TARGET_BUILD),debug))
-    BUILD_PROFILE_QNX_SO = so.le.g
-    BUILD_PROFILE_QNX_A = a.le.g
-    BUILD_PROFILE_QNX_SUFFIX = _g
-   endif
-endif
+
 
 LDIRS       += $(VISION_APPS_PATH)/out/J7/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIOVX_PATH)/lib/J7/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -96,12 +113,6 @@ LDIRS       += $(LINUX_FS_PATH)/usr/lib
 endif
 ifeq ($(TARGET_OS), QNX)
 LDIRS       += $(QNX_HOST)/usr/lib
-LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/pdk/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/sciclient/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/udmalld/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 endif
 
 TIOVX_LIBS  =
@@ -149,7 +160,7 @@ VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_a72
 VISION_APPS_KERNELS_LIBS += vx_kernels_fileio
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
 
-VISION_APPS_MODULES_LIBS  = 
+VISION_APPS_MODULES_LIBS  =
 VISION_APPS_MODULES_LIBS += vx_app_modules
 
 TEST_LIBS =
@@ -174,14 +185,9 @@ SYS_SHARED_LIBS += stdc++ m rt pthread ti_rpmsg_char
 endif
 ifeq ($(TARGET_OS),QNX)
 STATIC_LIBS += c++
-SHARED_LIBS += sharedmemallocator$(BUILD_PROFILE_QNX_SUFFIX)
-SHARED_LIBS += tiipc-usr$(BUILD_PROFILE_QNX_SUFFIX)
-SHARED_LIBS += tiudma-usr$(BUILD_PROFILE_QNX_SUFFIX)
-SHARED_LIBS += ti-pdk$(BUILD_PROFILE_QNX_SUFFIX)
-SHARED_LIBS += ti-sciclient$(BUILD_PROFILE_QNX_SUFFIX)
-SHARED_LIBS += ti-udmalld$(BUILD_PROFILE_QNX_SUFFIX)
 endif
 
 endif  # ifeq ($(LINK_SHARED_OBJ),yes)
+
 
 endif  # ifeq ($(TARGET_CPU),A72)
