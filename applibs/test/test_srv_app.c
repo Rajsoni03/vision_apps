@@ -818,7 +818,7 @@ TEST_WITH_ARG(tivxSrvApp, testApplib, Arg, PARAMETERS)
 
     /* TODO: Replace NULL with GPULUT output */
     ASSERT_VX_OBJECT(node = tivxGlSrvNode(graph2, param_obj, input_array, srv_views_array, out_gpulut_array, output_image), VX_TYPE_NODE);
-    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A15_0);
+    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
 
     VX_CALL(vxVerifyGraph(graph1));
     VX_CALL(vxProcessGraph(graph1));

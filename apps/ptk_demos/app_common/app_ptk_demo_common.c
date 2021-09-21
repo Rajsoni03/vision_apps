@@ -148,18 +148,6 @@ const char *app_common_get_coreName(const char *appCoreName)
     {
         return TIVX_TARGET_DSP_C7_1;
     }
-    else if (!strcmp(appCoreName, "TIVX_TARGET_EVE2"))
-    {
-        return TIVX_TARGET_EVE2;
-    }
-    else if (!strcmp(appCoreName, "TIVX_TARGET_EVE3"))
-    {
-        return TIVX_TARGET_EVE3;
-    }
-    else if (!strcmp(appCoreName, "TIVX_TARGET_EVE4"))
-    {
-        return TIVX_TARGET_EVE4;
-    }
     else if (!strcmp(appCoreName, "TIVX_TARGET_A72_0"))
     {
         return TIVX_TARGET_A72_0;
@@ -183,10 +171,6 @@ const char *app_common_get_coreName(const char *appCoreName)
     else if (!strcmp(appCoreName, "TIVX_TARGET_IPU1_1"))
     {
         return TIVX_TARGET_IPU1_1;
-    }
-    else if (!strcmp(appCoreName, "TIVX_TARGET_IPU2"))
-    {
-        return TIVX_TARGET_IPU2;
     }
 
     return NULL;
@@ -378,7 +362,7 @@ vx_status ptkdemo_load_vximage_from_sdefile(vx_image image, char *filename)
     rect.start_y = 0;
     rect.end_x   = img_width;
     rect.end_y   = img_height;
-    
+
     // raw disparity data
     vxStatus = vxMapImagePatch(image,
                                &rect,
@@ -431,7 +415,7 @@ vx_status ptkdemo_load_vxtensor_from_file(vx_tensor tensor, char *filename)
     fread(&padB, sizeof(int32_t), 1, fp);
     fread(&padL, sizeof(int32_t), 1, fp);
     fread(&padR, sizeof(int32_t), 1, fp);
-    
+
     start[0] = start[1] = start[2] = 0;
     vxQueryTensor(tensor, VX_TENSOR_NUMBER_OF_DIMS, &num_dims, sizeof(vx_size));
 
@@ -647,7 +631,7 @@ vx_status ptkdemo_save_vxtensor_to_file(vx_tensor tensor, sTIDL_IOBufDesc_t * io
 
     if (num_dims >= MAX_TENSOR_DIMS)
     {
-        VX_PRINT(VX_ZONE_ERROR, "Invalid number of dims read [%d]", num_dims);     
+        VX_PRINT(VX_ZONE_ERROR, "Invalid number of dims read [%d]", num_dims);
         return (vx_status)VX_FAILURE;
     }
 
@@ -661,7 +645,7 @@ vx_status ptkdemo_save_vxtensor_to_file(vx_tensor tensor, sTIDL_IOBufDesc_t * io
         ssOut = (uint8_t *)output_buffer;
 
         fp = fopen(filename, "wb");
-    
+
         if (fp == NULL)
         {
             tivxUnmapTensorPatch(tensor, map_id);
