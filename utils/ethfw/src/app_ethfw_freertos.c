@@ -327,7 +327,8 @@ static int32_t EthApp_initEthFw(void)
 
 /* NIMU callbacks (exact name required) */
 
-bool EthFwCallbacks_isPortLinked(Enet_Handle hEnet)
+bool EthFwCallbacks_isPortLinked(struct netif *netif,
+                                 Enet_Handle hEnet)
 {
     bool linked = false;
     uint32_t i;
