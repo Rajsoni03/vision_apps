@@ -52,18 +52,18 @@ tiovx_docs:
 ptk:
 ifeq ($(BUILD_PTK),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
-	-$(MAKE) -C $(PTK_PATH) BUILD_TARGET_MODE=no
-	-$(MAKE) -C $(PTK_PATH) release BUILD_TARGET_MODE=no
+	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) BUILD_TARGET_MODE=no
+	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) release BUILD_TARGET_MODE=no
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
-	-$(MAKE) -C $(PTK_PATH) BUILD_TARGET_MODE=yes
-	-$(MAKE) -C $(PTK_PATH) release BUILD_TARGET_MODE=yes
+	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) BUILD_TARGET_MODE=yes
+	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) release BUILD_TARGET_MODE=yes
 endif
 endif
 
 ptk_clean:
 ifeq ($(BUILD_PTK),yes)
-	-$(MAKE) -C $(PTK_PATH) clean
+	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) clean
 endif
 
 ptk_docs:
@@ -73,7 +73,7 @@ endif
 
 ptk_scrub:
 ifeq ($(BUILD_PTK),yes)
-	$(MAKE) -C $(PTK_PATH) scrub
+	$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) scrub
 endif
 
 imaging:
