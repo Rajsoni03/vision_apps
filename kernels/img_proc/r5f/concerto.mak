@@ -16,8 +16,6 @@ IDIRS       += $(TIDL_PATH)/inc
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 IDIRS       += $(VXLIB_PATH)/packages
 
-DEFS        += SOC_J721E
-
 include $(FINALE)
 
 endif

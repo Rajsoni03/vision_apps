@@ -55,8 +55,8 @@ endif
 
 pdk_emu:
 ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient udma dmautils SOC=j721e BOARD=j721e_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient udma dmautils SOC=j721e BOARD=j721e_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient udma dmautils SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient udma dmautils SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
 endif
 
 pdk_clean:
@@ -64,8 +64,8 @@ pdk_clean:
 
 pdk_emu_clean:
 ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean udma_clean dmautils_clean SOC=j721e BOARD=j721e_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean udma_clean dmautils_clean SOC=j721e BOARD=j721e_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean udma_clean dmautils_clean SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean udma_clean dmautils_clean SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
 endif
 
 pdk_scrub:

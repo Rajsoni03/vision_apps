@@ -29,8 +29,4 @@ ifeq ($(RTOS),FREERTOS)
 	STATIC_LIBS += app_rtos
 endif
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-endif
-
 DEFS        += $(RTOS)

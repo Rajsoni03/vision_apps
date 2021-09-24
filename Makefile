@@ -45,40 +45,40 @@ TARGET_COMBOS :=
 ifeq ($(BUILD_TARGET_MODE),yes)
   ifeq ($(PROFILE), $(filter $(PROFILE), debug all))
 	ifeq ($(BUILD_ISA_R5F),yes)
-	TARGET_COMBOS += J7:$(RTOS):R5F:3:debug:TIARMCGT
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):R5F:3:debug:TIARMCGT
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
-	TARGET_COMBOS += J7:$(RTOS):C66:2:debug:CGT6X
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:debug:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
-	TARGET_COMBOS += J7:SYSBIOS:C71:1:debug:CGT7X
+	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:C71:1:debug:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_A72),yes)
 		ifeq ($(BUILD_LINUX_A72),yes)
-		TARGET_COMBOS += J7:LINUX:A72:1:debug:GCC_LINUX_ARM
+		TARGET_COMBOS += $(TARGET_SOC):LINUX:A72:1:debug:GCC_LINUX_ARM
 		endif
 		ifeq ($(BUILD_QNX_A72),yes)
-		TARGET_COMBOS += J7:QNX:A72:1:debug:GCC_QNX_ARM
+		TARGET_COMBOS += $(TARGET_SOC):QNX:A72:1:debug:GCC_QNX_ARM
 		endif
 	endif
   endif
 
   ifeq ($(PROFILE), $(filter $(PROFILE), release all))
 	ifeq ($(BUILD_ISA_R5F),yes)
-	TARGET_COMBOS += J7:$(RTOS):R5F:3:release:TIARMCGT
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):R5F:3:release:TIARMCGT
 	endif
 	ifeq ($(BUILD_ISA_C6x),yes)
-	TARGET_COMBOS += J7:$(RTOS):C66:2:release:CGT6X
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:release:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
-	TARGET_COMBOS += J7:SYSBIOS:C71:1:release:CGT7X
+	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:C71:1:release:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_A72),yes)
 		ifeq ($(BUILD_LINUX_A72),yes)
-		TARGET_COMBOS += J7:LINUX:A72:1:release:GCC_LINUX_ARM
+		TARGET_COMBOS += $(TARGET_SOC):LINUX:A72:1:release:GCC_LINUX_ARM
 		endif
 		ifeq ($(BUILD_QNX_A72),yes)
-		TARGET_COMBOS += J7:QNX:A72:1:release:GCC_QNX_ARM
+		TARGET_COMBOS += $(TARGET_SOC):QNX:A72:1:release:GCC_QNX_ARM
 		endif
 	endif
   endif

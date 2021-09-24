@@ -23,10 +23,6 @@ CSOURCES    := app_ethfw_freertos.c
 
 endif
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-endif
-
 include $(FINALE)
 
 endif

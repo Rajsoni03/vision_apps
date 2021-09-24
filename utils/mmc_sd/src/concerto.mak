@@ -8,10 +8,6 @@ TARGETTYPE  := library
 
 CSOURCES    := app_mmc_sd.c app_fatfs_ffcio_gnu.c app_nosys_funcs.c
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-endif
-
 include $(FINALE)
 
 endif

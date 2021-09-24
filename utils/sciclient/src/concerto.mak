@@ -7,10 +7,6 @@ TARGETTYPE  := library
 
 CSOURCES    := app_sciclient.c
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-endif
-
 include $(FINALE)
 
 endif

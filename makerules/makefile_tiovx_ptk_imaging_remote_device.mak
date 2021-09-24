@@ -15,22 +15,22 @@ endif
 vxlib:
 ifeq ($(SOC),j721e)
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
-	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
-	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
 endif
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
-	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
-	TARGET_PLATFORM=J7 TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
 endif
 endif
-ifeq ($(SOC),j721e_test_aep)
+ifeq ($(SOC),j721s2)
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
-	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
-	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C7100 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C7100 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
 endif
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
-	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
-	TARGET_PLATFORM=J7 TARGET_CPU=C7100 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C7100 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C7100 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
 endif
 endif
 
@@ -52,18 +52,18 @@ tiovx_docs:
 ptk:
 ifeq ($(BUILD_PTK),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
-	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) BUILD_TARGET_MODE=no
-	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) release BUILD_TARGET_MODE=no
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) BUILD_TARGET_MODE=no
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) release BUILD_TARGET_MODE=no
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
-	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) BUILD_TARGET_MODE=yes
-	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) release BUILD_TARGET_MODE=yes
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) BUILD_TARGET_MODE=yes
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) release BUILD_TARGET_MODE=yes
 endif
 endif
 
 ptk_clean:
 ifeq ($(BUILD_PTK),yes)
-	-$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) clean
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) clean
 endif
 
 ptk_docs:
@@ -73,7 +73,7 @@ endif
 
 ptk_scrub:
 ifeq ($(BUILD_PTK),yes)
-	$(MAKE) -C $(PTK_PATH) RTOS=$(RTOS) scrub
+	$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) scrub
 endif
 
 imaging:
@@ -87,13 +87,13 @@ imaging_scrub:
 
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
-	$(MAKE) -C $(REMOTE_DEVICE_PATH) RTOS=$(RTOS) lib_remote_device_display lib_remote_device
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) lib_remote_device_display lib_remote_device
 endif
 
 remote_device_clean:
-	$(MAKE) -C $(REMOTE_DEVICE_PATH) RTOS=$(RTOS) clean
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) clean
 
 remote_device_scrub:
-	$(MAKE) -C $(REMOTE_DEVICE_PATH) scrub
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) scrub
 
 .PHONY: tiovx tiovx_clean ptk ptk_clean imaging imaging_clean remote_device remote_device_clean

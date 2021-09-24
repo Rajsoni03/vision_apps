@@ -6,10 +6,6 @@ include $(PRELUDE)
 TARGET      := app_utils_misc
 TARGETTYPE  := library
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-endif
-
 ifeq ($(TARGET_CPU),C71)
 ASSEMBLY += app_c7x_init_asm.asm
 CSOURCES += app_c7x_init.c
@@ -38,8 +34,9 @@ CSOURCES += app_r5f_init.c
 
 ifeq ($(BUILD_PDK_BOARD), j721e_evm)
 CSOURCES += app_pinmux.c
-DEFS+=j721e_evm
 endif
+
+DEFS+=$(BUILD_PDK_BOARD)
 
 endif
 

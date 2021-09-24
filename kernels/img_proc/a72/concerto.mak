@@ -12,8 +12,6 @@ IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/host
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 
-DEFS        += SOC_J721E
-
 include $(FINALE)
 
 endif

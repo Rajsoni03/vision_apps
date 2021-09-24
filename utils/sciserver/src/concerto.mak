@@ -8,10 +8,6 @@ TARGETTYPE  := library
 
 CSOURCES    := app_sciserver.c
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-endif
-
 DEFS+=BUILD_MCU1_0
 DEFS+=BUILD_MCU
 

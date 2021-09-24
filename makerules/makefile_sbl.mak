@@ -31,7 +31,7 @@ endif
 
 #SBL INFO
 SBL_CORE=mcu1_0
-BOARD=j721e_evm
+BOARD=$(BUILD_PDK_BOARD)
 ATF_OPTEE_PATH=$(VISION_APPS_PATH)/out/sbl_bootfiles/atf_optee_dir
 SBL_REPO_PATH=$(PDK_PATH)/packages/ti/boot/sbl
 MULTICORE_APPIMAGE_GEN_TOOL_PATH=$(SBL_REPO_PATH)/tools/multicoreImageGen/bin
@@ -124,7 +124,7 @@ sbl_pdk_ospi_hs:
 sbl_mcusw_bootimage_touch:
 	touch $(MCUSW_PATH)/mcuss_demos/boot_app_mcu_rtos/boot.c
 	touch $(MCUSW_PATH)/mcuss_demos/boot_app_mcu_rtos/main_tirtos.c
-	touch $(MCUSW_PATH)/mcuss_demos/boot_app_mcu_rtos/soc/j721e/boot_core_defs.c
+	touch $(MCUSW_PATH)/mcuss_demos/boot_app_mcu_rtos/soc/$(SOC)/boot_core_defs.c
 
 sbl_mcusw_bootimage_sd:
 	$(MAKE) sbl_mcusw_bootimage_touch
@@ -179,10 +179,10 @@ sbl_mcusw_bootimage_ospi_hs:
 sbl_vision_apps_bootimage_1:
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 ifeq ($(BUILD_CPU_MCU2_0),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1 $(REMOTE_CORE_LIST_LATEAPP1)
 
@@ -193,19 +193,19 @@ sbl_vision_apps_bootimage_hs_1:
 sbl_vision_apps_bootimage_2:
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 ifeq ($(BUILD_CPU_MCU3_0),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/J7/C71/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C71/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp2 $(REMOTE_CORE_LIST_LATEAPP2)
 
@@ -256,7 +256,7 @@ sbl_bootimage_hs: sbl_bootimage_sd_hs sbl_bootimage_ospi_hs sbl_atf_optee sbl_vi
 
 sbl_bootimage_flash_uniflash_programmer:
 ifeq ($(UNIFLASH_FOUND), yes)
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(UNIFLASH_DIR)/processors/FlashWriter/j721e_evm/uart_j721e_evm_flash_programmer_release.tiimage -i 0 || true
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(UNIFLASH_DIR)/processors/FlashWriter/$(BOARD)/uart_$(SOC)_evm_flash_programmer_release.tiimage -i 0 || true
 else
 	echo "Uniflash not found! Please install uniflash or update the uniflash path in makefile"
 endif

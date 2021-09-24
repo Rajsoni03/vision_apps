@@ -12,10 +12,6 @@ endif
 
 ifneq ($(TARGET_PLATFORM),PC)
 
-ifeq ($(SOC),j721e)
-DEFS=SOC_J721E
-endif
-
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72))
 CSOURCES    := app_iss_common.c app_iss.c
 endif

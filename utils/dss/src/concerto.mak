@@ -7,14 +7,11 @@ TARGETTYPE  := library
 
 CSOURCES    := app_dss.c app_dss_j721e.c app_dctrl.c app_dss_defaults.c app_dss_dual_display_defaults.c
 
-ifeq ($(SOC),j721e)
-DEFS+=SOC_J721E
-DEFS+=j721e_evm
-endif
-
 ifeq ($(BUILD_ENABLE_ETHFW),yes)
 DEFS+=ENABLE_ETHFW
 endif
+
+DEFS+=$(BUILD_PDK_BOARD)
 
 include $(FINALE)
 
