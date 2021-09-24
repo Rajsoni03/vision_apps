@@ -38,7 +38,7 @@ DIRECTORIES += kernels
 DIRECTORIES += modules
 DIRECTORIES += applibs
 DIRECTORIES += apps
-DIRECTORIES += platform
+DIRECTORIES += platform/$(SOC)
 
 TARGET_COMBOS :=
 
