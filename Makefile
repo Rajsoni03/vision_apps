@@ -38,6 +38,7 @@ DIRECTORIES += kernels
 DIRECTORIES += modules
 DIRECTORIES += applibs
 DIRECTORIES += apps
+DIRECTORIES += platform
 
 TARGET_COMBOS :=
 
@@ -167,7 +168,7 @@ include makerules/makefile_ipk.mak
 include makerules/makefile_uboot.mak
 
 vision_apps: sdk_check_paths
-	touch ${PSDK_PATH}/vision_apps/apps/basic_demos/app_rtos/rtos_linux/mcu2_0/mcu2_0.cfg
+	touch ${PSDK_PATH}/vision_apps/platform/$(SOC)/rtos/mcu2_0/mcu2_0.cfg
 	$(MAKE) all
 vision_apps_clean: sdk_check_paths pdk_emu_clean clean
 vision_apps_scrub: sdk_check_paths

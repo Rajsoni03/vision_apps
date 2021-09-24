@@ -42,7 +42,7 @@ BUILD_ENABLE_ETHFW=no
 endif
 
 # Need to export this variable so that the following xdc .cfg file can pick this up from the env:
-# ${PSDK_PATH}/vision_apps/apps/basic_demos/app_rtos/rtos_linux/mcu2_0/mcu2_0.cfg
+# ${PSDK_PATH}/vision_apps/platform/$(SOC)/rtos/mcu2_0/mcu2_0.cfg
 export BUILD_ENABLE_ETHFW
 
 # A72 OS specific Build flag

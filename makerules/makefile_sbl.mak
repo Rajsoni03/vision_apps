@@ -67,11 +67,11 @@ endif
 
 ifeq ($(BUILD_LINUX_A72), yes)
 	SBL_SD_FS_PATH=$(LINUX_SD_FS_BOOT_PATH)
-	LDS_PATH=$(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_linux/linux_lds
+	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/linux/linux_lds
 endif
 ifeq ($(BUILD_QNX_A72), yes)
 	SBL_SD_FS_PATH=$(QNX_SD_FS_BOOT_PATH)
-	LDS_PATH=$(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx/qnx_lds
+	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/qnx/qnx_lds
 endif
 
 sbl_atf_optee:

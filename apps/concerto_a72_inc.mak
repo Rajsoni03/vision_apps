@@ -32,14 +32,15 @@ VISION_APPS_APPLIBS_IDIRS =
 VISION_APPS_APPLIBS_IDIRS += $(VISION_APPS_PATH)/applibs
 
 ifeq ($(TARGET_OS),LINUX)
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_linux/mpu1
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_linux
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/linux/mpu1
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/linux
 endif
 ifeq ($(TARGET_OS),QNX)
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx/mpu1
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/rtos_qnx
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/qnx/mpu1
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/qnx
 endif
-IDIRS       += $(VISION_APPS_PATH)/apps/basic_demos/app_rtos/common
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos/common
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos
 
 # These rpath-link linker options are to provide directories for
 # secondary *.so file lookup
