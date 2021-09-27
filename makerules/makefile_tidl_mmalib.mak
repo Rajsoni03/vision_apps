@@ -37,6 +37,7 @@ ifeq ($(BUILD_LINUX_A72),yes)
 endif
 
 tidl_rt:
+	sed -i -e "s/vx_platform_psdk_j7_linux/vx_platform_psdk_j7/" $(TIDL_PATH)/rt/src/a72/concerto.mak
 ifeq ($(BUILD_LINUX_A72),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
