@@ -82,6 +82,7 @@
  *  @{
  */
 
+#if defined (SOC_J721E)
 /** \brief CPU ID */
 #define APP_IPC_CPU_MPU1_0  ( 0u)
 /** \brief CPU ID */
@@ -108,6 +109,34 @@
 #define APP_IPC_CPU_MAX     (11u)
 /** \brief Invalid CPU ID */
 #define APP_IPC_CPU_INVALID (0xFFu)
+#endif
+
+#if defined (SOC_J721S2)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MPU1_0  ( 0u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU1_0  ( 1u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU1_1  ( 2u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU2_0  ( 3u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU2_1  ( 4u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU3_0  ( 5u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU3_1  ( 6u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_1   ( 7u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_2   ( 8u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MPU1_1  ( 9u)
+/** \brief Max CPU ID */
+#define APP_IPC_CPU_MAX     (10u)
+/** \brief Invalid CPU ID */
+#define APP_IPC_CPU_INVALID (0xFFu)
+#endif
 
 /* @} */
 

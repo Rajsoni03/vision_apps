@@ -168,6 +168,7 @@ typedef struct {
 
 static app_ipc_obj_t g_app_ipc_obj;
 
+#if defined (SOC_J721E)
 static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
 {
     IPC_MPU1_0,
@@ -197,6 +198,37 @@ static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
     APP_IPC_CPU_C7x_1,
     APP_IPC_CPU_MPU1_1
 };
+#endif
+
+#if defined (SOC_J721S2)
+static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
+{
+    IPC_MPU1_0,
+    IPC_MCU1_0,
+    IPC_MCU1_1,
+    IPC_MCU2_0,
+    IPC_MCU2_1,
+    IPC_MCU3_0,
+    IPC_MCU3_1,
+    IPC_C7X_1,
+    IPC_C7X_2,
+    IPC_MPU1_1
+};
+
+static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
+{
+    APP_IPC_CPU_MPU1_0,
+    APP_IPC_CPU_MCU1_0,
+    APP_IPC_CPU_MCU1_1,
+    APP_IPC_CPU_MCU2_0,
+    APP_IPC_CPU_MCU2_1,
+    APP_IPC_CPU_MCU3_0,
+    APP_IPC_CPU_MCU3_1,
+    APP_IPC_CPU_C7x_1,
+    APP_IPC_CPU_C7x_2,
+    APP_IPC_CPU_MPU1_1
+};
+#endif
 
 static void appIpcRpmsgRxHandler(RPMessage_Handle rpmsg_handle,
                         void *arg, void *data,

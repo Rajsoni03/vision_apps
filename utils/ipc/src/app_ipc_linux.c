@@ -62,6 +62,7 @@
 #include <ti_rpmsg_char.h>
 #include <utils/ipc/src/app_ipc_linux_priv.h>
 
+#if defined (SOC_J721E)
 static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
 {
     (uint32_t)(-1),
@@ -91,6 +92,37 @@ static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
     "c7x_1",
     "mpu1_1"
 };
+#endif
+
+#if defined (SOC_J721S2)
+static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
+{
+    (uint32_t)(-1),
+    0,
+    3,
+    1,
+    4,
+    2,
+    5,
+    6,
+    7,
+    (uint32_t)(-1)
+};
+
+static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
+{
+    "mpu1_0",
+    "mcu1_0",
+    "mcu1_1",
+    "mcu2_0",
+    "mcu2_1",
+    "mcu3_0",
+    "mcu3_1",
+    "c7x_1",
+    "c7x_2",
+    "mpu1_1"
+};
+#endif
 
 app_ipc_obj_t g_app_ipc_obj;
 
