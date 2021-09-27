@@ -40,6 +40,14 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 		cp -R $(PTK_DEMO_DIR)/$$var/config $(PTK_DEMO_CFG_DIR)/$$var; \
 	done
 
+	# copy imaging sensor dcc binaries
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
+	cp $(IMAGING_PATH)/sensor_drv/src/imx390/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
+	cp $(IMAGING_PATH)/sensor_drv/src/ar0820/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
+	cp $(IMAGING_PATH)/sensor_drv/src/ar0233/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
+
 	# Copy header files (variables used in this section are defined in makefile_ipk.mak)
 	@# copy all the .h files under folders in IPK_INCLUDE_FOLDERS
 	@# https://stackoverflow.com/questions/10176849/how-can-i-copy-only-header-files-in-an-entire-nested-directory-to-another-direct
