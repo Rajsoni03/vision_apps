@@ -59,7 +59,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#include <dirent.h> 
+#include <dirent.h>
 #include <sys/stat.h>
 
 
@@ -401,7 +401,7 @@ int32_t appIssGetResizeParams(uint16_t in_width, uint16_t in_height, uint16_t tg
 }
 
 /*
-Returns the sum of sizes all .bin files inside a specified directory. 
+Returns the sum of sizes all .bin files inside a specified directory.
 Does not look inside subfolders.
 */
 int32_t get_dcc_dir_size(char* dcc_folder_path)
@@ -412,9 +412,9 @@ int32_t get_dcc_dir_size(char* dcc_folder_path)
     struct stat FileAttrib;
     int32_t size = 0;
     d = opendir(dcc_folder_path);
-    if (d) 
+    if (d)
     {
-        while ((dir = readdir(d)) != NULL) 
+        while ((dir = readdir(d)) != NULL)
         {
             char *dot = strrchr(dir->d_name, '.');
             if (dot && (strcmp(dot, ".bin") == 0))
@@ -428,7 +428,7 @@ int32_t get_dcc_dir_size(char* dcc_folder_path)
     }
     else
     {
-        printf("get_dcc_dir_size : Could not open directory or directory is empty %s \n", 
+        printf("get_dcc_dir_size : Could not open directory or directory is empty %s \n",
         dcc_folder_path);
     }
 
@@ -436,7 +436,7 @@ int32_t get_dcc_dir_size(char* dcc_folder_path)
 }
 
 /*
-Returns the contents of all .bin files inside a specified directory. 
+Returns the contents of all .bin files inside a specified directory.
 Does not look inside subfolders.
 */
 int32_t get_dcc_dir_data(char* dcc_folder_path, uint8_t * dcc_buf)
@@ -450,9 +450,9 @@ int32_t get_dcc_dir_data(char* dcc_folder_path, uint8_t * dcc_buf)
     FILE * fp;
     d = opendir(dcc_folder_path);
     printf("get_dcc_dir_data : %s \n", dcc_folder_path);
-    if (d) 
+    if (d)
     {
-        while ((dir = readdir(d)) != NULL) 
+        while ((dir = readdir(d)) != NULL)
         {
             char *dot = strrchr(dir->d_name, '.');
             if (dot && (strcmp(dot, ".bin") == 0))
@@ -555,7 +555,7 @@ int32_t appSplitVpacDcc(uint8_t *dcc_buf_in, uint32_t prmSize,
                         uint8_t ** dcc_buf_ldc, uint32_t *dcc_buf_ldc_num_bytes)
 {
     int32_t status = 0;
-    uint8_t *tmp_buf;//dcc_buf_2a, *dcc_buf_viss, *dcc_buf_ldc;
+    uint8_t *tmp_buf;
     uint32_t offset_2a = 0;
     uint32_t offset_viss = 0;
     uint32_t offset_ldc = 0;
@@ -576,7 +576,7 @@ int32_t appSplitVpacDcc(uint8_t *dcc_buf_in, uint32_t prmSize,
     }
 
     tmp_buf = malloc(prmSize);
-    if(NULL == dcc_buf_viss)
+    if(NULL == tmp_buf)
     {
         printf("Failed to allocate %d bytes for dcc_buf_viss \n", prmSize);
         free(*dcc_buf_aewb);
@@ -589,7 +589,7 @@ int32_t appSplitVpacDcc(uint8_t *dcc_buf_in, uint32_t prmSize,
     }
 
     tmp_buf = malloc(prmSize);
-    if(NULL == dcc_buf_ldc)
+    if(NULL == tmp_buf)
     {
         printf("Failed to allocate %d bytes for dcc_buf_ldc \n", prmSize);
         free(*dcc_buf_aewb);
@@ -640,7 +640,7 @@ int32_t appSplitVpacDcc(uint8_t *dcc_buf_in, uint32_t prmSize,
 /*
     This function receives a buffer containing VPAC tuning data.
     The data may have been received through ITT interface or file read.
-    It may contain tuning parameters for one or more plugins belonging to 
+    It may contain tuning parameters for one or more plugins belonging to
     one or more of the following nodes
         VISS
         AEWB
@@ -654,9 +654,9 @@ int32_t appSplitVpacDcc(uint8_t *dcc_buf_in, uint32_t prmSize,
         Split the tuning database into VISS, AEWB and LDC
         Send the tuning data to all the nodes one by one
 */
-int32_t appUpdateVpacDcc(uint8_t *dcc_buf, uint32_t prmSize, vx_context context, 
+int32_t appUpdateVpacDcc(uint8_t *dcc_buf, uint32_t prmSize, vx_context context,
                         vx_node viss_node, uint32_t viss_node_index,
-                        vx_node aewb_node, uint32_t aewb_node_index, 
+                        vx_node aewb_node, uint32_t aewb_node_index,
                         vx_node ldc_node, uint32_t ldc_node_index
                     )
 {
@@ -707,24 +707,24 @@ int32_t appUpdateVpacDcc(uint8_t *dcc_buf, uint32_t prmSize, vx_context context,
 
 /*
     This function reads tuning database from the file system.
-    The binary data read is then sent to VPAC nodes using appUpdateVpacDcc.  
+    The binary data read is then sent to VPAC nodes using appUpdateVpacDcc.
 
-    The database is expected under the path 
-    "/opt/vision_apps/dcc/<sensor_name>/<operating_mode>", where 
-        sensor_name is the string received by querying sensor properties. 
+    The database is expected under the path
+    "/opt/vision_apps/dcc/<sensor_name>/<operating_mode>", where
+        sensor_name is the string received by querying sensor properties.
         operating_mode is "wdr" or "linear" as set by the application.
 
     For e.g. IMX390 DCC database in WDR mode will be expected under the path
     /opt/vision_apps/dcc/IMX390-UB953_D3/wdr
 */
-int32_t appDccUpdatefromFS(char* sensor_name, uint8_t wdr_mode, 
+int32_t appDccUpdatefromFS(char* sensor_name, uint8_t wdr_mode,
                         vx_node node_viss, uint32_t viss_node_index,
-                        vx_node node_aewb, uint32_t aewb_node_index, 
+                        vx_node node_aewb, uint32_t aewb_node_index,
                         vx_node node_ldc, uint32_t ldc_node_index,
                         vx_context context)
 {
     char dcc_dir_path[MAX_FOLDER_NAME_LEN];
-     char op_mode[8]; 
+     char op_mode[8];
     int dcc_num_bytes;
     int dcc_bytes_read;
     uint8_t * dcc_buf;
@@ -748,8 +748,8 @@ int32_t appDccUpdatefromFS(char* sensor_name, uint8_t wdr_mode,
             dcc_bytes_read = get_dcc_dir_data(dcc_dir_path, dcc_buf);
             if(dcc_bytes_read > 0)
             {
-                appUpdateVpacDcc(dcc_buf, dcc_num_bytes, context, 
-                    node_viss, viss_node_index, 
+                appUpdateVpacDcc(dcc_buf, dcc_num_bytes, context,
+                    node_viss, viss_node_index,
                     node_aewb, aewb_node_index,
                     node_ldc, ldc_node_index
                 );
@@ -766,7 +766,7 @@ int32_t appDccUpdatefromFS(char* sensor_name, uint8_t wdr_mode,
 }
 
 /*
-    This function send node specific tuning data to the node using the control 
+    This function send node specific tuning data to the node using the control
     command ISS_CMD_SET_DCC_PARAMS.
 */
 int32_t appDccUpdateNode(uint8_t * dcc_buf, int32_t num_bytes, vx_node node, uint32_t replicate_nodex_idx, vx_context context)
