@@ -119,12 +119,7 @@ endif
 TIOVX_LIBS  =
 TIOVX_LIBS += vx_vxu vx_framework
 TIOVX_LIBS += vx_kernels_host_utils vx_kernels_target_utils
-ifeq ($(TARGET_OS), LINUX)
-TIOVX_LIBS += vx_platform_psdk_j7_linux
-endif
-ifeq ($(TARGET_OS), QNX)
-TIOVX_LIBS += vx_platform_psdk_j7_qnx
-endif
+TIOVX_LIBS += vx_platform_psdk_j7
 TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_utils
 TIOVX_LIBS += vx_kernels_hwa vx_kernels_tidl
