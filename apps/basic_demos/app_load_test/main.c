@@ -119,15 +119,23 @@ int main(int argc, char *argv[])
         core_id[0] = APP_IPC_CPU_MCU1_0;
         core_id[1] = APP_IPC_CPU_MCU2_0;
     }
+    #if defined(SOC_J721E)
     else if (core == C6X_FAMILY)
     {
         core_id[0] = APP_IPC_CPU_C6x_1;
         core_id[1] = APP_IPC_CPU_C6x_2;
     }
+    #endif
     else if (core == C7X_FAMILY)
     {
         core_id[0] = APP_IPC_CPU_C7x_1;
+
+        #if defined(SOC_J721S2)
+        core_id[1] = APP_IPC_CPU_C7x_2;
+        #endif
+        #if defined(SOC_J721E)
         core_cnt = 1;
+        #endif
     }
     else
     {
