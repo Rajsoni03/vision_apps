@@ -53,11 +53,11 @@ ptk:
 ifeq ($(BUILD_PTK),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) BUILD_TARGET_MODE=no
-	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) release BUILD_TARGET_MODE=no
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) cp_to_lib BUILD_TARGET_MODE=no
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) BUILD_TARGET_MODE=yes
-	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) release BUILD_TARGET_MODE=yes
+	-$(MAKE) -C $(PTK_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) cp_to_lib BUILD_TARGET_MODE=yes
 endif
 endif
 
@@ -88,6 +88,7 @@ imaging_scrub:
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) lib_remote_device_display lib_remote_device
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) cp_to_lib
 endif
 
 remote_device_clean:
