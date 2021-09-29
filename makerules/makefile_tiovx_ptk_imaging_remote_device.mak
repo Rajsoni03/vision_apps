@@ -87,8 +87,13 @@ imaging_scrub:
 
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
+ifeq ($(TARGET_SOC),J7)
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=J721E RTOS=$(RTOS) lib_remote_device_display lib_remote_device
+	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=J721E RTOS=$(RTOS) cp_to_lib
+else
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) lib_remote_device_display lib_remote_device
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) cp_to_lib
+endif
 endif
 
 remote_device_clean:
