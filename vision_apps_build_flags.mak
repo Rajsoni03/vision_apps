@@ -65,12 +65,8 @@ BUILD_APP_RTOS_LINUX?=$(BUILD_LINUX_A72)
 # Build RTOS + QNX binaries
 BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
 
-# PDK board to build for, valid values: j721e_sim j721e_evm
-ifeq ($(SOC),j721e)
-BUILD_PDK_BOARD=j721e_evm
-else ifeq ($(SOC),j721s2)
-BUILD_PDK_BOARD=j721s2_evm
-endif
+# PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm
+BUILD_PDK_BOARD=$(SOC)_evm
 
 # Flag to select silicon revision: 1_1 for ES 1.1, 1_0 for ES 1.0
 J7ES_SR?=1_1
