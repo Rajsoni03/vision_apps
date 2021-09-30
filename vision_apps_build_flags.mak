@@ -9,6 +9,7 @@ PSDK_VERSION?=8.0.0
 include $(TIOVX_PATH)/build_flags.mak
 
 # Build specific CPUs
+ifeq ($(SOC),j721e)
 BUILD_CPU_MPU1?=yes
 BUILD_CPU_MCU1_0?=no
 BUILD_CPU_MCU2_0?=yes
@@ -18,8 +19,22 @@ BUILD_CPU_MCU3_1?=no
 BUILD_CPU_C6x_1?=yes
 BUILD_CPU_C6x_2?=yes
 BUILD_CPU_C7x_1?=yes
+else ifeq ($(SOC),j721s2)
+BUILD_CPU_MPU1?=yes
+BUILD_CPU_MCU1_0?=no
+BUILD_CPU_MCU2_0?=yes
+BUILD_CPU_MCU2_1?=yes
+BUILD_CPU_MCU3_0?=no
+BUILD_CPU_MCU3_1?=no
+BUILD_CPU_C7x_1?=yes
+BUILD_CPU_C7x_2?=yes
+endif
 
 BUILD_ENABLE_ETHFW?=yes
+
+ifeq ($(SOC),j721s2)
+BUILD_ENABLE_ETHFW=no
+endif
 
 BUILD_EDGEAI?=no
 

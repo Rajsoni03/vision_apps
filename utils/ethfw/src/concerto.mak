@@ -1,3 +1,4 @@
+ifeq ($(TARGET_PLATFORM),J7)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 ifeq ($(TARGET_CPU),R5F)
 ifeq ($(BUILD_CPU_MCU2_0),yes)
@@ -25,6 +26,7 @@ endif
 
 include $(FINALE)
 
+endif
 endif
 endif
 endif

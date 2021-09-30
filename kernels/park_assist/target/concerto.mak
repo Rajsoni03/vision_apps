@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66 C71 A72))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66 C71 C7120 A72))
 
 include $(PRELUDE)
 TARGET      := vx_target_kernels_park_assist
@@ -15,22 +15,6 @@ IDIRS       += $(TIADALG_PATH)/include
 IDIRS       += $(IVISION_PATH)
 IDIRS       += $(TIDL_PATH)/inc
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
-
-#ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C71))
-#IDIRS       += $(J7_C_MODELS_PATH)/include
-#IDIRS       += ../c7x
-#CSOURCES    += ../c7x/vx_dof_to_tracks_target.c
-#CSOURCES    += ../c7x/vx_kernels_park_assist_target.c
-#CSOURCES    += ../c7x/vx_triangulation_target.c
-#endif
-
-#ifneq ($(TARGET_CPU),C71)
-#IDIRS       += $(VXLIB_PATH)/packages
-#endif
-
-#ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C71))
-#CSOURCES    += ../c7x/VXLIB_triangulatePoints_i32f_o32f_cn.c
-#endif
 
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66))
 IDIRS       += ../c6x

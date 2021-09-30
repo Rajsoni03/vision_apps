@@ -75,7 +75,7 @@
 #define ENABLE_CACHE_OPS
 
 #if 0
-#if defined(C71)
+#if defined(C71) || defined(C7120)
 #undef ENABLE_CACHE_OPS /* since C7x is coherent */
 #endif
 #endif
@@ -85,7 +85,7 @@
 /** \brief Minmum number of bytes that will be used for alignment, MUST >= max CPU cache line size */
 #define APP_MEM_ALIGN_MIN_BYTES     (256u)
 
-#ifdef C71
+#if defined(C71) || defined(C7120)
 extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
                                       void *appData);
@@ -459,14 +459,14 @@ int32_t appMemStats(uint32_t heap_id, app_mem_stats_t *stats)
     return status;
 }
 
-#if defined(C71)
+#if defined(C71) || defined(C7120)
 #include <c6x_migration.h>
 #include <c7x.h>
 #endif
 
 void appMemFence()
 {
-    #if defined(C71)
+    #if defined(C71) || defined(C7120)
     _mfence();
     _mfence();
     #endif
@@ -507,7 +507,7 @@ uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 {
     /* For rtos implementation, virtual and shared pointers are same
      */
-#ifdef C71
+#if defined(C71) || defined(C7120)
     uint64_t physPtr;
 
     physPtr = appUdmaVirtToPhyAddrConversion((void*)virtPtr, 0, NULL);

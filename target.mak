@@ -30,7 +30,7 @@ SYSDEFS  :=
 
 SYS_XDC_IDIRS = $(BIOS_PATH)/packages
 
-ifeq ($(TARGET_PLATFORM),J7)
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2))
     SYSDEFS +=
     ifeq ($(TARGET_FAMILY),ARM)
         ifeq ($(TARGET_CPU),A72)

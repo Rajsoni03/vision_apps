@@ -250,7 +250,7 @@ void appUdmaOsalMutexUnlock(void *mutexHandle)
 
 }
 
-#ifdef C71
+#if defined(C71) || defined(C7120)
 extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
                                       void *appData);
@@ -268,7 +268,7 @@ int32_t appUdmaInit(void)
     UdmaInitPrms_init(udmaInstId, &udmaInitPrms);
     udmaInitPrms.printFxn = (Udma_PrintFxn)appLogPrintf;
     udmaInitPrms.skipGlobalEventReg = FALSE;
-    #ifdef C71
+    #if defined(C71) || defined(C7120)
     udmaInitPrms.osalPrms.lockMutex = appUdmaOsalMutexLock;
     udmaInitPrms.osalPrms.unlockMutex = appUdmaOsalMutexUnlock;
     udmaInitPrms.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
@@ -745,7 +745,7 @@ int32_t appUdmaCopyNDTrigger(
     return (retVal);
 }
 
-#ifdef C71
+#if defined(C71) || defined(C7120)
 
 int32_t appUdmaCopyNDWait(
     app_udma_ch_handle_t ch_handle)
@@ -1017,7 +1017,7 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
             ch_obj->tdcq_event_handle = &ch_obj->tdcq_event_obj;
         }
     }
-#ifdef C71
+#if defined(C71) || defined(C7120)
     if ((uint32_t)FALSE == ch_obj->create_prms.use_dru)
     {
 #endif
@@ -1042,7 +1042,7 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
             ch_obj->tr_event_handle = &ch_obj->tr_event_obj;
         }
     }
-#ifdef C71
+#if defined(C71) || defined(C7120)
     }
 #endif
 

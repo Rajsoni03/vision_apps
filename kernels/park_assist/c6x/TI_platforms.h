@@ -3,7 +3,7 @@
 
 #ifdef _HOST_BUILD
 
-    #if defined (__C7100__)
+    #if defined(__C7100__) || defined(__C7120__)
         #include "c7x.h"
     #else
         #include "c6xsim/C6xSimulator.h"
@@ -37,7 +37,7 @@
 
 #else  /* _HOST_BUILD */
 
-    #if defined (__C7100__)
+    #if defined(__C7100__) || defined(__C7120__)
         #include <c7x.h>
         #include <c7x_strm.h>
         #include <c7x_luthist.h>
@@ -65,7 +65,7 @@
      * ---------------------------------------------------------------- */
     #define EMIT_PRAGMA(x) _Pragma(#x)
     #define CODE_SECTION(fn, section) EMIT_PRAGMA(CODE_SECTION(fn, section))
-#if defined (__C7100__)
+#if defined(__C7100__) || defined(__C7120__)
     #define _setFADCR(v) (__FPCR = v)
     #define _getFADCR()  (__FPCR)
 #else

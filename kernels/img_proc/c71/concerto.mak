@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 C71 ))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 C71 C7120))
 
 include $(PRELUDE)
 TARGET      := vx_target_kernels_img_proc_c71
@@ -17,7 +17,7 @@ IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 IDIRS       += $(VXLIB_PATH)/packages
 IDIRS       += $(PDK_PATH)/packages
 
-ifeq ($(TARGET_CPU),C71)
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C71 C7120))
 DEFS += CORE_DSP
 endif
 

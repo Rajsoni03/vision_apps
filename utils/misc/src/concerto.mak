@@ -6,7 +6,7 @@ include $(PRELUDE)
 TARGET      := app_utils_misc
 TARGETTYPE  := library
 
-ifeq ($(TARGET_CPU),C71)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120))
 ASSEMBLY += app_c7x_init_asm.asm
 CSOURCES += app_c7x_init.c
 endif

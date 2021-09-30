@@ -510,7 +510,7 @@ static inline void appUdmaCreatePrms_Init(app_udma_create_prms_t *prms)
     if(NULL != prms)
     {
         /* Interrupt mode not yet supported for C7x - use polling */
-#ifdef C71
+#if defined(C71) || defined(C7120)
         prms->enable_intr = 0;
 #else
         prms->enable_intr = 1;

@@ -5,7 +5,7 @@
 #include <stdint.h>
 #endif
 
-#ifdef __C7100__
+#if defined(__C7100__) || defined(__C7120__)
   #include <c7x.h>
   #if !defined(_HOST_BUILD)
     #define RESTRICT restrict

@@ -51,7 +51,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:debug:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
-	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:C71:1:debug:CGT7X
+	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:$(C7X_TARGET):1:debug:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_A72),yes)
 		ifeq ($(BUILD_LINUX_A72),yes)
@@ -71,7 +71,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:release:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
-	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:C71:1:release:CGT7X
+	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:$(C7X_TARGET):1:release:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_A72),yes)
 		ifeq ($(BUILD_LINUX_A72),yes)
@@ -176,6 +176,7 @@ vision_apps_scrub: sdk_check_paths
 
 vision_apps_docs: sdk_check_paths doxy_docs
 
+ifeq ($(SOC),j721e)
 sdk: sdk_check_paths pdk ethfw remote_device imaging ptk vxlib tiovx tiadalg qnx
 	$(MAKE) vision_apps
 	$(MAKE) tidl_rt
@@ -191,6 +192,24 @@ endif
 sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scrub ptk_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
+endif
+else ifeq ($(SOC),j721s2)
+sdk: sdk_check_paths pdk imaging ptk vxlib tiovx tiadalg qnx
+	$(MAKE) vision_apps
+	$(MAKE) tidl_rt
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot
+endif
+
+sdk_clean: sdk_check_paths pdk_clean imaging_clean ptk_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean tidl_rt_clean
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_clean
+endif
+
+sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub ptk_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_clean
+endif
 endif
 
 sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs ptk_docs tiadalg_docs

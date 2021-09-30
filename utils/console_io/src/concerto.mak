@@ -12,7 +12,7 @@ CSOURCES += app_log_rtos.c app_cli_rtos.c
 ifeq ($(TARGET_CPU),A72)
 CSOURCES += app_log_printf_gcc_rtos.c
 endif
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), R5F C66 C71))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), R5F C66 C71 C7120))
 CSOURCES += app_log_printf_ticgt_rtos.c
 endif
 endif
