@@ -527,7 +527,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
             tivxMemBufferMap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
 
             /* Map output image CbCr buffer */
-            if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+            if(out_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
             {
                 output_image_target_ptr[1U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[1U]);
                 tivxMemBufferMap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
@@ -544,7 +544,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
                 tivxMemBufferMap(backgroud_image_target_ptr[0U], background_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
 
                 /* Map background CbCr buffer */
-                if(background_img_desc->mem_ptr[1U].shared_ptr != NULL)
+                if(background_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
                 {
                     backgroud_image_target_ptr[1U] = tivxMemShared2TargetPtr(&background_img_desc->mem_ptr[1U]);
                     tivxMemBufferMap(backgroud_image_target_ptr[1U], background_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
@@ -582,7 +582,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
                 tivxMemBufferUnmap(backgroud_image_target_ptr[0U], background_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
 
                 /* Unmap background cbcr buffer */
-                if(background_img_desc->mem_ptr[1U].shared_ptr != NULL)
+                if(background_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
                 {
                     tivxMemBufferUnmap(backgroud_image_target_ptr[1U], background_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
                 }
@@ -599,7 +599,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
 
             /* unmap output buffer */
             tivxMemBufferUnmap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
-            if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+            if(out_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
             {
                 tivxMemBufferUnmap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
             }
@@ -613,7 +613,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
         tivxMemBufferMap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
 
         /* Map output image CbCr buffer */
-        if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+        if(out_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
         {
             output_image_target_ptr[1U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[1U]);
             tivxMemBufferMap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
@@ -743,7 +743,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
 
         /* unmap output buffer */
         tivxMemBufferUnmap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
-        if(out_img_desc->mem_ptr[1U].shared_ptr != NULL)
+        if(out_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
         {
             tivxMemBufferUnmap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
         }

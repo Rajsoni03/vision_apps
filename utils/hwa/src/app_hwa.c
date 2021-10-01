@@ -155,7 +155,7 @@ int32_t appCsi2TxInit(void)
 
     regVal = CSL_REG32_RD(CSL_CTRL_MMR0_CFG0_BASE +
                           CSL_MAIN_CTRL_MMR_CFG0_LOCK1_KICK0);
-    if (regVal & 0x1 == 0U)
+    if ((regVal & 0x1) == 0U)
     {
         /* Unlock MMR */
         unlocked = 1U;

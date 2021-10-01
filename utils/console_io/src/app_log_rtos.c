@@ -111,7 +111,7 @@ uint64_t appLogGetGlobalTimeInUsec()
 {
     uint64_t cur_ts = 0; /* Returning ts in usecs */
 
-    if ((NULL != GTC_BASE_ADDR) &&
+    if (((uintptr_t)NULL != GTC_BASE_ADDR) &&
         (0 != mhzFreq) )
     {
         cur_ts = GET_GTC_VALUE64 / mhzFreq;
