@@ -11,7 +11,7 @@ SECTIONS
 {
     .vecs       : {
         __VECS_ENTRY_POINT = .;
-    } palign(8) > R5F_TCMA
+    } palign(8) > ATCM_START
     .init_text  : {
                      boot.*(.text)
                      *(.text:ti_sysbios_family_arm_MPU_*)

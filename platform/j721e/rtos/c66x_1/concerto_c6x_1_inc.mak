@@ -3,13 +3,13 @@ ifeq ($(RTOS),SYSBIOS)
 	XDC_IDIRS    = $($(_MODULE)_SDIR)/../bios_cfg/
 	XDC_CFG_FILE = $($(_MODULE)_SDIR)/c66x_1.cfg
 	XDC_PLATFORM = "ti.platforms.c6x:J7ES"
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 endif
 ifeq ($(RTOS),FREERTOS)
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_mem_map_freertos.cmd
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
 endif
+
+LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
 

@@ -5,14 +5,14 @@ ifeq ($(RTOS),SYSBIOS)
 	XDC_IDIRS    = $($(_MODULE)_SDIR)/../bios_cfg/
 	XDC_CFG_FILE = $($(_MODULE)_SDIR)/mcu3_0.cfg
 	XDC_PLATFORM = "ti.platforms.cortexR:J7ES_MAIN"
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
 endif
 ifeq ($(RTOS),FREERTOS)
 	CSOURCES += ../common/mpu_cfg/$(SOC)_mpu_cfg.c
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_mem_map_freertos.cmd
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
 endif
+
+LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
 
@@ -28,7 +28,9 @@ include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
 
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_mcu3_0
-STATIC_LIBS += app_rtos
+ifeq ($(RTOS),FREERTOS)
+	STATIC_LIBS += app_rtos
+endif
 STATIC_LIBS += app_utils_sciclient
 
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f

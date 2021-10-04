@@ -66,8 +66,10 @@
 
 MEMORY
 {
-    /* R5F_TCMA [ size 32.00 KB ] */
-    R5F_TCMA                 (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00008000
+    /* R5F_TCMA_VECS [ size 64 B ] */
+    R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000040
+    /* R5F_TCMA [ size 31.94 KB ] */
+    R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x00007FC0
     /* Main OCRAM for MCU2_1 [ size 256.00 KB ] */
     MAIN_OCRAM_MCU2_1        ( RWIX ) : ORIGIN = 0x03640000 , LENGTH = 0x00040000
     /* R5F_TCMB0 [ size 32.00 KB ] */
