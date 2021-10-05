@@ -88,4 +88,10 @@ MEMORY
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
     /* DDR for MCU3_1 for local heap [ size  8.00 MB ] */
     DDR_MCU3_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE3800000 , LENGTH = 0x00800000
+    /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
+    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xFC000000 , LENGTH = 0x00800000
+    /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
+    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xFC800000 , LENGTH = 0x01800000
+    /* EEPROM shadow memory. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
+    EEPROM_SHADOW                     : ORIGIN = 0xFE000000 , LENGTH = 0x01000000
 }

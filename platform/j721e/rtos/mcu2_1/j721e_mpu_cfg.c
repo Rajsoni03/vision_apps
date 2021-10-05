@@ -109,7 +109,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .regionId         = 4U,
         .enable           = 1U,
         .baseAddr         = 0x41C00000,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_512KB,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 0U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
@@ -164,62 +164,6 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         /* Region 8 configuration: Ring buffer */
         .regionId         = 8U,
         .enable           = 1U,
-        .baseAddr         = DDR_MCU2_0_NON_CACHE_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_128MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 1U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 9 configuration: Ring buffer */
-        .regionId         = 9U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU1_0_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 10 configuration: Ring buffer */
-        .regionId         = 10U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU1_1_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 9 configuration: Ring buffer */
-        .regionId         = 11U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU2_0_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 10 configuration: Ring buffer */
-        .regionId         = 12U,
-        .enable           = 1U,
         .baseAddr         = DDR_MCU2_1_IPC_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
@@ -231,11 +175,13 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 9 configuration: Ring buffer */
-        .regionId         = 13U,
+        /* Region 9 configuration: MCU2_1 Non cache buffer */
+        /* Using MSC2_0 non cache address as base address */
+        /* As it is aligned to 128MB and carries the same cache policy */
+        .regionId         = 9U,
         .enable           = 1U,
-        .baseAddr         = DDR_MCU3_0_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
+        .baseAddr         = DDR_MCU2_0_NON_CACHE_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_128MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
@@ -245,17 +191,54 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 10 configuration: Ring buffer */
-        .regionId         = 14U,
+        /* Region 10 configuration:
+         * Cache 32MB from INTERCORE_ETH_DESC_MEM_ADDR
+         * But change the policy for the first 8MB in the
+         * next MPU region as non-cached. This leaves the remaining
+         * 24MB as cached for INTERCORE_ETH_DATA_MEM_ADDR
+         */
+        .regionId         = 10U,
         .enable           = 1U,
-        .baseAddr         = DDR_MCU3_1_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
+        .baseAddr         = INTERCORE_ETH_DESC_MEM_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_32MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
+        .shareable        = 1U,
+        .cacheable        = (uint32_t)TRUE,
+        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
+        .memAttr          = 0U,
+    },
+    {
+        /* Region 11 configuration:
+         * INTERCORE_ETH_DESC_MEM as non-cache 8 MB
+         */
+        .regionId         = 11U,
+        .enable           = 1U,
+        .baseAddr         = INTERCORE_ETH_DESC_MEM_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_8MB,
+        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
+        .exeNeverControl  = 1U,
+        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+        .shareable        = 1U,
         .cacheable        = (uint32_t)FALSE,
         .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
         .memAttr          = 0U,
     },
+    {
+        /* Region 12 configuration:
+         * EEPROM_SHADOW_ADDR as non-cache 16 MB
+         */
+        .regionId         = 12U,
+        .enable           = 1U,
+        .baseAddr         = EEPROM_SHADOW_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_16MB,
+        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
+        .exeNeverControl  = 1U,
+        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+        .shareable        = 1U,
+        .cacheable        = (uint32_t)FALSE,
+        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
+        .memAttr          = 0U,
+    }
 };

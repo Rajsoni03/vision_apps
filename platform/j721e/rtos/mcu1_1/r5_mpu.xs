@@ -167,10 +167,7 @@ attrs.noExecute = true;
 attrs.accPerm = 1;          /* RW at PL1 */
 attrs.tex = 0;
 attrs.subregionDisableMask = 0;
-MPU.setRegionMeta(index++, non_cache_base_addr + 0*32*MB, MPU.RegionSize_32M, attrs);
-MPU.setRegionMeta(index++, non_cache_base_addr + 1*32*MB, MPU.RegionSize_32M, attrs);
-MPU.setRegionMeta(index++, non_cache_base_addr + 2*32*MB, MPU.RegionSize_32M, attrs);
-MPU.setRegionMeta(index++, non_cache_base_addr + 3*32*MB, MPU.RegionSize_32M, attrs);
+MPU.setRegionMeta(index++, non_cache_base_addr, MPU.RegionSize_128M, attrs);
 
 /* make DDR_MCU1_1_IPC_ADDR as non-cache */
 /* Note: the next MPU regions start address (second argument of MPU.setRegionMeta)
@@ -186,5 +183,19 @@ attrs.accPerm = 1;          /* RW at PL1 */
 attrs.tex = 0;
 attrs.subregionDisableMask = 0;
 MPU.setRegionMeta(index++, 0xA1000000, MPU.RegionSize_1M, attrs);
+
+eeprom_shadow_base_addr = 0xFE000000;
+/* make EEPROM_SHADOW, as non-cache */
+/* Note: MUST be 8MB aligned
+ */
+attrs.enable = true;
+attrs.bufferable = false;
+attrs.cacheable = false;
+attrs.shareable = true;
+attrs.noExecute = true;
+attrs.accPerm = 1;          /* RW at PL1 */
+attrs.tex = 0;
+attrs.subregionDisableMask = 0;
+MPU.setRegionMeta(index++, eeprom_shadow_base_addr, MPU.RegionSize_16M, attrs);
 
 xdc.print("# MPU setup for " + index + " entries !!!");

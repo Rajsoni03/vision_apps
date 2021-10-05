@@ -287,6 +287,15 @@ c66x_2_ddr_scratch_size    = 48*MB;
 c7x_1_ddr_scratch_addr     = c66x_2_ddr_scratch_addr + c66x_2_ddr_scratch_size;
 c7x_1_ddr_scratch_size     = ddr_mem_size - (c7x_1_ddr_scratch_addr - ddr_mem_addr);
 
+mcu2_1_ddr_intercore_eth_desc_addr = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
+mcu2_1_ddr_intercore_eth_desc_size = 8*MB;
+
+mcu2_1_ddr_intercore_eth_data_addr = mcu2_1_ddr_intercore_eth_desc_addr + mcu2_1_ddr_intercore_eth_desc_size;
+mcu2_1_ddr_intercore_eth_data_size = 24*MB;
+
+eeprom_shadow_data_addr = mcu2_1_ddr_intercore_eth_data_addr + mcu2_1_ddr_intercore_eth_data_size;
+eeprom_shadow_data_size = 16*MB;
+
 c7x_1_ddr_local_heap_addr  = ddr_mem_addr_hi;
 c7x_1_ddr_local_heap_size  = ddr_mem_size_hi;
 
@@ -468,12 +477,25 @@ vision_apps_core_heaps_lo.concat(c66x_2_ddr_scratch);
 vision_apps_core_heaps_lo.concat(c7x_1_ddr_scratch);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
 
+# This falls in upper 2GB region in J721E
 c7x_1_ddr_local_heap_phy  = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, c7x_1_ddr_local_heap_size, "DDR for c7x_1 for local heap");
 
 vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
 vision_apps_core_heaps_hi.concat(c7x_1_ddr_local_heap_phy);
 vision_apps_core_heaps_hi.setDtsName("vision_apps_core_heaps_hi", "vision-apps-core-heap-memory-hi");
 vision_apps_core_heaps_hi.splitOrigin(True)
+
+# This region is for ethernet firmware, multi-core, multi-cast feature
+intercore_eth_desc_mem = MemSection("INTERCORE_ETH_DESC_MEM", "", mcu2_1_ddr_intercore_eth_desc_addr, mcu2_1_ddr_intercore_eth_desc_size, "Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent");
+intercore_eth_data_mem = MemSection("INTERCORE_ETH_DATA_MEM", "", mcu2_1_ddr_intercore_eth_data_addr, mcu2_1_ddr_intercore_eth_data_size, "Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent");
+intercore_eth_total    = MemSection("INTERCORE_ETH_DTS", "", 0, 0, "DDR for INTERCORE ETH for all sections, used for reserving memory in DTS file");
+intercore_eth_total.concat(intercore_eth_desc_mem);
+intercore_eth_total.concat(intercore_eth_data_mem);
+intercore_eth_total.setDtsName("intercore_eth_main_r5fss0_core1_memory_region", "intercore-eth-r5f-memory");
+
+eeprom_shadow_mem = MemSection("EEPROM_SHADOW", "", eeprom_shadow_data_addr, eeprom_shadow_data_size, "EEPROM shadow memory. MUST be non-cached or cache-coherent");
+eeprom_shadow_mem.setDtsName("eeprom_shadow_memory_region", "eeprom-shadow-r5f-memory");
+
 #
 # Create CPU specific memory maps using memory sections created above
 #
@@ -491,6 +513,9 @@ mcu1_0_mmap.addMemSection( tiovx_obj_desc_mem   );
 mcu1_0_mmap.addMemSection( ipc_vring_mem        );
 mcu1_0_mmap.addMemSection( mcu1_0_ddr_local_heap  );
 mcu1_0_mmap.addMemSection( ddr_shared_mem       );
+mcu1_0_mmap.addMemSection( intercore_eth_desc_mem );
+mcu1_0_mmap.addMemSection( intercore_eth_data_mem );
+mcu1_0_mmap.addMemSection( eeprom_shadow_mem );
 mcu1_0_mmap.checkOverlap();
 
 mcu1_1_mmap = MemoryMap("mcu1_1");
@@ -506,6 +531,9 @@ mcu1_1_mmap.addMemSection( tiovx_obj_desc_mem );
 mcu1_1_mmap.addMemSection( ipc_vring_mem      );
 mcu1_1_mmap.addMemSection( mcu1_1_ddr_local_heap  );
 mcu1_1_mmap.addMemSection( ddr_shared_mem     );
+mcu1_1_mmap.addMemSection( intercore_eth_desc_mem );
+mcu1_1_mmap.addMemSection( intercore_eth_data_mem );
+mcu1_1_mmap.addMemSection( eeprom_shadow_mem );
 mcu1_1_mmap.checkOverlap();
 
 
@@ -525,6 +553,9 @@ mcu2_0_mmap.addMemSection( ipc_vring_mem      );
 mcu2_0_mmap.addMemSection( mcu2_0_ddr_local_heap  );
 mcu2_0_mmap.addMemSection( ddr_shared_mem     );
 mcu2_0_mmap.addMemSection( mcu2_0_main_ocram );
+mcu2_0_mmap.addMemSection( intercore_eth_desc_mem );
+mcu2_0_mmap.addMemSection( intercore_eth_data_mem );
+mcu2_0_mmap.addMemSection( eeprom_shadow_mem );
 mcu2_0_mmap.checkOverlap();
 
 mcu2_1_mmap = MemoryMap("mcu2_1");
@@ -541,6 +572,9 @@ mcu2_1_mmap.addMemSection( ipc_vring_mem      );
 mcu2_1_mmap.addMemSection( mcu2_1_ddr_local_heap  );
 mcu2_1_mmap.addMemSection( ddr_shared_mem     );
 mcu2_1_mmap.addMemSection( mcu2_1_main_ocram );
+mcu2_1_mmap.addMemSection( intercore_eth_desc_mem );
+mcu2_1_mmap.addMemSection( intercore_eth_data_mem );
+mcu2_1_mmap.addMemSection( eeprom_shadow_mem );
 mcu2_1_mmap.checkOverlap();
 
 mcu3_0_mmap = MemoryMap("mcu3_0");
@@ -555,6 +589,9 @@ mcu3_0_mmap.addMemSection( tiovx_obj_desc_mem );
 mcu3_0_mmap.addMemSection( ipc_vring_mem      );
 mcu3_0_mmap.addMemSection( mcu3_0_ddr_local_heap  );
 mcu3_0_mmap.addMemSection( ddr_shared_mem     );
+mcu3_0_mmap.addMemSection( intercore_eth_desc_mem );
+mcu3_0_mmap.addMemSection( intercore_eth_data_mem );
+mcu3_0_mmap.addMemSection( eeprom_shadow_mem );
 mcu3_0_mmap.checkOverlap();
 
 mcu3_1_mmap = MemoryMap("mcu3_1");
@@ -569,6 +606,9 @@ mcu3_1_mmap.addMemSection( tiovx_obj_desc_mem );
 mcu3_1_mmap.addMemSection( ipc_vring_mem      );
 mcu3_1_mmap.addMemSection( mcu3_1_ddr_local_heap  );
 mcu3_1_mmap.addMemSection( ddr_shared_mem     );
+mcu3_1_mmap.addMemSection( intercore_eth_desc_mem );
+mcu3_1_mmap.addMemSection( intercore_eth_data_mem );
+mcu3_1_mmap.addMemSection( eeprom_shadow_mem );
 mcu3_1_mmap.checkOverlap();
 
 c66x_1_mmap = MemoryMap("c66x_1");
@@ -680,6 +720,9 @@ html_mmap.addMemSection( ddr_shared_mem     );
 html_mmap.addMemSection( tiovx_log_rt_mem );
 html_mmap.addMemSection( mcu2_0_main_ocram );
 html_mmap.addMemSection( mcu2_1_main_ocram );
+html_mmap.addMemSection( intercore_eth_desc_mem );
+html_mmap.addMemSection( intercore_eth_data_mem );
+html_mmap.addMemSection( eeprom_shadow_mem );
 html_mmap.checkOverlap();
 
 c_header_mmap = MemoryMap("Memory Map for C header file");
@@ -731,6 +774,9 @@ c_header_mmap.addMemSection( ddr_shared_mem     );
 c_header_mmap.addMemSection( c7x_1_msmc         );
 c_header_mmap.addMemSection( mcu2_0_main_ocram  );
 c_header_mmap.addMemSection( mcu2_1_main_ocram  );
+c_header_mmap.addMemSection( intercore_eth_desc_mem  );
+c_header_mmap.addMemSection( intercore_eth_data_mem  );
+c_header_mmap.addMemSection( eeprom_shadow_mem );
 c_header_mmap.checkOverlap();
 
 dts_mmap = MemoryMap("Memory Map for Linux kernel dts/dtsi file");
@@ -757,6 +803,8 @@ dts_mmap.addMemSection( ipc_vring_mem      );
 dts_mmap.addMemSection( ddr_shared_mem     );
 dts_mmap.addMemSection( vision_apps_core_heaps_lo );
 dts_mmap.addMemSection( vision_apps_core_heaps_hi );
+dts_mmap.addMemSection( intercore_eth_total );
+dts_mmap.addMemSection( eeprom_shadow_mem );
 dts_mmap.checkOverlap();
 
 #

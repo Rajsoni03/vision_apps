@@ -513,12 +513,36 @@
                 <td class="tg-kftd">DDR for c7x_1 for Scratch Memory</td>
             </tr>
             <tr>
-                <td class="tg-6sgx">DDR_C7X_1_LOCAL_HEAP</td>
-                <td class="tg-6sgx">0x100000000</td>
-                <td class="tg-6sgx">0x10FFFFFFF</td>
-                <td class="tg-6sgx">256.00 MB</td>
-                <td class="tg-6sgx">RWIX</td>
-                <td class="tg-6sgx">DDR for c7x_1 for local heap</td>
+                <td class="tg-6sgx">INTERCORE_ETH_DESC_MEM</td>
+                <td class="tg-6sgx">0xFC000000</td>
+                <td class="tg-6sgx">0xFC7FFFFF</td>
+                <td class="tg-6sgx"> 8.00 MB</td>
+                <td class="tg-6sgx"></td>
+                <td class="tg-6sgx">Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent</td>
+            </tr>
+            <tr>
+                <td class="tg-kftd">INTERCORE_ETH_DATA_MEM</td>
+                <td class="tg-kftd">0xFC800000</td>
+                <td class="tg-kftd">0xFDFFFFFF</td>
+                <td class="tg-kftd">24.00 MB</td>
+                <td class="tg-kftd"></td>
+                <td class="tg-kftd">Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent</td>
+            </tr>
+            <tr>
+                <td class="tg-6sgx">EEPROM_SHADOW</td>
+                <td class="tg-6sgx">0xFE000000</td>
+                <td class="tg-6sgx">0xFEFFFFFF</td>
+                <td class="tg-6sgx">16.00 MB</td>
+                <td class="tg-6sgx"></td>
+                <td class="tg-6sgx">EEPROM shadow memory. MUST be non-cached or cache-coherent</td>
+            </tr>
+            <tr>
+                <td class="tg-kftd">DDR_C7X_1_LOCAL_HEAP</td>
+                <td class="tg-kftd">0x100000000</td>
+                <td class="tg-kftd">0x10FFFFFFF</td>
+                <td class="tg-kftd">256.00 MB</td>
+                <td class="tg-kftd">RWIX</td>
+                <td class="tg-kftd">DDR for c7x_1 for local heap</td>
             </tr>
         </table>
     </body>
