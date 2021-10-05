@@ -116,6 +116,34 @@ static EthFw_Port gEthAppPorts[] =
 #endif
 };
 
+static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
+{
+    {
+        .remoteCoreId = IPC_MPU1_0,
+        .portId       = ETHREMOTECFG_SWITCH_PORT_0,
+    },
+    {
+        .remoteCoreId = IPC_MCU2_1,
+        .portId       = ETHREMOTECFG_SWITCH_PORT_1,
+    },
+    {
+        .remoteCoreId = IPC_MPU1_0,
+        .portId       = ETHREMOTECFG_MAC_PORT_1,
+    },
+    {
+        .remoteCoreId = IPC_MCU2_1,
+        .portId       = ETHREMOTECFG_MAC_PORT_4,
+    },
+};
+
+static EthFw_VirtPortCfg gEthApp_autosarVirtPortCfg[] =
+{
+    {
+        .remoteCoreId = IPC_MCU2_1,
+        .portId       = ETHREMOTECFG_SWITCH_PORT_1,
+    },
+};
+
 static int32_t EthApp_initEthFw(void);
 
 void appEthFwEarlyInit()
@@ -211,12 +239,22 @@ static int32_t EthApp_initEthFw(void)
 
     /* Set EthFw config params */
     EthFw_initConfigParams(gEthAppObj.enetType, &ethFwCfg);
-    ethFwCfg.ports = &gEthAppPorts[0];
-    ethFwCfg.numPorts = ARRAY_SIZE(gEthAppPorts);
 
     dmaCfg.rxChInitPrms.dmaPriority = UDMA_DEFAULT_RX_CH_DMA_PRIORITY;
     dmaCfg.hUdmaDrv = gEthAppObj.hUdmaDrv;
     ethFwCfg.cpswCfg.dmaCfg = (void *)&dmaCfg;
+
+    /* Set hardware port configuration parameters */
+    ethFwCfg.ports = &gEthAppPorts[0];
+    ethFwCfg.numPorts = ARRAY_SIZE(gEthAppPorts);
+
+    /* Set virtual port configuration parameters */
+    ethFwCfg.virtPortCfg  = &gEthApp_virtPortCfg[0];
+    ethFwCfg.numVirtPorts = ARRAY_SIZE(gEthApp_virtPortCfg);
+
+    /* Set AUTOSAR virtual port configuration parameters */
+    ethFwCfg.autosarVirtPortCfg  = &gEthApp_autosarVirtPortCfg[0];
+    ethFwCfg.numAutosarVirtPorts = ARRAY_SIZE(gEthApp_autosarVirtPortCfg);
 
     /* Overwrite config params with those for hardware interVLAN */
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
