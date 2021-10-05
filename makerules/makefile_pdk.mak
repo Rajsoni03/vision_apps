@@ -44,6 +44,9 @@ endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
 PDK_CORE_LIST_ALL+=c7x_1
 endif
+ifeq ($(BUILD_CPU_C7x_2),yes)
+PDK_CORE_LIST_ALL+=c7x_2
+endif
 
 pdk_build:
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build BOARD=$(BUILD_PDK_BOARD) custom_target BUILD_PROFILE_LIST_ALL="$(PDK_BUILD_PROFILE_LIST_ALL)" CORE_LIST_ALL="$(PDK_CORE_LIST_ALL)" BUILD_TARGET_LIST_ALL="$(PDK_BUILD_TARGET_LIST_ALL)" -s
