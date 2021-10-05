@@ -122,7 +122,7 @@ TIOVX_LIBS += vx_kernels_host_utils vx_kernels_target_utils
 TIOVX_LIBS += vx_platform_psdk_j7
 TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_utils
-TIOVX_LIBS += vx_kernels_hwa vx_kernels_tidl
+TIOVX_LIBS += vx_kernels_hwa vx_kernels_tidl vx_kernels_tvm
 TIOVX_LIBS += vx_tutorial
 
 IMAGING_LIBS  = vx_kernels_imaging
@@ -167,7 +167,7 @@ VISION_APPS_MODULES_LIBS += vx_app_modules
 
 TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
-TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tidl_tests
+TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tidl_tests vx_tiovx_tvm_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink
 TEST_LIBS += vx_kernels_srv_tests
