@@ -11,7 +11,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	$(MAKE) -C $(MMALIB_PATH) mmalib mmalib_cn common SRC_DIR=cnn TARGET_BUILD=release
 endif
 ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(MAKE) -C $(MMALIB_PATH) mmalib mmalib_cn common SRC_DIR=cnn TARGET_CPU=x86_64 TARGET_SCPU=C71 TARGET_PLATFORM=PC TARGET_BUILD=release
+	$(MAKE) -C $(MMALIB_PATH) mmalib mmalib_cn common SRC_DIR=cnn TARGET_CPU=x86_64 TARGET_SCPU=$(C7X_TARGET) TARGET_PLATFORM=PC TARGET_BUILD=release
 endif
 
 mmalib_clean:
