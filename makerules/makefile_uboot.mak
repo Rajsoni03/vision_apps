@@ -11,6 +11,12 @@ ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 UBOOT_APP_PROFILE=release
 endif
 
+VISION_APPS_LINUX_DM=$(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0.out
+VISION_APPS_LINUX_DM_STRIP=$(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0_strip.out
+
+VISION_APPS_QNX_DM=$(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out
+VISION_APPS_QNX_DM_STRIP=$(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0_strip.out
+
 uboot_check:
 ifeq ($(BUILD_TARGET_MODE),yes)
 	@if [ ! -d $(PSDK_LINUX_PATH) ]; then echo 'ERROR: $(PSDK_LINUX_PATH) not found !!!'; exit 1; fi
@@ -22,10 +28,10 @@ endif
 uboot_check_firmware:
 ifeq ($(BUILD_TARGET_MODE),yes)
 ifeq ($(BUILD_LINUX_A72),yes)
-	@if [ ! -f  $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0.out ]; then echo 'ERROR: $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0.out not found !!!'; exit 1; fi
+	@if [ ! -f  $(VISION_APPS_LINUX_DM) ]; then echo 'ERROR: $(VISION_APPS_LINUX_DM) not found !!!'; exit 1; fi
 endif
 ifeq ($(BUILD_QNX_A72),yes)
-	@if [ ! -f $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out ]; then echo 'ERROR: $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out not found !!!'; exit 1; fi
+	@if [ ! -f $(VISION_APPS_QNX_DM) ]; then echo 'ERROR: $(VISION_APPS_QNX_DM) !!!'; exit 1; fi
 endif
 endif
 
@@ -39,16 +45,16 @@ endif
 uboot: uboot_check uboot_check_firmware
 ifeq ($(BUILD_TARGET_MODE),yes)
 ifeq ($(BUILD_LINUX_A72),yes)
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0.out $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0_strip.out
-	$(TIARMCGT_ROOT)/bin/armstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0_strip.out
+	cp $(VISION_APPS_LINUX_DM) $(VISION_APPS_LINUX_DM_STRIP)
+	$(TIARMCGT_ROOT)/bin/armstrip -p $(VISION_APPS_LINUX_DM_STRIP)
 	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- O=$(SOC)-arm64-linux -j8 $(SOC)_evm_a72_defconfig
-	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_PATH)/out/$(TARGET_SOC)R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_linux_mcu1_0_strip.out O=$(SOC)-arm64-linux
+	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_LINUX_DM_STRIP) O=$(SOC)-arm64-linux
 endif
 ifeq ($(BUILD_QNX_A72),yes)
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0_strip.out
-	$(TIARMCGT_ROOT)/bin/armstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0_strip.out
+	cp $(VISION_APPS_QNX_DM) $(VISION_APPS_QNX_DM_STRIP)
+	$(TIARMCGT_ROOT)/bin/armstrip -p $(VISION_APPS_QNX_DM_STRIP)
 	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- O=$(SOC)-arm64-qnx -j8 $(SOC)_evm_a72_defconfig
-	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(UBOOT_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0_strip.out O=$(SOC)-arm64-qnx
+	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_QNX_DM_STRIP) O=$(SOC)-arm64-qnx
 endif
 endif
 
