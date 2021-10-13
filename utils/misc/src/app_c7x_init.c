@@ -68,11 +68,8 @@ void appC7xClecInitForNonSecAccess(void)
     CSL_ClecEventConfig   cfgClec;
     CSL_CLEC_EVTRegs     *clecBaseAddr = (CSL_CLEC_EVTRegs*)CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
 
-    uint32_t max_inputs      = 2048;
-    uint32_t dru_input_start = 192;
-    uint32_t dru_input_num   = 16;
     uint32_t i;
-
+    uint32_t max_inputs      = 2048;
     /* make secure claim bit to FALSE so that after we switch to non-secure mode
      * we can program the CLEC MMRs
      */
@@ -85,6 +82,17 @@ void appC7xClecInitForNonSecAccess(void)
         cfgClec.c7xEvtNum         = 0;
         CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
     }
+}
+
+void appC7xClecInitDru(void)
+{
+    #if 1
+    CSL_ClecEventConfig   cfgClec;
+    CSL_CLEC_EVTRegs     *clecBaseAddr = (CSL_CLEC_EVTRegs*)CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
+
+    uint32_t i;
+    uint32_t dru_input_start = 192;
+    uint32_t dru_input_num   = 16;
     /* program CLEC events from DRU used for polling by TIDL
      * to map to required events in C7x
      */
@@ -98,5 +106,5 @@ void appC7xClecInitForNonSecAccess(void)
         cfgClec.c7xEvtNum         = (i-dru_input_start)+32;
         CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
     }
+    #endif
 }
-

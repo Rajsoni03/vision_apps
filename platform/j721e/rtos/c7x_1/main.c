@@ -67,12 +67,22 @@
 #include <string.h>
 #include <ti/osal/osal.h>
 #include <ti/osal/TaskP.h>
-#include <ti/sysbios/family/c7x/Hwi.h>
-#include <ti/sysbios/family/c7x/Cache.h>
+#include <ti/osal/HwiP.h>
+#include <ti/osal/CacheP.h>
 #include <app_mem_map.h>
 #include <app_ipc_rsctable.h>
 #include <ti/csl/soc.h>
 #include <ti/csl/csl_clec.h>
+
+#if (defined (FREERTOS))
+#include <ti/kernel/freertos/portable/TI_CGT/c7x/Cache.h>
+#include <ti/kernel/freertos/portable/TI_CGT/c7x/Hwi.h>
+#include <ti/kernel/freertos/portable/TI_CGT/c7x/Mmu.h>
+#else
+#include <ti/sysbios/family/c7x/Cache.h>
+#include <ti/sysbios/family/c7x/Hwi.h>
+#include <ti/sysbios/family/c7x/Mmu.h>
+#endif
 
 /* For J7ES/J721E/TDA4VM the upper 2GB DDR starts from 0x0008_8000_0000 */
 /* This address is mapped to a virtual address of 0x0001_0000_0000 */
@@ -99,26 +109,6 @@ void StartupEmulatorWaitFxn (void)
     do
     {
     }while (enableDebug);
-}
-
-/* To set C71 timer interrupts */
-void appTimerInterruptInit(void)
-{
-    CSL_ClecEventConfig   cfgClec;
-    CSL_CLEC_EVTRegs     *clecBaseAddr = (CSL_CLEC_EVTRegs*)CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
-
-    uint32_t input         = 1249; /* Used for Timer Interrupt */
-    uint32_t corepackEvent = 15;
-
-    /* Configure CLEC */
-    cfgClec.secureClaimEnable = FALSE;
-    cfgClec.evtSendEnable     = TRUE;
-    cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_ALL;
-    cfgClec.extEvtNum         = 0;
-    cfgClec.c7xEvtNum         = corepackEvent;
-    CSL_clecConfigEvent(clecBaseAddr, input, &cfgClec);
-    CSL_clecConfigEventLevel(clecBaseAddr, input, 0); /* configure interrupt as pulse */
-    Hwi_setPriority(corepackEvent, 1);
 }
 
 /* IMPORTANT NOTE: For C7x,
@@ -156,9 +146,9 @@ int main(void)
 
     OS_init();
 
-    setup_dru_qos();
+    appC7xClecInitDru();
 
-    appTimerInterruptInit();
+    setup_dru_qos();
 
     TaskP_Params_init(&tskParams);
     tskParams.priority = 8u;
@@ -173,8 +163,6 @@ int main(void)
 
     return 0;
 }
-
-#include <ti/sysbios/family/c7x/Mmu.h>
 
 uint32_t g_app_rtos_c7x_mmu_map_error = 0;
 
@@ -330,16 +318,17 @@ mmu_exit:
 
 void appCacheInit()
 {
-    ti_sysbios_family_c7x_Cache_Size  cacheSize;
-    
+    Cache_Size  cacheSize;
+
     /* init cache size here, since this needs to be done in secure mode */
-    cacheSize.l1pSize = ti_sysbios_family_c7x_Cache_L1Size_32K;
-    cacheSize.l1dSize = ti_sysbios_family_c7x_Cache_L1Size_32K;
-    cacheSize.l2Size  = ti_sysbios_family_c7x_Cache_L2Size_64K;
+    cacheSize.l1pSize = Cache_L1Size_32K;
+    cacheSize.l1dSize = Cache_L1Size_32K;
+    cacheSize.l2Size  = Cache_L2Size_64K;
+
     Cache_setSize(&cacheSize);
 }
 
-void appMmuInit(void)
+void InitMmu(void)
 {
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();

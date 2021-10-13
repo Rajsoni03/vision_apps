@@ -129,7 +129,7 @@ int main(void)
 
 #include <ti/sysbios/family/arm/v8a/Mmu.h>
 
-void appMmuInit(void)
+void InitMmu(void)
 {
     Bool            retVal;
     Mmu_MapAttrs    attrs;

@@ -1,18 +1,30 @@
-XDC_BLD_FILE = $($(_MODULE)_SDIR)/../bios_cfg/config_c71.bld
-XDC_IDIRS    = $($(_MODULE)_SDIR)/../bios_cfg/
-XDC_CFG_FILE = $($(_MODULE)_SDIR)/c7x_1.cfg
-XDC_PLATFORM = "ti.platforms.tms320C7x:J7ES"
+ifeq ($(RTOS),SYSBIOS)
+	XDC_BLD_FILE = $($(_MODULE)_SDIR)/../bios_cfg/config_c71.bld
+	XDC_IDIRS    = $($(_MODULE)_SDIR)/../bios_cfg/
+	XDC_CFG_FILE = $($(_MODULE)_SDIR)/c7x_1.cfg
+	XDC_PLATFORM = "ti.platforms.tms320C7x:J7ES"
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
+endif
+ifeq ($(RTOS),FREERTOS)
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
+endif
+
+LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
 
-LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
-LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker.cmd
+ifeq ($(RTOS),FREERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
+endif
 
 
 include $($(_MODULE)_SDIR)/../concerto_c7x_inc.mak
 
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_c7x_1
+ifeq ($(RTOS),FREERTOS)
+	STATIC_LIBS += app_rtos
+endif
 
 #
 # Suppress this warning, 10063-D: entry-point symbol other than "_c_int00" specified

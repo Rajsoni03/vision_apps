@@ -99,12 +99,12 @@ ifeq ($(BUILD_CPU_C6x_2),yes)
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
 	# copy remote firmware files for c7x_1
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_0-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_0-fw
 	$(CGT7X_ROOT)/bin/strip7x -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_0-fw
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	# copy remote firmware files for c7x_2
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/SYSBIOS/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_1-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_1-fw
 	$(CGT7X_ROOT)/bin/strip7x -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_1-fw
 endif
 	sync

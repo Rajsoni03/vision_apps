@@ -51,7 +51,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:debug:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
-	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:$(C7X_TARGET):1:debug:CGT7X
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):$(C7X_TARGET):1:debug:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_A72),yes)
 		ifeq ($(BUILD_LINUX_A72),yes)
@@ -71,7 +71,7 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):C66:2:release:CGT6X
 	endif
 	ifeq ($(BUILD_ISA_C7x),yes)
-	TARGET_COMBOS += $(TARGET_SOC):SYSBIOS:$(C7X_TARGET):1:release:CGT7X
+	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):$(C7X_TARGET):1:release:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_A72),yes)
 		ifeq ($(BUILD_LINUX_A72),yes)

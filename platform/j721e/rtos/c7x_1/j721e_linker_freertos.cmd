@@ -59,36 +59,62 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+--ram_model
+-heap  0x20000
+-stack 0x20000
+--args 0x1000
+--diag_suppress=10068 /* "no matching section" */
+--cinit_compression=off
+-e _c_int00_secure
 
-xdc.loadCapsule("bios_common.cfg");
+SECTIONS
+{
+    boot:
+    {
+      boot.*<boot.oe71>(.text)
+    } load > DDR_C7x_1_BOOT ALIGN(0x200000)
+    .vecs       >       DDR_C7x_1_VECS ALIGN(0x400000)
+    .secure_vecs >      DDR_C7x_1_SECURE_VECS ALIGN(0x200000)
+    .text:_c_int00_secure > DDR_C7x_1_BOOT ALIGN(0x200000)
+    .text       >       DDR_C7x_1 ALIGN(0x200000)
 
-/* import the target's run-time support pkg */
-xdc.loadPackage("ti.targets.rts7000");
+    .bss        >       DDR_C7x_1  /* Zero-initialized data */
+    .data       >       DDR_C7x_1  /* Initialized data */
 
-var BIOS        = xdc.useModule("ti.sysbios.BIOS");
-BIOS.libType = BIOS.LibType_Custom;
-BIOS.cpuFreq.lo = 1000000000;
-BIOS.cpuFreq.hi = 0;
+    .cinit      >       DDR_C7x_1  /* could be part of const */
+    .init_array >       DDR_C7x_1  /* C++ initializations */
+    .stack      >       DDR_C7x_1  ALIGN(0x20000) /* MUST be 128KB aligned to handle nested interrupts */
+    .args       >       DDR_C7x_1
+    .cio        >       DDR_C7x_1
+    .const      >       DDR_C7x_1
+    .switch     >       DDR_C7x_1
+    .sysmem     >       DDR_C7x_1 /* heap */
+    /* .bss:taskStackSection:tiovx (NOLOAD) : {} > L2RAM_C7x_1 */
+    .bss:taskStackSection       > DDR_C7x_1
+    .bss:ddr_shared_mem     (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP
+    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_1_SCRATCH
 
-var Mmu = xdc.useModule('ti.sysbios.family.c7x.Mmu');
-Mmu.initFunc = "&InitMmu";
-Mmu.tableMemory = "";
+    .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
+    .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
+    .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
 
-var HwiC7x = xdc.useModule('ti.sysbios.family.c7x.Hwi');
-HwiC7x.bootToNonSecure = true;
+    .bss:l1mem              (NOLOAD)(NOINIT) : {} > L1RAM_C7x_1
+    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_1
+    .bss:l3mem              (NOLOAD)(NOINIT) : {} > MSMC_C7x_1
 
-/* Disable Timer frequency check, workaround for QT test */
-var Timer = xdc.useModule('ti.sysbios.timers.dmtimer.Timer');
+    ipc_data_buffer:       > DDR_C7x_1
+    .tracebuf                : {} align(1024)   > DDR_C7x_1
+    .resource_table > DDR_C7x_1_RESOURCE_TABLE
 
-var Clock = xdc.useModule('ti.sysbios.knl.Clock');
-Clock.timerId = 2;
+    GROUP:              >  DDR_C7x_1
+    {
+        .data.Mmu_tableArray          : type=NOINIT
+        .data.Mmu_tableArraySlot      : type=NOINIT
+        .data.Mmu_level1Table         : type=NOINIT
+        .data.Mmu_tableArray_NS       : type=NOINIT
+        .data.Mmu_tableArraySlot_NS   : type=NOINIT
+        .data.Mmu_level1Table_NS      : type=NOINIT
+    }
 
-/* DO NOT set cache size here, since it wont take effect, setup cache size in Mmu.initFunc 
-   but ONLY AFTER all Mmu_map()'s
-   At this point CPU is in secure mode and setting cache size is allowed there.
-   Later during boot CPU switches to non-secure mode, at this point cache size setting is not 
-   allowed.
- */ 
-var Cache = xdc.useModule('ti.sysbios.family.c7x.Cache');
 
-xdc.print("# !!!  Clock TimerId [" + Clock.timerId + "] @ 0x" + Number(Timer.timerSettings[Clock.timerId].baseAddr).toString(16) + " and interrupt " + Timer.timerSettings[Clock.timerId].intNum + " and event ID " + Timer.timerSettings[Clock.timerId].eventId + " !!!" );
+}

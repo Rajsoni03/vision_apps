@@ -10,7 +10,12 @@ IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 IDIRS+=$(TIADALG_PATH)/include
 
-LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c7x/$(TARGET_BUILD)/
+ifeq ($(RTOS),SYSBIOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c7x/$(TARGET_BUILD)/
+endif
+ifeq ($(RTOS),FREERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/c7x/$(TARGET_BUILD)/
+endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c7x/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
@@ -62,10 +67,16 @@ SYS_STATIC_LIBS += $(TIOVX_LIBS) $(TIDL_LIBS)
 
 ADDITIONAL_STATIC_LIBS += ti.osal.ae71
 ADDITIONAL_STATIC_LIBS += ipc.ae71
-ADDITIONAL_STATIC_LIBS += ti.csl.ae71
-ADDITIONAL_STATIC_LIBS += udma.ae71
 ADDITIONAL_STATIC_LIBS += dmautils.ae71
 ADDITIONAL_STATIC_LIBS += sciclient.ae71
-ADDITIONAL_STATIC_LIBS += libc.a
+ADDITIONAL_STATIC_LIBS += udma.ae71
+
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.ae71
+endif
+ADDITIONAL_STATIC_LIBS += ti.csl.ae71
+
 ADDITIONAL_STATIC_LIBS += libtiadalg_structure_from_motion.a
+ADDITIONAL_STATIC_LIBS += libc.a
+
 endif
