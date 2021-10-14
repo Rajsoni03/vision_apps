@@ -410,7 +410,7 @@ static EGLImageKHR appEglWindowCreateIMG(app_egl_obj_t *obj,
     else if (prop->dataFormat == APP_EGL_DF_UYVY)
         attr[attrIdx++] = FOURCC_STR("UYVY");
     else
-        attr[attrIdx++] = FOURCC_STR("AR24");
+        attr[attrIdx++] = FOURCC_STR("AB24");
 
     attr[attrIdx++] = EGL_WIDTH;
     attr[attrIdx++] = prop->width;
