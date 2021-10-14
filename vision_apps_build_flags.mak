@@ -102,7 +102,7 @@ BUILD_ISA_C6x=yes
 else
 BUILD_ISA_C6x=no
 endif
-ifneq (,$(filter yes,$(BUILD_CPU_C7x_1)))
+ifneq (,$(filter yes,$(BUILD_CPU_C7x_1) $(BUILD_CPU_C7x_2)))
 BUILD_ISA_C7x=yes
 else
 BUILD_ISA_C7x=no
