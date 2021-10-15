@@ -63,7 +63,6 @@
 /* ========================================================================== */
 /*                             Include Files                                  */
 /* ========================================================================== */
-#include <string.h>
 #include <utils/dss/include/app_dss.h>
 #include <utils/console_io/include/app_log.h>
 #include <ti/drv/dss/dss.h>

@@ -65,7 +65,6 @@
 /* ========================================================================== */
 
 #include "app_dss_defaults_priv.h"
-#include <string.h>
 
 app_dss_default_obj_t g_app_dss_default_obj;
 
