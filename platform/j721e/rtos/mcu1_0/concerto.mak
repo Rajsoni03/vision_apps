@@ -11,7 +11,10 @@ include $(PRELUDE)
 TARGET      := vx_app_rtos_linux_mcu1_0
 TARGETTYPE  := exe
 CSOURCES    := main.c
+
+ifeq ($(RTOS),SYSBIOS)
 ASSEMBLY    := mcuCopyVecs2Exc.asm
+endif
 
 include $($(_MODULE)_SDIR)/concerto_mcu1_0_inc.mak
 
