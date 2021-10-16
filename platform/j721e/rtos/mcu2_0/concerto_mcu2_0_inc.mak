@@ -38,6 +38,7 @@ ifeq ($(RTOS),FREERTOS)
     LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
     LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
     LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/lib/freertos/${SOC}/r5f/$(TARGET_BUILD)/
     LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/freertos/j721e/r5f/$(TARGET_BUILD)/
 endif
 
@@ -94,6 +95,7 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += lwipstack_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += lwipcontrib_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipport_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += lwipif_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += enet_example_utils_freertos.aer5f
 endif
