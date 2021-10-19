@@ -85,7 +85,7 @@ MEMORY
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
     /* DDR for c66x_2 for local heap [ size 16.00 MB ] */
-    DDR_C66X_2_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE8000000 , LENGTH = 0x01000000
+    DDR_C66X_2_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE0000000 , LENGTH = 0x01000000
     /* DDR for c66x_2 for Scratch Memory [ size 48.00 MB ] */
-    DDR_C66X_2_SCRATCH       ( RWIX ) : ORIGIN = 0xE9000000 , LENGTH = 0x03000000
+    DDR_C66X_2_SCRATCH       ( RWIX ) : ORIGIN = 0xE1000000 , LENGTH = 0x03000000
 }

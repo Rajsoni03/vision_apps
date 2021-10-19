@@ -195,57 +195,49 @@
 #define DDR_SHARED_MEM_ADDR (0xB8000000u)
 #define DDR_SHARED_MEM_SIZE (0x20000000u)
 
-/* DDR for MCU2_0 for non-cached heap [ size 16.00 MB ] */
-#define DDR_MCU2_0_NON_CACHE_ADDR (0xD8000000u)
-#define DDR_MCU2_0_NON_CACHE_SIZE (0x01000000u)
-
-/* DDR for MCU2_1 for non-cached heap [ size 112.00 MB ] */
-#define DDR_MCU2_1_NON_CACHE_ADDR (0xD9000000u)
-#define DDR_MCU2_1_NON_CACHE_SIZE (0x07000000u)
-
 /* DDR for MCU1_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xE0000000u)
+#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xD8000000u)
 #define DDR_MCU1_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU1_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xE0800000u)
+#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xD8800000u)
 #define DDR_MCU1_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
-#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xE1000000u)
+#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xD9000000u)
 #define DDR_MCU2_0_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for MCU2_1 for local heap [ size 16.00 MB ] */
-#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xE2000000u)
+#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xDA000000u)
 #define DDR_MCU2_1_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for MCU3_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xE3000000u)
+#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xDB000000u)
 #define DDR_MCU3_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU3_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xE3800000u)
+#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xDB800000u)
 #define DDR_MCU3_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for c66x_1 for local heap [ size 16.00 MB ] */
-#define DDR_C66X_1_LOCAL_HEAP_ADDR (0xE4000000u)
+#define DDR_C66X_1_LOCAL_HEAP_ADDR (0xDC000000u)
 #define DDR_C66X_1_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for c66x_1 for Scratch Memory [ size 48.00 MB ] */
-#define DDR_C66X_1_SCRATCH_ADDR (0xE5000000u)
+#define DDR_C66X_1_SCRATCH_ADDR (0xDD000000u)
 #define DDR_C66X_1_SCRATCH_SIZE (0x03000000u)
 
 /* DDR for c66x_2 for local heap [ size 16.00 MB ] */
-#define DDR_C66X_2_LOCAL_HEAP_ADDR (0xE8000000u)
+#define DDR_C66X_2_LOCAL_HEAP_ADDR (0xE0000000u)
 #define DDR_C66X_2_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for c66x_2 for Scratch Memory [ size 48.00 MB ] */
-#define DDR_C66X_2_SCRATCH_ADDR (0xE9000000u)
+#define DDR_C66X_2_SCRATCH_ADDR (0xE1000000u)
 #define DDR_C66X_2_SCRATCH_SIZE (0x03000000u)
 
-/* DDR for c7x_1 for Scratch Memory [ size 256.00 MB ] */
-#define DDR_C7X_1_SCRATCH_ADDR (0xEC000000u)
-#define DDR_C7X_1_SCRATCH_SIZE (0x10000000u)
+/* DDR for c7x_1 for Scratch Memory [ size 384.00 MB ] */
+#define DDR_C7X_1_SCRATCH_ADDR (0xE4000000u)
+#define DDR_C7X_1_SCRATCH_SIZE (0x18000000u)
 
 /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
 #define INTERCORE_ETH_DESC_MEM_ADDR (0xFC000000u)

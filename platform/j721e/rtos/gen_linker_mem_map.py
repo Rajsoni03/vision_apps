@@ -254,14 +254,7 @@ tiovx_log_rt_mem_size   = 32*MB;
 ddr_shared_mem_addr     = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
 ddr_shared_mem_size     = 512*MB;
 
-# Core specific Local Memory Heap, Non Cached Regions
-mcu2_0_ddr_non_cache_addr   = ddr_shared_mem_addr + ddr_shared_mem_size;
-mcu2_0_ddr_non_cache_size   = 16*MB;
-
-mcu2_1_ddr_non_cache_addr   = mcu2_0_ddr_non_cache_addr + mcu2_0_ddr_non_cache_size;
-mcu2_1_ddr_non_cache_size   = 128*MB - mcu2_0_ddr_non_cache_size;
-
-mcu1_0_ddr_local_heap_addr  = mcu2_1_ddr_non_cache_addr + mcu2_1_ddr_non_cache_size;
+mcu1_0_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
 mcu1_0_ddr_local_heap_size  = 8*MB;
 mcu1_1_ddr_local_heap_addr  = mcu1_0_ddr_local_heap_addr + mcu1_0_ddr_local_heap_size;
 mcu1_1_ddr_local_heap_size  = 8*MB;
@@ -358,7 +351,6 @@ mcu2_0_ddr_resource_table  = MemSection("DDR_MCU2_0_RESOURCE_TABLE", "RWIX", mcu
 mcu2_0_ddr                 = MemSection("DDR_MCU2_0", "RWIX", mcu2_0_ddr_addr, mcu2_0_ddr_size, "DDR for MCU2_0 for code/data");
 mcu2_0_ddr_total           = MemSection("DDR_MCU2_0_DTS", "", 0, 0, "DDR for MCU2_0 for all sections, used for reserving memory in DTS file");
 mcu2_0_ddr_local_heap      = MemSection("DDR_MCU2_0_LOCAL_HEAP", "RWIX", mcu2_0_ddr_local_heap_addr, mcu2_0_ddr_local_heap_size, "DDR for MCU2_0 for local heap");
-mcu2_0_ddr_non_cache       = MemSection("DDR_MCU2_0_NON_CACHE", "RWIX", mcu2_0_ddr_non_cache_addr, mcu2_0_ddr_non_cache_size, "DDR for MCU2_0 for non-cached heap");
 mcu2_0_ddr_total.concat(mcu2_0_ddr_resource_table);
 mcu2_0_ddr_total.concat(mcu2_0_ddr);
 mcu2_0_ddr_total.setDtsName("vision_apps_main_r5fss0_core0_memory_region", "vision-apps-r5f-memory");
@@ -369,7 +361,6 @@ mcu2_1_ddr_resource_table  = MemSection("DDR_MCU2_1_RESOURCE_TABLE", "RWIX", mcu
 mcu2_1_ddr                 = MemSection("DDR_MCU2_1", "RWIX", mcu2_1_ddr_addr, mcu2_1_ddr_size, "DDR for MCU2_1 for code/data");
 mcu2_1_ddr_total           = MemSection("DDR_MCU2_1_DTS", "", 0, 0, "DDR for MCU2_1 for all sections, used for reserving memory in DTS file");
 mcu2_1_ddr_local_heap      = MemSection("DDR_MCU2_1_LOCAL_HEAP", "RWIX", mcu2_1_ddr_local_heap_addr, mcu2_1_ddr_local_heap_size, "DDR for MCU2_1 for local heap");
-mcu2_1_ddr_non_cache       = MemSection("DDR_MCU2_1_NON_CACHE", "RWIX", mcu2_1_ddr_non_cache_addr, mcu2_1_ddr_non_cache_size, "DDR for MCU2_1 for non-cached heap");
 mcu2_1_ddr_total.concat(mcu2_1_ddr_resource_table);
 mcu2_1_ddr_total.concat(mcu2_1_ddr);
 mcu2_1_ddr_total.setDtsName("vision_apps_main_r5fss0_core1_memory_region", "vision-apps-r5f-memory");
@@ -463,8 +454,6 @@ ddr_shared_mem.setNoMap(False);
 ddr_shared_mem.setOriginTag(False);
 
 vision_apps_core_heaps_lo = MemSection("DDR_VISION_APPS_CORE_HEAPS_LO_DTS", "", 0, 0, "Vision Apps Core Heaps in 32bit address range of DDR");
-vision_apps_core_heaps_lo.concat(mcu2_0_ddr_non_cache);
-vision_apps_core_heaps_lo.concat(mcu2_1_ddr_non_cache);
 vision_apps_core_heaps_lo.concat(mcu1_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu2_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu2_1_ddr_local_heap);
@@ -544,7 +533,6 @@ mcu2_0_mmap.addMemSection( r5f_tcmb0          );
 mcu2_0_mmap.addMemSection( mcu2_0_ddr_ipc     );
 mcu2_0_mmap.addMemSection( mcu2_0_ddr_resource_table  );
 mcu2_0_mmap.addMemSection( mcu2_0_ddr         );
-mcu2_0_mmap.addMemSection( mcu2_0_ddr_non_cache  );
 mcu2_0_mmap.addMemSection( app_log_mem        );
 mcu2_0_mmap.addMemSection( tiovx_obj_desc_mem );
 mcu2_0_mmap.addMemSection( pcie_queue_shared_mem );
@@ -565,7 +553,6 @@ mcu2_1_mmap.addMemSection( r5f_tcmb0          );
 mcu2_1_mmap.addMemSection( mcu2_1_ddr_ipc     );
 mcu2_1_mmap.addMemSection( mcu2_1_ddr_resource_table  );
 mcu2_1_mmap.addMemSection( mcu2_1_ddr         );
-mcu2_1_mmap.addMemSection( mcu2_1_ddr_non_cache  );
 mcu2_1_mmap.addMemSection( app_log_mem        );
 mcu2_1_mmap.addMemSection( tiovx_obj_desc_mem );
 mcu2_1_mmap.addMemSection( ipc_vring_mem      );
@@ -677,12 +664,10 @@ html_mmap.addMemSection( mcu2_0_ddr_ipc     );
 html_mmap.addMemSection( mcu2_0_ddr_resource_table      );
 html_mmap.addMemSection( mcu2_0_ddr         );
 html_mmap.addMemSection( mcu2_0_ddr_local_heap );
-html_mmap.addMemSection( mcu2_0_ddr_non_cache );
 html_mmap.addMemSection( mcu2_1_ddr_ipc     );
 html_mmap.addMemSection( mcu2_1_ddr_resource_table      );
 html_mmap.addMemSection( mcu2_1_ddr         );
 html_mmap.addMemSection( mcu2_1_ddr_local_heap );
-html_mmap.addMemSection( mcu2_1_ddr_non_cache );
 html_mmap.addMemSection( mcu3_0_ddr_ipc     );
 html_mmap.addMemSection( mcu3_0_ddr_resource_table      );
 html_mmap.addMemSection( mcu3_0_ddr         );
@@ -762,8 +747,6 @@ c_header_mmap.addMemSection( c7x_1_ddr_local_heap);
 c_header_mmap.addMemSection( c66x_1_ddr_scratch);
 c_header_mmap.addMemSection( c66x_2_ddr_scratch);
 c_header_mmap.addMemSection( c7x_1_ddr_scratch);
-c_header_mmap.addMemSection( mcu2_0_ddr_non_cache);
-c_header_mmap.addMemSection( mcu2_1_ddr_non_cache);
 c_header_mmap.addMemSection( tiovx_log_rt_mem );
 c_header_mmap.addMemSection( app_log_mem        );
 c_header_mmap.addMemSection( tiovx_obj_desc_mem );

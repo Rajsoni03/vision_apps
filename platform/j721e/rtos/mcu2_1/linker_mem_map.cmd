@@ -88,10 +88,8 @@ MEMORY
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB2040000 , LENGTH = 0x03FA0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
-    /* DDR for MCU2_1 for non-cached heap [ size 112.00 MB ] */
-    DDR_MCU2_1_NON_CACHE     ( RWIX ) : ORIGIN = 0xD9000000 , LENGTH = 0x07000000
     /* DDR for MCU2_1 for local heap [ size 16.00 MB ] */
-    DDR_MCU2_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE2000000 , LENGTH = 0x01000000
+    DDR_MCU2_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xDA000000 , LENGTH = 0x01000000
     /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
     INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xFC000000 , LENGTH = 0x00800000
     /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */

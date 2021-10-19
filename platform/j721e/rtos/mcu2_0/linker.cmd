@@ -39,7 +39,6 @@ SECTIONS
 
     .bss:l3mem              (NOLOAD) : {} > MAIN_OCRAM_MCU2_0
     .bss:ddr_shared_mem     (NOLOAD) : {} > DDR_MCU2_0_LOCAL_HEAP
-    .bss:ddr_non_cache_mem  (NOLOAD) : {} > DDR_MCU2_0_NON_CACHE
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM

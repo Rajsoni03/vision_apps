@@ -184,20 +184,6 @@ attrs.tex = 0;
 attrs.subregionDisableMask = 0;
 MPU.setRegionMeta(index++, 0xA4000000, MPU.RegionSize_1M, attrs);
 
-non_cache_base_addr = 0xD8000000;
-/* make DDR_MCU2_0_NON_CACHE, DDR_MCU2_1_NON_CACHE as non-cache */
-/* Note: MUST be 32MB aligned
- */
-attrs.enable = true;
-attrs.bufferable = false;
-attrs.cacheable = false;
-attrs.shareable = true;
-attrs.noExecute = true;
-attrs.accPerm = 1;          /* RW at PL1 */
-attrs.tex = 0;
-attrs.subregionDisableMask = 0;
-MPU.setRegionMeta(index++, non_cache_base_addr, MPU.RegionSize_128M, attrs);
-
 intercore_eth_base_addr = 0xFC000000;
 /* Cache 32MB from intercore_eth_base_addr */
 /* But change the policy for the first 8MB in the */
