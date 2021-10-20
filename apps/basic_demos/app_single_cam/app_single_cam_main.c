@@ -1058,6 +1058,15 @@ vx_status app_run_graph(AppObj *obj)
         return VX_FAILURE;
     }
     status = appStartImageSensor(obj->sensor_name, channel_mask);
+    if(status < 0)
+    {
+        printf("Failed to start sensor %s \n", obj->sensor_name);
+        if (NULL != obj->fs_test_raw_image)
+        {
+            printf("Defaulting to file test mode \n");
+            status = 0;
+        }
+    }
 
     graph_parameter_num = 0;    
     for(buf_id=0; buf_id<obj->num_cap_buf; buf_id++)    
