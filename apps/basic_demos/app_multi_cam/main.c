@@ -1177,7 +1177,7 @@ static vx_status app_run_graph(AppObj *obj)
     }
 
     // if test_mode is enabled, don't fail the program if the sensor init fails
-    if(obj->test_mode)
+    if( (obj->test_mode) || (obj->captureObj.enable_error_detection) )
     {
         appStartImageSensor(sensorObj->sensor_name, ch_mask);
     }
