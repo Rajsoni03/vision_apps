@@ -11,6 +11,12 @@
 # "opkg_utils" is required for making opkg repo: git://git.yoctoproject.org/opkg-utils
 #  - This can be automatically downloaded from running setup_psdk_rtos.sh
 
+ifeq ($(SOC),j721e)
+LINUX_FIRMWARE_PREFIX=j7
+else ifeq ($(SOC),j721s2)
+LINUX_FIRMWARE_PREFIX=j721s2
+endif
+
 IPK_TARGET_INC_PATH  = usr/include/processor_sdk
 OPKG_UTILS_PATH     ?= $(PSDK_PATH)/opkg-utils-master
 IPK_VERSION_STRING  ?= $(PSDK_VERSION)
@@ -80,7 +86,7 @@ ipk_package: linux_fs_install
 	# Get firmware images for ipk package
 	@mkdir -p $(IPK_TMP_PATH)/lib/firmware
 	cp -pr $(LINUX_FS_PATH)/lib/firmware/vision_apps* $(IPK_TMP_PATH)/lib/firmware
-	cp -pP $(LINUX_FS_PATH)/lib/firmware/j7-*-fw $(IPK_TMP_PATH)/lib/firmware
+	cp -pP $(LINUX_FS_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-*-fw $(IPK_TMP_PATH)/lib/firmware
 
 	# Get header files for ipk package
 	@# copy all the .h files under folders in IPK_INCLUDE_FOLDERS

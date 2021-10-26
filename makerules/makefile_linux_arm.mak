@@ -11,6 +11,12 @@ ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 LINUX_APP_PROFILE=release
 endif
 
+ifeq ($(SOC),j721e)
+LINUX_FIRMWARE_PREFIX=j7
+else ifeq ($(SOC),j721s2)
+LINUX_FIRMWARE_PREFIX=j721s2
+endif
+
 FIRMWARE_SUBFOLDER?=vision_apps_evm
 UENV_NAME?=uEnv_$(SOC)_vision_apps.txt
 LINUX_FS_STAGE_PATH?=/tmp/tivision_apps_targetfs_stage
@@ -64,66 +70,66 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu1_0.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-mcu-r5f0_0-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-mcu-r5f0_0-fw
 else
 	# Copy MCU1_0 firmware which is used in the default uboot
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/pdk-ipc/ipc_echo_testb_mcu1_0_release_strip.xer5f $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-mcu-r5f0_0-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/pdk-ipc/ipc_echo_testb_mcu1_0_release_strip.xer5f $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-mcu-r5f0_0-fw
 endif
 ifeq ($(BUILD_CPU_MCU1_1),yes)
 	# copy remote firmware files for mcu1_1
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu1_1.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-mcu-r5f0_1-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-mcu-r5f0_1-fw
 endif
 ifeq ($(BUILD_CPU_MCU2_0),yes)
 	# copy remote firmware files for mcu2_0
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu2_0.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-main-r5f0_0-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f0_0-fw
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
 	# copy remote firmware files for mcu2_1
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu2_1.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-main-r5f0_1-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f0_1-fw
 endif
 ifeq ($(BUILD_CPU_MCU3_0),yes)
 	# copy remote firmware files for mcu3_0
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu3_0.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-main-r5f1_0-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f1_0-fw
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
 	# copy remote firmware files for mcu3_1
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu3_1.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-main-r5f1_1-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f1_1-fw
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
 	# copy remote firmware files for c6x_1
 	$(eval IMAGE_NAME := vx_app_rtos_linux_c6x_1.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(CGT6X_ROOT)/bin/strip6x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-c66_0-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c66_0-fw
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
 	# copy remote firmware files for c6x_2
 	$(eval IMAGE_NAME := vx_app_rtos_linux_c6x_2.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(CGT6X_ROOT)/bin/strip6x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-c66_1-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c66_1-fw
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
 	# copy remote firmware files for c7x_1
 	$(eval IMAGE_NAME := vx_app_rtos_linux_c7x_1.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(CGT7X_ROOT)/bin/strip7x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-c71_0-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_0-fw
 
 	#Build TIDL test case and copy binaries
 	#$(MAKE) -C $(TIDL_PATH)/../ run
@@ -139,7 +145,7 @@ ifeq ($(BUILD_CPU_C7x_2),yes)
 	$(eval IMAGE_NAME := vx_app_rtos_linux_c7x_2.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(CGT7X_ROOT)/bin/strip7x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
-	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/j7-c71_1-fw
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_1-fw
 endif
 	sync
 
@@ -161,7 +167,7 @@ endef
 # $1 : destination rootfs path
 define CLEAN_COPY_FROM_STAGE =
 	# remove old remote files from filesystem
-	-rm -f $(1)/lib/firmware/j7-*-fw
+	-rm -f $(1)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-*-fw
 	-rm -rf $(1)/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	-rm -rf $(1)/opt/tidl_test/*
 	-rm -rf $(1)/opt/notebooks/*

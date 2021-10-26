@@ -13,6 +13,12 @@ ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 QNX_APP_PROFILE=release
 endif
 
+ifeq ($(SOC),j721e)
+QNX_FIRMWARE_PREFIX=j7
+else ifeq ($(SOC),j721s2)
+QNX_FIRMWARE_PREFIX=j721s2
+endif
+
 qnx:
 ifeq ($(BUILD_QNX_A72),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx all        VISION_APPS_BUILD_FLAGS_MAK=$(VISION_APPS_BUILD_FLAGS_MAK) QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD) -s
@@ -59,53 +65,53 @@ endif
 
 	# remove old remote firmware files from filesystem
 	mkdir -p $(QNX_AUX_FS_PATH)/lib/firmware
-	-rm $(QNX_AUX_FS_PATH)/lib/firmware/j7-*-fw -f
+	-rm $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-*-fw -f
 
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	# copy remote firmware files for mcu1_0
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-mcu-r5f0_0-fw
-	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-mcu-r5f0_0-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-mcu-r5f0_0-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-mcu-r5f0_0-fw
 endif
 
 ifeq ($(BUILD_CPU_MCU2_0),yes)
 	# copy remote firmware files for mcu2_0
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f0_0-fw
-	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f0_0-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f0_0-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f0_0-fw
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
 	# copy remote firmware files for mcu2_1
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f0_1-fw
-	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f0_1-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f0_1-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f0_1-fw
 endif
 ifeq ($(BUILD_CPU_MCU3_0),yes)
 	# copy remote firmware files for mcu3_0
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f1_0-fw
-	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f1_0-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f1_0-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f1_0-fw
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
 	# copy remote firmware files for mcu3_1
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f1_1-fw
-	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-main-r5f1_1-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f1_1-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f1_1-fw
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
 	# copy remote firmware files for c6x_1
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c66_0-fw
-	$(CGT6X_ROOT)/bin/strip6x -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-c66_0-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c66_0-fw
+	$(CGT6X_ROOT)/bin/strip6x -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c66_0-fw
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
 	# copy remote firmware files for c6x_2
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c66_1-fw
-	$(CGT6X_ROOT)/bin/strip6x -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-c66_1-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c66_1-fw
+	$(CGT6X_ROOT)/bin/strip6x -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c66_1-fw
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
 	# copy remote firmware files for c7x_1
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_0-fw
-	$(CGT7X_ROOT)/bin/strip7x -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_0-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c71_0-fw
+	$(CGT7X_ROOT)/bin/strip7x -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c71_0-fw
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	# copy remote firmware files for c7x_2
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_1-fw
-	$(CGT7X_ROOT)/bin/strip7x -p $(QNX_AUX_FS_PATH)/lib/firmware/j7-c71_1-fw
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c71_1-fw
+	$(CGT7X_ROOT)/bin/strip7x -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c71_1-fw
 endif
 	sync
 
@@ -151,8 +157,8 @@ qnx_fs_create_sd: qnx_fs_create
 qnx_fs_install_firmware:
 	# copy remote core firmware's
 	mkdir -p $(QNX_SD_FS_ROOT_PATH)/lib/firmware
-	rm $(QNX_SD_FS_ROOT_PATH)/lib/firmware/j7-*-fw -f
-	cp -v $(QNX_AUX_FS_PATH)/lib/firmware/j7-*-fw $(QNX_SD_FS_ROOT_PATH)/lib/firmware/
+	rm $(QNX_SD_FS_ROOT_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-*-fw -f
+	cp -v $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-*-fw $(QNX_SD_FS_ROOT_PATH)/lib/firmware/
 	sync
 
 qnx_fs_install_sd: qnx_fs_copy_spl_uboot qnx_fs_install qnx_fs_install_firmware
