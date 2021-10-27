@@ -19,8 +19,6 @@ endif
 	@if [ ! -d $(IVISION_PATH) ]; then echo 'ERROR: $(IVISION_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(IMAGING_PATH) ]; then echo 'ERROR: $(IMAGING_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(MMALIB_PATH) ]; then echo 'ERROR: $(MMALIB_PATH) not found !!!'; exit 1; fi
-	@if [ ! -d $(BIOS_PATH) ]; then echo 'ERROR: $(BIOS_PATH) not found !!!'; exit 1; fi
-	@if [ ! -d $(XDCTOOLS_PATH) ]; then echo 'ERROR: $(XDCTOOLS_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(PDK_PATH) ]; then echo 'ERROR: $(PDK_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(VISION_APPS_PATH) ]; then echo 'ERROR: $(VISION_APPS_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(TIOVX_PATH) ]; then echo 'ERROR: $(TIOVX_PATH) not found !!!'; exit 1; fi
