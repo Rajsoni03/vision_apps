@@ -448,7 +448,7 @@ vision_apps_ddr_total.setDtsName("vision_apps_memory_region", "vision-apps-dma-m
 
 # this region should NOT have the "no-map" flag since we want ION to map this memory and do cache ops on it as needed
 ddr_shared_mem     = MemSection("DDR_SHARED_MEM"    , "", ddr_shared_mem_addr    , ddr_shared_mem_size    , "Memory for shared memory buffers in DDR");
-ddr_shared_mem.setDtsName("vision_apps_shared_region", "vision-apps-shared-memories");
+ddr_shared_mem.setDtsName("vision_apps_shared_region", "vision_apps_shared-memories");
 ddr_shared_mem.setCompatibility("dma-heap-carveout");
 ddr_shared_mem.setNoMap(False);
 ddr_shared_mem.setOriginTag(False);

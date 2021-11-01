@@ -135,7 +135,7 @@
             no-map;
         };
         
-        vision_apps_shared_region: vision-apps-shared-memories {
+        vision_apps_shared_region: vision_apps_shared-memories {
             compatible = "dma-heap-carveout";
             reg = <0x00 0xb8000000 0x00 0x20000000>;
         };
