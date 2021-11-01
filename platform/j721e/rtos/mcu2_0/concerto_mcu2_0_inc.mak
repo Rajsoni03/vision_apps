@@ -97,6 +97,8 @@ ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += lwipcontrib_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += lwipport_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += lwipif_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipific_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_intercore.aer5f
 	ADDITIONAL_STATIC_LIBS += enet_example_utils_freertos.aer5f
 endif
 

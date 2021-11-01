@@ -36,6 +36,20 @@ ifeq ($(SOC),j721s2)
 BUILD_ENABLE_ETHFW=no
 endif
 
+# Proxy ARP handling support
+# To enable this feature, ETHFW_PROXY_ARP_SUPPORT must be set to "yes" in
+# ethfw_build_flags.mk. This feature is enabled by default.
+
+# Inter-core virtual ethernet support
+# Supported Values: yes | no
+ifneq (,$(filter yes,$(BUILD_CPU_MCU2_0)))
+ifeq ($(BUILD_QNX_A72),yes)
+ETHFW_INTERCORE_ETH_SUPPORT?=no
+else
+ETHFW_INTERCORE_ETH_SUPPORT?=yes
+endif
+endif
+
 BUILD_EDGEAI?=no
 
 # If set to no, then MCU core firmware will be built with NO board dependencies

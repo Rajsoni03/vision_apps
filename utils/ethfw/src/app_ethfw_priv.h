@@ -105,6 +105,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcpip.h"
 #include "lwip/netif.h"
+#include "lwip/netifapi.h"
 #include "lwip/api.h"
 
 #include "lwip/tcp.h"
@@ -114,10 +115,19 @@
 /* lwIP netif includes */
 #include "lwip/etharp.h"
 #include "netif/ethernet.h"
+#include "netif/bridgeif.h"
 
 #include <ti/drv/enet/lwipif/inc/default_netif.h>
+#include <ti/drv/enet/lwipif/inc/lwip2lwipif.h>
 
 #include <utils/ethfw_callbacks/include/ethfw_callbacks_lwipif.h>
+
+#if defined(ETHAPP_ENABLE_INTERCORE_ETH)
+#include <ti/drv/enet/lwipific/inc/netif_ic.h>
+#include <ti/drv/enet/lwipific/inc/lwip2enet_ic.h>
+#include <ti/drv/enet/lwipific/inc/lwip2lwipif_ic.h>
+#endif
+
 #endif
 
 /* ========================================================================== */
