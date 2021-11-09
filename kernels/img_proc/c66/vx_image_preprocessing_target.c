@@ -63,6 +63,7 @@
 
 
 #include <TI/tivx.h>
+#include <TI/j7.h>
 #include <TI/tivx_img_proc.h>
 #include <TI/tivx_target_kernel.h>
 #include "tivx_kernels_target_utils.h"
@@ -422,7 +423,8 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
         rem_height = 0;
         in_size = 0;
         out_size = 0;
-        while((total_size < req_size) && (rem_height == 0))
+        num_sets = 0;
+        while((total_size < req_size) && (rem_height == 0) && ((num_sets & 1) == 0))
         {
             kernelParams->blkWidth = blk_width;
             kernelParams->blkHeight = mblk_height;
@@ -453,6 +455,8 @@ static vx_status VX_CALLBACK tivxKernelImgPreProcCreate
 
             total_size = in_size + out_size;
             rem_height = in_height % mblk_height;
+            num_sets = in_height / mblk_height;
+
         }
 
         num_sets = in_height / kernelParams->blkHeight;
