@@ -37,8 +37,11 @@ tidl_dir = $(notdir $(call dirname,$(TIDL_PATH)))
 
 # Use this to use a subset of the interface headers in the component folders
 IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
+					imaging/algos/ae/include \
+					imaging/algos/awb/include \
 					imaging/itt_server_remote/include \
 					imaging/kernels/include \
+					imaging/ti_2a_wrapper/include \
 					imaging/sensor_drv/include \
 					ivision \
 					perception/include \
