@@ -197,6 +197,10 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                     NULL);
 
         status = vxGetStatus((vx_reference)kernel);
+        if((vx_status)VX_SUCCESS != status)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to add user kernel!\n");
+        }
     }
 
     index = 0;
@@ -207,7 +211,11 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                         VX_INPUT,
                         VX_TYPE_USER_DATA_OBJECT,
                         VX_PARAMETER_STATE_REQUIRED);
-       index++;
+        if((vx_status)VX_SUCCESS != status)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+        }
+        index++;
     }
     if (status == VX_SUCCESS)
     {
@@ -216,7 +224,11 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                         VX_OUTPUT,
                         VX_TYPE_IMAGE,
                         VX_PARAMETER_STATE_REQUIRED);
-       index++;
+        if((vx_status)VX_SUCCESS != status)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+        }
+        index++;
     }
     if (status == VX_SUCCESS)
     {
@@ -225,7 +237,11 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                         VX_INPUT,
                         VX_TYPE_IMAGE,
                         VX_PARAMETER_STATE_OPTIONAL);
-       index++;
+        if((vx_status)VX_SUCCESS != status)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+        }
+        index++;
     }
     for(i = 0; i < num_inputs; i++)
     {
@@ -236,7 +252,11 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                           VX_INPUT,
                           VX_TYPE_OBJECT_ARRAY,
                           VX_PARAMETER_STATE_REQUIRED);
-              index++;
+            if((vx_status)VX_SUCCESS != status)
+            {
+                VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+            }
+            index++;
         }
     }
     if (status == VX_SUCCESS)
@@ -248,11 +268,16 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
     if (status == VX_SUCCESS)
     {
         status = vxFinalizeKernel(kernel);
+        if((vx_status)VX_SUCCESS != status)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to finalize kernel!\n");
+        }
     }
     if (status != VX_SUCCESS)
     {
         vxReleaseKernel(&kernel);
         kernel = NULL;
+        VX_PRINT(VX_ZONE_ERROR, "kernel handle is set to NULL!\n");
     }
 
     return kernel;
