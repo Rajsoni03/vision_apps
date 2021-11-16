@@ -50,9 +50,11 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/imx219
 	cp $(IMAGING_PATH)/sensor_drv/src/imx390/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
 	cp $(IMAGING_PATH)/sensor_drv/src/ar0820/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
 	cp $(IMAGING_PATH)/sensor_drv/src/ar0233/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
+	cp $(IMAGING_PATH)/sensor_drv/src/imx219/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/imx219
 
 	# Copy header files (variables used in this section are defined in makefile_ipk.mak)
 	@# copy all the .h files under folders in IPK_INCLUDE_FOLDERS
