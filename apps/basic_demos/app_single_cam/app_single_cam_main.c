@@ -177,7 +177,7 @@ vx_status app_init(AppObj *obj)
 
             while ((obj->selectedCam != 0xFF) && (selectedSensor > (num_sensors_found-1)))
             {
-                printf("0x%d registered sensor drivers\n", num_sensors_found);
+                printf("%d registered sensor drivers\n", num_sensors_found);
                 for(count=0;count<num_sensors_found;count++)
                 {
                     printf("%c : %s \n", count+'a', sensor_list[count]);
@@ -483,7 +483,6 @@ Sensor driver does not support metadata yet.
     APP_PRINTF("Initializing params for capture node \n");
 
     /* Setting to num buf of capture node */
-    APP_PRINTF("Initializing params for capture node \n");
     obj->num_cap_buf = NUM_BUFS;
 
     if(vx_false_e == yuv_cam_input)
