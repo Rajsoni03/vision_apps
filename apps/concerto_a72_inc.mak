@@ -129,6 +129,12 @@ IMAGING_LIBS  = vx_kernels_imaging
 IMAGING_LIBS += app_utils_itt_server
 IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_iss
+ifeq ($(BUILD_EDGEAI), yes)
+IMAGING_LIBS += ti_2a_wrapper
+IMAGING_LIBS += ti_imaging_aealg
+IMAGING_LIBS += ti_imaging_awbalg
+IMAGING_LIBS += ti_imaging_dcc
+endif
 
 VISION_APPS_UTILS_LIBS  =
 VISION_APPS_UTILS_LIBS += app_utils_draw2d
