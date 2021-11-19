@@ -49,7 +49,7 @@ BUILD_MCU_BOARD_DEPENDENCIES?=yes
 ifeq ($(BUILD_EDGEAI), yes)
 BUILD_MCU_BOARD_DEPENDENCIES=no
 FIRMWARE_SUBFOLDER=vision_apps_eaik
-UENV_NAME=uEnv_edgeai_apps.txt
+UENV_NAME=uEnv_$(SOC)_edgeai_apps.txt
 endif
 
 ifeq ($(BUILD_MCU_BOARD_DEPENDENCIES),no)
