@@ -116,8 +116,8 @@ int main(int argc, char *argv[])
 
     if (core == R5F_FAMILY)
     {
-        core_id[0] = APP_IPC_CPU_MCU1_0;
-        core_id[1] = APP_IPC_CPU_MCU2_0;
+        core_id[0] = APP_IPC_CPU_MCU2_0;
+        core_id[1] = APP_IPC_CPU_MCU2_1;
     }
     #if defined(SOC_J721E)
     else if (core == C6X_FAMILY)
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
             appLogWaitMsecs(2000);
 
             for (i = 0; i < core_cnt; i++)
-                status = appCpuLoadPrint(core_id[0]);
+                status = appCpuLoadPrint(core_id[i]);
 
             elaspedTime = appLogGetTimeInUsec() - startTime;
 
