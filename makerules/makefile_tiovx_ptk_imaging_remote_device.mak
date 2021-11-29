@@ -13,6 +13,17 @@ else
 endif
 
 vxlib:
+ifeq ($(BUILD_EMULATION_MODE),yesDISABLE)
+ifeq ($(PROFILE), $(filter $(PROFILE),release all))
+	TARGET_PLATFORM=PC TARGET_CPU=x86_64 TARGET_SCPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=PC TARGET_CPU=x86_64 TARGET_SCPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
+ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
+	TARGET_PLATFORM=PC TARGET_CPU=x86_64 TARGET_SCPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
+	TARGET_PLATFORM=PC TARGET_CPU=x86_64 TARGET_SCPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
 ifeq ($(SOC),j721e)
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
@@ -31,6 +42,7 @@ endif
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=$(C7X_TARGET) TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) vxlib
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=$(C7X_TARGET) TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
+endif
 endif
 endif
 
