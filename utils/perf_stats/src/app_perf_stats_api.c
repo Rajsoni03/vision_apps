@@ -657,7 +657,7 @@ FILE *appPerfStatsExportOpenFile(const char *output_file_path, const char *outpu
         fp = fopen(filename, "wb");
         if (NULL != fp)
         {
-            APP_PERF_EXPORT_WRITELN(fp, "# Datasheet {#group_%s_datasheet}\n", output_file_prefix);
+            APP_PERF_EXPORT_WRITELN(fp, "# Datasheet {#group_apps_%s_datasheet}\n", output_file_prefix);
         }
     }
     else

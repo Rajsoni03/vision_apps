@@ -189,7 +189,7 @@ vx_status app_init(AppObj *obj)
                 {
                     uint8_t num_sensors_detected = 0;
                     uint8_t channel_mask = (1<<obj->selectedCam);
-                
+
                     status = appDetectImageSensor(detectedSensors, &num_sensors_detected, channel_mask);
                     if(0 == status)
                     {
@@ -377,27 +377,27 @@ vx_status app_create_graph(AppObj *obj)
             sensor_wdr_enabled = 0;
             obj->sensor_wdr_mode = 0;
         }
-        
+
         if(ISS_SENSOR_FEATURE_MANUAL_EXPOSURE == (sensor_features_supported & ISS_SENSOR_FEATURE_MANUAL_EXPOSURE))
         {
             APP_PRINTF("Expsoure control is supported \n");
             sensor_features_enabled |= ISS_SENSOR_FEATURE_MANUAL_EXPOSURE;
             sensor_exp_control_enabled = 1;
         }
-        
+
         if(ISS_SENSOR_FEATURE_MANUAL_GAIN == (sensor_features_supported & ISS_SENSOR_FEATURE_MANUAL_GAIN))
         {
             APP_PRINTF("Gain control is supported \n");
             sensor_features_enabled |= ISS_SENSOR_FEATURE_MANUAL_GAIN;
             sensor_gain_control_enabled = 1;
         }
-        
+
         if(ISS_SENSOR_FEATURE_CFG_UC1 == (sensor_features_supported & ISS_SENSOR_FEATURE_CFG_UC1))
         {
             APP_PRINTF("CMS Usecase is supported \n");
             sensor_features_enabled |= ISS_SENSOR_FEATURE_CFG_UC1;
         }
-        
+
         switch(sensorParams.sensorInfo.aewbMode)
         {
             case ALGORITHMS_ISS_AEWB_MODE_NONE:
@@ -424,7 +424,7 @@ vx_status app_create_graph(AppObj *obj)
                 obj->aewb_cfg.ae_mode = ALGORITHMS_ISS_AE_MANUAL;
             }
         }
-        
+
         APP_PRINTF("obj->aewb_cfg.ae_mode = %d\n", obj->aewb_cfg.ae_mode);
         APP_PRINTF("obj->aewb_cfg.awb_mode = %d\n", obj->aewb_cfg.awb_mode);
 
@@ -502,9 +502,9 @@ Sensor driver does not support metadata yet.
     else
     {
         capt_yuv_image = vxCreateImage(
-                                obj->context, 
-                                sensorParams.sensorInfo.raw_params.width, 
-                                sensorParams.sensorInfo.raw_params.height, 
+                                obj->context,
+                                sensorParams.sensorInfo.raw_params.width,
+                                sensorParams.sensorInfo.raw_params.height,
                                 VX_DF_IMAGE_UYVY
                          );
 
@@ -550,7 +550,7 @@ Sensor driver does not support metadata yet.
     }
 
     local_capture_config.chInstMap[0] = obj->selectedCam/NUM_CAPT_CHANNELS;
-    local_capture_config.chVcNum[0]   = obj->selectedCam%NUM_CAPT_CHANNELS;    
+    local_capture_config.chVcNum[0]   = obj->selectedCam%NUM_CAPT_CHANNELS;
 
     capture_config = vxCreateUserDataObject(obj->context, capture_user_data_object_name, sizeof(tivx_capture_params_t), &local_capture_config);
     APP_PRINTF("capture_config = 0x%p \n", capture_config);
@@ -576,10 +576,10 @@ Sensor driver does not support metadata yet.
             status = tivxReleaseRawImage(&raw_image);
         }
 #ifdef _APP_DEBUG_
-    
+
 
         obj->fs_test_raw_image = tivxCreateRawImage(obj->context, &(sensorParams.sensorInfo.raw_params));
-    
+
         if (NULL != obj->fs_test_raw_image)
         {
             if(status == VX_SUCCESS)
@@ -619,7 +619,7 @@ Sensor driver does not support metadata yet.
     {
         obj->capt_yuv_image = (vx_image)vxGetObjectArrayItem(obj->cap_frames[0], 0);
         ldc_in_image = obj->capt_yuv_image;
-        vxReleaseImage(&capt_yuv_image);    
+        vxReleaseImage(&capt_yuv_image);
     }
 
     if (obj->ldc_enable)
@@ -661,7 +661,7 @@ Sensor driver does not support metadata yet.
             obj->scaler_enable = vx_false_e;
             obj->display_image = obj->ldc_out;
 
-            /* MSC can only downsize. If ldc resolution is lower, 
+            /* MSC can only downsize. If ldc resolution is lower,
                display resolution must be set accordingly
             */
             obj->display_params.outWidth = obj->table_width;
@@ -684,7 +684,7 @@ Sensor driver does not support metadata yet.
             else
             {
                 obj->scaler_enable = vx_false_e;
-                /* MSC can only downsize. If viss resolution is lower, 
+                /* MSC can only downsize. If viss resolution is lower,
                    display resolution must be set accordingly
                 */
                 obj->display_params.outWidth = image_width;
@@ -1050,7 +1050,7 @@ vx_status app_run_graph(AppObj *obj)
     int graph_parameter_num = 0;
 
     uint8_t channel_mask = (1<<obj->selectedCam);
-    
+
     if(NULL == obj->sensor_name)
     {
         printf("sensor name is NULL \n");
@@ -1067,8 +1067,8 @@ vx_status app_run_graph(AppObj *obj)
         }
     }
 
-    graph_parameter_num = 0;    
-    for(buf_id=0; buf_id<obj->num_cap_buf; buf_id++)    
+    graph_parameter_num = 0;
+    for(buf_id=0; buf_id<obj->num_cap_buf; buf_id++)
     {
         if(status == VX_SUCCESS)
         {
@@ -1100,7 +1100,7 @@ vx_status app_run_graph(AppObj *obj)
 #ifdef A72
 #if defined(LINUX)
 
-    appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode, 
+    appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode,
                         obj->node_aewb, 0,
                         obj->node_viss, 0,
                         obj->node_ldc, 0,
@@ -1276,7 +1276,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
 #endif
                 case 'e':
                     perf_arr[0] = &obj->total_perf;
-                    fp = appPerfStatsExportOpenFile(".", "basic_demos_apps_single_cam");
+                    fp = appPerfStatsExportOpenFile(".", "basic_demos_app_single_cam");
                     if (NULL != fp)
                     {
                         appPerfStatsExportAll(fp, perf_arr, 1);
@@ -1292,7 +1292,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
 #ifdef A72
 #if defined(LINUX)
                 case 'u':
-                    appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode, 
+                    appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode,
                         obj->node_aewb, 0,
                         obj->node_viss, 0,
                         obj->node_ldc, 0,
@@ -1338,7 +1338,7 @@ int appSingleCamUpdateVpacDcc(AppObj *obj, uint8_t* dcc_buf, uint32_t dcc_buf_si
 {
     int32_t status = 0;
 
-    status = appUpdateVpacDcc(dcc_buf, dcc_buf_size, obj->context, 
+    status = appUpdateVpacDcc(dcc_buf, dcc_buf_size, obj->context,
                 obj->node_viss, 0,
                 obj->node_aewb, 0,
                 obj->node_ldc, 0
@@ -1360,7 +1360,7 @@ int save_debug_images(AppObj *obj)
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = app_get_test_file_path();
     struct stat s;
-    
+
     if(NULL == test_data_path)
     {
         printf("Test data path is NULL. Defaulting to current folder \n");
@@ -1428,7 +1428,7 @@ int save_debug_images(AppObj *obj)
             return VX_FAILURE;
         }
     }
-    
+
     if(obj->ldc_enable)
     {
         snprintf(yuv_image_fname, MAX_FNAME, "%s/%s_%04d.yuv", test_data_path, "img_ldc", file_index);
@@ -1440,7 +1440,7 @@ int save_debug_images(AppObj *obj)
             return VX_FAILURE;
         }
     }
-    
+
     file_index++;
     return (file_index-1);
 }
