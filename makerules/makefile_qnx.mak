@@ -50,7 +50,7 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	# copy application binaries and scripts
 	mkdir -p $(QNX_FS_PATH)/vision_apps
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(QNX_APP_PROFILE)/*.out $(QNX_FS_PATH)/vision_apps
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(QNX_FS_PATH)/usr/lib
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(QNX_FS_PATH)/tilib
 	# app_linux_fs_files are not very OS specific. Only input file paths change
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/* $(QNX_FS_PATH)/vision_apps
 	# Rename file paths in app cfg files
