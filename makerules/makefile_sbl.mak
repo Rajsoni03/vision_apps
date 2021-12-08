@@ -182,9 +182,11 @@ sbl_mcusw_bootimage_ospi_hs:
 sbl_vision_apps_bootimage_1:
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 ifeq ($(BUILD_CPU_MCU2_0),yes)
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp1 $(REMOTE_CORE_LIST_LATEAPP1)
@@ -196,21 +198,27 @@ sbl_vision_apps_bootimage_hs_1:
 sbl_vision_apps_bootimage_2:
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 ifeq ($(BUILD_CPU_MCU3_0),yes)
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
+	$(CGT6X_ROOT)/bin/strip6x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
+	$(CGT6X_ROOT)/bin/strip6x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
+	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
+	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp2 $(REMOTE_CORE_LIST_LATEAPP2)
