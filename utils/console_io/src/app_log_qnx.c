@@ -298,7 +298,7 @@ void *appMemMap(void *phys_ptr, uint32_t size)
         tsize = appAlign(tsize + (taddr % pageSize), pageSize);
         taddr = appFloor(taddr, pageSize);
 
-        virt_ptr  = mmap(0, tsize,
+        virt_ptr  = mmap64(0, tsize,
                         (PROT_READ | PROT_WRITE | PROT_NOCACHE),
                         (MAP_SHARED), dev_mem_fd, taddr);
         if(virt_ptr==MAP_FAILED)
