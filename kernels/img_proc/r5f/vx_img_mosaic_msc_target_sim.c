@@ -478,7 +478,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
     tivx_obj_desc_user_data_object_t *config_desc;
     void                             *config_target_ptr;
     tivx_obj_desc_image_t            *out_img_desc;
-    void                             *output_image_target_ptr[2U];
+    void                             *output_image_target_ptr[2U] = {NULL};
     vx_int32                          win, in, ch, msc_cnt;
     vx_int32                          num_inputs;
     tivxImgMosaicParams              *params;
