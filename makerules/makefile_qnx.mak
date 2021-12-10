@@ -196,4 +196,7 @@ qnx_fs_install_ospi: qnx_fs_install sbl_bootimage_install_ospi
 qnx_fs_install_sd_test_data:
 	$(call INSTALL_TEST_DATA,$(QNX_SD_FS_BOOT_PATH),vision_apps)
 
+qnx_fs_install_sd_sbl_combined: qnx_fs_install sbl_combined_bootimage_install_sd
+	$(call MODIFY_QNX_SD_FS)
+
 .PHONY: qnx qnx_clean qnx_scrub

@@ -166,6 +166,7 @@ include makerules/makefile_sbl.mak
 include makerules/makefile_ethfw.mak
 include makerules/makefile_ipk.mak
 include makerules/makefile_uboot.mak
+include makerules/makefile_sbl_combined_appimage.mak
 
 vision_apps: sdk_check_paths
 	touch ${PSDK_PATH}/vision_apps/platform/$(SOC)/rtos/mcu2_0/mcu2_0.cfg
