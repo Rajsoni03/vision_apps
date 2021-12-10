@@ -25,10 +25,6 @@ IDIRS       += $(VISION_APPS_KERNELS_IDIRS)
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(TIADALG_LIBS)
 STATIC_LIBS += $(IMAGING_LIBS)
-STATIC_LIBS += vx_kernels_img_proc
-STATIC_LIBS += vx_target_kernels_img_proc_c66
-STATIC_LIBS += vx_kernels_fileio
-STATIC_LIBS += vx_target_kernels_fileio
 
 # Not building for PC
 SKIPBUILD=1

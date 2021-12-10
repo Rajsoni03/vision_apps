@@ -157,6 +157,9 @@ void tivxImgProcLoadKernels(vx_context context)
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);
         tivxRegisterImgProcTargetC71Kernels();
 
+        tivxSetSelfCpuId(TIVX_CPU_ID_IPU1_0);
+        tivxRegisterImgProcTargetR5FKernels();
+ 
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         #endif
         tivxRegisterImgProcTargetA72Kernels();

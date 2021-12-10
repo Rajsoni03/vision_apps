@@ -1,6 +1,6 @@
 /*
 *
-* Copyright (c) 2019 Texas Instruments Incorporated
+* Copyright (c) 2021 Texas Instruments Incorporated
 *
 * All rights reserved not granted herein.
 *
@@ -61,16 +61,13 @@
 */
 
 #include <TI/tivx.h>
-#include <TI/tivx_event.h>
 #include <TI/tivx_img_proc.h>
 #include <TI/tivx_target_kernel.h>
 
 #include <tivx_kernels_target_utils.h>
+#include <vx_kernels_hwa_target.h>
 #include <tivx_img_mosaic_host.h>
-#include <ti/drv/vhwa/include/vhwa_m2mMsc.h>
-#include <utils/mem/include/app_mem.h>
-
-#include <utils/perf_stats/include/app_perf_stats.h>
+#include "scaler_core.h"
 
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
@@ -87,29 +84,32 @@
 /* Mosaic MSC internal object */
 typedef struct
 {
-    Vhwa_M2mMscCreatePrms   createArgs;
-    Vhwa_M2mMscParams       msc_prms;
-    Fvid2_Handle            handle;
-    tivx_event              wait_for_compl;
+    msc_config config;
 
-    Fvid2_FrameList         inFrmList;
-    Fvid2_FrameList         outFrmList;
-    Fvid2_Frame             inFrm;
-    Fvid2_Frame             outFrm;
-    Fvid2_CbParams          cbPrms;
+    uint16_t *src16[2];
+    uint16_t *dst16[2];
 
-    uint32_t                msc_drv_inst_id;
+    uint32_t crop_width;
+    uint32_t crop_height;
 
-    uint64_t                time;
+    /* State from user commands to override auto mode or not */
+    uint32_t user_init_phase_x;
+    uint32_t user_init_phase_y;
+    uint32_t user_offset_x;
+    uint32_t user_offset_y;
+    uint32_t user_crop_start_x;
+    uint32_t user_crop_start_y;
 
-    uint32_t                scIdx;
 } tivxImgMosaicMscInstObj;
 
 typedef struct
 {
     tivxImgMosaicMscInstObj inst_obj[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
 
-    Msc_Coeff               coeffCfg;
+    uint32_t buffer_size_in;
+    uint32_t buffer_size_out;
+    uint16_t *src16[2];
+    uint16_t *dst16[2];
 
     tivxImgMosaicWindow    *tmp_win[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
     uint32_t                tmp_in_ch[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
@@ -117,8 +117,6 @@ typedef struct
 
     tivx_obj_desc_object_array_t *in_arr_desc[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
     tivx_obj_desc_image_t        *in_img_desc[TIVX_IMAGE_MOSAIC_MSC_MAX_INST][TIVX_OBJECT_ARRAY_MAX_ITEMS];
-
-    app_perf_hwa_id_t       app_hwa_inst_id[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
 
     vx_uint32               max_msc_instances;
     vx_uint32               msc_instance;
@@ -151,30 +149,15 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
     void *priv_arg);
 
 /* Local Functions */
-static vx_status tivxKernelImgMosaicMscDrvCreate(
-    tivxImgMosaicMscInstObj *inst_obj, uint32_t inst_id);
-static vx_status tivxKernelImgMosaicMscDrvDelete(
-    tivxImgMosaicMscInstObj *inst_obj);
-static void tivxKernelImgMosaicMscDrvSetScCfg(
-    Msc_ScConfig *sc_cfg,
-    const tivx_obj_desc_image_t *in_img_desc,
-    const tivxImgMosaicWindow *window);
-static int32_t tivxKernelImgMosaicMscDrvCompCb(
-    Fvid2_Handle handle,
-    void *appData);
-static vx_status tivxKernelImgMosaicMscSetCoeffsCmd(tivxImgMosaicMscObj *msc_obj);
-static void scale_set_coeff(
-    tivx_vpac_msc_coefficients_t *coeff,
-    uint32_t interpolation);
+static void tivxKernelImgMosaicMscFreeMem(tivxImgMosaicMscObj *msc_obj);
+static void tivxVpacMscScaleInitParams(Scaler_Config *settings);
+static vx_status tivxVpacMscScaleUpdateOutputSettings(tivxImgMosaicMscInstObj *prms, uint32_t ow, uint32_t oh, uint32_t cnt, uint32_t h_divider, vx_df_image format);
 
-static vx_status tivxKernelImgMosaicMscDrvPrepare(
+static vx_status tivxKernelImgMosaicMscSimProcess(
     tivxImgMosaicMscInstObj *inst_obj,
     const tivx_obj_desc_image_t *in_img_desc,
     const tivxImgMosaicWindow *window,
     const tivx_obj_desc_image_t* out_img_desc);
-static vx_status tivxKernelImgMosaicMscDrvSubmit(tivxImgMosaicMscInstObj *inst_obj);
-static void tivxKernelImgMosaicMscDrvWait(tivxImgMosaicMscInstObj *inst_obj);
-static vx_status tivxKernelImgMosaicMscDrvGetReq(tivxImgMosaicMscInstObj *inst_obj);
 
 
 /* ========================================================================== */
@@ -317,12 +300,22 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
             obj_desc[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX];
         if(VX_SUCCESS == status)
         {
+            vx_uint32 maxInPixels = 0;
+            vx_uint32 maxOutPixels = 0;
+
             for(win = 0U; win < params->num_windows; win++)
             {
                 tivxImgMosaicWindow *window =
                     (tivxImgMosaicWindow *) &params->windows[win];
                 vx_int32 in = window->input_select;
                 vx_int32 ch = window->channel_select;
+                vx_int32 outPixels = window->width * window->height;
+                vx_int32 inPixels;
+
+                if(maxOutPixels < outPixels)
+                {
+                    maxOutPixels = outPixels;
+                }
 
                 if(in > num_inputs)
                 {
@@ -339,6 +332,12 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
                     input_image_arr_desc->obj_desc_id,
                     (tivx_obj_desc_t **) &in_img_desc[0U],
                     input_image_arr_desc->num_items);
+
+                inPixels = in_img_desc[0U]->width * in_img_desc[0U]->height;
+                if(maxInPixels < inPixels)
+                {
+                    maxInPixels = inPixels;
+                }
 
                 if(ch > input_image_arr_desc->num_items)
                 {
@@ -357,6 +356,8 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
                     status = VX_FAILURE;
                 }
             }
+            msc_obj->buffer_size_in  = maxInPixels*2U;
+            msc_obj->buffer_size_out = maxOutPixels*2U;
         }
 
         VX_PRINT(VX_ZONE_INFO, "num_msc_instance = %d \n", params->num_msc_instances);
@@ -390,42 +391,36 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
 
     if(VX_SUCCESS == status)
     {
-        if (msc_obj->max_msc_instances == 2)
+        for (i = 0u; (i < 2u) && (VX_SUCCESS == status); i ++)
         {
-            msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_MSC0;
-            msc_obj->app_hwa_inst_id[1] = APP_PERF_HWA_MSC1;
-        }
-        else if(msc_obj->max_msc_instances == 1)
-        {
-            if(msc_obj->msc_instance == 0)
+            msc_obj->src16[i] = tivxMemAlloc(msc_obj->buffer_size_in, (vx_enum)TIVX_MEM_EXTERNAL);
+            if (NULL == msc_obj->src16[i])
             {
-                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_MSC0;
-            }
-            else if (msc_obj->msc_instance == 1)
-            {
-                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_MSC1;
+                VX_PRINT(VX_ZONE_ERROR, "Input Buffer Alloc Error\n");
+                status = (vx_status)VX_ERROR_NO_MEMORY;
             }
         }
-
-        for (i = 0u; i < msc_obj->max_msc_instances; i ++)
+        for (i = 0u; (i < 2u) && (VX_SUCCESS == status); i ++)
         {
-            if (0u == i)
+            msc_obj->dst16[i] = tivxMemAlloc(msc_obj->buffer_size_out, (vx_enum)TIVX_MEM_EXTERNAL);
+            if (NULL == msc_obj->dst16[i])
             {
-                msc_obj->inst_obj[i].scIdx = i;
+                VX_PRINT(VX_ZONE_ERROR, "Output Buffer Alloc Error\n");
+                status = (vx_status)VX_ERROR_NO_MEMORY;
             }
-            else
-            {
-                msc_obj->inst_obj[i].scIdx = MSC_MAX_OUTPUT - 1U - i;
-            }
-
-            /* MSC driver create */
-            status = tivxKernelImgMosaicMscDrvCreate(&msc_obj->inst_obj[i], i);
         }
     }
 
     if(VX_SUCCESS == status)
     {
-        status = tivxKernelImgMosaicMscSetCoeffsCmd(msc_obj);
+        for (i = 0u; i < msc_obj->max_msc_instances; i ++)
+        {
+            msc_obj->inst_obj[i].src16[0] = msc_obj->src16[0];
+            msc_obj->inst_obj[i].src16[1] = msc_obj->src16[1];
+            msc_obj->inst_obj[i].dst16[0] = msc_obj->dst16[0];
+            msc_obj->inst_obj[i].dst16[1] = msc_obj->dst16[1];
+            tivxVpacMscScaleInitParams(&msc_obj->inst_obj[i].config.settings);
+        }
     }
 
     /* Free the allocated memory incase of error */
@@ -433,14 +428,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
     {
         if(msc_obj != NULL)
         {
-            for (i = 0u; i < msc_obj->max_msc_instances; i ++)
-            {
-                /* MSC driver delete */
-                status = tivxKernelImgMosaicMscDrvDelete(
-                    &msc_obj->inst_obj[i]);
-            }
-
-            tivxMemFree(msc_obj, sizeof(tivxImgMosaicMscObj), TIVX_MEM_EXTERNAL);
+            tivxKernelImgMosaicMscFreeMem(msc_obj);
         }
     }
 
@@ -474,13 +462,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscDelete(
     }
     else
     {
-        for (i = 0u; i < msc_obj->max_msc_instances; i ++)
-        {
-            status = tivxKernelImgMosaicMscDrvDelete(
-                &msc_obj->inst_obj[i]);
-        }
-
-        tivxMemFree(msc_obj, sizeof(tivxImgMosaicMscObj), TIVX_MEM_EXTERNAL);
+        tivxKernelImgMosaicMscFreeMem(msc_obj);
     }
 
     return (status);
@@ -496,14 +478,12 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
     tivx_obj_desc_user_data_object_t *config_desc;
     void                             *config_target_ptr;
     tivx_obj_desc_image_t            *out_img_desc;
-    tivx_obj_desc_image_t            *in_img_desc;
     void                             *output_image_target_ptr[2U];
     vx_int32                          win, in, ch, msc_cnt;
     vx_int32                          num_inputs;
     tivxImgMosaicParams              *params;
     tivxImgMosaicMscObj              *msc_obj = NULL;
     vx_uint32                         size, num_inst;
-    uint32_t                         do_process[TIVX_IMAGE_MOSAIC_MSC_MAX_INST];
 
     status = tivxGetTargetKernelInstanceContext(kernel, (void **)&msc_obj, &size);
     if((VX_SUCCESS != status) || (NULL == msc_obj) ||  (sizeof(tivxImgMosaicMscObj) != size))
@@ -611,13 +591,13 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
         /* Map output image luma buffer */
         out_img_desc = (tivx_obj_desc_image_t *) obj_desc[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX];
         output_image_target_ptr[0U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[0U]);
-        tivxMemBufferMap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
+        tivxMemBufferMap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
 
         /* Map output image CbCr buffer */
         if(out_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
         {
             output_image_target_ptr[1U] = tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[1U]);
-            tivxMemBufferMap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
+            tivxMemBufferMap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
         }
 
         /* 0 - config, 1 - output image, 2 - background image, 3 onwards is array of inputs */
@@ -653,7 +633,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
                         (tivx_obj_desc_t **) &msc_obj->in_img_desc[msc_cnt][0U],
                         msc_obj->in_arr_desc[msc_cnt]->num_items);
 
-                    status = tivxKernelImgMosaicMscDrvPrepare(
+                    status = tivxKernelImgMosaicMscSimProcess(
                         &msc_obj->inst_obj[msc_cnt],
                         msc_obj->in_img_desc[msc_cnt][ch],
                         msc_obj->tmp_win[msc_cnt], out_img_desc);
@@ -665,71 +645,6 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
 
                     msc_obj->tmp_in_ch[msc_cnt] = in;
                     msc_obj->tmp_ch_sel[msc_cnt] = ch;
-                    do_process[msc_cnt] = 1;
-                }
-                else
-                {
-                    do_process[msc_cnt] = 0;
-                }
-            }
-            for (msc_cnt = 0u; (msc_cnt < num_inst) &&
-                    (VX_SUCCESS == status); msc_cnt ++)
-            {
-                if (do_process[msc_cnt])
-                {
-                    msc_obj->inst_obj[msc_cnt].time =
-                        tivxPlatformGetTimeInUsecs();
-                }
-            }
-
-            for (msc_cnt = 0u; (msc_cnt < num_inst) &&
-                    (VX_SUCCESS == status); msc_cnt ++)
-            {
-                if (do_process[msc_cnt])
-                {
-                    status = tivxKernelImgMosaicMscDrvSubmit(
-                        &msc_obj->inst_obj[msc_cnt]);
-                }
-            }
-
-            for (msc_cnt = 0u; (msc_cnt < num_inst) &&
-                    (VX_SUCCESS == status); msc_cnt ++)
-            {
-                if (do_process[msc_cnt])
-                {
-                    tivxKernelImgMosaicMscDrvWait(
-                        &msc_obj->inst_obj[msc_cnt]);
-                }
-            }
-
-            for (msc_cnt = 0u; (msc_cnt < num_inst) &&
-                    (VX_SUCCESS == status); msc_cnt ++)
-            {
-                if (do_process[msc_cnt])
-                {
-                    status = tivxKernelImgMosaicMscDrvGetReq(
-                        &msc_obj->inst_obj[msc_cnt]);
-                }
-            }
-
-            for (msc_cnt = 0u; (msc_cnt < num_inst) &&
-                    (VX_SUCCESS == status); msc_cnt ++)
-            {
-                if (do_process[msc_cnt])
-                {
-                    msc_obj->inst_obj[msc_cnt].time =
-                        tivxPlatformGetTimeInUsecs() - msc_obj->inst_obj[msc_cnt].time;
-
-                    ch = msc_obj->tmp_win[msc_cnt]->channel_select;
-
-                    in_img_desc = msc_obj->in_img_desc[msc_cnt][ch];
-                    size = (in_img_desc->imagepatch_addr[0].dim_x *
-                        in_img_desc->imagepatch_addr[0].dim_y) +
-                        (in_img_desc->imagepatch_addr[1].dim_x *
-                        in_img_desc->imagepatch_addr[1].dim_y);
-
-                    appPerfStatsHwaUpdateLoad(msc_obj->app_hwa_inst_id[msc_cnt],
-                        msc_obj->inst_obj[msc_cnt].time, size/* pixels processed */);
                 }
             }
 
@@ -743,10 +658,10 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
         tivxMemBufferUnmap(config_target_ptr, config_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
 
         /* unmap output buffer */
-        tivxMemBufferUnmap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
+        tivxMemBufferUnmap(output_image_target_ptr[0U], out_img_desc->mem_size[0U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
         if(out_img_desc->mem_ptr[1U].shared_ptr != (uint64_t)NULL)
         {
-            tivxMemBufferUnmap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], TIVX_MEMORY_TYPE_DMA, VX_WRITE_ONLY);
+            tivxMemBufferUnmap(output_image_target_ptr[1U], out_img_desc->mem_size[1U], VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
         }
     }
 
@@ -757,453 +672,375 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscProcess(
 /*                              Local Functions                               */
 /* ========================================================================== */
 
-static vx_status tivxKernelImgMosaicMscDrvCreate(tivxImgMosaicMscInstObj *inst_obj, uint32_t inst_id)
+static void tivxKernelImgMosaicMscFreeMem(tivxImgMosaicMscObj *msc_obj)
 {
-    vx_status   status = VX_SUCCESS;
+    uint32_t i;
 
-    /* Hard code to first instance */
-    inst_obj->msc_drv_inst_id = inst_id;
-
-    Vhwa_M2mMscCreatePrmsInit(&inst_obj->createArgs);
-    status = tivxEventCreate(&inst_obj->wait_for_compl);
-    if(VX_SUCCESS == status)
+    if (NULL != msc_obj)
     {
-        inst_obj->cbPrms.cbFxn   = tivxKernelImgMosaicMscDrvCompCb;
-        inst_obj->cbPrms.appData = inst_obj;
-
-        inst_obj->handle = Fvid2_create(
-            FVID2_VHWA_M2M_MSC_DRV_ID,
-            inst_obj->msc_drv_inst_id,
-            &inst_obj->createArgs,
-            NULL,
-            &inst_obj->cbPrms);
-        if(NULL == inst_obj->handle)
+        for( i = 0; i < 2; i++)
         {
-            VX_PRINT(VX_ZONE_ERROR, "Fvid2_create failed\n");
-            status = VX_ERROR_NO_RESOURCES;
+            if (NULL != msc_obj->src16[i])
+            {
+                tivxMemFree(msc_obj->src16[i], msc_obj->buffer_size_in, (vx_enum)TIVX_MEM_EXTERNAL);
+                msc_obj->src16[i] = NULL;
+            }
+            if (NULL != msc_obj->dst16[i])
+            {
+                tivxMemFree(msc_obj->dst16[i], msc_obj->buffer_size_out, (vx_enum)TIVX_MEM_EXTERNAL);
+                msc_obj->dst16[i] = NULL;
+            }
         }
-        else
+
+        for (i = 0u; i < msc_obj->max_msc_instances; i ++)
         {
-            Fvid2Frame_init(&inst_obj->inFrm);
-            Fvid2Frame_init(&inst_obj->outFrm);
+            msc_obj->inst_obj[i].src16[0] = NULL;
+            msc_obj->inst_obj[i].src16[1] = NULL;
+            msc_obj->inst_obj[i].dst16[0] = NULL;
+            msc_obj->inst_obj[i].dst16[1] = NULL;
         }
-    }
-    else
-    {
-        VX_PRINT(VX_ZONE_ERROR, "Failed to allocate Event\n");
-    }
 
-    return (status);
-}
-
-static vx_status tivxKernelImgMosaicMscDrvDelete(tivxImgMosaicMscInstObj *inst_obj)
-{
-    vx_status   status = VX_SUCCESS;
-
-    if(NULL != inst_obj->handle)
-    {
-        Fvid2_delete(inst_obj->handle, NULL);
-        inst_obj->handle = NULL;
+        tivxMemFree(msc_obj, sizeof(tivxImgMosaicMscObj), (vx_enum)TIVX_MEM_EXTERNAL);
     }
-    if(NULL != inst_obj->wait_for_compl)
-    {
-        tivxEventDelete(&inst_obj->wait_for_compl);
-        inst_obj->wait_for_compl = NULL;
-    }
-
-    return (status);
 }
 
 /* ========================================================================== */
 /*                    Control Command Implementation                          */
 /* ========================================================================== */
 
-static vx_status tivxKernelImgMosaicMscSetCoeffsCmd(tivxImgMosaicMscObj *msc_obj)
-{
-    vx_status                         status = VX_SUCCESS;
-    int32_t                           fvid2_status = FVID2_SOK;
-    uint32_t                          cnt;
-    tivx_vpac_msc_coefficients_t      coeffs;
-    Msc_Coeff                        *coeffCfg;
 
-    scale_set_coeff(&coeffs, VX_INTERPOLATION_BILINEAR);
-
-    coeffCfg = &msc_obj->coeffCfg;
-
-    Msc_coeffInit(coeffCfg);
-
-    for (cnt = 0u; cnt < MSC_MAX_SP_COEFF_SET; cnt ++)
-    {
-        coeffCfg->spCoeffSet[cnt] = &coeffs.single_phase[cnt][0u];
-    }
-
-    for (cnt = 0u; cnt < MSC_MAX_MP_COEFF_SET; cnt ++)
-    {
-        coeffCfg->mpCoeffSet[cnt] = &coeffs.multi_phase[cnt][0u];
-    }
-
-    if (VX_SUCCESS == status)
-    {
-        fvid2_status = Fvid2_control(msc_obj->inst_obj[0u].handle, VHWA_M2M_IOCTL_MSC_SET_COEFF,
-            coeffCfg, NULL);
-        if (FVID2_SOK != fvid2_status)
-        {
-            VX_PRINT(VX_ZONE_ERROR,
-                "tivxKernelImgMosaicMscSetCoeffsCmd: Failed to create coefficients\n");
-            status = VX_FAILURE;
-        }
-    }
-
-    return (status);
-}
-
-
-static vx_status tivxKernelImgMosaicMscDrvPrepare(
+static vx_status tivxKernelImgMosaicMscSimProcess(
     tivxImgMosaicMscInstObj *inst_obj,
     const tivx_obj_desc_image_t *in_img_desc,
     const tivxImgMosaicWindow *window,
     const tivx_obj_desc_image_t* out_img_desc)
 {
     vx_status           status = VX_SUCCESS;
-    Vhwa_M2mMscParams  *msc_prms;
-    Fvid2_Format       *fmt;
-    Msc_ScConfig       *sc_cfg;
-    Fvid2_Frame        *frm;
-    uint32_t            plane_cnt;
+    uint32_t            plane_cnt, i;
     vx_uint32           startX, startY;
-    uint32_t            scIdx;
+    uint32_t ow;
+    uint32_t oh;
+    unsigned short *imgInput[2];
+    unsigned short *imgOutput[SCALER_NUM_PIPES] = {0};
 
-    msc_prms = &inst_obj->msc_prms;
-    Vhwa_m2mMscParamsInit(msc_prms);
+    if ((vx_status)VX_SUCCESS == status)
+    {
+        void *src_target_ptr;
 
-    /* Set input format */
-    fmt = &msc_prms->inFmt;
-    scIdx = inst_obj->scIdx;
-
-    if(in_img_desc->format == VX_DF_IMAGE_U8 ||in_img_desc->format == VX_DF_IMAGE_U16)
-    {
-        fmt->dataFormat = FVID2_DF_LUMA_ONLY;
-    }
-    else
-    {
-        fmt->dataFormat = FVID2_DF_YUV420SP_UV;
-    }
-
-    if(in_img_desc->format == VX_DF_IMAGE_U16)
-    {
-        fmt->ccsFormat  = FVID2_CCSF_BITS12_UNPACKED16;
-    }
-    else
-    {
-        fmt->ccsFormat  = FVID2_CCSF_BITS8_PACKED;
-    }
-
-    fmt->width      = in_img_desc->imagepatch_addr[0U].dim_x;
-    fmt->height     = in_img_desc->imagepatch_addr[0U].dim_y;
-    fmt->pitch[0U]  = in_img_desc->imagepatch_addr[0U].stride_y;
-    fmt->pitch[1U]  = in_img_desc->imagepatch_addr[1U].stride_y;
-
-    /* Set output format */
-    sc_cfg = &msc_prms->mscCfg.scCfg[scIdx];       /* Only one output used */
-    tivxKernelImgMosaicMscDrvSetScCfg(sc_cfg, in_img_desc, window);
-    fmt = &msc_prms->outFmt[scIdx];                /* Only one output used */
-
-    if(out_img_desc->format == VX_DF_IMAGE_U8 ||in_img_desc->format == VX_DF_IMAGE_U16)
-    {
-        fmt->dataFormat = FVID2_DF_LUMA_ONLY;
-    }
-    else
-    {
-        fmt->dataFormat = FVID2_DF_YUV420SP_UV;
-    }
-
-    if(out_img_desc->format == VX_DF_IMAGE_U16)
-    {
-        fmt->ccsFormat  = FVID2_CCSF_BITS12_UNPACKED16;
-    }
-    else
-    {
-        fmt->ccsFormat  = FVID2_CCSF_BITS8_PACKED;
-    }
-
-    fmt->width      = sc_cfg->outWidth;
-    fmt->height     = sc_cfg->outHeight;
-    /* Use the output overlay pitch */
-    fmt->pitch[0U]  = out_img_desc->imagepatch_addr[0U].stride_y;
-    fmt->pitch[1U]  = out_img_desc->imagepatch_addr[1U].stride_y;
-
-    status = Fvid2_control(
-        inst_obj->handle, VHWA_M2M_IOCTL_MSC_SET_PARAMS, msc_prms, NULL);
-    if(FVID2_SOK != status)
-    {
-        VX_PRINT(VX_ZONE_ERROR, "Fvid2_control Failed: Set Params\n");
-        status = VX_FAILURE;
-    }
-    else
-    {
-        status = VX_SUCCESS;
-    }
-
-    if(VX_SUCCESS == status)
-    {
-        frm = &inst_obj->inFrm;
-        for(plane_cnt = 0U; plane_cnt < TIVX_IMAGE_MOSAIC_MAX_PLANES; plane_cnt++)
+        for (i=0; (i < in_img_desc->planes) && (VX_SUCCESS == status); i++)
         {
-            frm->addr[plane_cnt] = tivxMemShared2PhysPtr(
-                in_img_desc->mem_ptr[plane_cnt].shared_ptr,
-                in_img_desc->mem_ptr[plane_cnt].mem_heap_region);
+            src_target_ptr = tivxMemShared2TargetPtr(&in_img_desc->mem_ptr[i]);
+            tivxCheckStatus(&status, tivxMemBufferMap(src_target_ptr, in_img_desc->mem_size[i],
+                (vx_enum)VX_MEMORY_TYPE_HOST, (vx_enum)VX_READ_ONLY));
+
+            /* C-model supports only 12-bit in uint16_t container
+             * So we may need to translate.  In HW, VPAC_LSE does this
+             */
+            lse_reformat_in(in_img_desc, src_target_ptr, inst_obj->src16[i], i, 0);
+
+            tivxCheckStatus(&status, tivxMemBufferUnmap(src_target_ptr, in_img_desc->mem_size[i],
+                (vx_enum)VX_MEMORY_TYPE_HOST, (vx_enum)VX_READ_ONLY));
+        }
+    }
+
+    if ((vx_status)VX_SUCCESS == status)
+    {
+        if(window->width > in_img_desc->imagepatch_addr[0U].dim_x)
+        {
+            /* Upscaling not supported - set MSC width same as input */
+            ow = in_img_desc->imagepatch_addr[0U].dim_x;
+        }
+        else
+        {
+            ow = window->width;
+        }
+        if(window->height > in_img_desc->imagepatch_addr[0U].dim_y)
+        {
+            /* Upscaling not supported - set MSC height same as input */
+            oh = in_img_desc->imagepatch_addr[0U].dim_y;
+        }
+        else
+        {
+            oh = window->height;
         }
 
+        inst_obj->user_init_phase_x = 0;//TIVX_VPAC_MSC_AUTOCOMPUTE;
+        inst_obj->user_init_phase_y = 0;//TIVX_VPAC_MSC_AUTOCOMPUTE;
+        inst_obj->user_offset_x =     0;//TIVX_VPAC_MSC_AUTOCOMPUTE;
+        inst_obj->user_offset_y =     0;//TIVX_VPAC_MSC_AUTOCOMPUTE;
+
+        /* Crop setting - same as input size */
+        if(window->enable_roi == 0)
+        {
+            inst_obj->user_crop_start_x = 0U;
+            inst_obj->user_crop_start_y = 0U;
+            inst_obj->crop_width = in_img_desc->imagepatch_addr[0U].dim_x;
+            inst_obj->crop_height = in_img_desc->imagepatch_addr[0U].dim_y;
+        }
+        else
+        {
+            inst_obj->user_crop_start_x = window->roiStartX;
+            inst_obj->user_crop_start_y = window->roiStartY;
+            inst_obj->crop_width = window->roiWidth;
+            inst_obj->crop_height = window->roiHeight;
+
+        }
+        status = tivxVpacMscScaleUpdateOutputSettings(inst_obj, ow, oh, 0, 1, in_img_desc->format);
+    }
+
+    if ((vx_status)VX_SUCCESS == status)
+    {
+        inst_obj->config.settings.G_inWidth[0] = in_img_desc->imagepatch_addr[0].dim_x;
+        inst_obj->config.settings.G_inHeight[0] = in_img_desc->imagepatch_addr[0].dim_y;
+
+        /* Is it enough to set for just 1 pipe in host-emulation mode? */
+        inst_obj->config.settings.unitParams[0].uvMode = 0;
+
+        imgInput[0] = inst_obj->src16[0];
+        imgOutput[0] = inst_obj->dst16[0];
+
+        scaler_top_processing(imgInput, imgOutput, &inst_obj->config.settings);
+    }
+
+    if (((vx_status)VX_SUCCESS == status) && (in_img_desc->format == (vx_df_image)VX_DF_IMAGE_NV12))
+    {
+        status = tivxVpacMscScaleUpdateOutputSettings(inst_obj, ow, oh/2, 0, 2, in_img_desc->format);
+
+        if ((vx_status)VX_SUCCESS == status)
+        {
+            inst_obj->config.settings.G_inWidth[0] = in_img_desc->imagepatch_addr[1].dim_x;
+            inst_obj->config.settings.G_inHeight[0] = in_img_desc->imagepatch_addr[1].dim_y / in_img_desc->imagepatch_addr[1].step_y;
+
+            /* Is it enough to set for just 1 pipe in host-emulation mode? */
+            inst_obj->config.settings.unitParams[0].uvMode = 1;
+
+            imgInput[0] = inst_obj->src16[1];
+            imgOutput[0] = inst_obj->dst16[1];
+
+            scaler_top_processing(imgInput, imgOutput, &inst_obj->config.settings);
+        }
+    }
+
+    if ((vx_status)VX_SUCCESS == status)
+    {
         /* Adjust start X/Y so that we center the input when input size is less
          * than the window size */
-        startX = window->startX + ((window->width  - sc_cfg->outWidth)  >> 1U);
-        startY = window->startY + ((window->height - sc_cfg->outHeight) >> 1U);
+        startX = window->startX + ((window->width  - ow)  >> 1U);
+        startY = window->startY + ((window->height - oh) >> 1U);
         startX = ((startX >> 1U) << 1U);    /* Make it even for YUV420SP */
         startY = ((startY >> 1U) << 1U);    /* Make it even for YUV420SP */
-        frm = &inst_obj->outFrm;
-        for(plane_cnt = 0U; plane_cnt < TIVX_IMAGE_MOSAIC_MAX_PLANES; plane_cnt++)
+
+        for(plane_cnt = 0U; plane_cnt < out_img_desc->planes; plane_cnt++)
         {
-            uint64_t    temp;
-            temp = tivxMemShared2PhysPtr(
-                       out_img_desc->mem_ptr[plane_cnt].shared_ptr,
-                       out_img_desc->mem_ptr[plane_cnt].mem_heap_region);
+            uint64_t    temp, out_addr;
+            tivx_obj_desc_image_t stub_in, stub_out;
+
+            stub_in.valid_roi.start_x = 0;
+            stub_in.valid_roi.start_y = 0;
+
+            memcpy(&stub_out, out_img_desc, sizeof(tivx_obj_desc_image_t));
+            stub_out.imagepatch_addr[plane_cnt].dim_x = window->width;
+            stub_out.imagepatch_addr[plane_cnt].dim_y = window->height;
+
+            /* Map output image luma buffer */
+            temp = (uint64_t)tivxMemShared2TargetPtr(&out_img_desc->mem_ptr[plane_cnt]);
+
             /* Manipulate output overlay pointer to point to right offset
              * to do scaling */
             if(0U == plane_cnt)
             {
-                frm->addr[plane_cnt] = temp +
+                out_addr = temp +
                     (startY * out_img_desc->imagepatch_addr[0U].stride_y) +
                     startX;
+                lse_reformat_out((const tivx_obj_desc_image_t *)&stub_in, (const tivx_obj_desc_image_t *)&stub_out, (void *)out_addr,
+                    inst_obj->dst16[plane_cnt], 12, 0);
             }
             else
             {
-                frm->addr[plane_cnt] = temp +
-                    ((startY >> 1U) * out_img_desc->imagepatch_addr[0U].stride_y) +
+               out_addr = temp +
+                    ((startY >> 1U) * out_img_desc->imagepatch_addr[1U].stride_y) +
                     startX;
+               lse_reformat_out((const tivx_obj_desc_image_t *)&stub_in, (const tivx_obj_desc_image_t *)&stub_out, (void *)out_addr,
+                    inst_obj->dst16[plane_cnt], 12, 1);
             }
         }
     }
-
     return (status);
 }
 
-static vx_status tivxKernelImgMosaicMscDrvSubmit(tivxImgMosaicMscInstObj *inst_obj)
-{
-    vx_status           status = VX_SUCCESS;
-
-    Fvid2FrameList_init(&inst_obj->inFrmList);
-    Fvid2FrameList_init(&inst_obj->outFrmList);
-
-    /* Set up Framelist */
-    inst_obj->inFrmList.numFrames = 1U;
-    inst_obj->inFrmList.frames[0U] = &inst_obj->inFrm;
-    inst_obj->outFrmList.numFrames = MSC_MAX_OUTPUT;
-    inst_obj->outFrmList.frames[inst_obj->scIdx] = &inst_obj->outFrm;
-
-    /* Submit MSC Request*/
-    status = Fvid2_processRequest(
-                 inst_obj->handle,
-                 &inst_obj->inFrmList,
-                 &inst_obj->outFrmList,
-                 FVID2_TIMEOUT_FOREVER);
-    if(FVID2_SOK != status)
-    {
-        VX_PRINT(VX_ZONE_ERROR, "Failed to Submit Request\n");
-        status = VX_FAILURE;
-    }
-
-    return (status);
-}
-
-static void tivxKernelImgMosaicMscDrvWait(tivxImgMosaicMscInstObj *inst_obj)
-{
-    /* Wait for Frame Completion */
-    tivxEventWait(inst_obj->wait_for_compl, TIVX_EVENT_TIMEOUT_WAIT_FOREVER);
-}
-
-static vx_status tivxKernelImgMosaicMscDrvGetReq(tivxImgMosaicMscInstObj *inst_obj)
-{
-    vx_status           status = VX_SUCCESS;
-
-    status = Fvid2_getProcessedRequest(
-                 inst_obj->handle,
-                 &inst_obj->inFrmList,
-                 &inst_obj->outFrmList,
-                 0U);
-    if(FVID2_SOK != status)
-    {
-        VX_PRINT(VX_ZONE_ERROR, "Failed to Get Processed Request\n");
-        /* status = VX_FAILURE; */
-    }
-
-    return (status);
-}
-
-static void tivxKernelImgMosaicMscDrvSetScCfg(
-    Msc_ScConfig *sc_cfg,
-    const tivx_obj_desc_image_t *in_img_desc,
-    const tivxImgMosaicWindow *window)
-{
-    sc_cfg->enable = TRUE;
-    if(window->width > in_img_desc->imagepatch_addr[0U].dim_x)
-    {
-        /* Upscaling not supported - set MSC width same as input */
-        sc_cfg->outWidth = in_img_desc->imagepatch_addr[0U].dim_x;
-    }
-    else
-    {
-        sc_cfg->outWidth = window->width;
-    }
-    if(window->height > in_img_desc->imagepatch_addr[0U].dim_y)
-    {
-        /* Upscaling not supported - set MSC height same as input */
-        sc_cfg->outHeight = in_img_desc->imagepatch_addr[0U].dim_y;
-    }
-    else
-    {
-        sc_cfg->outHeight = window->height;
-    }
-    /* Crop setting - same as input size */
-    if(window->enable_roi == 0)
-    {
-        sc_cfg->inRoi.cropStartX = 0U;
-        sc_cfg->inRoi.cropStartY = 0U;
-        sc_cfg->inRoi.cropWidth  = in_img_desc->imagepatch_addr[0U].dim_x;
-        sc_cfg->inRoi.cropHeight = in_img_desc->imagepatch_addr[0U].dim_y;
-    }
-    else
-    {
-        sc_cfg->inRoi.cropStartX = window->roiStartX;
-        sc_cfg->inRoi.cropStartY = window->roiStartY;
-        sc_cfg->inRoi.cropWidth  = window->roiWidth;
-        sc_cfg->inRoi.cropHeight = window->roiHeight;
-    }
-
-    /* For Scale, multi phase coefficients are used. */
-    sc_cfg->filtMode     = MSC_FILTER_MODE_MULTI_PHASE;
-    sc_cfg->phaseMode    = MSC_PHASE_MODE_64PHASE;
-    sc_cfg->hsMpCoeffSel = MSC_MULTI_64PHASE_COEFF_SET_0;
-    sc_cfg->vsMpCoeffSel = MSC_MULTI_64PHASE_COEFF_SET_0;
-    sc_cfg->coeffShift   = MSC_COEFF_SHIFT_8;
-}
-
-static void scale_set_coeff(
-    tivx_vpac_msc_coefficients_t *coeff,
-    uint32_t interpolation)
+static void tivxVpacMscScaleInitParams(Scaler_Config *settings)
 {
     uint32_t i;
-    uint32_t idx;
     uint32_t weight;
-
-    idx = 0;
-    coeff->single_phase[0][idx++] = 0;
-    coeff->single_phase[0][idx++] = 0;
-    coeff->single_phase[0][idx++] = 256;
-    coeff->single_phase[0][idx++] = 0;
-    coeff->single_phase[0][idx++] = 0;
-    idx = 0;
-    coeff->single_phase[1][idx++] = 0;
-    coeff->single_phase[1][idx++] = 0;
-    coeff->single_phase[1][idx++] = 256;
-    coeff->single_phase[1][idx++] = 0;
-    coeff->single_phase[1][idx++] = 0;
-
-    if(VX_INTERPOLATION_BILINEAR == interpolation)
+    /* Coefficients for Bilinear Interpolation */
+    for(i=0; i<32; i++)
     {
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            weight = i<<2;
-            coeff->multi_phase[0][idx++] = 0;
-            coeff->multi_phase[0][idx++] = 0;
-            coeff->multi_phase[0][idx++] = 256-weight;
-            coeff->multi_phase[0][idx++] = weight;
-            coeff->multi_phase[0][idx++] = 0;
-        }
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            weight = (i+32)<<2;
-            coeff->multi_phase[1][idx++] = 0;
-            coeff->multi_phase[1][idx++] = 0;
-            coeff->multi_phase[1][idx++] = 256-weight;
-            coeff->multi_phase[1][idx++] = weight;
-            coeff->multi_phase[1][idx++] = 0;
-        }
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            weight = i<<2;
-            coeff->multi_phase[2][idx++] = 0;
-            coeff->multi_phase[2][idx++] = 0;
-            coeff->multi_phase[2][idx++] = 256-weight;
-            coeff->multi_phase[2][idx++] = weight;
-            coeff->multi_phase[2][idx++] = 0;
-        }
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            weight = (i+32)<<2;
-            coeff->multi_phase[3][idx++] = 0;
-            coeff->multi_phase[3][idx++] = 0;
-            coeff->multi_phase[3][idx++] = 256-weight;
-            coeff->multi_phase[3][idx++] = weight;
-            coeff->multi_phase[3][idx++] = 0;
-        }
+        weight = i<<2;
+        settings->coef_mp[0].matrix[i][0] = 0;
+        settings->coef_mp[0].matrix[i][1] = 0;
+        settings->coef_mp[0].matrix[i][2] = 256-weight;
+        settings->coef_mp[0].matrix[i][3] = weight;
+        settings->coef_mp[0].matrix[i][4] = 0;
     }
-    else /* STR_VX_INTERPOLATION_NEAREST_NEIGHBOR */
+    for(i=0; i<32; i++)
     {
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            coeff->multi_phase[0][idx++] = 0;
-            coeff->multi_phase[0][idx++] = 0;
-            coeff->multi_phase[0][idx++] = 256;
-            coeff->multi_phase[0][idx++] = 0;
-            coeff->multi_phase[0][idx++] = 0;
-        }
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            coeff->multi_phase[1][idx++] = 0;
-            coeff->multi_phase[1][idx++] = 0;
-            coeff->multi_phase[1][idx++] = 0;
-            coeff->multi_phase[1][idx++] = 256;
-            coeff->multi_phase[1][idx++] = 0;
-        }
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            coeff->multi_phase[2][idx++] = 0;
-            coeff->multi_phase[2][idx++] = 0;
-            coeff->multi_phase[2][idx++] = 256;
-            coeff->multi_phase[2][idx++] = 0;
-            coeff->multi_phase[2][idx++] = 0;
-        }
-        idx = 0;
-        for(i = 0; i < 32; i++)
-        {
-            coeff->multi_phase[3][idx++] = 0;
-            coeff->multi_phase[3][idx++] = 0;
-            coeff->multi_phase[3][idx++] = 0;
-            coeff->multi_phase[3][idx++] = 256;
-            coeff->multi_phase[3][idx++] = 0;
-        }
+        weight = (i+32)<<2;
+        settings->coef_mp[1].matrix[i][0] = 0;
+        settings->coef_mp[1].matrix[i][1] = 0;
+        settings->coef_mp[1].matrix[i][2] = 256-weight;
+        settings->coef_mp[1].matrix[i][3] = weight;
+        settings->coef_mp[1].matrix[i][4] = 0;
+    }
+    /* Coefficients for Nearest Neighbor */
+    for(i=0; i<32; i++)
+    {
+        settings->coef_mp[2].matrix[i][0] = 0;
+        settings->coef_mp[2].matrix[i][1] = 0;
+        settings->coef_mp[2].matrix[i][2] = 256;
+        settings->coef_mp[2].matrix[i][3] = 0;
+        settings->coef_mp[2].matrix[i][4] = 0;
+    }
+    for(i=0; i<32; i++)
+    {
+        settings->coef_mp[3].matrix[i][0] = 0;
+        settings->coef_mp[3].matrix[i][1] = 0;
+        settings->coef_mp[3].matrix[i][2] = 0;
+        settings->coef_mp[3].matrix[i][3] = 256;
+        settings->coef_mp[3].matrix[i][4] = 0;
+    }
+
+    /* Be default, 5-tap filter */
+    settings->cfg_Kernel[0].Sz_height = 5;
+    settings->cfg_Kernel[0].Tpad_sz = 2;
+    settings->cfg_Kernel[0].Bpad_sz = 2;
+
+    /* Initializing all scaler outputs to defaults */
+    for (i = 0u; i < SCALER_NUM_PIPES; i ++)
+    {
+        settings->unitParams[i].threadMap = 0;
+        settings->unitParams[i].coefShift = 8;
+
+        settings->unitParams[i].filter_mode = 1;
+
+        settings->unitParams[i].phase_mode = 0;
+        settings->unitParams[i].hs_coef_sel = 0;
+        settings->unitParams[i].vs_coef_sel = 0;
+
+        settings->unitParams[i].x_offset = 0;
+        settings->unitParams[i].y_offset = 0;
     }
 }
 
-/* ========================================================================== */
-/*                              Driver Callbacks                              */
-/* ========================================================================== */
 
-static int32_t tivxKernelImgMosaicMscDrvCompCb(Fvid2_Handle handle, void *appData)
+static vx_status tivxVpacMscScaleUpdateOutputSettings(tivxImgMosaicMscInstObj *prms, uint32_t ow, uint32_t oh, uint32_t cnt, uint32_t h_divider, vx_df_image format)
 {
-    tivxImgMosaicMscInstObj *inst_obj = (tivxImgMosaicMscInstObj *) appData;
+    vx_status status = (vx_status)VX_SUCCESS;
+    float temp_horzAccInit, temp_vertAccInit;
+    uint32_t int_horzAccInit, int_vertAccInit;
+    uint32_t temp_cropStartX, temp_cropStartY;
+    uint32_t iw = prms->crop_width;
+    uint32_t ih = prms->crop_height/h_divider;
+    uint32_t hzScale = (4096*iw+(ow>>1))/ow;
+    uint32_t vtScale = (4096*ih+(oh>>1))/oh;
 
-    if(NULL != inst_obj)
+    if(hzScale > 16384U)
     {
-        tivxEventPost(inst_obj->wait_for_compl);
+        VX_PRINT(VX_ZONE_ERROR,
+            "Output %d: max horizontal downscale exceeded, limit is 1/4\n", cnt);
+        status = (vx_status)VX_FAILURE;
     }
 
-    return FVID2_SOK;
+    if(vtScale > 16384U)
+    {
+        VX_PRINT(VX_ZONE_ERROR,
+            "Output %d: max vertical downscale exceeded, limit is 1/4\n", cnt);
+        status = (vx_status)VX_FAILURE;
+    }
+
+    prms->config.settings.unitParams[cnt].outWidth = ow;
+    prms->config.settings.unitParams[cnt].outHeight = oh;
+    prms->config.settings.unitParams[cnt].hzScale = hzScale;
+    prms->config.settings.unitParams[cnt].vtScale = vtScale;
+
+    if((TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_offset_x) ||
+       (TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_init_phase_x))
+    {
+        temp_horzAccInit = (((((float)iw/(float)ow) * 0.5f) - 0.5f) * 4096.0f) + 0.5f;
+        int_horzAccInit = (uint32_t)temp_horzAccInit;
+        temp_cropStartX = 0;
+        if(int_horzAccInit > 4095U)
+        {
+            int_horzAccInit -= 4096U;
+            temp_cropStartX = 1U;
+        }
+
+        if(TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_init_phase_x)
+        {
+            prms->config.settings.unitParams[cnt].initPhaseX = int_horzAccInit;
+        }
+        else
+        {
+            prms->config.settings.unitParams[cnt].initPhaseX = prms->user_init_phase_x;
+        }
+
+        if(TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_offset_x)
+        {
+            prms->config.settings.unitParams[cnt].x_offset = prms->user_crop_start_x + temp_cropStartX;
+        }
+        else
+        {
+            prms->config.settings.unitParams[cnt].x_offset = prms->user_crop_start_x + prms->user_offset_x;
+        }
+
+        /* TIOVX-1129: If NV12, x_offset should be an even number to not flip the chroma channels */
+        if ((format == (vx_df_image)VX_DF_IMAGE_NV12) && ((prms->config.settings.unitParams[cnt].x_offset & 1U) == 1U))
+        {
+            prms->config.settings.unitParams[cnt].x_offset--;
+            prms->config.settings.unitParams[cnt].initPhaseX = 4095U;
+        }
+    }
+    else
+    {
+        prms->config.settings.unitParams[cnt].initPhaseX = prms->user_init_phase_x;
+        prms->config.settings.unitParams[cnt].x_offset = prms->user_crop_start_x + prms->user_offset_x;
+    }
+
+    if((TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_offset_y) ||
+       (TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_init_phase_y))
+    {
+        temp_vertAccInit = (((((float)ih/(float)oh) * 0.5f) - 0.5f) * 4096.0f) + 0.5f;
+        int_vertAccInit = (uint32_t)temp_vertAccInit;
+        temp_cropStartY = 0;
+        if(int_vertAccInit > 4095U)
+        {
+            int_vertAccInit -= 4096U;
+            temp_cropStartY = 1U;
+        }
+
+        if(TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_init_phase_y)
+        {
+            prms->config.settings.unitParams[cnt].initPhaseY = int_vertAccInit;
+        }
+        else
+        {
+            prms->config.settings.unitParams[cnt].initPhaseY = prms->user_init_phase_y;
+        }
+
+        if(TIVX_VPAC_MSC_AUTOCOMPUTE == prms->user_offset_y)
+        {
+            prms->config.settings.unitParams[cnt].y_offset = prms->user_crop_start_y + temp_cropStartY;
+        }
+        else
+        {
+            prms->config.settings.unitParams[cnt].y_offset = prms->user_crop_start_y + prms->user_offset_y;
+        }
+    }
+    else
+    {
+        prms->config.settings.unitParams[cnt].initPhaseY = prms->user_init_phase_y;
+        prms->config.settings.unitParams[cnt].y_offset = prms->user_crop_start_y + prms->user_offset_y;
+    }
+
+    return status;
 }
+
