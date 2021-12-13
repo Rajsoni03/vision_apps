@@ -510,143 +510,143 @@ void drawDetections(PostProcObj *postProcObj, vx_object_array output_tensor_arr,
 
     for(ch = 0; ch < NUM_CH; ch++)
     {
-      start[0] = start[1] = start[2] = start[3] = 0;
+        start[0] = start[1] = start[2] = start[3] = 0;
 
-      output_sizes[0] = postProcObj->params.num_max_det;
-      output_sizes[1] = postProcObj->params.points_per_line*\
-                        postProcObj->params.num_keypoints*2;
+        output_sizes[0] = postProcObj->params.num_max_det;
+        output_sizes[1] = postProcObj->params.points_per_line*\
+                            postProcObj->params.num_keypoints*2;
 
-      output_strides[0] = 1;
-      output_strides[1] = postProcObj->params.points_per_line*\
-                          postProcObj->params.num_keypoints*2;
+        output_strides[0] = 1;
+        output_strides[1] = postProcObj->params.points_per_line*\
+                            postProcObj->params.num_keypoints*2;
 
-      vx_tensor kp_tensor = (vx_tensor)vxGetObjectArrayItem((vx_object_array)postProcObj->kp_tensor_arr, ch);
-      status = vxGetStatus((vx_reference)kp_tensor);
-      if (VX_SUCCESS == status)
-      {
-        tivxMapTensorPatch(kp_tensor, 2, start, output_sizes, &map_id_kp, output_strides, (void**)&kp_ptr, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
-      }
+        vx_tensor kp_tensor = (vx_tensor)vxGetObjectArrayItem((vx_object_array)postProcObj->kp_tensor_arr, ch);
+        status = vxGetStatus((vx_reference)kp_tensor);
+        if (VX_SUCCESS == status)
+        {
+            tivxMapTensorPatch(kp_tensor, 2, start, output_sizes, &map_id_kp, output_strides, (void**)&kp_ptr, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
+        }
 
-      vx_tensor kp_valid = (vx_tensor)vxGetObjectArrayItem((vx_object_array)postProcObj->kp_valid_arr, ch);
-      status = vxGetStatus((vx_reference)kp_valid);
-      if (VX_SUCCESS == status)
-      {
-        tivxMapTensorPatch(kp_valid, 1, start, output_sizes, &map_id_kp_valid, output_strides, (void**)&kp_valid_ptr, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
-      }
+        vx_tensor kp_valid = (vx_tensor)vxGetObjectArrayItem((vx_object_array)postProcObj->kp_valid_arr, ch);
+        status = vxGetStatus((vx_reference)kp_valid);
+        if (VX_SUCCESS == status)
+        {
+            tivxMapTensorPatch(kp_valid, 1, start, output_sizes, &map_id_kp_valid, output_strides, (void**)&kp_valid_ptr, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
+        }
 
-      output_sizes[0] = ioBufDesc->outWidth[0]  + ioBufDesc->outPadL[0] + ioBufDesc->outPadR[0];
-      output_sizes[1] = ioBufDesc->outHeight[0] + ioBufDesc->outPadT[0] + ioBufDesc->outPadB[0];
-      output_sizes[2] = ioBufDesc->outNumChannels[0];
+        output_sizes[0] = ioBufDesc->outWidth[0]  + ioBufDesc->outPadL[0] + ioBufDesc->outPadR[0];
+        output_sizes[1] = ioBufDesc->outHeight[0] + ioBufDesc->outPadT[0] + ioBufDesc->outPadB[0];
+        output_sizes[2] = ioBufDesc->outNumChannels[0];
 
-      vx_tensor output_tensor = (vx_tensor)vxGetObjectArrayItem((vx_object_array)output_tensor_arr, ch);
-      status = vxGetStatus((vx_reference)output_tensor);
+        vx_tensor output_tensor = (vx_tensor)vxGetObjectArrayItem((vx_object_array)output_tensor_arr, ch);
+        status = vxGetStatus((vx_reference)output_tensor);
 
-      if (VX_SUCCESS == status)
-      {
-          void *output_buffer;
+        if (VX_SUCCESS == status)
+        {
+            void *output_buffer;
 
-          TIDL_ODLayerHeaderInfo *pHeader;
-          TIDL_ODLayerObjInfo *pObjInfo;
-          vx_float32*pOut;
-          vx_uint32 numObjs;
-          TIDL_ODLayerObjInfo * pPSpots;
-          vx_int32 total_points_per_box;
-          vx_int32 occupied, unoccupied, background;
+            TIDL_ODLayerHeaderInfo *pHeader;
+            TIDL_ODLayerObjInfo *pObjInfo;
+            vx_float32*pOut;
+            vx_uint32 numObjs;
+            TIDL_ODLayerObjInfo * pPSpots;
+            vx_int32 total_points_per_box;
+            vx_int32 occupied, unoccupied, background;
 
-          output_strides[0] = 1;
-          output_strides[1] = output_sizes[0];
-          output_strides[2] = output_sizes[1] * output_strides[1];
+            output_strides[0] = 1;
+            output_strides[1] = output_sizes[0];
+            output_strides[2] = output_sizes[1] * output_strides[1];
 
-          tivxMapTensorPatch(output_tensor, 3, start, output_sizes, &map_id_output, output_strides, &output_buffer, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
+            tivxMapTensorPatch(output_tensor, 3, start, output_sizes, &map_id_output, output_strides, &output_buffer, VX_READ_ONLY, VX_MEMORY_TYPE_HOST);
 
-          pOut   = (vx_float32*)output_buffer + (ioBufDesc->outPadT[0] * output_sizes[0]) + ioBufDesc->outPadL[0];
-          pHeader  = (TIDL_ODLayerHeaderInfo *)pOut;
-          pObjInfo = (TIDL_ODLayerObjInfo *)((uint8_t *)pOut + (vx_uint32)pHeader->objInfoOffset);
-          numObjs  = (vx_uint32)pHeader->numDetObjects;
+            pOut     = (vx_float32*)output_buffer + (ioBufDesc->outPadT[0] * output_sizes[0]) + ioBufDesc->outPadL[0];
+            pHeader  = (TIDL_ODLayerHeaderInfo *)pOut;
+            pObjInfo = (TIDL_ODLayerObjInfo *)((uint8_t *)pOut + (vx_uint32)pHeader->objInfoOffset);
+            numObjs  = (vx_uint32)pHeader->numDetObjects;
 
-          total_points_per_box = postProcObj->params.num_keypoints * postProcObj->params.points_per_line;
+            total_points_per_box = postProcObj->params.num_keypoints * postProcObj->params.points_per_line;
 
-          occupied = 0;
-          unoccupied = 0;
-          background = 0;
-          for (i = 0; i < numObjs; i++)
-          {
-            pPSpots = (TIDL_ODLayerObjInfo *) ((uint8_t *)pObjInfo + (i * ((vx_uint32)pHeader->objInfoSize)));
-              if(pPSpots->score >= viz_th)
-              {
-                if(pPSpots->label == 2) occupied++;
-                else if (pPSpots->label == 1) unoccupied++;
-                else background++;
-              }
-          }
-
-          tivxUnmapTensorPatch(output_tensor, map_id_output);
-
-          vx_image input_image  = (vx_image)vxGetObjectArrayItem((vx_object_array)input_image_arr, ch);
-          status = vxGetStatus((vx_reference)input_image);
-
-          if(VX_SUCCESS == status)
-          {
-            vx_rectangle_t rect;
-            vx_imagepatch_addressing_t image_addr;
-            vx_map_id map_id_1;
-            vx_map_id map_id_2;
-            void * data_ptr_1;
-            void * data_ptr_2;
-            vx_uint32  img_width;
-            vx_uint32  img_height;
-
-            vxQueryImage(input_image, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
-            vxQueryImage(input_image, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
-
-            rect.start_x = 0;
-            rect.start_y = 0;
-            rect.end_x = img_width;
-            rect.end_y = img_height;
-            status = vxMapImagePatch(input_image,
-                                     &rect,
-                                     0,
-                                     &map_id_1,
-                                     &image_addr,
-                                     &data_ptr_1,
-                                     VX_READ_ONLY,
-                                     VX_MEMORY_TYPE_HOST,
-                                     VX_NOGAP_X);
-
-            rect.start_x = 0;
-            rect.start_y = 0;
-            rect.end_x = img_width;
-            rect.end_y = img_height / 2;
-            status = vxMapImagePatch(input_image,
-                                     &rect,
-                                     1,
-                                     &map_id_2,
-                                     &image_addr,
-                                     &data_ptr_2,
-                                     VX_READ_ONLY,
-                                     VX_MEMORY_TYPE_HOST,
-                                     VX_NOGAP_X);
-
+            occupied = 0;
+            unoccupied = 0;
+            background = 0;
             for (i = 0; i < numObjs; i++)
             {
-              pPSpots = (TIDL_ODLayerObjInfo *) ((uint8_t *)pObjInfo + (i * ((vx_uint32)pHeader->objInfoSize)));
-
-              /*Drawing of object for display purpose should be done only when score is high and key point valid flag is 1*/
-              /*For drawing purpose interpolated and post processed key points are used*/
-              if (NULL != kp_valid_ptr)
-              {
-                if((pPSpots->score >= 0.5) && (kp_valid_ptr[i] == 1) && (data_ptr_1 != 0x0) && (data_ptr_2 != 0x0))
+                pPSpots = (TIDL_ODLayerObjInfo *) ((uint8_t *)pObjInfo + (i * ((vx_uint32)pHeader->objInfoSize)));
+                if(pPSpots->score >= viz_th)
                 {
-                  drawPoints(postProcObj, data_ptr_1, data_ptr_2, &kp_ptr[i*total_points_per_box*2],total_points_per_box, pPSpots->label);
+                    if(pPSpots->label == 2) occupied++;
+                    else if (pPSpots->label == 1) unoccupied++;
+                    else background++;
                 }
-              }
             }
 
-            vxUnmapImagePatch(input_image, map_id_1);
-            vxUnmapImagePatch(input_image, map_id_2);
-          }
+            tivxUnmapTensorPatch(output_tensor, map_id_output);
 
-          vxReleaseImage(&input_image);
+            vx_image input_image  = (vx_image)vxGetObjectArrayItem((vx_object_array)input_image_arr, ch);
+            status = vxGetStatus((vx_reference)input_image);
+
+            if(VX_SUCCESS == status)
+            {
+                vx_rectangle_t rect;
+                vx_imagepatch_addressing_t image_addr;
+                vx_map_id map_id_1;
+                vx_map_id map_id_2;
+                void * data_ptr_1;
+                void * data_ptr_2;
+                vx_uint32  img_width;
+                vx_uint32  img_height;
+
+                vxQueryImage(input_image, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+                vxQueryImage(input_image, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+
+                rect.start_x = 0;
+                rect.start_y = 0;
+                rect.end_x = img_width;
+                rect.end_y = img_height;
+                status = vxMapImagePatch(input_image,
+                                        &rect,
+                                        0,
+                                        &map_id_1,
+                                        &image_addr,
+                                        &data_ptr_1,
+                                        VX_READ_ONLY,
+                                        VX_MEMORY_TYPE_HOST,
+                                        VX_NOGAP_X);
+
+                rect.start_x = 0;
+                rect.start_y = 0;
+                rect.end_x = img_width;
+                rect.end_y = img_height / 2;
+                status = vxMapImagePatch(input_image,
+                                        &rect,
+                                        1,
+                                        &map_id_2,
+                                        &image_addr,
+                                        &data_ptr_2,
+                                        VX_READ_ONLY,
+                                        VX_MEMORY_TYPE_HOST,
+                                        VX_NOGAP_X);
+
+                for (i = 0; i < numObjs; i++)
+                {
+                    pPSpots = (TIDL_ODLayerObjInfo *) ((uint8_t *)pObjInfo + (i * ((vx_uint32)pHeader->objInfoSize)));
+
+                    /*Drawing of object for display purpose should be done only when score is high and key point valid flag is 1*/
+                    /*For drawing purpose interpolated and post processed key points are used*/
+                    if (NULL != kp_valid_ptr)
+                    {
+                        if((pPSpots->score >= 0.5) && (kp_valid_ptr[i] == 1) && (data_ptr_1 != 0x0) && (data_ptr_2 != 0x0))
+                        {
+                            drawPoints(postProcObj, data_ptr_1, data_ptr_2, &kp_ptr[i*total_points_per_box*2],total_points_per_box, pPSpots->label);
+                        }
+                    }
+                }
+
+                vxUnmapImagePatch(input_image, map_id_1);
+                vxUnmapImagePatch(input_image, map_id_2);
+            }
+
+            vxReleaseImage(&input_image);
         }
 
         tivxUnmapTensorPatch(kp_tensor, map_id_kp);

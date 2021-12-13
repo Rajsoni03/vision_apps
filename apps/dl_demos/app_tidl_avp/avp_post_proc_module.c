@@ -435,7 +435,6 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
                 tivxMemFree(pCb, (img_width * img_height)/4, TIVX_MEM_EXTERNAL);
                 tivxMemFree(pCr, (img_width * img_height)/4, TIVX_MEM_EXTERNAL);
             }
-
             vxUnmapImagePatch(output, map_id_2);
         }
 
@@ -445,7 +444,6 @@ vx_status writePostProcOutput(char* file_name, vx_object_array output_arr)
 
     return(status);
 }
-
 void drawDetections(PostProcObj *postProcObj, vx_object_array output_tensor_arr, vx_object_array input_image_arr, vx_float32 viz_th)
 {
     vx_status status = VX_SUCCESS;
