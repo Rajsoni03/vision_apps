@@ -86,8 +86,8 @@ static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
     vx_df_image output_fmt;
 
     vx_image background = NULL;
-    vx_uint32 background_width, background_height;
-    vx_df_image background_fmt;
+    vx_uint32 background_width = 0, background_height = 0;
+    vx_df_image background_fmt = VX_DF_IMAGE_U8;
 
     if (   (NULL == parameters[TIVX_IMG_MOSAIC_HOST_CONFIG_IDX])
         || (NULL == parameters[TIVX_IMG_MOSAIC_HOST_OUTPUT_IMAGE_IDX])
