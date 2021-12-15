@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.00.00</h2>
+<h2 align='center'>Version: 08.01.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -136,7 +136,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li>TI-RTOS on C7x and C6x, <strong>Free RTOS</strong> on R5F and Linux or QNX on A72</li>
+    <li> <strong>Free RTOS</strong> on C7x, C6x on R5F and Linux or QNX on A72</li>
     <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C6x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
     <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
     </ul>
@@ -256,48 +256,56 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-4902</td>
-<td align="left"><span>Mosaic node performance inefficiency</span></td>
+<td align="center">ADASVISION-5069</td>
+<td align="left"><span>hex number to show registered sensor drivers</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4869</td>
-<td align="left"><span>Single camera app fails for low resolution cameras</span></td>
+<td align="center">ADASVISION-5068</td>
+<td align="left"><span>Duplicate log in single cam app in PSDKR v8.0</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4797</td>
-<td align="left"><span>vx_image_preprocessing_target.c does not release DMA memory</span></td>
+<td align="center">ADASVISION-5044</td>
+<td align="left"><span>Multi cam app error with enable_error_detection flag</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4786</td>
-<td align="left"><span>Number of items not set in GPU LUT kernel</span></td>
+<td align="center">ADASVISION-5028</td>
+<td align="left"><span>appSplitVpacDcc() is incorrectly checking for allocated buffers</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4775</td>
-<td align="left"><span>SFM app has several garbage collection warnings at end of test</span></td>
+<td align="center">ADASVISION-5014</td>
+<td align="left"><span>IPC resource table should use RPMSG_VRING_ADDR_ANY</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4771</td>
-<td align="left"><span>[ImgPreProc]: Node hangs for RGB-Interleaved to RGB-Planar conversion</span></td>
+<td align="center">ADASVISION-4992</td>
+<td align="left"><span>Remote Device: RPMessage heap is sized wrong and is causing heap corruption of Rx messages</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4744</td>
-<td align="left"><span>writeScalerOutput does not honor stride parameter</span></td>
+<td align="center">ADASVISION-4980</td>
+<td align="left"><span>IPC Utils: RPMessage heap is sized wrong and is causing heap corruption of Rx messages</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4743</td>
-<td align="left"><span>QNX: VisionApps MCU1_0 IPC Not Working in SPL Boot</span></td>
+<td align="center">ADASVISION-4927</td>
+<td align="left"><span>CPU Load values in free RTOS is inconsistent</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4738</td>
-<td align="left"><span>multicam app : Incorrect mapping of camera channels to CSI2 virtual channels</span></td>
+<td align="center">ADASVISION-4926</td>
+<td align="left"><span>QNX: Ipc Init fail when invoking twice appCommonInit() in a process</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-4737</td>
-<td align="left"><span>Broken link in the vision apps documentation to logs</span></td>
+<td align="center">ADASVISION-4911</td>
+<td align="left"><span>C7x L2RAM heap size incorrect</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4577</td>
-<td align="left"><span>PTK SFM/Valet parking demos throw error</span></td>
+<td align="center">ADASVISION-4906</td>
+<td align="left"><span>Python tool for updating memory map does not generate free RTOS files</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-4777</td>
+<td align="left"><span>DOF app output differs between release vs debug on PC mode</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-4776</td>
+<td align="left"><span>SFM apps output differs for each run on PC mode</span></td>
 </tr>
 </tbody>
 </table>
@@ -315,12 +323,12 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10501">ADASVISION-4927</a></td>
-<td align="left"><span>CPU Load values in free RTOS is inconsistent</span></td>
+<td align="center">ADASVISION-5060</td>
+<td align="left"><span>Long duration run of vision apps tidl object detection demo hangs at high usage of A72</span></td>
 </tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10502">ADASVISION-4926</a></td>
-<td align="left"><span>QNX: Ipc Init fail when invoking twice appCommonInit() in a process</span></td>
+<tr class="odd">
+<td align="center">ADASVISION-5039</td>
+<td align="left"><span>TIDL preemption test fails when TIDL logs are used</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10503">ADASVISION-4925</a></td>
@@ -329,14 +337,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
 <td align="left"><span>Frozen frame running OpenVX graphs back to back </span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10507">ADASVISION-4911</a></td>
-<td align="left"><span>C7x L2RAM heap size incorrect</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10508">ADASVISION-4906</a></td>
-<td align="left"><span>Python tool for updating memory map does not generate free RTOS files</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10510">ADASVISION-4876</a></td>
@@ -357,18 +357,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10514">ADASVISION-4799</a></td>
 <td align="left"><span>QNX: SRV Broadcast Mode Unreliable</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10515">ADASVISION-4777</a></td>
-<td align="left"><span>DOF app output differs between release vs debug on PC mode</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10516">ADASVISION-4776</a></td>
-<td align="left"><span>SFM apps output differs for each run on PC mode</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-4570</td>
-<td align="left"><span>Fix remaining KW bugs in video codec lib</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10518">ADASVISION-4422</a></td>
