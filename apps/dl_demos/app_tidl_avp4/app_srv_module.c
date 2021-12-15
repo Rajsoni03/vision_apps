@@ -357,6 +357,9 @@ static void read_calmat_file( svCalmat_t *calmat, const char*fileName)
     FILE* f = 0;
     size_t sz;
     uint32_t  read_size;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
     printf ("Reading calmat file \n");
 
@@ -366,7 +369,19 @@ static void read_calmat_file( svCalmat_t *calmat, const char*fileName)
         return;
     }
 
-    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), fileName);
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
     if (sz > APP_MAX_FILE_PATH)
     {
         return;
@@ -430,6 +445,9 @@ static void read_lut_file(ldc_lensParameters *ldcParams, const char*fileName)
     uint32_t  read_size;
     FILE* f = 0;
     size_t sz;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
     if (!fileName)
     {
@@ -437,7 +455,19 @@ static void read_lut_file(ldc_lensParameters *ldcParams, const char*fileName)
         return;
     }
 
-    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), fileName);
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
     if (sz > APP_MAX_FILE_PATH)
     {
         return;

@@ -97,6 +97,12 @@ vx_status app_init_tidl_od(vx_context context, TIDLObj *tidlObj, char *objName)
     tidlObj->num_input_tensors  = num_input_tensors;
     tidlObj->num_output_tensors = num_output_tensors;
 
+    if ((tidlObj->num_input_tensors > APP_MAX_TENSORS) ||
+        (tidlObj->num_output_tensors> APP_MAX_TENSORS))
+    {
+        status = VX_FAILURE;
+    }
+
     if(status == VX_SUCCESS)
     {
         tidlObj->network = readNetwork(context, &tidlObj->network_file_path[0], &tidlObj->network_checksum[0]);
@@ -155,16 +161,20 @@ vx_status app_init_tidl_od(vx_context context, TIDLObj *tidlObj, char *objName)
         }
     }
 
-    createOutputTensors(context, tidlObj->config, output_tensors);
-    tidlObj->output1_tensor_arr  = vxCreateObjectArray(context, (vx_reference)output_tensors[0], NUM_CH);
-    vxReleaseTensor(&output_tensors[0]);
-
     if(status == VX_SUCCESS)
     {
+        createOutputTensors(context, tidlObj->config, output_tensors);
+        tidlObj->output1_tensor_arr  = vxCreateObjectArray(context, (vx_reference)output_tensors[0], NUM_CH);
+        vxReleaseTensor(&output_tensors[0]);
+
         tidlObj->kernel = tivxAddKernelTIDL(context, tidlObj->num_input_tensors, tidlObj->num_output_tensors);
         status = vxGetStatus((vx_reference)tidlObj->kernel);
     }
-    strcpy(tidlObj->objName, objName);
+
+    if(status == VX_SUCCESS)
+    {
+        strcpy(tidlObj->objName, objName);
+    }
 
     return status;
 }

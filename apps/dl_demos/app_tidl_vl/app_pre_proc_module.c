@@ -148,12 +148,21 @@ vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_use
     preProcObj->num_input_tensors  = ioBufDesc->numInputBuf;
     preProcObj->num_output_tensors = ioBufDesc->numOutputBuf;
 
-    createOutputTensors(context, config, output_tensors);
-
-    for(i = 0; i < preProcObj->num_input_tensors; i++)
+    if (preProcObj->num_input_tensors > APP_MAX_TENSORS)
     {
-        preProcObj->output_tensor_arr[i] = vxCreateObjectArray(context, (vx_reference)output_tensors[i], NUM_CH);
-        vxReleaseTensor(&output_tensors[i]);
+        status = VX_FAILURE;
+        printf("Error: preProcObj->num_input_tensors > APP_MAX_TENSORS \n");
+    }
+
+    if(VX_SUCCESS == status)
+    {
+        createOutputTensors(context, config, output_tensors);
+
+        for(i = 0; i < preProcObj->num_input_tensors; i++)
+        {
+            preProcObj->output_tensor_arr[i] = vxCreateObjectArray(context, (vx_reference)output_tensors[i], NUM_CH);
+            vxReleaseTensor(&output_tensors[i]);
+        }
     }
 
     return status;
@@ -282,7 +291,7 @@ static void createOutputTensors(vx_context context, vx_user_data_object config, 
                       (void **)&tidlParams, VX_READ_ONLY, VX_MEMORY_TYPE_HOST, 0);
 
     ioBufDesc = (sTIDL_IOBufDesc_t *)&tidlParams->ioBufDesc;
-    for(id = 0; id < ioBufDesc->numInputBuf; id++) 
+    for(id = 0; id < ioBufDesc->numInputBuf; id++)
     {
 
         input_sizes[0] = ioBufDesc->inWidth[id]  + ioBufDesc->inPadL[id] + ioBufDesc->inPadR[id];

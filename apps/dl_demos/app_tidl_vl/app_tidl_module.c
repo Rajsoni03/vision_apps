@@ -109,6 +109,12 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, tivxVisualLocaliza
     tidlObj->num_input_tensors  = num_input_tensors;
     tidlObj->num_output_tensors = num_output_tensors;
 
+    if ((tidlObj->num_input_tensors > APP_MAX_TENSORS) ||
+        (tidlObj->num_output_tensors> APP_MAX_TENSORS))
+    {
+        status = VX_FAILURE;
+    }
+
     if(status == VX_SUCCESS)
     {
         tidlObj->network = readNetwork(context, &tidlObj->network_file_path[0], &tidlObj->network_checksum[0]);
@@ -117,7 +123,7 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, tivxVisualLocaliza
 
     if(status == VX_SUCCESS)
     {
-    status = updateChecksums(tidlObj->config, &tidlObj->config_checksum[0], &tidlObj->network_checksum[0]);
+        status = updateChecksums(tidlObj->config, &tidlObj->config_checksum[0], &tidlObj->network_checksum[0]);
     }
 
     if(status == VX_SUCCESS)
@@ -161,39 +167,43 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, tivxVisualLocaliza
         }
     }
 
-#ifdef APP_TIDL_TRACE_DUMP
-    vx_user_data_object trace_data = vxCreateUserDataObject(context, "TIDL_traceData", TIVX_TIDL_TRACE_DATA_SIZE, NULL);
-    status = vxGetStatus((vx_reference)trace_data);
     if(status == VX_SUCCESS)
     {
-        tidlObj->trace_data_arr = vxCreateObjectArray(context, (vx_reference)trace_data, NUM_CH);
-        vxReleaseUserDataObject(&trace_data);
-    }
-    else
-    {
-        tidlObj->trace_data_arr = NULL;
-    }
+
+#ifdef APP_TIDL_TRACE_DUMP
+        vx_user_data_object trace_data = vxCreateUserDataObject(context, "TIDL_traceData", TIVX_TIDL_TRACE_DATA_SIZE, NULL);
+        status = vxGetStatus((vx_reference)trace_data);
+        if(status == VX_SUCCESS)
+        {
+            tidlObj->trace_data_arr = vxCreateObjectArray(context, (vx_reference)trace_data, NUM_CH);
+            vxReleaseUserDataObject(&trace_data);
+        }
+        else
+        {
+            tidlObj->trace_data_arr = NULL;
+        }
 #endif
 
-    for(i = 0; i < APP_TIDL_MAX_TENSORS; i++)
-    {
-        tidlObj->output_tensor_arr[i] = NULL;
-    }
+        for(i = 0; i < APP_TIDL_MAX_TENSORS; i++)
+        {
+            tidlObj->output_tensor_arr[i] = NULL;
+        }
 
-    createOutputTensors(context, tidlObj->config, output_tensors,
-                    desc_layer_name, score_layer_name,
-                    &params->lo_res_desc_lyr_id,
-                    &params->score_lyr_id,
-                    &params->lo_res_desc_elm_type,
-                    &params->score_lyr_elm_type,
-                    params->tidl_tensor_startx,
-                    params->tidl_tensor_pitch,
-                    &params->desc_plane_size);
+        createOutputTensors(context, tidlObj->config, output_tensors,
+                        desc_layer_name, score_layer_name,
+                        &params->lo_res_desc_lyr_id,
+                        &params->score_lyr_id,
+                        &params->lo_res_desc_elm_type,
+                        &params->score_lyr_elm_type,
+                        params->tidl_tensor_startx,
+                        params->tidl_tensor_pitch,
+                        &params->desc_plane_size);
 
-    for(i = 0; i < num_output_tensors; i++)
-    {
-        tidlObj->output_tensor_arr[i]  = vxCreateObjectArray(context, (vx_reference)output_tensors[i], NUM_CH);
-        vxReleaseTensor(&output_tensors[i]);
+        for(i = 0; i < num_output_tensors; i++)
+        {
+            tidlObj->output_tensor_arr[i]  = vxCreateObjectArray(context, (vx_reference)output_tensors[i], NUM_CH);
+            vxReleaseTensor(&output_tensors[i]);
+        }
     }
 
     if(status == VX_SUCCESS)
@@ -202,7 +212,10 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, tivxVisualLocaliza
         status = vxGetStatus((vx_reference)tidlObj->kernel);
     }
 
-    strcpy(tidlObj->objName, objName);
+    if(status == VX_SUCCESS)
+    {
+        strcpy(tidlObj->objName, objName);
+    }
 
     return status;
 }
@@ -706,7 +719,7 @@ static void createOutputTensors(vx_context context, vx_user_data_object config, 
 
     ioBufDesc = (sTIDL_IOBufDesc_t *)&tidlParams->ioBufDesc;
 
-    for(id = 0; id < ioBufDesc->numOutputBuf; id++) 
+    for(id = 0; id < ioBufDesc->numOutputBuf; id++)
     {
 
         output_sizes[0] = ioBufDesc->outWidth[id]  + ioBufDesc->outPadL[id] + ioBufDesc->outPadR[id];

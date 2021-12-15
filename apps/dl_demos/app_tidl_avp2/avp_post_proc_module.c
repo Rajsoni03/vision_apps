@@ -555,8 +555,8 @@ void drawDetections(PostProcObj *postProcObj, vx_object_array output_tensor_arr,
             {
                 vx_rectangle_t rect;
                 vx_imagepatch_addressing_t image_addr;
-                vx_map_id map_id_1;
-                vx_map_id map_id_2;
+                vx_map_id map_id_1 = 0;
+                vx_map_id map_id_2 = 0;
                 void * data_ptr_1;
                 void * data_ptr_2;
                 vx_uint32  img_width;
@@ -615,19 +615,25 @@ void drawDetections(PostProcObj *postProcObj, vx_object_array output_tensor_arr,
                     }
                 }
 
-                vxUnmapImagePatch(input_image, map_id_1);
-                vxUnmapImagePatch(input_image, map_id_2);
+                if(VX_SUCCESS == status)
+                {
+                    vxUnmapImagePatch(input_image, map_id_1);
+                    vxUnmapImagePatch(input_image, map_id_2);
+                }
             }
 
             vxReleaseImage(&input_image);
         }
 
-        tivxUnmapTensorPatch(kp_tensor, map_id_kp);
-        tivxUnmapTensorPatch(kp_valid, map_id_kp_valid);
+        if(VX_SUCCESS == status)
+        {
+            tivxUnmapTensorPatch(kp_tensor, map_id_kp);
+            tivxUnmapTensorPatch(kp_valid, map_id_kp_valid);
 
-        vxReleaseTensor(&output_tensor);
-        vxReleaseTensor(&kp_tensor);
-        vxReleaseTensor(&kp_valid);
+            vxReleaseTensor(&output_tensor);
+            vxReleaseTensor(&kp_tensor);
+            vxReleaseTensor(&kp_valid);
+        }
     }
 }
 
