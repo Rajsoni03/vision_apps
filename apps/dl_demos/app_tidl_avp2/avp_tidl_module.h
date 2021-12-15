@@ -65,7 +65,8 @@
 #include "avp_common.h"
 #include "itidl_ti.h"
 
-typedef struct {
+typedef struct 
+{
     vx_node    node;
     vx_kernel  kernel;
 

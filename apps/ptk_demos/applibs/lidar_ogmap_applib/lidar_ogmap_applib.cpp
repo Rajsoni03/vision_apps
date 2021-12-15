@@ -1009,19 +1009,22 @@ static void ADAM_Lidar_removeCarReflection(
             {
                 PTK_Point *pt = PTK_PointCloud_refPoint(src, idx);
 
-                // Remove all points inside the box [-2.2,-1.4]x[1.9,0.4]
-                if ((pt->x > -2.2f)&&
-                    (pt->x < 1.9f) &&
-                    (pt->y > -1.4f) &&
-                    (pt->y < 0.4f ))
+                if (NULL != pt)
                 {
-                    // @todo need a tag to use defined by the application to
-                    // use for invalid points
-                    PTK_PointCloud_tag(src, idx, TAG_POINT_REMOVED);
-                    PTK_LidarMeta_setPointIndex(meta,
-                                                slice,
-                                                laser,
-                                                PTK_POINTCLOUD_INVALID_POINT);
+                    // Remove all points inside the box [-2.2,-1.4]x[1.9,0.4]
+                    if ((pt->x > -2.2f)&&
+                        (pt->x < 1.9f) &&
+                        (pt->y > -1.4f) &&
+                        (pt->y < 0.4f ))
+                    {
+                        // @todo need a tag to use defined by the application to
+                        // use for invalid points
+                        PTK_PointCloud_tag(src, idx, TAG_POINT_REMOVED);
+                        PTK_LidarMeta_setPointIndex(meta,
+                                                    slice,
+                                                    laser,
+                                                    PTK_POINTCLOUD_INVALID_POINT);
+                    }
                 }
             }
         }
@@ -1211,7 +1214,7 @@ vx_status LIDAROGAPPLIB_process(
     if (vxStatus == (vx_status)VX_SUCCESS)
     {
         vxStatus = LIDAROGAPPLIB_setupNodes(appCntxt, &gpDesc, data);
-        
+
         if (vxStatus != (vx_status)VX_SUCCESS)
         {
             PTK_printf("[%s:%d] LIDAROGAPPLIB_setupNodes() failed.\n",

@@ -850,6 +850,8 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
 vx_int32 app_tidl_vl_main(vx_int32 argc, vx_char* argv[])
 {
     AppObj *obj = &gAppObj;
+    vx_status status = VX_SUCCESS;
+    vx_int32 retval = 0;
 
     /*Optional parameter setting*/
     app_default_param_set(obj);
@@ -863,33 +865,51 @@ vx_int32 app_tidl_vl_main(vx_int32 argc, vx_char* argv[])
     app_update_param_set(obj);
     APP_PRINTF("Updated user params! \n");
 
-    app_init(obj);
+    status = app_init(obj);
     APP_PRINTF("App Init Done! \n");
 
-    app_create_graph(obj);
-    APP_PRINTF("App Create Graph Done! \n");
-
-    app_verify_graph(obj);
-    APP_PRINTF("App Verify Graph Done! \n");
-
-    if(obj->is_interactive)
+    if (VX_SUCCESS == status)
     {
-        app_run_graph_interactive(obj);
-    }
-    else
-    {
-        app_run_graph(obj);
+        status = app_create_graph(obj);
+        APP_PRINTF("App Create Graph Done! \n");
     }
 
-    APP_PRINTF("App Run Graph Done! \n");
+    if (VX_SUCCESS == status)
+    {
+        status = app_verify_graph(obj);
+        APP_PRINTF("App Verify Graph Done! \n");
+    }
 
-    app_delete_graph(obj);
-    APP_PRINTF("App Delete Graph Done! \n");
+    if (VX_SUCCESS == status)
+    {
+        if(obj->is_interactive)
+        {
+            app_run_graph_interactive(obj);
+        }
+        else
+        {
+            app_run_graph(obj);
+        }
 
-    app_deinit(obj);
-    APP_PRINTF("App De-init Done! \n");
+        APP_PRINTF("App Run Graph Done! \n");
+    }
 
-    return 0;
+    if (VX_SUCCESS == status)
+    {
+        app_delete_graph(obj);
+        APP_PRINTF("App Delete Graph Done! \n");
+
+        app_deinit(obj);
+        APP_PRINTF("App De-init Done! \n");
+    }
+
+    if (VX_SUCCESS != status)
+    {
+        APP_PRINTF("app_tidl_vl_main Failed! \n");
+        retval = -1;
+    }
+
+    return retval;
 }
 
 
@@ -932,56 +952,86 @@ static vx_int32 app_init(AppObj *obj)
     }
 
     /* Initialize modules */
-    app_init_scaler(obj->context, &obj->scalerObj, "scaler_obj", NUM_CH, 2);
+    status = app_init_scaler(obj->context, &obj->scalerObj, "scaler_obj", NUM_CH, 2);
     APP_PRINTF("Scaler Init Done! \n");
 
-    /* Initialize TIDL first to get tensor I/O information from network */
-    app_init_tidl(obj->context, &obj->tidlObj, &obj->poseCalcObj.params,
-                obj->lo_res_desc_head_name,obj->hi_res_score_head_name,
-                "tidl_obj");
-
-    APP_PRINTF("TIDL Init Done! \n");
-
-    /* Update pre-proc parameters with TIDL config before calling init */
-    app_update_pre_proc(obj->context, &obj->preProcObj, obj->tidlObj.config);
-    APP_PRINTF("Pre Proc Update Done! \n");
-
-    app_init_pre_proc(obj->context, &obj->preProcObj, "pre_proc_obj");
-    APP_PRINTF("Pre Proc Init Done! \n");
-
-    /* Update post-proc parameters with TIDL config before calling init */
-    app_update_pose_calc(obj->context, &obj->poseCalcObj);
-    APP_PRINTF("Pose calc Update Done! \n");
-
-    app_init_pose_calc(obj->context, &obj->poseCalcObj, "pose_calc_obj");
-    APP_PRINTF("Pose calc Init Done! \n");
-
-    /* Update post-proc parameters with TIDL config before calling init */
-    app_update_pose_viz(obj->context, &obj->poseVizObj);
-    APP_PRINTF("Pose viz Update Done! \n");
-
-    app_init_pose_viz(obj->context, &obj->poseVizObj, "pose_viz_obj", APP_BUFFER_Q_DEPTH);
-    APP_PRINTF("Pose viz Init Done! \n");
-
-    app_init_img_mosaic(obj->context, &obj->imgMosaicObj, "sw_mosaic_obj", APP_BUFFER_Q_DEPTH);
-    APP_PRINTF("Img Mosaic Init Done! \n");
-
-#ifdef ENABLE_DISPLAY
-    app_init_display(obj->context, &obj->displayObj, "display_obj");
-    APP_PRINTF("Display Init Done! \n");
-
-    #ifndef x86_64
-    if(obj->displayObj.display_option == 1)
+    if(status == VX_SUCCESS)
     {
-      appGrpxInitParamsInit(&grpx_prms, obj->context);
-      grpx_prms.draw_callback = app_draw_graphics;
-      appGrpxInit(&grpx_prms);
-    }
-    #endif
-#endif
+        /* Initialize TIDL first to get tensor I/O information from network */
+        status = app_init_tidl(obj->context, &obj->tidlObj, &obj->poseCalcObj.params,
+                    obj->lo_res_desc_head_name,obj->hi_res_score_head_name,
+                    "tidl_obj");
 
-    appPerfPointSetName(&obj->total_perf , "TOTAL");
-    appPerfPointSetName(&obj->fileio_perf, "FILEIO");
+        APP_PRINTF("TIDL Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        /* Update pre-proc parameters with TIDL config before calling init */
+        status = app_update_pre_proc(obj->context, &obj->preProcObj, obj->tidlObj.config);
+        APP_PRINTF("Pre Proc Update Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        status = app_init_pre_proc(obj->context, &obj->preProcObj, "pre_proc_obj");
+        APP_PRINTF("Pre Proc Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        /* Update post-proc parameters with TIDL config before calling init */
+        status = app_update_pose_calc(obj->context, &obj->poseCalcObj);
+        APP_PRINTF("Pose calc Update Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        status = app_init_pose_calc(obj->context, &obj->poseCalcObj, "pose_calc_obj");
+        APP_PRINTF("Pose calc Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        /* Update post-proc parameters with TIDL config before calling init */
+        status = app_update_pose_viz(obj->context, &obj->poseVizObj);
+        APP_PRINTF("Pose viz Update Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        status = app_init_pose_viz(obj->context, &obj->poseVizObj, "pose_viz_obj", APP_BUFFER_Q_DEPTH);
+        APP_PRINTF("Pose viz Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        status = app_init_img_mosaic(obj->context, &obj->imgMosaicObj, "sw_mosaic_obj", APP_BUFFER_Q_DEPTH);
+        APP_PRINTF("Img Mosaic Init Done! \n");
+    }
+
+    if(status == VX_SUCCESS)
+    {
+    #ifdef ENABLE_DISPLAY
+        status = app_init_display(obj->context, &obj->displayObj, "display_obj");
+        APP_PRINTF("Display Init Done! \n");
+
+        #ifndef x86_64
+        if(obj->displayObj.display_option == 1)
+        {
+          appGrpxInitParamsInit(&grpx_prms, obj->context);
+          grpx_prms.draw_callback = app_draw_graphics;
+          appGrpxInit(&grpx_prms);
+        }
+        #endif
+    #endif
+    }
+
+    if(status == VX_SUCCESS)
+    {
+        appPerfPointSetName(&obj->total_perf , "TOTAL");
+        appPerfPointSetName(&obj->fileio_perf, "FILEIO");
+    }
 
   return status;
 }

@@ -79,7 +79,7 @@ void add_graph_parameter_by_node_index(vx_graph graph, vx_node node,
 char *get_test_file_path()
 {
     char *tivxPlatformGetEnv(char *env_var);
-    
+
     #if defined(SYSBIOS)
     return tivxPlatformGetEnv("VX_TEST_DATA_PATH");
     #else
@@ -163,7 +163,7 @@ vx_status app_load_vximage_from_bin_file(char *filename, vx_image image)
     }
     else
     {
-        printf("# ERROR: Invalid image specified for reading\n");        
+        printf("# ERROR: Invalid image specified for reading\n");
     }
     return status;
 }
@@ -268,19 +268,34 @@ vx_int32 write_output_image_nv12_8bit(char * file_name, vx_image out_nv12)
 
 /* Reads LUT file using get_test_file_path */
 void read_lut_file(ldc_lensParameters *ldcParams, const char*fileName)
-{ 
-    char file[APP_MAX_FILE_PATH];  
+{
+    char file[APP_MAX_FILE_PATH];
     uint32_t  read_size;
     FILE* f = 0;
     size_t sz;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
     if (!fileName)
     {
-        printf("Image file name not specified\n");
+        printf("LUT file name not specified\n");
         return;
     }
 
-    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), fileName);
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
     if (sz > APP_MAX_FILE_PATH)
     {
         return;
@@ -336,11 +351,14 @@ LDC_status LDC_Init(LensDistortionCorrection* ldc,
 
 /* Reads CHARTPOS file */
 void read_chartpos_file(vx_int8 *inChartPos, const char*fileName)
-{ 
-    char file[APP_MAX_FILE_PATH];  
+{
+    char file[APP_MAX_FILE_PATH];
     FILE* f = 0;
     size_t sz;
     uint32_t  read_size;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
     if (!fileName)
     {
@@ -348,7 +366,19 @@ void read_chartpos_file(vx_int8 *inChartPos, const char*fileName)
         return;
     }
 
-    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), fileName);
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
     if (sz > APP_MAX_FILE_PATH)
     {
         return;
@@ -373,11 +403,16 @@ void read_chartpos_file(vx_int8 *inChartPos, const char*fileName)
 }
 
 void read_calmat_file( svCalmat_t *calmat, const char*fileName)
-{ 
+{
     char file[APP_MAX_FILE_PATH];
     uint32_t cnt;
     FILE* f = 0;
     size_t sz;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
+
+    printf ("Reading calmat file \n");
 
     if (!fileName)
     {
@@ -385,8 +420,19 @@ void read_calmat_file( svCalmat_t *calmat, const char*fileName)
         return;
     }
 
-    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), fileName); 
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
 
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
     if (sz > APP_MAX_FILE_PATH)
     {
         return;
@@ -422,6 +468,10 @@ void write_calmat_file( svCalmat_t *calmat, const char*fileName)
     char file[APP_MAX_FILE_PATH];
     uint32_t cnt;
     FILE* f = 0;
+    size_t sz;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
     if (!fileName)
     {
@@ -429,7 +479,23 @@ void write_calmat_file( svCalmat_t *calmat, const char*fileName)
         return;
     }
 
-    snprintf(file, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), fileName);
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
+    if (sz > APP_MAX_FILE_PATH)
+    {
+        return;
+    }
 
     f = fopen(file, "wb");
     if (!f)

@@ -439,8 +439,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     if(token != NULL)
                     {
                         if (token[strlen(token)-1] == '\n')
-                        token[strlen(token)-1]=0;
-
+                        {
+                            token[strlen(token)-1]=0;
+                        }
                         height =  atoi(token);
                         obj->scalerObj.input.height = height;
                     }
@@ -460,9 +461,10 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     token = strtok(NULL, s);
                     if(token != NULL)
                     {
-                        if(token[strlen(token)-1] == '\n')
-                        token[strlen(token)-1]=0;
-
+                        if (token[strlen(token)-1] == '\n')
+                        {
+                            token[strlen(token)-1]=0;
+                        }
                         height =  atoi(token);
                         obj->scalerObj.output.height  = height;
                     }
@@ -479,9 +481,10 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     token = strtok(NULL, s);
                     if(token != NULL)
                     {
-                        if (token[strlen(token)-1] == '\n')
-                        token[strlen(token)-1]=0;
-
+                        if(token[strlen(token)-1] == '\n')
+                        {
+                            token[strlen(token)-1]=0;
+                        }
                         obj->viz_th_vd = atof(token);
                     }
                 }
@@ -575,7 +578,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     token[strlen(token)-1]=0;
                     obj->delay_in_msecs = atoi(token);
                     if(obj->delay_in_msecs > 2000)
+                    {
                         obj->delay_in_msecs = 2000;
+                    }
                 }
             }
             else
@@ -587,7 +592,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     token[strlen(token)-1]=0;
                     obj->num_iterations = atoi(token);
                     if(obj->num_iterations == 0)
+                    {
                         obj->num_iterations = 1;
+                    }
                 }
             }
             else
@@ -599,7 +606,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     token[strlen(token)-1]=0;
                     obj->is_interactive = atoi(token);
                     if(obj->is_interactive > 1)
+                    {
                         obj->is_interactive = 1;
+                    }
                 }
             }
             else
@@ -717,6 +726,7 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
         obj->num_frames = sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0])
                             + TEST_BUFFER;
     }
+
     #ifdef x86_64
     obj->displayObj.display_option = 0;
     obj->is_interactive = 0;
@@ -1015,8 +1025,12 @@ static vx_status app_init(AppObj *obj)
     {
         status = app_init_display(obj->context, &obj->displayObj, "display_obj");
     }
-    appPerfPointSetName(&obj->total_perf , "TOTAL");
-    appPerfPointSetName(&obj->fileio_perf, "FILEIO");
+
+    if(status == VX_SUCCESS)
+    {
+        appPerfPointSetName(&obj->total_perf , "TOTAL");
+        appPerfPointSetName(&obj->fileio_perf, "FILEIO");
+    }
 
     #ifndef x86_64
     if(obj->displayObj.display_option == 1 && obj->enable_gui)

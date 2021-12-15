@@ -274,6 +274,12 @@ vx_status app_init_tidl_pc(vx_context context, TIDLObj *tidlObj, char *objName)
     tidlObj->num_input_tensors  = num_input_tensors;
     tidlObj->num_output_tensors = num_output_tensors;
 
+    if ((tidlObj->num_input_tensors > APP_MAX_TENSORS) ||
+        (tidlObj->num_output_tensors > APP_MAX_TENSORS))
+    {
+        status = VX_FAILURE;
+    }
+
     if(status == VX_SUCCESS)
     {
         tidlObj->network = readNetwork(context, &tidlObj->network_file_path[0], &tidlObj->network_checksum[0]);
@@ -304,11 +310,11 @@ vx_status app_init_tidl_pc(vx_context context, TIDLObj *tidlObj, char *objName)
 
         for(i = 0; i < NUM_CH; i++)
         {
-           vx_user_data_object inArgs;
+            vx_user_data_object inArgs;
 
-           inArgs = (vx_user_data_object)vxGetObjectArrayItem(tidlObj->in_args_arr, i);
-           setInArgs(context, inArgs);
-           vxReleaseUserDataObject(&inArgs);
+            inArgs = (vx_user_data_object)vxGetObjectArrayItem(tidlObj->in_args_arr, i);
+            setInArgs(context, inArgs);
+            vxReleaseUserDataObject(&inArgs);
         }
     }
 
@@ -324,24 +330,28 @@ vx_status app_init_tidl_pc(vx_context context, TIDLObj *tidlObj, char *objName)
 
         for(i = 0; i < NUM_CH; i++)
         {
-           vx_user_data_object outArgs;
+            vx_user_data_object outArgs;
 
-           outArgs = (vx_user_data_object)vxGetObjectArrayItem(tidlObj->out_args_arr, i);
-           setOutArgs(context, outArgs);
-           vxReleaseUserDataObject(&outArgs);
+            outArgs = (vx_user_data_object)vxGetObjectArrayItem(tidlObj->out_args_arr, i);
+            setOutArgs(context, outArgs);
+            vxReleaseUserDataObject(&outArgs);
         }
     }
 
-    createOutputTensors(context, tidlObj->config, output_tensors);
-    tidlObj->output1_tensor_arr = vxCreateObjectArray(context, (vx_reference)output_tensors[0], NUM_CH);
-    vxReleaseTensor(&output_tensors[0]);
-
     if(status == VX_SUCCESS)
     {
+        createOutputTensors(context, tidlObj->config, output_tensors);
+        tidlObj->output1_tensor_arr = vxCreateObjectArray(context, (vx_reference)output_tensors[0], NUM_CH);
+        vxReleaseTensor(&output_tensors[0]);
+
         tidlObj->kernel = tivxAddKernelTIDL(context, tidlObj->num_input_tensors, tidlObj->num_output_tensors);
         status = vxGetStatus((vx_reference)tidlObj->kernel);
     }
-    strcpy(tidlObj->objName, objName);
+
+    if(status == VX_SUCCESS)
+    {
+        strcpy(tidlObj->objName, objName);
+    }
 
     return status;
 }
@@ -368,7 +378,7 @@ void app_delete_tidl_pc(TIDLObj *tidlObj)
     {
         vxRemoveKernel(tidlObj->kernel);
     }
-    }
+}
 
 vx_status app_create_graph_tidl_pc(vx_context context, vx_graph graph, TIDLObj *tidlObj, vx_object_array input_tensor_arr)
 {
@@ -501,10 +511,11 @@ vx_status writeTIDLOutput(vx_object_array output_arr, vx_char *out_name)
             for (i = 0; i < numObjs; i++)
             {
                 TIDL_ODLayerObjInfo * pPSpots = (TIDL_ODLayerObjInfo *) ((uint8_t *)pObjInfo + (i * ((vx_uint32)pHeader->objInfoSize)));
-                if(pPSpots->score >= 0.5) {
-                if(pPSpots->label == 2) occupied++;
-                else if (pPSpots->label == 1) unoccupied++;
-                else background++;
+                if(pPSpots->score >= 0.5)
+                {
+                    if(pPSpots->label == 2) occupied++;
+                    else if (pPSpots->label == 1) unoccupied++;
+                    else background++;
                 }
             }
 
@@ -689,6 +700,7 @@ static vx_status updateChecksums(vx_user_data_object config, vx_uint8 *config_ch
 
     return status;
 }
+
 static vx_status setCreateParams(vx_context context, vx_user_data_object createParams)
 {
     vx_status status = VX_SUCCESS;
@@ -819,19 +831,18 @@ static void createOutputTensors(vx_context context, vx_user_data_object config, 
     return;
 }
 
-
 static void initParam(vx_reference params[], uint32_t _max_params)
 {
-   num_params  = 0;
-   max_params = _max_params;
+    num_params  = 0;
+    max_params = _max_params;
 }
 
 static void addParam(vx_reference params[], vx_reference obj)
 {
-   APP_ASSERT(num_params <= max_params);
+    APP_ASSERT(num_params <= max_params);
 
-   params[num_params] = obj;
-   num_params++;
+    params[num_params] = obj;
+    num_params++;
 }
 
 #ifdef COMPUTE_CHECKSUM
