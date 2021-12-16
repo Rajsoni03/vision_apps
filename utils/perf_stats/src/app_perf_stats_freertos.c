@@ -180,8 +180,8 @@ void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
 
     LoadP_getTaskLoad(task, &rtos_load_stat);
 
-    load->total_time += rtos_load_stat.totalTime;
-    load->thread_time += rtos_load_stat.threadTime;
+    load->total_time = rtos_load_stat.totalTime;
+    load->thread_time = rtos_load_stat.threadTime;
 }
 
 void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
@@ -243,6 +243,7 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
             appPerfStatsResetHwaLoadCalcAll();
             break;
         case APP_PERF_STATS_CMD_RESET_LOAD_CALC:
+            LoadP_reset();
             appPerfStatsResetLoadCalcAll(obj);
             break;
         case APP_PERF_STATS_CMD_RESET_DDR_STATS:
@@ -310,15 +311,6 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
                 app_perf_stats_cpu_load_t *cpu_load = (app_perf_stats_cpu_load_t*)prm;
 
                 appPerfStatsLock(obj);
-
-                static uint32_t is_first_time_load = 1;
-
-                if (is_first_time_load)
-                {
-                    LoadP_reset();
-
-                    is_first_time_load = 0;
-                }
 
                 /* Multiplying by 100 to show decimal points when printing */
                 cpu_load->cpu_load = 100 * LoadP_getCPULoad();

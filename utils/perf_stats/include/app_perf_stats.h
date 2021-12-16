@@ -102,7 +102,7 @@ typedef enum {
 #define APP_PERF_STATS_TASK_NAME_MAX (12u)
 
 /** \brief Max number of tasks whoose information can be retrived */
-#define APP_PERF_STATS_TASK_MAX (16u)
+#define APP_PERF_STATS_TASK_MAX (24u)
 
 /** \brief Max size of performance point name string */
 #define APP_PERF_POINT_NAME_MAX     (16u)
@@ -211,7 +211,7 @@ typedef struct {
     uint32_t write_bw_peak; /**< peak bytes read in a sampling period, in units of MB/s */
     uint32_t total_available_bw; /**< theoritical bw available to system, in units of MB/s */
 
-    uint32_t counter0_total;  /**< sum total of counter0 values aggregated over time as defined by APP_PERF_SNAPSHOT_WINDOW_WIDTH */  
+    uint32_t counter0_total;  /**< sum total of counter0 values aggregated over time as defined by APP_PERF_SNAPSHOT_WINDOW_WIDTH */
     uint32_t counter1_total;  /**< sum total of counter1 values aggregated over time as defined by APP_PERF_SNAPSHOT_WINDOW_WIDTH */
     uint32_t counter2_total;  /**< sum total of counter2 values aggregated over time as defined by APP_PERF_SNAPSHOT_WINDOW_WIDTH */
     uint32_t counter3_total;  /**< sum total of counter3 values aggregated over time as defined by APP_PERF_SNAPSHOT_WINDOW_WIDTH */
