@@ -145,7 +145,7 @@ void calculateSpotDistance(tivx_ps_mapping_alg_parmas_t *params, PTK_Point * pt1
 void alg_ps_mapping_update_og(tivxPsMappingObj *obj);
 
 // based on VXLIB_distortedToNormalized_c32f_cn
-static vx_uint32 distortedToNormalized(
+static vx_status distortedToNormalized(
         vx_float32     src[],
         vx_float32     dst[],
         vx_uint32      numPoints,
@@ -545,7 +545,7 @@ static void getPsUndistorted(tivxPsMappingObj *obj,
 }
 
 
-static vx_uint32 distortedToNormalized(
+static vx_status distortedToNormalized(
         vx_float32     src[],
         vx_float32     dst[],
         vx_uint32      numPoints,
@@ -558,11 +558,22 @@ static vx_uint32 distortedToNormalized(
         vx_float32     principalPointY)
 {
     uint32_t    pp;
-    uint32_t    status = VX_SUCCESS;
-    float       d2uTableStepInv = 1/d2uTableStep;
-    float       indFMax = d2uTableSize-1.f;
-    float       fXInv = 1.f/focalLengthX;
-    float       fYInv = 1.f/focalLengthY;
+    vx_status   vxStatus = VX_SUCCESS;
+    float       d2uTableStepInv;
+    float       indFMax;
+    float       fXInv;
+    float       fYInv;
+
+    if (d2uTableSize < 1 || d2uTableStep == 0.0 || focalLengthX == 0.0 || focalLengthY == 0.0)
+    {
+        VX_PRINT(VX_ZONE_ERROR, "Incorrect parameters for distortedToNormalized()!\n");
+        return VX_FAILURE;
+    }
+
+    d2uTableStepInv = 1/d2uTableStep;
+    indFMax = d2uTableSize-1.f;
+    fXInv = 1.f/focalLengthX;
+    fYInv = 1.f/focalLengthY;
 
     for (pp = 0; pp < numPoints; pp++)
     {
@@ -570,6 +581,7 @@ static vx_uint32 distortedToNormalized(
         int32_t indI;
         diffX = src[2*pp    ] - principalPointX;
         diffY = src[2*pp + 1] - principalPointY;
+
         /* NOTE: Opportunity for optimization :
          * diffX and diffY and their squares are actually computed twice,
          * once here and once in the node to determine ROI.
@@ -594,10 +606,9 @@ static vx_uint32 distortedToNormalized(
         /* normalized point */
         dst[2*pp    ] = fXInv * diffX * ruDivRd;
         dst[2*pp + 1] = fYInv * diffY * ruDivRd;
-
     }
 
-    return (status);
+    return (vxStatus);
 }
 
 
