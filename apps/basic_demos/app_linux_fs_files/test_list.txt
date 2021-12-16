@@ -16,7 +16,7 @@ run_app_stereo.sh          | 20 | basic_demos_app_stereo.md  | 01_basic_demos | 
 run_app_dof.sh             | 10 | basic_demos_app_dense_optical_flow.md | 01_basic_demos | 015_app_dense_optical_flow_datasheet.md | Dense Optical Flow Application Datasheet | 0 |
 
 # Demos with capture
-run_app_single_cam.sh     | 10 | basic_demos_apps_single_cam.md   | 01_basic_demos | 010_app_single_cam_datasheet.md | Single Camera Application Datasheet | 1 |
+run_app_single_cam.sh     | 10 | basic_demos_app_single_cam.md    | 01_basic_demos | 010_app_single_cam_datasheet.md | Single Camera Application Datasheet | 1 |
 run_app_tidl_cam.sh       | 10 | dl_demos_app_tidl_cam.md         | 02_dl_demos | 022_app_tidl_cam_datasheet.md | Camera based Object Classification Application Datasheet | 1 |
 run_app_tidl_od_cam.sh    | 10 | dl_demos_app_tidl_od_cam.md      | 02_dl_demos | 0231_app_tidl_od_cam_datasheet.md | Camera Based Object Detection Application Datasheet | 1 |
 run_app_tidl_seg_cam.sh   | 10 | dl_demos_app_tidl_seg_cam.md     | 02_dl_demos | 0251_app_tidl_seg_cam_datasheet.md | Camera Based Semantic Segmentation Application Datasheet | 1 |

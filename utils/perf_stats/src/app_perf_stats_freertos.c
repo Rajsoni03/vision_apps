@@ -279,13 +279,6 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
                 /* interrupts disabled since update happens in ISR */
                 cookie = HwiP_disable();
 
-                #ifdef R5F
-                /* not taken in inside lock since interrupts are disabled for locking
-                 * interrupts are disable since counters are read in ISR context
-                 */
-                appPerfStatsDddrStatsUpdate();
-                #endif
-
                 *ddr_load = obj->ddrLoad.ddr_stats;
 
                 HwiP_restore(cookie);
@@ -719,3 +712,33 @@ void appPerfStatsResetDdrLoadCalcAll()
 
     HwiP_restore(cookie);
 }
+
+#ifdef R5F
+
+#include <utils/ipc/include/app_ipc.h>
+
+/* This function is called when configUSE_IDLE_HOOK is 1 in FreeRTOSConfig.h */
+void vApplicationIdleHook( void )
+{
+#if (configLOAD_UPDATE_IN_IDLE==1)
+    void vApplicationLoadHook();
+
+    vApplicationLoadHook();
+#endif
+
+    if(g_perf_stats_load_update_enable)
+    {
+        uint32_t cpu_id = appIpcGetSelfCpuId();
+
+        if (cpu_id == APP_IPC_CPU_MCU2_0)
+        {
+            /* not taken in inside lock since interrupts are disabled for locking
+             * interrupts are disable since counters are read in ISR context
+             */
+            appPerfStatsDddrStatsUpdate();
+        }
+    }
+
+    asm ( " WFI " );
+}
+#endif
