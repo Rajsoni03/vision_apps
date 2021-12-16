@@ -441,7 +441,7 @@ static void app_delete_graph(AppObj *obj)
         vxReleaseNode(&obj->disp_node);
         vxReleaseGraph(&obj->disp_graph);
     }
-    
+
     #ifdef APP_TIVX_LOG_RT_ENABLE
     tivxLogRtTraceExportToFile("app_tidl.bin");
     tivxLogRtTraceDisable(obj->graph);
@@ -918,6 +918,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
     }
     else
     {
+        appPerfStatsResetAll();
         while((!done) && (status == VX_SUCCESS))
         {
             printf(menu);

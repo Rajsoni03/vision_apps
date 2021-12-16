@@ -800,6 +800,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
     }
     else
     {
+        appPerfStatsResetAll();
         while(!done && (status == VX_SUCCESS))
         {
             printf(menu);
