@@ -1985,6 +1985,21 @@ static void app_run_graph(SrvCalibAppObj *obj)
     int graph_parameter_num = 0;
     char yuv_image_fname[APP_MAX_FILE_PATH];
     uint8_t pause = 0, set_pause = 0;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
+
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
 
     if(NULL == obj->sensor_name)
     {
@@ -2128,19 +2143,19 @@ static void app_run_graph(SrvCalibAppObj *obj)
                     printf("writing capture channel %d...\n", buf_id);
                     if (0 == buf_id)
                     {
-                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/viss_output_front.yuv");
+                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/viss_output_front.yuv");
                     }
                     else if (1 == buf_id)
                     {
-                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/viss_output_right.yuv");
+                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/viss_output_right.yuv");
                     }
                     else if (2 == buf_id)
                     {
-                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/viss_output_back.yuv");
+                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/viss_output_back.yuv");
                     }
                     else if (3 == buf_id)
                     {
-                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/viss_output_left.yuv");
+                        snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/viss_output_left.yuv");
                     }
                     image = (vx_image)vxGetObjectArrayItem(obj->in_array, buf_id);
                     write_output_image_nv12_8bit(yuv_image_fname, image);
@@ -2159,19 +2174,19 @@ static void app_run_graph(SrvCalibAppObj *obj)
                 printf("writing capture channel %d...\n", buf_id);
                 if (0 == buf_id)
                 {
-                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/capture_output_front.raw");
+                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/capture_output_front.raw");
                 }
                 else if (1 == buf_id)
                 {
-                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/capture_output_right.raw");
+                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/capture_output_right.raw");
                 }
                 else if (2 == buf_id)
                 {
-                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/capture_output_back.raw");
+                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/capture_output_back.raw");
                 }
                 else if (3 == buf_id)
                 {
-                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", get_test_file_path(), "output/capture_output_left.raw");
+                    snprintf(yuv_image_fname, APP_MAX_FILE_PATH, "%s/%s", test_data_path, "output/capture_output_left.raw");
                 }
                 raw_img = (tivx_raw_image)vxGetObjectArrayItem(out_capture_frames, buf_id);
                 write_output_image_raw(yuv_image_fname, raw_img);

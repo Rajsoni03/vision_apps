@@ -279,6 +279,9 @@ int main(int argc, char *argv[])
     tivx_opengl_mosaic_params_t params;
     char output_file_path[APP_MAX_FILE_PATH];
     char input1_file_path[APP_MAX_FILE_PATH];
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
     vx_user_data_object param_obj;
     vx_context context;
@@ -290,8 +293,20 @@ int main(int argc, char *argv[])
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
 
-    snprintf(output_file_path, APP_MAX_FILE_PATH, "%s/output/%s", get_test_file_path(), "mosaic_output_file.bin");
-    snprintf(input1_file_path, APP_MAX_FILE_PATH, "%s/psdkra/app_opengl_mosaic/%s", get_test_file_path(), "input1_file.bin");
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    snprintf(output_file_path, APP_MAX_FILE_PATH, "%s/output/%s", test_data_path, "mosaic_output_file.bin");
+    snprintf(input1_file_path, APP_MAX_FILE_PATH, "%s/psdkra/app_opengl_mosaic/%s", test_data_path, "input1_file.bin");
 
 #ifdef J7
     status = appCommonInit();

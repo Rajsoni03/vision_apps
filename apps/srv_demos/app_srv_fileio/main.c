@@ -330,14 +330,35 @@ static int load_from_raw_file(vx_image copy_image, int width, int height, const 
     char file[MAXPATHLENGTH];
     vx_rectangle_t rect             = { 0, 0, width, height };
     vx_imagepatch_addressing_t addr = VX_IMAGEPATCH_ADDR_INIT;
+    size_t sz;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
+    if (!filename)
+    {
+        printf("Raw file name not specified\n");
+        return -1;
+    }
 
-    addr.dim_x = width;
-    addr.dim_y = height;
-    addr.stride_x = 3;
-    addr.stride_y = width*3;
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
 
-    snprintf(file, MAXPATHLENGTH, "%s/%s", get_test_file_path(), filename);
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(file, MAXPATHLENGTH, "%s/%s", test_data_path, filename);
+    if (sz > MAXPATHLENGTH)
+    {
+        return -1;
+    }
+
     fp = fopen(file, "rb");
 
     if(!fp)
@@ -362,6 +383,11 @@ static int load_from_raw_file(vx_image copy_image, int width, int height, const 
         free(data);
         return -1;
     }
+
+    addr.dim_x = width;
+    addr.dim_y = height;
+    addr.stride_x = 3;
+    addr.stride_y = width*3;
 
     vxCopyImagePatch(copy_image, &rect, 0, &addr, data, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
 
@@ -1231,8 +1257,28 @@ int main(int argc, char* argv[])
     AppObj *obj = &gAppObj;
     vx_status status = VX_SUCCESS;
     char output_file_path[MAXPATHLENGTH];
+    size_t sz;
+    char failsafe_test_data_path[3] = "./";
+    char * test_data_path = get_test_file_path();
+    struct stat s;
 
-    snprintf(output_file_path, MAXPATHLENGTH, "%s/output/srv_output_file.bin", get_test_file_path());
+    if(NULL == test_data_path)
+    {
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
+    }
+
+    if (stat(test_data_path, &s))
+    {
+        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+        test_data_path = failsafe_test_data_path;
+    }
+
+    sz = snprintf(output_file_path, MAXPATHLENGTH, "%s/output/srv_output_file.bin", test_data_path);
+    if (sz > MAXPATHLENGTH)
+    {
+        return -1;
+    }
 
     app_parse_cmd_line_args(obj, argc, argv);
     app_init(obj);
