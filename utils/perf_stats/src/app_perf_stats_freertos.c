@@ -730,7 +730,7 @@ void vApplicationIdleHook( void )
     {
         uint32_t cpu_id = appIpcGetSelfCpuId();
 
-        if (cpu_id == APP_IPC_CPU_MCU2_0)
+        if (cpu_id == APP_PERF_STATS_GET_DDR_STATS_CORE)
         {
             /* not taken in inside lock since interrupts are disabled for locking
              * interrupts are disable since counters are read in ISR context

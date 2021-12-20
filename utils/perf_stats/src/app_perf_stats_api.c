@@ -820,7 +820,7 @@ int32_t appPerfStatsDdrStatsGet(app_perf_stats_ddr_stats_t *ddr_stats)
 {
     int32_t status;
 
-    status = appRemoteServiceRun(APP_IPC_CPU_MCU2_0, APP_PERF_STATS_SERVICE_NAME,
+    status = appRemoteServiceRun(APP_PERF_STATS_GET_DDR_STATS_CORE, APP_PERF_STATS_SERVICE_NAME,
         APP_PERF_STATS_CMD_GET_DDR_STATS,
         ddr_stats, sizeof(app_perf_stats_ddr_stats_t),
         0);
