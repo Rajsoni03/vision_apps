@@ -82,10 +82,10 @@ static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
 #else
 #define NUM_CHECKSUM_SAMPLES 7
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
-  {0x5d4831e0,0x60b02b10,0xe41763c0,0xe31675f0,
-  0x24aec0d0,0x06507b60,0x7a7e8460},
-  {0x3e61c9ca,0xe9ced7e7,0xe5cc03cc,0xeeba18b8,
-  0x2dc251a8,0x6711af7d,0x804bb420}
+  {0x71a51890,0x82091580,0x641880f0,0x39932260,
+  0xf6cb7730,0x03572320,0x00000000},
+  {0x6fb08f8e,0x5ca8d50c,0xaff6d4b0,0xb5a5853a,
+  0xd6c45a79,0x01ba3f99,0x00000000}
 };
 #endif
 

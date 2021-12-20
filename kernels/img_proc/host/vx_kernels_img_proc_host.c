@@ -151,7 +151,7 @@ void tivxImgProcLoadKernels(vx_context context)
         /* These three lines only work on PC emulation mode ...
          * this will need to be updated when moving to target */
 
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterImgProcTargetC66Kernels();
 
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);
@@ -159,8 +159,8 @@ void tivxImgProcLoadKernels(vx_context context)
 
         tivxSetSelfCpuId(TIVX_CPU_ID_IPU1_0);
         tivxRegisterImgProcTargetR5FKernels();
- 
-        tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
+
+        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
         #endif
         tivxRegisterImgProcTargetA72Kernels();
         #endif
