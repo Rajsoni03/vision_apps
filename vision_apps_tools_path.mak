@@ -6,6 +6,7 @@ MCUSW_PATH=$(PSDK_PATH)/mcusw
 # paths for components shared between tiovx and vision_apps are specified in below
 # file in tiovx, ex, bios, tidl, pdk, cgtools, ...
 include $(TIOVX_PATH)/psdkra_tools_path.mak
+include $(TIOVX_PATH)/build_flags.mak
 
 LINUX_FS_PATH ?= $(PSDK_PATH)/targetfs/
 LINUX_FS_BOOT_PATH ?= $(PSDK_PATH)/bootfs/
