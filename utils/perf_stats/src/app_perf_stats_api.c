@@ -867,7 +867,7 @@ int32_t appPerfStatsDdrStatsResetAll()
 {
     int32_t status;
 
-    status = appRemoteServiceRun(APP_IPC_CPU_MCU2_0, APP_PERF_STATS_SERVICE_NAME,
+    status = appRemoteServiceRun(APP_PERF_STATS_GET_DDR_STATS_CORE, APP_PERF_STATS_SERVICE_NAME,
         APP_PERF_STATS_CMD_RESET_DDR_STATS,
         NULL, 0,
         0);
