@@ -70,10 +70,12 @@ class MemSection :
         self.length = length;
         self.dtsNodeName = name
         self.dtsLabelName = name
+        self.printCompatibility = True
         self.compatibility = "shared-dma-pool"
         self.no_map = True
         self.origin_tag = True
         self.split_origin = False;
+        self.alignment = False;
 
         if comment == "" :
             self.comment = self.name;
@@ -95,6 +97,12 @@ class MemSection :
 
     def splitOrigin(self, value) :
         self.split_origin = value;
+
+    def setAlignment(self, value) :
+        self.alignment = value;
+
+    def setPrintCompatibility(self, value) :
+        self.printCompatibility = value;
 
     def concat(self, memSection) :
         # first section

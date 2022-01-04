@@ -336,7 +336,7 @@ mcu1_0_ddr_total.concat(mcu1_0_ddr);
 mcu1_0_ddr_total.setDtsName("vision_apps_mcu_r5fss0_core0_memory_region", "vision-apps-r5f-memory");
 
 mcu1_1_ddr_ipc             = MemSection("DDR_MCU1_1_IPC", "RWIX", mcu1_1_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for MCU1_1 for Linux IPC");
-mcu1_1_ddr_ipc.setDtsName("vision_apps_mcu_r5fss0_core1_dma_memory_region", "r5f-dma-memory");
+mcu1_1_ddr_ipc.setDtsName("vision_apps_mcu_r5fss0_core1_dma_memory_region", "vision-apps-r5f-dma-memory");
 mcu1_1_ddr_resource_table  = MemSection("DDR_MCU1_1_RESOURCE_TABLE", "RWIX", mcu1_1_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for MCU1_1 for Linux resource table");
 mcu1_1_ddr                 = MemSection("DDR_MCU1_1", "RWIX", mcu1_1_ddr_addr, mcu1_1_ddr_size, "DDR for MCU1_1 for code/data");
 mcu1_1_ddr_local_heap      = MemSection("DDR_MCU1_1_LOCAL_HEAP", "RWIX", mcu1_1_ddr_local_heap_addr, mcu1_1_ddr_local_heap_size, "DDR for MCU1_1 for local heap");
@@ -346,7 +346,7 @@ mcu1_1_ddr_total.concat(mcu1_1_ddr);
 mcu1_1_ddr_total.setDtsName("vision_apps_mcu_r5fss0_core1_memory_region", "vision-apps-r5f-memory");
 
 mcu2_0_ddr_ipc             = MemSection("DDR_MCU2_0_IPC", "RWIX", mcu2_0_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for MCU2_0 for Linux IPC");
-mcu2_0_ddr_ipc.setDtsName("vision_apps_main_r5fss0_core0_dma_memory_region", "r5f-dma-memory");
+mcu2_0_ddr_ipc.setDtsName("vision_apps_main_r5fss0_core0_dma_memory_region", "vision-apps-r5f-dma-memory");
 mcu2_0_ddr_resource_table  = MemSection("DDR_MCU2_0_RESOURCE_TABLE", "RWIX", mcu2_0_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for MCU2_0 for Linux resource table");
 mcu2_0_ddr                 = MemSection("DDR_MCU2_0", "RWIX", mcu2_0_ddr_addr, mcu2_0_ddr_size, "DDR for MCU2_0 for code/data");
 mcu2_0_ddr_total           = MemSection("DDR_MCU2_0_DTS", "", 0, 0, "DDR for MCU2_0 for all sections, used for reserving memory in DTS file");
@@ -436,7 +436,10 @@ pcie_queue_mirror_remote_shared_mem  = MemSection("PCIE_QUEUE_MIRROR_REMOTE_SHAR
 tiovx_log_rt_mem     = MemSection("TIOVX_LOG_RT_MEM" , "", tiovx_log_rt_mem_addr, tiovx_log_rt_mem_size, "Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent");
 
 ipc_vring_mem      = MemSection("IPC_VRING_MEM"     , "", ipc_vring_mem_addr     , ipc_vring_mem_size     , "Memory for IPC Vring's. MUST be non-cached or cache-coherent");
-ipc_vring_mem.setDtsName("vision_apps_rtos_ipc_memory_region", "vision-apps-ipc-memories");
+ipc_vring_mem.setDtsName("vision_apps_rtos_ipc_memory_region", "vision-apps-rtos-ipc-memory-region");
+ipc_vring_mem.setAlignment(True)
+ipc_vring_mem.setPrintCompatibility(False)
+ipc_vring_mem.setOriginTag(False);
 
 vision_apps_ddr_total  = MemSection("DDR_VISION_APPS_DTS", "", 0                      , 0                      , "DDR for Vision Apps for all sections, used for reserving memory in DTS file");
 vision_apps_ddr_total.concat(app_log_mem);

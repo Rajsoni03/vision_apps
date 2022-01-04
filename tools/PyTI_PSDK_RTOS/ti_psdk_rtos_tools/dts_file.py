@@ -68,7 +68,7 @@ class DtsFile :
     def __init__(self, memoryMap, name="app_mem_map.h"):
         self.memoryMap = memoryMap;
         self.name = name;
-        self.indent = "    ";
+        self.indent = "\t";
         self.indent_level = 0;
 
     def open(self) :
@@ -130,7 +130,6 @@ class DtsFile :
         self.write_line( header );
         self.write_line( "" );
         self.inc_indent();
-        self.inc_indent();
         for key,memSection in sorted(self.memoryMap.memoryMap.items(), key=CHeaderFile.sortKey):
             if(memSection.origin_tag) :
                 string = '%s: %s@%08x {' % (memSection.dtsLabelName, memSection.dtsNodeName, memSection.origin );
@@ -138,8 +137,9 @@ class DtsFile :
                 string = '%s: %s {' % (memSection.dtsLabelName, memSection.dtsNodeName );
             self.write_line( string );
             self.inc_indent();
-            string = 'compatible = "%s";' % (memSection.compatibility);
-            self.write_line( string );
+            if(memSection.printCompatibility) :
+                string = 'compatible = "%s";' % (memSection.compatibility);
+                self.write_line( string );
             if (memSection.split_origin) :
                 val_lo = memSection.origin & 0xFFFFFFFF;
                 val_hi = (memSection.origin & 0xFF00000000 ) >> 32;
@@ -147,10 +147,11 @@ class DtsFile :
             else:
                 string = 'reg = <0x00 0x%08x 0x00 0x%08x>;' % (memSection.origin, memSection.length);
             self.write_line( string );
+            if( memSection.alignment) :
+                self.write_line( 'alignment = <0x1000>;' );
             if( memSection.no_map) :
                 self.write_line( 'no-map;' );
             self.close_brace();
-            self.write_line( "" );
         self.dec_indent();
         self.dec_indent();
         self.write_line( "" );
