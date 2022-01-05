@@ -131,8 +131,10 @@ IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_iss
 IMAGING_LIBS += ti_2a_wrapper
 IMAGING_LIBS += ti_imaging_aealg
+ifeq ($(TARGET_OS), LINUX)
 IMAGING_LIBS += ti_imaging_awbalg
 IMAGING_LIBS += ti_imaging_dcc
+endif
 
 VISION_APPS_UTILS_LIBS  =
 VISION_APPS_UTILS_LIBS += app_utils_draw2d
