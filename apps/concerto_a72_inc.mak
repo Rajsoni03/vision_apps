@@ -129,9 +129,9 @@ IMAGING_LIBS  = vx_kernels_imaging
 IMAGING_LIBS += app_utils_itt_server
 IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_iss
+ifeq ($(TARGET_OS), LINUX)
 IMAGING_LIBS += ti_2a_wrapper
 IMAGING_LIBS += ti_imaging_aealg
-ifeq ($(TARGET_OS), LINUX)
 IMAGING_LIBS += ti_imaging_awbalg
 IMAGING_LIBS += ti_imaging_dcc
 endif
