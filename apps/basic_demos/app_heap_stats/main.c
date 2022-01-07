@@ -101,6 +101,38 @@ int32_t appPerfStatsMemStatsPrintAll()
     return status;
 }
 
+int32_t appPerfStatsOsStatsPrintAll()
+{
+    uint32_t cpu_id;
+    int32_t status=0;
+    app_perf_stats_os_stats_t cpu_os_stats;
+
+    printf("\n");
+    printf("Detailed CPU OS memory statistics,\n");
+    printf("==================================\n");
+    printf("\n");
+    for(cpu_id=0; cpu_id<APP_IPC_CPU_MAX; cpu_id++)
+    {
+        if(appIpcIsCpuEnabled(cpu_id))
+        {
+            #if defined(LINUX) || defined(QNX)
+            /* NOT supported for Linux/QNX A72 as of now */
+            if(cpu_id!=appIpcGetSelfCpuId())
+            #endif
+            {
+                status = appPerfStatsCpuOsStatsGet(cpu_id, &cpu_os_stats);
+                if(status==0)
+                {
+                    appPerfStatsCpuOsStatsPrint(cpu_id, &cpu_os_stats, 0);
+                }
+            }
+        }
+    }
+    printf("\n");
+    return status;
+}
+
+
 
 int main(int argc, char *argv[])
 {
@@ -111,6 +143,11 @@ int main(int argc, char *argv[])
     if(status == VX_SUCCESS)
     {
         status = appPerfStatsMemStatsPrintAll();
+
+        if(status == VX_SUCCESS)
+        {
+            status = appPerfStatsOsStatsPrintAll();
+        }
 
         if(status == VX_SUCCESS)
         {

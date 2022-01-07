@@ -230,6 +230,48 @@ void appPerfStatsGetMemStatsAll(app_perf_stats_obj_t *obj, app_perf_stats_mem_st
     }
 
     appPerfStatsUnLock(obj);
+
+}
+
+extern uint32_t  gOsalSemAllocCnt, gOsalSemPeak;
+extern uint32_t  gOsalMutexAllocCnt, gOsalMutexPeak;
+extern uint32_t  gOsalQueueAllocCnt, gOsalQueuePeak;
+extern uint32_t  gOsalEventAllocCnt, gOsalEventPeak;
+extern uint32_t  gOsalHeapAllocCnt, gOsalHeapPeak;
+extern uint32_t  gOsalMailboxAllocCnt, gOsalMailboxPeak;
+extern uint32_t  gOsalTaskAllocCnt, gOsalTaskPeak;
+extern uint32_t  gOsalClockAllocCnt, gOsalClockPeak;
+extern uint32_t  gOsalHwiAllocCnt, gOsalHwiPeak;
+extern uint32_t  gOsalTimerAllocCnt, gOsalTimerPeak;
+
+void appPerfStatsGetOsStatsAll(app_perf_stats_obj_t *obj, app_perf_stats_os_stats_t *os_stats)
+{
+    if (NULL != os_stats)
+    {
+        memset(os_stats, 0, sizeof(app_perf_stats_os_stats_t));
+
+        os_stats->semaphore_count  = gOsalSemAllocCnt;
+        os_stats->mutex_count      = gOsalMutexAllocCnt;
+        os_stats->queue_count      = gOsalQueueAllocCnt;
+        os_stats->event_count      = gOsalEventAllocCnt;
+        os_stats->heap_count       = gOsalHeapAllocCnt;
+        os_stats->mailbox_count    = gOsalMailboxAllocCnt;
+        os_stats->task_count       = gOsalTaskAllocCnt;
+        os_stats->clock_count      = gOsalClockAllocCnt;
+        os_stats->hwi_count        = gOsalHwiAllocCnt;
+        os_stats->timer_count      = gOsalTimerAllocCnt;
+
+        os_stats->semaphore_peak   = gOsalSemPeak;
+        os_stats->mutex_peak       = gOsalMutexPeak;
+        os_stats->queue_peak       = gOsalQueueAllocCnt;
+        os_stats->event_peak       = gOsalEventPeak;
+        os_stats->heap_peak        = gOsalHeapPeak;
+        os_stats->mailbox_peak     = gOsalMailboxPeak;
+        os_stats->task_peak        = gOsalTaskPeak;
+        os_stats->clock_peak       = gOsalClockPeak;
+        os_stats->hwi_peak         = gOsalHwiPeak;
+        os_stats->timer_peak       = gOsalTimerPeak;
+    }
 }
 
 int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm_size, uint32_t flags)
@@ -354,6 +396,23 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
                     cmd,
                     prm_size,
                     sizeof(app_perf_stats_mem_stats_t)
+                    );
+            }
+            break;
+        case APP_PERF_STATS_CMD_GET_OS_STATS:
+            if(prm_size == sizeof(app_perf_stats_os_stats_t))
+            {
+                app_perf_stats_os_stats_t *os_stats = (app_perf_stats_os_stats_t*)prm;
+
+                appPerfStatsGetOsStatsAll(obj, os_stats);
+            }
+            else
+            {
+                status = -1;
+                appLogPrintf("PERF STATS: ERROR: Invalid parameter size (cmd = %08x, prm_size = %d B, expected prm_size = %d B\n",
+                    cmd,
+                    prm_size,
+                    sizeof(app_perf_stats_os_stats_t)
                     );
             }
             break;

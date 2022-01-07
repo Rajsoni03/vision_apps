@@ -219,6 +219,35 @@ typedef struct {
 } app_perf_stats_ddr_stats_t;
 
 /**
+ * \brief OS Resource usage information
+ */
+typedef struct {
+
+    uint32_t semaphore_count;  /**< total semaphores currently being allocated */
+    uint32_t mutex_count;      /**< total mutexes currently being allocated */
+    uint32_t queue_count;      /**< total queues currently being allocated */
+    uint32_t event_count;      /**< total events currently being allocated */
+    uint32_t heap_count;       /**< total heaps currently being allocated */
+    uint32_t mailbox_count;    /**< total mailboxes currently being allocated */
+    uint32_t task_count;       /**< total tasks currently being allocated */
+    uint32_t clock_count;      /**< total clocks currently being allocated */
+    uint32_t hwi_count;        /**< total hwis currently being allocated */
+    uint32_t timer_count;      /**< total timers currently being allocated */
+
+    uint32_t semaphore_peak;   /**< peak semaphores allocated since boot */
+    uint32_t mutex_peak;       /**< peak mutexes allocated since boot */
+    uint32_t queue_peak;       /**< peak queues allocated since boot */
+    uint32_t event_peak;       /**< peak events allocated since boot */
+    uint32_t heap_peak;        /**< peak heaps allocated since boot */
+    uint32_t mailbox_peak;     /**< peak mailboxes allocated since boot */
+    uint32_t task_peak;        /**< peak tasks allocated since boot */
+    uint32_t clock_peak;       /**< peak clocks allocated since boot */
+    uint32_t hwi_peak;         /**< peak hwis allocated since boot */
+    uint32_t timer_peak;       /**< peak timers allocated since boot */
+
+} app_perf_stats_os_stats_t;
+
+/**
  * \brief Initialize perf statistics collector module
  *
  *        TI-RTOS only API
@@ -321,6 +350,31 @@ int32_t appPerfStatsCpuLoadPrint(uint32_t app_cpu_id, app_perf_stats_cpu_load_t 
  * \return 0 on success
  */
 int32_t appPerfStatsCpuLoadPrintAll();
+
+/**
+ * \brief Get CPU OS statistics
+ *
+ *        Linux, TI-RTOS API
+ *
+ * \param app_cpu_id [in] CPU ID
+ * \param os_stats [out] CPU os static memory statistics
+ *
+ * \return 0 on success
+ */
+int32_t appPerfStatsCpuOsStatsGet(uint32_t app_cpu_id, app_perf_stats_os_stats_t *os_stats);
+
+/**
+ * \brief Print CPU OS statistics
+ *
+ *        Linux, TI-RTOS API
+ *
+ * \param app_cpu_id [in] CPU ID
+ * \param os_stats  [in] Detailed CPU os memory statistics
+ * \param showPeak  [in] flag to print peak numbers or not
+ *
+ * \return 0 on success
+ */
+int32_t appPerfStatsCpuOsStatsPrint(uint32_t app_cpu_id, app_perf_stats_os_stats_t *os_stats, uint32_t showPeak);
 
 /**
  * \brief Print CPU peformance statistics for all enabled CPUs

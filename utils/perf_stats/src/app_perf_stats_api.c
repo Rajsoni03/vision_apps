@@ -122,6 +122,18 @@ int32_t appPerfStatsCpuMemStatsGet(uint32_t app_cpu_id, app_perf_stats_mem_stats
     return status;
 }
 
+int32_t appPerfStatsCpuOsStatsGet(uint32_t app_cpu_id, app_perf_stats_os_stats_t *os_stats)
+{
+    int32_t status;
+
+    status = appRemoteServiceRun(app_cpu_id, APP_PERF_STATS_SERVICE_NAME,
+        APP_PERF_STATS_CMD_GET_OS_STATS,
+        os_stats, sizeof(app_perf_stats_os_stats_t),
+        0);
+
+    return status;
+}
+
 int32_t appPerfStatsCpuLoadPrintAll()
 {
     uint32_t cpu_id;
@@ -475,6 +487,44 @@ int32_t appPerfStatsCpuMemStatsPrint(uint32_t app_cpu_id, app_perf_stats_mem_sta
     printf("\n");
     return status;
 }
+
+int32_t appPerfStatsCpuOsStatsPrint(uint32_t app_cpu_id, app_perf_stats_os_stats_t *os_stats, uint32_t showPeak)
+{
+    int32_t status = 0;
+
+    printf("CPU: %6s\n", appIpcGetCpuName(app_cpu_id));
+
+    if (showPeak != 0)
+    {
+        printf("  semaphore:  cnt= %6d: peak: %6d\n", os_stats->semaphore_count, os_stats->semaphore_peak);
+        printf("  mutex:      cnt= %6d: peak: %6d\n", os_stats->mutex_count, os_stats->mutex_peak);
+        printf("  queue:      cnt= %6d: peak: %6d\n", os_stats->queue_count, os_stats->queue_peak);
+        printf("  event:      cnt= %6d: peak: %6d\n", os_stats->event_count, os_stats->event_peak);
+        printf("  heap:       cnt= %6d: peak: %6d\n", os_stats->heap_count, os_stats->heap_peak);
+        printf("  mailbox:    cnt= %6d: peak: %6d\n", os_stats->mailbox_count, os_stats->mailbox_peak);
+        printf("  task:       cnt= %6d: peak: %6d\n", os_stats->task_count, os_stats->task_peak);
+        printf("  clock:      cnt= %6d: peak: %6d\n", os_stats->clock_count, os_stats->clock_peak);
+        printf("  hwi:        cnt= %6d: peak: %6d\n", os_stats->hwi_count, os_stats->hwi_peak);
+        printf("  timer:      cnt= %6d: peak: %6d\n", os_stats->timer_count, os_stats->timer_peak);
+    }
+    else
+    {
+        printf("  semaphore:  cnt= %6d\n", os_stats->semaphore_count);
+        printf("  mutex:      cnt= %6d\n", os_stats->mutex_count);
+        printf("  queue:      cnt= %6d\n", os_stats->queue_count);
+        printf("  event:      cnt= %6d\n", os_stats->event_count);
+        printf("  heap:       cnt= %6d\n", os_stats->heap_count);
+        printf("  mailbox:    cnt= %6d\n", os_stats->mailbox_count);
+        printf("  task:       cnt= %6d\n", os_stats->task_count);
+        printf("  clock:      cnt= %6d\n", os_stats->clock_count);
+        printf("  hwi:        cnt= %6d\n", os_stats->hwi_count);
+        printf("  timer:      cnt= %6d\n", os_stats->timer_count);
+    }
+
+    printf("\n");
+    return status;
+}
+
 
 int32_t appPerfStatsCpuLoadPrint(uint32_t app_cpu_id, app_perf_stats_cpu_load_t *cpu_load)
 {
