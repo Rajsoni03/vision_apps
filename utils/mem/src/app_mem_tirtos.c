@@ -83,7 +83,7 @@
 /* #define APP_MEM_DEBUG */
 
 /** \brief Minmum number of bytes that will be used for alignment, MUST >= max CPU cache line size */
-#define APP_MEM_ALIGN_MIN_BYTES     (256u)
+#define APP_MEM_ALIGN_MIN_BYTES     (128u)
 
 #if defined(C71) || defined(C7120)
 extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
