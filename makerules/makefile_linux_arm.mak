@@ -184,6 +184,24 @@ define CLEAN_COPY_FROM_STAGE =
 	sync
 endef
 
+# CLEAN_COPY_FROM_STAGE_FAST macro for updating a file system from the stage fs
+# - Assumes that FULL copy has been done before
+# - Only updates vision_apps exe and firmware
+# $1 : destination rootfs path
+define CLEAN_COPY_FROM_STAGE_FAST =
+	# remove old remote files from filesystem
+	-rm -f $(1)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-*-fw
+	-rm -rf $(1)/lib/firmware/$(FIRMWARE_SUBFOLDER)
+
+	# copy partial vision apps linux fs stage directory into linux fs
+	cp -r $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-*-fw $(1)/lib/firmware/.
+	cp -r $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER) $(1)/lib/firmware/.
+	cp -r $(LINUX_FS_STAGE_PATH)/opt/vision_apps/* $(1)/opt/vision_apps/.
+	cp -r $(LINUX_FS_STAGE_PATH)/usr/lib/* $(1)/usr/lib/.
+	sync
+endef
+
+
 linux_host_libs_includes:
 	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX $(MAKE) imaging
 	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX $(MAKE) tiovx
@@ -211,6 +229,13 @@ endif
 
 linux_fs_install_nfs: linux_fs_install
 	$(call MODIFY_FS,$(LINUX_FS_PATH),$(LINUX_FS_BOOT_PATH))
+
+linux_fs_install_sd_ip: ip_addr_check linux_fs_install
+	mkdir -p /tmp/j7-evm
+	sshfs -o nonempty root@$(J7_IP_ADDRESS):/ /tmp/j7-evm
+	#(call CLEAN_COPY_FROM_STAGE,/tmp/j7-evm)
+	$(call CLEAN_COPY_FROM_STAGE_FAST,/tmp/j7-evm)
+	fusermount -u /tmp/j7-evm/
 
 linux_fs_install_sd_test_data:
 	$(call INSTALL_TEST_DATA,$(LINUX_SD_FS_ROOT_PATH),opt/vision_apps)
