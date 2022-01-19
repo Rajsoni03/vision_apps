@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2022 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,88 +60,14 @@
  *
  */
 
-#ifndef APP_UTILS_MISC_H_
-#define APP_UTILS_MISC_H_
+#include <FreeRTOS.h>
 
-/**
- * \defgroup group_vision_apps_utils_misc Miscellaneous utility APIs (TI-RTOS only)
- *
- * \brief This section contains miscellaneous utility APIs
- *
- * \ingroup group_vision_apps_utils
- *
- * @{
- */
-
-#include <stdint.h>
-
-typedef struct
+void appUtilsTaskInit(void)
 {
-    uint32_t enable_hdmi;
-    uint32_t enable_i2c1;
-} app_pinmux_cfg_t;
-
-
-/**
- * \brief Switch C7x from secure supervisor to non-secure supervisor
- *
- * NOTE, this API must be called after MMU and Cache init
- */
-uint64_t appC7xSecSupv2NonSecSupv ( void );
-
-
-/**
- * \brief Init CLEC so that C7x in non-secure mode can program it
- *
- * This also sets defaults for DRU input events to what TIDL needs
- *
- * This API MUST be called before switching C7x to secure mode
- */
-void appC7xClecInitForNonSecAccess(void);
-
-/**
- * \brief This sets defaults for DRU input events to what TIDL needs
- *
- */
-void appC7xClecInitDru(void);
-
-/**
- * \brief API to set to DLFO bit in ACTRL register of R5F
- *
- * This API uses assembly instruction to set DLFO bit in ACTRL register
- * of R5F.
- * This should be called from the Core reset callback.
- *
- */
-void appUtilsSetDLFOBitInACTRLReg(void);
-
-/**
- * \brief API to set to set pinmux required for running basic demos in Vision Apps
- *
- * It internally uses Board API to configure Pinmux.
- *
- */
-void appSetPinmux(app_pinmux_cfg_t *cfg);
-
-/**
- * \brief Inline Function to initialize Pinmux config to default value
- *
- */
-void appPinMuxCfgSetDefault(app_pinmux_cfg_t *cfg);
-
-/**
- * \brief API to print the CPU Frequency in Hz
- *
- */
-int32_t appUtilsPrintCpuHz(void);
-
-/**
- * \brief API call OS-specific init API's when creating tasks
- *
- */
-void appUtilsTaskInit(void);
-
-/* @} */
-
-#endif
-
+    #if defined(FREERTOS)
+    /* Any task that uses the floating point unit MUST call portTASK_USES_FLOATING_POINT()
+     * before any floating point instructions are executed.
+     */
+    portTASK_USES_FLOATING_POINT();
+    #endif
+}

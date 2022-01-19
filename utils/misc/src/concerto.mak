@@ -45,6 +45,8 @@ DEFS+=$(BUILD_PDK_BOARD)
 
 endif
 
+CSOURCES += app_utils_task_init.c
+
 include $(FINALE)
 
 endif
