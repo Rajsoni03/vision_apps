@@ -168,6 +168,23 @@ vx_reference App_Common_MemAllocObject(vx_context context, vx_enum type, uint32_
 
         ref = (vx_reference)rawImage;
     }
+    else if (type == (vx_enum)VX_TYPE_PYRAMID)
+    {
+        vx_pyramid  pyramid;
+        vx_size     levels = 4;
+        vx_uint32   width = 640;
+        vx_uint32   height = 480;
+        vx_float32  scale = VX_SCALE_PYRAMID_HALF;
+
+        pyramid = vxCreatePyramid(context, levels, scale, width, height, aux);
+
+        if (pyramid == NULL)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "vxCreatePyramid() failed.\n");
+        }
+
+        ref = (vx_reference)pyramid;
+    }
     else
     {
         VX_PRINT(VX_ZONE_ERROR, "Unsupported type [%d].\n", type);
@@ -236,6 +253,11 @@ int32_t App_Common_DeAllocImageObjects(vx_reference  ref[], uint32_t numRefs)
         {
             tivx_raw_image  rawImage = (tivx_raw_image)ref[i];
             vxStatus = tivxReleaseRawImage(&rawImage);
+        }
+        else if (refType == (vx_enum)VX_TYPE_PYRAMID)
+        {
+            vx_pyramid  pyramid = (vx_pyramid)ref[i];
+            vxStatus = vxReleasePyramid(&pyramid);
         }
         else
         {

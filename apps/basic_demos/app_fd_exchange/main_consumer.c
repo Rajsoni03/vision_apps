@@ -158,7 +158,7 @@ static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
                 {
                     VX_PRINT(VX_ZONE_ERROR,
                              "Data validation check for Obj [%d] plane [%d] "
-                             "failed. Expected = 0x8.8X Received = 0x%8.8X\n",
+                             "failed. Expected = 0x%8.8X Received = 0x%8.8X\n",
                              objNum, j, expected, *(uint32_t*)ptrs[j]);
                 }
                 else

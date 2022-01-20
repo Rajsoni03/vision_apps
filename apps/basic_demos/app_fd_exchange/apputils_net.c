@@ -32,6 +32,8 @@
  */
 #include <apputils_net.h>
 
+#define APPUTIL_MAX_NUM_FD  128
+
 int32_t
 AppUtil_netReadUnixSock(int32_t     sockFd,
                         void       *buff,
@@ -40,7 +42,7 @@ AppUtil_netReadUnixSock(int32_t     sockFd,
                         uint32_t   *numFd)
 {
     struct msghdr   msg;
-    char            buf[CMSG_SPACE(sizeof(int32_t)*4)];
+    char            buf[CMSG_SPACE(sizeof(int32_t)*APPUTIL_MAX_NUM_FD)];
     struct iovec    iov[1];
     int32_t         status;
 
@@ -136,7 +138,7 @@ AppUtil_netWriteUnixSock(int32_t    sockFd,
 {
     struct msghdr   msg;
     struct iovec    iov[1];
-    char            buf[CMSG_SPACE(sizeof(int32_t)*4)];
+    char            buf[CMSG_SPACE(sizeof(int32_t)*APPUTIL_MAX_NUM_FD)];
     int32_t         status = APPUTIL_NET_RET_SUCCESS;
 
     iov[0].iov_base = buff;
