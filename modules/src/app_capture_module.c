@@ -64,6 +64,8 @@
 #include <iss_sensors.h>
 #include <iss_sensor_if.h>
 
+#define MAX_FNAME (256)
+
 static vx_status configure_capture_params(vx_context context, CaptureObj *captureObj, SensorObj *sensorObj)
 {
     vx_status status = VX_SUCCESS;
@@ -229,33 +231,45 @@ static vx_status create_error_detection_frame(vx_context context, CaptureObj *ca
     IssSensor_CreateParams *sensorParams = &sensorObj->sensorParams;
 
     /*Error detection is currently enabled only for RAW input*/
-
-    /* If in test mode, send the test frame */
     if(0 != captureObj->capture_format)
     {
         captureObj->enable_error_detection = 0;
     }
 
-    if (captureObj->test_mode)
+    /* If in test mode or error detection is enabled, send the test frame */
+    if ((1 == captureObj->test_mode) || (1 == captureObj->enable_error_detection))
     {
-        char test_data_paths[2][255] =
+        uint32_t path_index = 0;
+        vx_int32 bytes_read = 0;
+#if defined (QNX)
+        const char * test_data_path = "/ti_fs/vision_apps/test_data/";
+#elif defined (PC)
+        const char * test_data_path = "./";
+#else
+        const char * test_data_path = "/opt/vision_apps/test_data/";
+#endif
+        char raw_image_fname[MAX_FNAME] = {0};
+        const char test_image_paths[3][64] =
         {
-            "/opt/vision_apps/test_data/psdkra/app_single_cam/IMX390_001/input2.raw",
-            "/opt/vision_apps/test_data/psdkra/app_single_cam/AR0233_001/input2.raw"
+            "psdkra/app_single_cam/IMX390_001/input2",  /* Used in test mode */
+            "psdkra/app_single_cam/AR0233_001/input2",  /* Used in test mode */
+            "img_test"                                  /* Used as error frame when not in test mode */
         };
-        struct stat sb;
-        
-        /* Check that we are not using data from QNX, in which case we should search
-           from ti_fs as the root */
-        const char * base_path = "/opt/vision_apps";
-        if (stat(base_path, &sb) != 0) {
-            memcpy(test_data_paths[0], "/ti_fs/vision_apps/test_data/psdkra/app_single_cam/IMX390_001/input2.raw", 73);
-            memcpy(test_data_paths[1], "/ti_fs/vision_apps/test_data/psdkra/app_single_cam/AR0233_001/input2.raw", 73);
+
+        if (1 == captureObj->test_mode)
+        {
+            path_index = sensorObj->sensor_index;
+        }
+        else
+        {
+            /* Point to last index in the test_image_paths list */
+            path_index = ((sizeof(test_image_paths)/64)/sizeof(char))-1;
         }
 
-        vx_int32 bytes_read = 0;
+        snprintf(raw_image_fname, MAX_FNAME, "%s/%s.raw", test_data_path, test_image_paths[path_index]);
+
         captureObj->error_frame_raw_image = read_error_image_raw(context, &(sensorParams->sensorInfo),
-                                                test_data_paths[sensorObj->sensor_index],
+                                                raw_image_fname,
                                                 &bytes_read);
 
         APP_PRINTF("%d bytes were read by read_error_image_raw() from path %s\n", bytes_read, test_data_paths[sensorObj->sensor_index]);
@@ -263,8 +277,7 @@ static vx_status create_error_detection_frame(vx_context context, CaptureObj *ca
 
         if(status == VX_SUCCESS)
         {
-            APP_PRINTF("%d bytes were read by read_error_image_raw()\n", bytes_read);
-            if(bytes_read <= 0)
+            if(bytes_read < 0)
             {
                 printf("[CAPTURE_MODULE] Bytes read by error frame for RAW image is < 0! \n");
                 tivxReleaseRawImage(&captureObj->error_frame_raw_image);
@@ -273,48 +286,12 @@ static vx_status create_error_detection_frame(vx_context context, CaptureObj *ca
         }
         else
         {
-            printf("[CAPTURE_MODULE] Unable to crate error frame RAW image!\n");
+            printf("[CAPTURE_MODULE] Unable to create error frame RAW image!\n");
         }
     }
     else
     {
-        /* If we are doing error detection, just send a black frame to the dead sensor */
-        if(captureObj->enable_error_detection)
-        {
-            vx_map_id map_id;
-            vx_rectangle_t rect;
-            vx_imagepatch_addressing_t image_addr;
-            void * data_ptr;
-
-            rect.start_x = 0;
-            rect.start_y = 0;
-            rect.end_x = sensorParams->sensorInfo.raw_params.width;
-            rect.end_y = sensorParams->sensorInfo.raw_params.height;
-
-            captureObj->error_frame_raw_image = tivxCreateRawImage(context, &(sensorParams->sensorInfo.raw_params));
-
-            status = vxGetStatus((vx_reference)captureObj->error_frame_raw_image);
-
-            if(status == VX_SUCCESS)
-            {
-                vxSetReferenceName((vx_reference)captureObj->error_frame_raw_image, "capture_node_error_frame_raw_image");
-
-                status = tivxMapRawImagePatch((tivx_raw_image)captureObj->error_frame_raw_image, &rect, 0, &map_id, &image_addr, &data_ptr, VX_READ_ONLY, VX_MEMORY_TYPE_HOST, TIVX_RAW_IMAGE_ALLOC_BUFFER);
-
-                if ((vx_status)VX_SUCCESS == status)
-                {
-                    memset(data_ptr, 0x00, image_addr.stride_y*(sensorParams->sensorInfo.raw_params.height+sensorParams->sensorInfo.raw_params.meta_height_before+sensorParams->sensorInfo.raw_params.meta_height_after));
-                }
-            }
-            else
-            {
-                printf("[CAPTURE_MODULE] Unable to crate error frame RAW image!\n");
-            }
-        }
-        else
-        {
-            captureObj->error_frame_raw_image = NULL;
-        }
+        captureObj->error_frame_raw_image = NULL;
     }
 
     return status;
@@ -359,7 +336,7 @@ static vx_status configure_capture_output_write(vx_context context, CaptureObj *
         {
             printf("[CAPTURE-MODULE] Unable to create file prefix object for writing capture output! \n");
         }
-        
+
 
         captureObj->write_cmd = vxCreateUserDataObject(context, "tivxFileIOWriteCmd", sizeof(tivxFileIOWriteCmd), NULL);
         status = vxGetStatus((vx_reference)captureObj->write_cmd);
@@ -428,67 +405,82 @@ tivx_raw_image read_error_image_raw(vx_context context,
     tivx_raw_image raw_image = NULL;
     tivx_raw_image_format_t format;
     vx_uint32 imgaddr_width, imgaddr_height, imgaddr_stride;
-    /* Provision for injecting RAW frame into the sensor */
-    /* rect defines the outer bounds of the raw_image frame
-        which will be defined */
-    rect.start_x = 0;
-    rect.start_y = 0;
-    rect.end_x = sensorInfo->raw_params.width;
-    rect.end_y = sensorInfo->raw_params.height;
+    vx_status status = VX_SUCCESS;
 
     /* Nothing is being populated here - just an empty frame */
     raw_image = tivxCreateRawImage(context, &(sensorInfo->raw_params));
 
-    APP_PRINTF("Reading test RAW image %s \n", raw_image_fname);
-    fp = fopen(raw_image_fname, "rb");
-    if(!fp)
+    status = vxGetStatus((vx_reference)raw_image);
+
+    if(status == VX_SUCCESS)
     {
-        printf("read_test_image_raw : Unable to open file %s\n", raw_image_fname);
-        return NULL;
+        vxSetReferenceName((vx_reference)raw_image, "capture_node_error_frame_raw_image");
     }
-    tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_WIDTH, &width, sizeof(vx_uint32));
-    tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
-    tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_FORMAT, &format, sizeof(format));
-
-    rect.start_x = 0;
-    rect.start_y = 0;
-    rect.end_x = width;
-    rect.end_y = height;
-
-    tivxMapRawImagePatch(raw_image,
-        &rect,
-        0,
-        &map_id,
-        &image_addr,
-        &data_ptr,
-        VX_READ_AND_WRITE,
-        VX_MEMORY_TYPE_HOST,
-        TIVX_RAW_IMAGE_PIXEL_BUFFER
-        );
-
-    if(!data_ptr)
+    else
     {
-        APP_PRINTF("data_ptr is NULL \n");
-        fclose(fp);
-        return NULL;
-    }
-    num_bytes_read_from_file = 0;
-
-    imgaddr_width  = image_addr.dim_x;
-    imgaddr_height = image_addr.dim_y;
-    imgaddr_stride = image_addr.stride_y;
-
-    for(i=0;i<imgaddr_height;i++)
-    {
-        num_bytes_read_from_file += fread(data_ptr, 1, imgaddr_width*num_bytes_per_pixel, fp);
-        data_ptr += imgaddr_stride;
+        printf("[CAPTURE_MODULE] Unable to create error frame RAW image!\n");
     }
 
-    tivxUnmapRawImagePatch(raw_image, map_id);
+    if ((vx_status)VX_SUCCESS == status)
+    {
+        tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_WIDTH, &width, sizeof(vx_uint32));
+        tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
+        tivxQueryRawImage(raw_image, TIVX_RAW_IMAGE_FORMAT, &format, sizeof(format));
 
-    fclose(fp);
-    APP_PRINTF("%d bytes read from %s\n", num_bytes_read_from_file, raw_image_fname);
-    *bytes_read = num_bytes_read_from_file;
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = width;
+        rect.end_y = height;
+
+        tivxMapRawImagePatch(raw_image,
+            &rect,
+            0,
+            &map_id,
+            &image_addr,
+            &data_ptr,
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            TIVX_RAW_IMAGE_PIXEL_BUFFER
+            );
+
+        if(!data_ptr)
+        {
+            printf("data_ptr is NULL \n");
+            tivxReleaseRawImage(&raw_image);
+            return NULL;
+        }
+
+        APP_PRINTF("Reading test RAW image %s \n", raw_image_fname);
+        fp = fopen(raw_image_fname, "rb");
+
+        if(!fp)
+        {
+            printf("read_test_image_raw : Unable to open file %s, setting error message as all 0s\n", raw_image_fname);
+            memset(data_ptr, 0x00, image_addr.stride_y*height);
+            *bytes_read = 0;
+        }
+        else
+        {
+            num_bytes_read_from_file = 0;
+
+            imgaddr_width  = image_addr.dim_x;
+            imgaddr_height = image_addr.dim_y;
+            imgaddr_stride = image_addr.stride_y;
+
+            for(i=0;i<imgaddr_height;i++)
+            {
+                num_bytes_read_from_file += fread(data_ptr, 1, imgaddr_width*num_bytes_per_pixel, fp);
+                data_ptr += imgaddr_stride;
+            }
+
+            fclose(fp);
+
+            APP_PRINTF("%d bytes read from %s\n", num_bytes_read_from_file, raw_image_fname);
+            *bytes_read = num_bytes_read_from_file;
+        }
+
+        tivxUnmapRawImagePatch(raw_image, map_id);
+    }
     return raw_image;
 }
 
@@ -548,7 +540,7 @@ vx_status app_create_graph_capture(vx_graph graph, CaptureObj *captureObj)
     {
         printf("[CAPTURE-MODULE] Unable to create capture node! \n");
     }
-    
+
     return status;
 }
 
