@@ -48,7 +48,7 @@ set demo [lindex $argv 0];
 set delay [lindex $argv 1];
 set ds [lindex $argv 2]
 set cameras [lindex $argv 3]
-set delta_cmd [lindex $argv 4]
+set single [lindex $argv 4]
 
 set mul "[expr 3 * $cameras]"
 set camera_sleep "[expr 6 + $mul]"
@@ -59,16 +59,25 @@ sleep 2
 
 if {$cameras != 0} {
 
-    # Autodetect Camera (single camera : Channel Number)
-    send -- "0\r"
+    if {$single != 0} {
+        # Channel Number
+        send -- "0\r"
+        sleep 1
+    }
+
+    # Camera Selection
+    send -- "a\r"
     sleep 1
 
-    # LDC On            (single camera : Autodetect Camera)
-    send -- "${delta_cmd}\r"
+    # LDC On
+    send -- "1\r"
     sleep 1
 
-    # One Camera        (single camera : LDC On)
-    send -- "${cameras}\r"
+    if {$single == 0} {
+        # Num Cameras
+        send -- "${cameras}\r"
+    }
+
     sleep $camera_sleep
 }
 

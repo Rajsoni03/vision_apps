@@ -54,9 +54,9 @@ do
 
         if [[ ${EXECUTION_CMD} == *"run_app_single_cam"* ]]
         then
-            DELTA_CMD=0
+            SINGLE_CAM=1
         else
-            DELTA_CMD=1
+            SINGLE_CAM=0
         fi
 
         if [ ${CAMERAS} -eq 0 ] || [ ${no_camera} -eq 0 ]
@@ -64,7 +64,7 @@ do
             if [ ${ds} -eq 1 ]
             then
                 # Use programmable delay for datasheet dump
-                ./script.exp ${EXECUTION_CMD} ${DELAY} 1 ${CAMERAS} ${DELTA_CMD}
+                ./script.exp ${EXECUTION_CMD} ${DELAY} 1 ${CAMERAS} ${SINGLE_CAM}
                 echo "Moving ${DS_ORIG} to datasheets/${DS_DIR}/${DS_RENAME}"
                 mkdir -p datasheets/${DS_DIR}
                 mv ${DS_ORIG} datasheets/${DS_DIR}/${DS_RENAME}
@@ -95,7 +95,7 @@ do
                 fi
             else
                 # Hard coding delay to 2 seconds for sanity testing (no datasheet dumps)
-                ./script.exp ${EXECUTION_CMD} 2 0 ${CAMERAS} ${DELTA_CMD}
+                ./script.exp ${EXECUTION_CMD} 2 0 ${CAMERAS} ${SINGLE_CAM}
             fi
         fi
     fi
