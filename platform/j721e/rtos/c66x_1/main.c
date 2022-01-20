@@ -62,6 +62,7 @@
 
 #include <app.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/misc/include/app_misc.h>
 #include <stdio.h>
 #include <string.h>
 #include <ti/osal/osal.h>
@@ -79,6 +80,7 @@ void appCacheMarInit(void);
 
 static void appMain(void* arg0, void* arg1)
 {
+    appUtilsTaskInit();
     appInit();
     appTimerInterruptInit();
     appRun();

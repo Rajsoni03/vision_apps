@@ -64,6 +64,7 @@
 #define APP_LOG_PRIV_H_
 
 #include <utils/console_io/include/app_log.h>
+#include <utils/misc/include/app_misc.h>
 
 #define APP_LOG_BUF_MAX  (1024u)
 

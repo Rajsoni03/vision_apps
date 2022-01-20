@@ -60,7 +60,9 @@
  *
  */
 
+#if defined(FREERTOS)
 #include <FreeRTOS.h>
+#endif
 
 void appUtilsTaskInit(void)
 {

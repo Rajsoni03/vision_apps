@@ -259,6 +259,10 @@ void* appLogRdRun(app_log_rd_obj_t *obj)
     uint32_t done = 0, cpu_id;
     uint32_t num_bytes, str_len;
 
+    #if defined(FREERTOS) || defined(SYSBIOS)
+    appUtilsTaskInit();
+    #endif
+
     while(!done)
     {
         appLogWaitMsecs(obj->log_rd_poll_interval_in_msecs);

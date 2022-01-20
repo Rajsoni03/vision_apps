@@ -91,6 +91,7 @@
 /* Vision Apps utils */
 #include <utils/udma/include/app_udma.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/misc/include/app_misc.h>
 
 #if defined (SYSBIOS)
 

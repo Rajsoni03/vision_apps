@@ -511,6 +511,8 @@ static void EthApp_lwipMain(void *a0,
     err_t err;
     sys_sem_t initSem;
 
+    appUtilsTaskInit();
+
     /* initialize lwIP stack and network interfaces */
     err = sys_sem_new(&initSem, 0);
     LWIP_ASSERT("failed to create initSem", err == ERR_OK);

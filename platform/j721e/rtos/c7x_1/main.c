@@ -91,6 +91,7 @@
 
 static void appMain(void* arg0, void* arg1)
 {
+    appUtilsTaskInit();
     appInit();
     appRun();
     #if 1

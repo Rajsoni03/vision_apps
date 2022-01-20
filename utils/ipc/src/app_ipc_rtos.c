@@ -63,6 +63,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/misc/include/app_misc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <ti/drv/ipc/ipc.h>
@@ -273,6 +274,8 @@ static void appIpcRpmsgRxTaskMain(void *arg0, void *arg1)
     uint32_t done = 0, src_cpu_id, reply_endpt;
     uint16_t len;
     int32_t status = 0;
+
+    appUtilsTaskInit();
 
     while(!done)
     {
@@ -857,6 +860,8 @@ char *appIpcGetCpuName(uint32_t app_cpu_id)
 
 static void traceBufFlush(void* arg0, void* arg1)
 {
+    appUtilsTaskInit();
+
     while (1)
     {
         TaskP_sleepInMsecs(IPC_TRACEBUF_FLUSH_PERIOD_IN_MSEC);

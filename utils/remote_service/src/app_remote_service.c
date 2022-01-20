@@ -62,6 +62,7 @@
 
 #include "app_remote_service_priv.h"
 #include <utils/perf_stats/include/app_perf_stats.h>
+#include <utils/misc/include/app_misc.h>
 #include <ti/drv/ipc/ipc.h>
 #include <ti/osal/TaskP.h>
 #include <ti/osal/SemaphoreP.h>
@@ -155,6 +156,8 @@ static void appRemoteServiceRxTaskMain(void *arg0, void *arg1)
     int32_t status = -1;
     uint32_t done = 0, reply_endpt, src_cpu_id;
     uint16_t len;
+
+    appUtilsTaskInit();
 
     while(!done)
     {

@@ -63,6 +63,7 @@
 #include <app.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/ethfw/include/app_ethfw.h>
+#include <utils/misc/include/app_misc.h>
 #include <stdio.h>
 #include <string.h>
 #include <ti/osal/osal.h>
@@ -72,6 +73,7 @@
 
 static void appMain(void* arg0, void* arg1)
 {
+    appUtilsTaskInit();
     appInit();
     appRun();
     #if 1

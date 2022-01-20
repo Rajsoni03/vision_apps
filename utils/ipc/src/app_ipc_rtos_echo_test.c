@@ -47,6 +47,7 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/ipc/include/app_ipc.h>
+#include <utils/misc/include/app_misc.h>
 
 /* #define APP_IPC_ECHO_TEST_DEBUG */
 
@@ -223,6 +224,8 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
     uint32_t    bufSize = RPMSG_DATA_SIZE;
     char        str[MSGSIZE];
 
+    appUtilsTaskInit();
+
     #ifdef APP_IPC_ECHO_TEST_DEBUG
     appLogPrintf("IPC: RecvTask: Started ...\n");
     #endif
@@ -313,6 +316,8 @@ static void rpmsg_senderFxn(uintptr_t arg0, uintptr_t arg1)
     int32_t             status = 0;
     char                buf[MSGSIZE];
     uint8_t            *buf1;
+
+    appUtilsTaskInit();
 
     dstProc = (uint16_t)arg0;
     appDstProcId = (uint32_t)arg1;

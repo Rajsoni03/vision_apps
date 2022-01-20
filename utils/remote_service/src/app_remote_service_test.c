@@ -67,6 +67,7 @@
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
+#include <utils/misc/include/app_misc.h>
 
 #if defined(SYSBIOS) || defined(FREERTOS)
 /* define this to enable load test */
@@ -146,6 +147,8 @@ static void appRemoteServiceLoadTestTaskMain(void *arg0, void *arg1)
 {
     app_remote_service_load_test_obj_t *obj = &g_app_remote_service_load_test_obj;
     uint32_t cpu_id = appIpcGetSelfCpuId();
+
+    appUtilsTaskInit();
 
     while(1)
     {
