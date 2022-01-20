@@ -1,3 +1,20 @@
+
+ 
+ /* 
+  * IMPORTANT NOTE: Follow below instructions to apply the updated memory map to linux dtsi file, 
+  * 
+  * 1. Copy the memory sections, from the generated dts file, to the file shown below under reserved_memory: reserved-memory { ... } 
+  *     ${LINUX_KERNEL_PATH}/arch/arm64/boot/dts/ti/k3-j721e-rtos-memory-map.dtsi
+  * 
+  * 2. Rebuild the dtb, dtbo from PSDK Linux install directory 
+  *      make linux-dtbs 
+  * 
+  * 3. Install the dtb, dtbo to the rootfs/boot folder on SD card 
+  *      sudo make linux-dtbs_intall; sync 
+  * 
+   */
+
+
 	vision_apps_mcu_r5fss0_core0_dma_memory_region: vision-apps-r5f-dma-memory@a0000000 {
 		compatible = "shared-dma-pool";
 		reg = <0x00 0xa0000000 0x00 0x00100000>;
@@ -104,17 +121,17 @@
 	};
 	vision_apps_core_heaps_lo: vision-apps-core-heap-memory-lo@d8000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xd8000000 0x00 0x24000000>;
+		reg = <0x00 0xd8000000 0x00 0x23000000>;
 		no-map;
 	};
-	intercore_eth_main_r5fss0_core1_memory_region: intercore-eth-r5f-memory@fc000000 {
+	vision_apps_main_r5fss0_core0_shared_memory_queue_region: vision-apps-r5f-virtual-eth-queues@fb000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xfc000000 0x00 0x02000000>;
+		reg = <0x00 0xfb000000 0x00 0x00800000>;
 		no-map;
 	};
-	eeprom_shadow_memory_region: eeprom-shadow-r5f-memory@fe000000 {
+	vision_apps_main_r5fss0_core0_shared_memory_bufpool_region: vision-apps-r5f-virtual-eth-buffers@fb800000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xfe000000 0x00 0x01000000>;
+		reg = <0x00 0xfb800000 0x00 0x01800000>;
 		no-map;
 	};
 	vision_apps_core_heaps_hi: vision-apps-core-heap-memory-hi@880000000 {
@@ -122,3 +139,4 @@
 		reg = <0x08 0x80000000 0x00 0x10000000>;
 		no-map;
 	};
+

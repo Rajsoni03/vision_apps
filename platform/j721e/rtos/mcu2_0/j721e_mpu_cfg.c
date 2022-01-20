@@ -208,21 +208,5 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .cacheable        = (uint32_t)FALSE,
         .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
         .memAttr          = 0U,
-    },
-    {
-        /* Region 12 configuration:
-         * EEPROM_SHADOW_ADDR as non-cache 16 MB
-         */
-        .regionId         = 11U,
-        .enable           = 1U,
-        .baseAddr         = EEPROM_SHADOW_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_16MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 1U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
     }
 };
