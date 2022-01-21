@@ -1845,11 +1845,7 @@ static void app_default_param_set(AppObj *obj)
 
     app_pipeline_params_defaults(obj);
 
-    #ifdef APP_USE_IMAGE_SENSOR
-    obj->captureObj.enable_error_detection = 0; /* disable when image sensor is enabled */
-    #else
-    obj->captureObj.enable_error_detection = 1; /* enabled when image sensor is disabled */
-    #endif
+    obj->captureObj.enable_error_detection = 1; /* enabled by default */
     obj->is_interactive = 1;
     obj->write_file = 0;
     obj->num_frames_to_run = 1000000000;

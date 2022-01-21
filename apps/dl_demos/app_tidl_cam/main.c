@@ -665,7 +665,7 @@ static vx_status app_init(AppObj *obj)
     /* Initialize modules */
     if(status == VX_SUCCESS)
     {
-        status = app_init_sensor(&obj->sensorObj, "sensor_obj");
+        app_init_sensor(&obj->sensorObj, "sensor_obj");
         APP_PRINTF("Sensor init done!\n");
     }
     if(status == VX_SUCCESS)
@@ -1314,7 +1314,7 @@ static void app_default_param_set(AppObj *obj)
 
     app_pipeline_params_defaults(obj);
 
-    obj->captureObj.enable_error_detection = 0; /* disable by default */
+    obj->captureObj.enable_error_detection = 1; /* enable by default */
     obj->is_interactive = 1;
     obj->test_mode = 0;
     obj->write_file = 0;

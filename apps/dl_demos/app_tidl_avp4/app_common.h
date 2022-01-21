@@ -67,8 +67,6 @@
 //#define APP_DEBUG
 //#define APP_WRITE_INTERMEDIATE_OUTPUTS
 
-#define APP_USE_FILEIO
-#define APP_USE_IMAGE_SENSOR
 #define APP_TIVX_LOG_RT_ENABLE
 
 #define APP_MAX_FILE_PATH           (256u)
