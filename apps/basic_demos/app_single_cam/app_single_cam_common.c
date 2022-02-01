@@ -769,6 +769,8 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     }
 #endif
 
+    obj->viss_params.enable_ctx = 1;
+
     if(sensor_wdr_enabled == 1)
     {
         obj->viss_params.bypass_glbce = 0;
