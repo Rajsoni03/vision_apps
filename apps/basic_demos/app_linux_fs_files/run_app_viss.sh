@@ -1,6 +1,7 @@
 echo "!Starting VISS APP Stress Test!"
 /opt/vision_apps/vx_app_viss.out 5 60
 echo "!10 Second Cooldown!"
+sleep 10
 /opt/vision_apps/vx_app_viss.out 15 60
 echo "!10 Second Cooldown!"
 sleep 10
