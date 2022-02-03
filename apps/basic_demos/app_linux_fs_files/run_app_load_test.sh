@@ -1,8 +1,8 @@
-echo "!Starting Load Test!"
+echo "!Starting App Load Test!"
 
-echo "!Starting C7x Core Testing!"
 /opt/vision_apps/vx_app_load_test.out 2 5 60
 echo "!10 Second Cooldown!"
+sleep 10
 /opt/vision_apps/vx_app_load_test.out 2 15 60
 echo "!10 Second Cooldown!"
 sleep 10
@@ -31,9 +31,9 @@ sleep 10
 echo "!10 Second Cooldown!"
 sleep 10
 
-echo "!Starting R5F Core Testing!"
 /opt/vision_apps/vx_app_load_test.out 4 5 60
 echo "!10 Second Cooldown!"
+sleep 10
 /opt/vision_apps/vx_app_load_test.out 4 15 60
 echo "!10 Second Cooldown!"
 sleep 10
@@ -62,9 +62,9 @@ sleep 10
 echo "!10 Second Cooldown!"
 sleep 10
 
-echo "!Starting C6x Core Testing!"
 /opt/vision_apps/vx_app_load_test.out 5 5 60
 echo "!10 Second Cooldown!"
+sleep 10
 /opt/vision_apps/vx_app_load_test.out 5 15 60
 echo "!10 Second Cooldown!"
 sleep 10
