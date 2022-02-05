@@ -6,7 +6,7 @@
 
 QNX_AUX_FS_PATH=$(PSDK_QNX_PATH)/rootfs
 
-ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
+ifeq ($(PROFILE), $(filter $(PROFILE),debug))
 QNX_APP_PROFILE=debug
 endif
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
@@ -117,34 +117,12 @@ endif
 
 
 # MODIFY_QNX_SD_FS macro for making PSDK RTOS modifications to the QNX to file system
-define MODIFY_QNX_SD_FS_WITH_ARG =
-	# copy vision apps binaries
-	mkdir -p $(1)/vision_apps
-	# copy tisci-mgr
-	cp $(PSDK_QNX_PATH)/qnx/resmgr/sciclient_qnx_rsmgr/aarch64/o.le/tisci-mgr $(1)/tibin/
-	# copy tiudma-mgr
-	cp $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/resmgr/aarch64/o.le/tiudma-mgr $(1)/tibin/
-	# copy sharedmemallocator
-	cp $(PSDK_QNX_PATH)/qnx/sharedmemallocator/resmgr/aarch64/o.le/shmemallocator $(1)/tibin/
-	# copy tiipc-mgr
-	cp $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/resmgr/aarch64/o.le/tiipc-mgr $(1)/tibin/
-	sync
-endef
-
 define MODIFY_QNX_SD_FS =
 	# copy all staged files
 	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
 	# copy vision apps binaries
 	mkdir -p $(QNX_SD_FS_BOOT_PATH)/vision_apps
 	cp -r $(QNX_FS_PATH)/vision_apps $(QNX_SD_FS_BOOT_PATH)/
-	# copy tisci-mgr
-	cp $(PSDK_QNX_PATH)/qnx/resmgr/sciclient_qnx_rsmgr/aarch64/o.le/tisci-mgr $(QNX_SD_FS_BOOT_PATH)/tibin/
-	# copy tiudma-mgr
-	cp $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/resmgr/aarch64/o.le/tiudma-mgr $(QNX_SD_FS_BOOT_PATH)/tibin/
-	# copy sharedmemallocator
-	cp $(PSDK_QNX_PATH)/qnx/sharedmemallocator/resmgr/aarch64/o.le/shmemallocator $(QNX_SD_FS_BOOT_PATH)/tibin/
-	# copy tiipc-mgr
-	cp $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/resmgr/aarch64/o.le/tiipc-mgr $(QNX_SD_FS_BOOT_PATH)/tibin/
 	sync
 endef
 
@@ -168,8 +146,6 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 endif
 
 qnx_fs_install_nfs: qnx_fs_copy_spl_uboot qnx_fs_install
-	# QNX_FS_INSTALL_NFS with QNX_FS_PATH ${QNX_FS_PATH}
-	$(call MODIFY_QNX_SD_FS_WITH_ARG,${QNX_FS_PATH})
 	cp $(PSDK_QNX_PATH)/qnx/bsp/images/ifs-j721e-evm-ti-spl-nfs.raw $(QNX_AUX_FS_PATH)/qnx-ifs-spl-nfs
 	sync
 
