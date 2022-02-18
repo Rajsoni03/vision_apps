@@ -235,6 +235,7 @@ static vx_status dma_transfer_trigger(DMAObj *dmaObj)
     {
         app_udma_copy_nd_prms_t *tfrPrms;
         vx_uint32 icnt1, icnt2, icnt3;
+        vx_uint32 num_bytes = 1;
 
         tfrPrms = (app_udma_copy_nd_prms_t *)&dmaObj->tfrPrms;
 
@@ -252,9 +253,31 @@ static vx_status dma_transfer_trigger(DMAObj *dmaObj)
         vx_uint8 *pSrcNext = (vx_uint8 *)(tfrPrms->src_addr + (icnt3 * tfrPrms->dim3) + (icnt2 * tfrPrms->dim2));
         vx_uint8 *pDstNext = (vx_uint8 *)(tfrPrms->dest_addr + (icnt3 * tfrPrms->ddim3) + (icnt2 * tfrPrms->ddim2));
 #endif
+
+        if((tfrPrms->eltype == 1) || (tfrPrms->eltype == 0))
+        {
+            /* Indicate 1 byte per element for transferring 8bit data */
+            num_bytes = 1;
+        }
+        else if(tfrPrms->eltype == 2)
+        {
+            /* Indicate 2 bytes per element for transferring 16bit data */
+            num_bytes = 2;
+        }
+        else if(tfrPrms->eltype == 3)
+        {
+            /* Indicate 3 bytes per element for transferring 24bit data */
+            num_bytes = 3;
+        }
+        else if(tfrPrms->eltype == 4)
+        {
+            /* Indicate 4 bytes per element for transferring 32bit data */
+            num_bytes = 4;
+        }
+
         for(icnt1 = 0; icnt1 < tfrPrms->icnt1; icnt1++)
         {
-            memcpy(pDstNext, pSrcNext, tfrPrms->icnt0);
+            memcpy(pDstNext, pSrcNext, (tfrPrms->icnt0 * num_bytes));
 
             pSrcNext += tfrPrms->dim1;
             pDstNext += tfrPrms->ddim1;

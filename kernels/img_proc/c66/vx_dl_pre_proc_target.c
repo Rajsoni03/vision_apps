@@ -1211,9 +1211,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
 
-                                pOut[offset + 2] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 2] = (int8_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[offset + 1] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[offset + 0] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[offset + 0] = (int8_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
 
                                 offset += 3;
                             }
@@ -1240,9 +1240,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
 
-                                pOut[offset + 2] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 2] = (uint8_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[offset + 1] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[offset + 0] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[offset + 0] = (uint8_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
 
                                 offset += 3;
                             }
@@ -1269,9 +1269,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_SIGNED_MIN, DL_PRE_PROC_16BIT_SIGNED_MAX);
 
-                                pOut[offset + 2] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 2] = (int16_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[offset + 1] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[offset + 0] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[offset + 0] = (int16_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
 
                                 offset += 3;
                             }
@@ -1298,9 +1298,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_UNSIGNED_MIN, DL_PRE_PROC_16BIT_UNSIGNED_MAX);
 
-                                pOut[offset + 2] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 2] = (uint16_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[offset + 1] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[offset + 0] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[offset + 0] = (uint16_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
 
                                 offset += 3;
                             }
@@ -1327,9 +1327,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_SIGNED_MIN, DL_PRE_PROC_32BIT_SIGNED_MAX);
 
-                                pOut[offset + 2] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 2] = (int32_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[offset + 1] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[offset + 0] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[offset + 0] = (int32_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
 
                                 offset += 3;
                             }
@@ -1356,9 +1356,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_UNSIGNED_MIN, DL_PRE_PROC_32BIT_UNSIGNED_MAX);
 
-                                pOut[offset + 2] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[offset + 2] = (uint32_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[offset + 1] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[offset + 0] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[offset + 0] = (uint32_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
 
                                 offset += 3;
                             }
@@ -1385,9 +1385,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_FLOAT_MIN, DL_PRE_PROC_FLOAT_MAX);
 
-                                pOut[offset + 2] = (R - dlParams->mean[0]) * dlParams->scale[0];
+                                pOut[offset + 2] = (R - dlParams->mean[2]) * dlParams->scale[2];
                                 pOut[offset + 1] = (G - dlParams->mean[1]) * dlParams->scale[1];
-                                pOut[offset + 0] = (B - dlParams->mean[2]) * dlParams->scale[2];
+                                pOut[offset + 0] = (B - dlParams->mean[0]) * dlParams->scale[0];
 
                                 offset += 3;
                             }
@@ -1592,9 +1592,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (int8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 2) + pos_x] = (int8_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[(ch_offset * 1) + pos_x] = (int8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[(ch_offset * 0) + pos_x] = (int8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[(ch_offset * 0) + pos_x] = (int8_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
                             }
                         }
                     }
@@ -1616,9 +1616,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_8BIT_UNSIGNED_MIN, DL_PRE_PROC_8BIT_UNSIGNED_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (uint8_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint8_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[(ch_offset * 1) + pos_x] = (uint8_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[(ch_offset * 0) + pos_x] = (uint8_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint8_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
                             }
                         }
                     }
@@ -1640,9 +1640,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_SIGNED_MIN, DL_PRE_PROC_16BIT_SIGNED_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (int16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 2) + pos_x] = (int16_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[(ch_offset * 1) + pos_x] = (int16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[(ch_offset * 0) + pos_x] = (int16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[(ch_offset * 0) + pos_x] = (int16_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
                             }
                         }
                     }
@@ -1664,9 +1664,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_16BIT_UNSIGNED_MIN, DL_PRE_PROC_16BIT_UNSIGNED_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (uint16_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint16_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[(ch_offset * 1) + pos_x] = (uint16_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[(ch_offset * 0) + pos_x] = (uint16_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint16_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
                             }
                         }
                     }
@@ -1688,9 +1688,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_SIGNED_MIN, DL_PRE_PROC_32BIT_SIGNED_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (int32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 2) + pos_x] = (int32_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[(ch_offset * 1) + pos_x] = (int32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[(ch_offset * 0) + pos_x] = (int32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[(ch_offset * 0) + pos_x] = (int32_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
                             }
                         }
                     }
@@ -1712,9 +1712,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_32BIT_UNSIGNED_MIN, DL_PRE_PROC_32BIT_UNSIGNED_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (uint32_t)((R - dlParams->mean[0]) * dlParams->scale[0]);
+                                pOut[(ch_offset * 2) + pos_x] = (uint32_t)((R - dlParams->mean[2]) * dlParams->scale[2]);
                                 pOut[(ch_offset * 1) + pos_x] = (uint32_t)((G - dlParams->mean[1]) * dlParams->scale[1]);
-                                pOut[(ch_offset * 0) + pos_x] = (uint32_t)((B - dlParams->mean[2]) * dlParams->scale[2]);
+                                pOut[(ch_offset * 0) + pos_x] = (uint32_t)((B - dlParams->mean[0]) * dlParams->scale[0]);
                             }
                         }
                     }
@@ -1736,9 +1736,9 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcProcess
 
                                 convertYCbCrToRGB(Y, Cb, Cr, &R, &G, &B, DL_PRE_PROC_FLOAT_MIN, DL_PRE_PROC_FLOAT_MAX);
 
-                                pOut[(ch_offset * 2) + pos_x] = (R - dlParams->mean[0]) * dlParams->scale[0];
+                                pOut[(ch_offset * 2) + pos_x] = (R - dlParams->mean[2]) * dlParams->scale[2];
                                 pOut[(ch_offset * 1) + pos_x] = (G - dlParams->mean[1]) * dlParams->scale[1];
-                                pOut[(ch_offset * 0) + pos_x] = (B - dlParams->mean[2]) * dlParams->scale[2];
+                                pOut[(ch_offset * 0) + pos_x] = (B - dlParams->mean[0]) * dlParams->scale[0];
                             }
                         }
                     }
