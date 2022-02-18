@@ -356,14 +356,14 @@ vx_status triangulateStereoDisparity(
             // check if disparity is valid based on confidence threshould
             valid = !pcParams->usePCConfig;
             valid = valid || (pcParams->usePCConfig && 
-                              ((pixDisparity & 0x3) >= pcParams->thConfidence));
+                              ((pixDisparity & 0x7) >= pcParams->thConfidence));
             if (valid == 0)
             {
                 R += 3; G += 3; B += 3;
                 continue;
             }
 
-            boverd =  baseline*8.0/d;
+            boverd =  baseline*16.0/d;
             Z = focal_length * boverd;
             X = (i - dcx) * boverd;
             Y = (j - dcy) * boverd;
