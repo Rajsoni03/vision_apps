@@ -66,10 +66,4 @@
 
 void appUtilsTaskInit(void)
 {
-    #if defined(FREERTOS)
-    /* Any task that uses the floating point unit MUST call portTASK_USES_FLOATING_POINT()
-     * before any floating point instructions are executed.
-     */
-    portTASK_USES_FLOATING_POINT();
-    #endif
 }
