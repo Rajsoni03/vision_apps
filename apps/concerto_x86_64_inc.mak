@@ -31,7 +31,7 @@ LDIRS       += $(TIOVX_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(IMAGING_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 LDIRS       += $(CGT7X_ROOT)/host_emulation
-LDIRS       += $(MMALIB_PATH)/lib/$(TARGET_BUILD)
+LDIRS       += $(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
 
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unused-variable
