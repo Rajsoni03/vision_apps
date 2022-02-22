@@ -3,7 +3,7 @@ ifndef $(VISION_APPS_BUILD_FLAGS_MAK)
 VISION_APPS_BUILD_FLAGS_MAK = 1
 
 # Used to version control the tivision_apps.so and ipk files
-PSDK_VERSION?=8.1.0
+PSDK_VERSION?=8.2.0
 
 # Edit below file in tiovx/ to change additional build options
 include $(TIOVX_PATH)/build_flags.mak
