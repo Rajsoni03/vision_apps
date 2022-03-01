@@ -244,7 +244,8 @@ linux_fs_install_nfs_test_data:
 	$(call INSTALL_TEST_DATA,$(LINUX_FS_PATH),opt/vision_apps)
 
 linux_fs_install_tar: linux_fs_install_nfs linux_fs_install_nfs_test_data
-	# Creating bootfs tar
+	# Creating bootfs tar - zipping with gzip (-z option in tar)
 	cd $(LINUX_FS_BOOT_PATH) && tar czf $(VISION_APPS_PATH)/bootfs.tar.gz .
-	# Creating rootfs tar
-	cd $(LINUX_FS_PATH) && sudo tar cpzf $(VISION_APPS_PATH)/rootfs.tar.xz .
+	# Creating rootfs tar - using lzma compression, but parallelized to increase performance (-I pxz)
+	# (-J would do lzma compression, but without parallelization)
+	cd $(LINUX_FS_PATH) && sudo tar -I pxz -cpf $(VISION_APPS_PATH)/rootfs.tar.xz .
