@@ -139,7 +139,7 @@ ifeq ($(BUILD_CPU_C7x_1),yes)
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/tidl_test
 	cp -P $(TIDL_PATH)/tfl_delegate/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(TIDL_PATH)/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	#cp -P $(TIDL_PATH)/onnxrt_EP/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp -P $(TIDL_PATH)/onnxrt_EP/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp $(TIDL_PATH)/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out  $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 	cp -r $(TIDL_PATH)/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 endif
