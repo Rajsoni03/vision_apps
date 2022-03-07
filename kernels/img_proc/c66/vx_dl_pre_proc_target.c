@@ -441,7 +441,6 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcCreate
         kernelParams->alloc_size = req_size;
 
         vx_df_image image_format = in_img_desc->format;
-        vx_uint32 tensor_data_type = out_tensor_desc->data_type;
         vx_uint32 channel_order = kernelParams->dlParams.channel_order;
 
         sTransferGroup *inTfrs = (sTransferGroup *)&kernelParams->inTfrs;
