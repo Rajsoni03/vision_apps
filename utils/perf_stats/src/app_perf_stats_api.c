@@ -300,7 +300,7 @@ static void appPerfStatsCpuStatsExportMemTable(FILE *fp, uint32_t app_cpu_id, ap
                 && cpu_stats->mem_stats[i].heap_size >= cpu_stats->mem_stats[i].free_size
                 )
             {
-                free_size_in_percentage = (uint32_t)((uint64_t)cpu_stats->mem_stats[i].free_size*100u)/cpu_stats->mem_stats[i].heap_size;
+                free_size_in_percentage = (uint32_t)(((float)cpu_stats->mem_stats[i].free_size/(float)cpu_stats->mem_stats[i].heap_size)*100);
             }
 
             APP_PERF_EXPORT_WRITELN(fp, "%16s | %10d B | %10d B | %3d %%",
@@ -472,7 +472,7 @@ int32_t appPerfStatsCpuMemStatsPrint(uint32_t app_cpu_id, app_perf_stats_mem_sta
                 && cpu_stats->mem_stats[i].heap_size >= cpu_stats->mem_stats[i].free_size
                 )
             {
-                free_size_in_percentage = (uint32_t)((uint64_t)cpu_stats->mem_stats[i].free_size*100u)/cpu_stats->mem_stats[i].heap_size;
+                free_size_in_percentage = (uint32_t)(((float)cpu_stats->mem_stats[i].free_size/(float)cpu_stats->mem_stats[i].heap_size)*100);
             }
 
             printf("CPU: %6s: HEAP: %16s: size = %10d B, free = %10d B (%3d %% unused)\n",
