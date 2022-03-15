@@ -164,13 +164,10 @@ int32_t appLogGlobalTimeInit()
     HW_WR_REG32(*(volatile uint32_t*)GTC_BASE_ADDR + 0x0U, 0x1);
     #endif
 
-    if (0 == status)
-    {
-        status = Sciclient_pmGetModuleClkFreq(TISCI_DEV_GTC0,
-                                           TISCI_DEV_GTC0_GTC_CLK,
-                                           &clkFreq,
-                                           SCICLIENT_SERVICE_WAIT_FOREVER);
-    }
+    status = Sciclient_pmGetModuleClkFreq(TISCI_DEV_GTC0,
+                                       TISCI_DEV_GTC0_GTC_CLK,
+                                       &clkFreq,
+                                       SCICLIENT_SERVICE_WAIT_FOREVER);
 
     if (0 == status)
     {

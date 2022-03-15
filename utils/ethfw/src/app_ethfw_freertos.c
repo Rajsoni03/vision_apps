@@ -204,7 +204,7 @@ typedef struct
 } EthApp_SharedMcastAddrTable;
 
 /* Must not exceed ETHAPP_MAX_SHARED_MCAST_ADDR entries */
-static EthApp_SharedMcastAddrTable gEthApp_sharedMcastAddrTable[] =
+static EthApp_SharedMcastAddrTable gEthApp_sharedMcastAddrTable[ETHAPP_MAX_SHARED_MCAST_ADDR] =
 {
     {
         /* MCast IP ADDR: 224.0.0.1 */
@@ -237,6 +237,10 @@ static EthApp_SharedMcastAddrTable gEthApp_sharedMcastAddrTable[] =
         .macAddr = {0x01,0x80,0xC2,0x00,0x00,0x03},
         .portMask= 0U,
     },
+    {
+        .macAddr = {0x00,0x00,0x00,0x00,0x00,0x00},
+        .portMask= 0U,
+    }
 };
 #endif
 
