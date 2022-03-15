@@ -603,8 +603,8 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcCreate
 #endif
         }
         kernelParams->pL2 = tivxMemAlloc(kernelParams->alloc_size, kernelParams->l2_heap_id);
-        VX_PRINT(VX_ZONE_INFO, "kernelParams->pL2 = %0x08X\n", kernelParams->pL2);
-        VX_PRINT(VX_ZONE_INFO, "kernelParams->l2_global_base = %0x08X\n", kernelParams->l2_global_base);
+        VX_PRINT(VX_ZONE_INFO, "kernelParams->pL2 = 0x%08X\n", kernelParams->pL2);
+        VX_PRINT(VX_ZONE_INFO, "kernelParams->l2_global_base = 0x%08X\n", kernelParams->l2_global_base);
 
         if(kernelParams->pL2 == NULL)
         {
