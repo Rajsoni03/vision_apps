@@ -712,7 +712,7 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
     int32_t errVal = 0;
 
     /* Search the mac_address in the shared mcast addr table */
-    for (idx = 0; idx < ETHFW_SHARED_MCAST_LIST_LEN; idx++)
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
     {
         if (EnetUtils_cmpMacAddr(mac_address,
                     &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
