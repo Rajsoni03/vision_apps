@@ -23,6 +23,7 @@ CSOURCES    += tivx_sfm_host.c
 CSOURCES    += tivx_dl_pre_proc_host.c
 CSOURCES    += tivx_dl_color_blend_host.c
 CSOURCES    += tivx_dl_draw_box_host.c
+CSOURCES    += tivx_dl_color_convert_host.c
 
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(TIDL_PATH)/inc

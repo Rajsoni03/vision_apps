@@ -435,3 +435,20 @@ VX_API_ENTRY vx_node VX_API_CALL tivxDLDrawBoxNode(vx_graph             graph,
 
     return(node);
 }
+
+VX_API_ENTRY vx_node VX_API_CALL tivxDLColorConvertNode(vx_graph  graph,
+                                                        vx_image  input_image,
+                                                        vx_image  output_image)
+{
+    vx_reference prms[] = {
+            (vx_reference)input_image,
+            (vx_reference)output_image
+    };
+
+    vx_node node = tivxCreateNodeByKernelName(graph,
+                                             TIVX_KERNEL_DL_COLOR_CONVERT_NAME,
+                                             prms,
+                                             dimof(prms));
+
+    return(node);
+}

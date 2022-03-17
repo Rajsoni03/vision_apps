@@ -84,6 +84,7 @@ vx_status tivxAddKernelSFM(vx_context context);
 vx_status tivxAddKernelDLPreProc(vx_context context);
 vx_status tivxAddKernelDLColorBlend(vx_context context);
 vx_status tivxAddKernelDLDrawBox(vx_context context);
+vx_status tivxAddKernelDLColorConvert(vx_context context);
 
 vx_status tivxRemoveKernelODPostProc(vx_context context);
 vx_status tivxRemoveKernelImgPreProc(vx_context context);
@@ -99,6 +100,7 @@ vx_status tivxRemoveKernelSFM(vx_context context);
 vx_status tivxRemoveKernelDLPreProc(vx_context context);
 vx_status tivxRemoveKernelDLColorBlend(vx_context context);
 vx_status tivxRemoveKernelDLDrawBox(vx_context context);
+vx_status tivxRemoveKernelDLColorConvert(vx_context context);
 
 static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelImgPreProc, &tivxRemoveKernelImgPreProc},
@@ -114,7 +116,8 @@ static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelSFM, &tivxRemoveKernelSFM},
     {&tivxAddKernelDLPreProc, &tivxRemoveKernelDLPreProc},
     {&tivxAddKernelDLColorBlend, &tivxRemoveKernelDLColorBlend},
-    {&tivxAddKernelDLDrawBox, &tivxRemoveKernelDLDrawBox}
+    {&tivxAddKernelDLDrawBox, &tivxRemoveKernelDLDrawBox},
+    {&tivxAddKernelDLColorConvert, &tivxRemoveKernelDLColorConvert}
 };
 
 static vx_status VX_CALLBACK publishKernels(vx_context context)

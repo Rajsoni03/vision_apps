@@ -170,6 +170,11 @@ extern "C" {
  */
 #define TIVX_KERNEL_DL_DRAW_BOX_NAME     "com.ti.img_proc.dl.draw.box"
 
+/*! \brief Kernel Name: DL color convert
+ *  \see group_vision_apps_kernels_dl_color_convert
+ */
+#define TIVX_KERNEL_DL_COLOR_CONVERT_NAME     "com.ti.img_proc.dl.color.convert"
+
 /*!
  * \brief
  * \ingroup group_vision_apps_kernels_img_proc

@@ -428,6 +428,22 @@ VX_API_ENTRY vx_node VX_API_CALL tivxDLDrawBoxNode(vx_graph             graph,
                                                    vx_tensor            input_tensor,
                                                    vx_image             output_image);
 
+/*! \brief DL Color Convert Node
+  *
+  * Performs limited color conversions required for DL pipeline which is DMA optimized
+  *
+  * \param [in] graph              reference to the graph
+  * \param [in] input_image        Input image
+  * \param [out] output_image      Output image
+  *
+  * \ingroup group_vision_apps_kernels_img_proc
+  *
+  * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>vxGetStatus</tt>
+  */
+VX_API_ENTRY vx_node VX_API_CALL tivxDLColorConvertNode(vx_graph             graph,
+                                                        vx_image             input_image,
+                                                        vx_image             output_image);
+
 #ifdef __cplusplus
 }
 #endif

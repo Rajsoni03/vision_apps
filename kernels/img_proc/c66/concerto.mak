@@ -19,13 +19,17 @@ CSOURCES    += vx_draw_box_detections_target.c
 CSOURCES    += vx_dl_pre_proc_target.c
 CSOURCES    += vx_dl_color_blend_target.c
 CSOURCES    += vx_dl_draw_box_target.c
+CSOURCES    += vx_dl_color_convert_target.c
+CSOURCES    += vx_dma_transfers.c
 
+IDIRS       += $(VISION_APPS_PATH)/kernels/common/target
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/host
 IDIRS       += $(TIADALG_PATH)/include
 IDIRS       += $(IVISION_PATH)
 IDIRS       += $(TIDL_PATH)/inc
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
+IDIRS       += $(TIOVX_PATH)/kernels/openvx-core/include
 IDIRS       += $(VXLIB_PATH)/packages
 
 ifeq ($(TARGET_CPU),C66)
