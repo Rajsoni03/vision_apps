@@ -302,9 +302,13 @@ endif
 sbl_bootimage_flash_rtosapp:
 ifeq ($(UNIFLASH_FOUND), yes)
 	#Multicore Image 1
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp1 -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_1) || true
+	cp -fv $(OSPI_BINARIES_PATH)/lateapp1 $(OSPI_BINARIES_PATH)/lateapp1.appimage
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp1.appimage -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_1) || true
+	rm -rf $(OSPI_BINARIES_PATH)/lateapp1.appimage
 	#Multicore Image 2
-	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp2 -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_2) || true
+	cp -fv $(OSPI_BINARIES_PATH)/lateapp2 $(OSPI_BINARIES_PATH)/lateapp2.appimage
+	$(UNIFLASH_SCRIPT) --mode processors -c $(UNIFLASH_COM_PORT) -f $(OSPI_BINARIES_PATH)/lateapp2.appimage -d 3 -o $(OSPI_LOCATION_MULTI_CORE_IMAGE_2) || true
+	rm -rf $(OSPI_BINARIES_PATH)/lateapp2.appimage
 else
 	echo "Uniflash not found! Please install uniflash or update the uniflash path in makefile"
 endif
