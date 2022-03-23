@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.02.00</h2>
+<h2 align='center'>Version: 08.01.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -136,7 +136,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li> Free RTOS on C7x, C6x on R5F and Linux or QNX on A72</li>
+    <li> <strong>Free RTOS</strong> on C7x, C6x on R5F and Linux or QNX on A72</li>
     <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C6x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
     <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
     </ul>
@@ -255,49 +255,69 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="center">ADASVISION-5069</td>
+<td align="left"><span>hex number to show registered sensor drivers</span></td>
+</tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10513">ADASVISION-4864</a></td>
-<td align="left"><span>Instability in heterogeneous camera</span></td>
+<td align="center">ADASVISION-5068</td>
+<td align="left"><span>Duplicate log in single cam app in PSDKR v8.0</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4874</td>
-<td align="left"><span>Color flashes on display with 8-camera use case with FreeRTOS</span></td>
+<td align="center">ADASVISION-5044</td>
+<td align="left"><span>Multi cam app error with enable_error_detection flag</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10711">ADASVISION-5039</a></td>
-<td align="left"><span>TIDL preemption test fails when TIDL logs are used</span></td>
+<td align="center">ADASVISION-5028</td>
+<td align="left"><span>appSplitVpacDcc() is incorrectly checking for allocated buffers</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5101</td>
-<td align="left"><span>YUV or RAW test pattern input fails</span></td>
+<td align="center">ADASVISION-5014</td>
+<td align="left"><span>IPC resource table should use RPMSG_VRING_ADDR_ANY</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5114</td>
-<td align="left"><span>Difference in contents of k3-j721e-rtos-memory-map.dtsi in PSDKRA and PSDKLA</span></td>
+<td align="center">ADASVISION-4992</td>
+<td align="left"><span>Remote Device: RPMessage heap is sized wrong and is causing heap corruption of Rx messages</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5119</td>
-<td align="left"><span>Installed ATF and OPTEE are out-dated</span></td>
+<td align="center">ADASVISION-4980</td>
+<td align="left"><span>IPC Utils: RPMessage heap is sized wrong and is causing heap corruption of Rx messages</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5120</td>
-<td align="left"><span>The alignment for the Cache Line size is too high, 256bytes</span></td>
+<td align="center">ADASVISION-4927</td>
+<td align="left"><span>CPU Load values in free RTOS is inconsistent</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5121</td>
-<td align="left"><span>k3-j721e-vision-apps.dtbo carveouts have conflict/overlap</span></td>
+<td align="center">ADASVISION-4926</td>
+<td align="left"><span>QNX: Ipc Init fail when invoking twice appCommonInit() in a process</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5142</td>
-<td align="left"><span>Update Recommended MicroSD card size from 16Gb --> 32Gb for both data sets</span></td>
+<td align="center">ADASVISION-4911</td>
+<td align="left"><span>C7x L2RAM heap size incorrect</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5321</td>
-<td align="left"><span>16bit inference in PC mode for app_tidl_seg is incorrect</span></td>
+<td align="center">ADASVISION-4906</td>
+<td align="left"><span>Python tool for updating memory map does not generate free RTOS files</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-4777</td>
+<td align="left"><span>DOF app output differs between release vs debug on PC mode</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5372</td>
-<td align="left"><span>Incorrect calculation for Free Memory in percentage</span></td>
+<td align="center">ADASVISION-4776</td>
+<td align="left"><span>SFM apps output differs for each run on PC mode</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10511">ADASVISION-4874</a></td>
+<td align="left"><span>8-camera use case fails with FreeRTOS</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5103</td>
+<td align="left"><span>Random hang at vxWaitGraph for MCU2_0 based OpenVX nodes</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5116</td>
+<td align="left"><span>QNX7: PSDK QNX 8.1 Build Error With Imaging Libraries</span></td>
 </tr>
 </tbody>
 </table>
@@ -314,29 +334,41 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
-<td align="left"><span>AVP4 freezes in first second of running on QNX</span></td>
-</tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
 <td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
 </tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10713">ADASVISION-5060</a></td>
+<td align="left"><span>Long duration run of vision apps tidl object detection demo hangs at high usage of A72</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10711">ADASVISION-5039</a></td>
+<td align="left"><span>TIDL preemption test fails when TIDL logs are used</span></td>
+</tr>
 <tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10503">ADASVISION-4925</a></td>
+<td align="left"><span>Bandwidth performance values in certain applications are incorrect</span></td>
+</tr>
+<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
 <td align="left"><span>Frozen frame running OpenVX graphs back to back </span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10510">ADASVISION-4876</a></td>
 <td align="left"><span>Performance degradation observed on some vision apps demos</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10512">ADASVISION-4873</a></td>
 <td align="left"><span>[IMGPreProcNode]: BT601 limited range CSC coefficients causes clipping</span></td>
 </tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10513">ADASVISION-4864</a></td>
+<td align="left"><span>Instability in heterogeneous camera</span></td>
+</tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10514">ADASVISION-4799</a></td>
-<td align="left"><span>Broadcast Mode Unreliable</span></td>
+<td align="left"><span>QNX: SRV Broadcast Mode Unreliable</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10518">ADASVISION-4422</a></td>
@@ -391,19 +423,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10713">ADASVISION-5060</a></td>
-<td align="left"><span>Long duration run of vision apps tidl object detection demo hangs at high usage of A72</span></td>
-<td align="left"><span> 1. Ask customers to have TI review board design<br>2. Determine if sample has gone through full TMS production testing from die ID.
-<br>
-Ask die ID using:<br>
-devmem2 0x43000020 – for die id 0<br>
-devmem2 0x43000024 – for die id 1<br>
-devmem2 0x43000028 – for die id 2<br>
-devmem2 0x4300002C – for die id 3<br>
-
-Send die ID to TI. </span></td>
-</tr>
-<tr class="even">
 <td align="center">ADASVISION-4345</td>
 <td align="left"><span>SteamFIFO overflow observed in long run > 6hrs when using D3 IMX390 CM cameras </span></td>
 <td align="left"><span>Upgrade to D3 IMX390 RCM cameras </span></td>
@@ -423,28 +442,28 @@ Send die ID to TI. </span></td>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">JACINTOREQ-2446</a></td>
-<td align="left"><span>Descope codecs application from 8.2 release</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>08.04.00</span></td>
+<td align="center">JACINTOREQ-1540</a></td>
+<td align="left"><span>J7ES Flex connect scope change</span></td>
+<td align="left"><span>08.00.00</span></td>
+<td align="left"><span>08.01.00</span></td>
 </tr>
 <tr class="even">
-<td align="center">JACINTOREQ-2446</a></td>
-<td align="left"><span>VPAC TIOVX Scope Change</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>09.00.00</span></td>
+<td align="center">JACINTOREQ-1465</a></td>
+<td align="left"><span>Descope Windows build/installer for J7ES RTOS SDK</span></td>
+<td align="left"><span>08.00.00</span></td>
+<td align="left"><span>Descoped</span></td>
 </tr>
 <tr class="odd">
-<td align="center">JACINTOREQ-2444</a></td>
-<td align="left"><span>SafeRTOS Vision Apps Integration Testing Descope</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>08.04.00</span></td>
+<td align="center">JACINTOREQ-1444</a></td>
+<td align="left"><span>Vision apps firmware inclusion in yocto build</span></td>
+<td align="left"><span>08.00.00</span></td>
+<td align="left"><span>Descoped</span></td>
 </tr>
 <tr class="even">
-<td align="center">JACINTOREQ-2347</a></td>
-<td align="left"><span>De-scope BAM enablement on J7 from 8.2</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>08.05.00</span></td>
+<td align="center">JACINTOREQ-1244</a></td>
+<td align="left"><span>Descope RTOS-Based Codecs and OpenVX codec nodes</span></td>
+<td align="left"><span>08.00.00</span></td>
+<td align="left"><span>Descoped</span></td>
 </tr>
 </tbody>
 </table>
