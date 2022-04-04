@@ -37,8 +37,15 @@ DIRECTORIES += utils
 DIRECTORIES += kernels
 DIRECTORIES += modules
 DIRECTORIES += applibs
-DIRECTORIES += apps
 DIRECTORIES += platform/$(SOC)
+
+ifeq ($(BUILD_EDGEAI),no)
+	DIRECTORIES += apps
+else
+	DIRECTORIES += apps/utilities
+	DIRECTORIES += apps/tests
+	DIRECTORIES += apps/ptk_demos/app_common
+endif
 
 TARGET_COMBOS :=
 
