@@ -68,7 +68,6 @@
 #include "tivx_stereo_kernels_priv.h"
 #include "tivx_kernel_sde_histogram_visualize.h"
 #include "TI/tivx_target_kernel.h"
-#include "TI/j7.h"
 #include "tivx_kernels_target_utils.h"
 
 #include "stdio.h"
