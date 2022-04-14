@@ -5,7 +5,7 @@ include $(PRELUDE)
 TARGET      := vx_app_multi_cam_encode
 TARGETTYPE  := exe
 
-CSOURCES    := main.c
+CSOURCES    := main.c multi_cam_encode_ldc_module.c multi_cam_encode_img_mosaic_module.c
 
 ifeq ($(TARGET_CPU),x86_64)
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
