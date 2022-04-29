@@ -1562,7 +1562,7 @@ static vx_status app_create_graphs(AppObj *obj)
 
         if(obj->test_mode == 1)
         {
-            add_graph_parameter_by_node_index(obj->graph, obj->displayNode, 0);
+            add_graph_parameter_by_node_index(obj->graph, obj->displayNode, 1);
             /* Set graph schedule config such that graph parameter @ index 0 is
             * enqueuable */
             obj->displayNodeGraphParamNum = graph_parameter_num;

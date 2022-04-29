@@ -747,7 +747,7 @@ Sensor driver does not support metadata yet.
 
     if(obj->test_mode == 1)
     {
-        add_graph_parameter_by_node_index(obj->graph, obj->displayNode, 0);
+        add_graph_parameter_by_node_index(obj->graph, obj->displayNode, 1);
 
         /* set graph schedule config such that graph parameter @ index 0 is enqueuable */
         graph_parameters_queue_params_list[graph_parameter_num].graph_parameter_index = graph_parameter_num;
