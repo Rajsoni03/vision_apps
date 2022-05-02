@@ -70,6 +70,10 @@
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>
 
+#if defined(C71) || defined(C7120)
+#include <c7x.h>
+#endif
+
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
 /* ========================================================================== */

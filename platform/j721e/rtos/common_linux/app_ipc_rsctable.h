@@ -48,6 +48,7 @@ extern "C" {
 
 #if defined(CPU_c7x_1)
 #define BUILD_C7X_1
+#define BUILD_C7X
 #endif
 
 #include <ti/drv/ipc/include/ipc_rsctypes.h>
