@@ -115,8 +115,10 @@ void tivxLidarLoadKernels(vx_context context)
         #ifdef x86_64
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterLidarTargetArmKernels();
-        tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
-        tivxRegisterLidarTargetArmKernels();
+        #if defined (SOC_J721E)
+            tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
+            tivxRegisterLidarTargetArmKernels();
+        #endif
         tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
         tivxRegisterLidarTargetArmKernels();
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);

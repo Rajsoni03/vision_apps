@@ -134,14 +134,16 @@ void tivxParkAssistLoadKernels(vx_context context)
         tivxRegisterParkAssistTargetKernels();
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterParkAssistTargetC6XKernels();
-        tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
-        tivxRegisterParkAssistTargetC6XKernels();
+        #if defined (SOC_J721E)
+            tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
+            tivxRegisterParkAssistTargetC6XKernels();
+        #endif
         #endif
         #ifdef A72
         tivxRegisterParkAssistTargetKernels();
         tivxRegisterParkAssistTargetArmKernels();
         #endif
-		
+
         gIsParkAssistKernelsLoad = 1U;
     }
 }

@@ -349,7 +349,7 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
 
         /*Convert detected keypoint in fish eye corrected domain*/
         /*center_x and center_y is optical center of original image resolution widthxheight*/
-        status = tiadalg_fisheye_transformation_c66
+        status = tiadalg_fisheye_transformation_cn
                  (
                     prms->fe_points_ptr,
                     numObjs*prms->prms_host.num_keypoints,
@@ -427,7 +427,7 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
         out_tensor_target_ptr = tivxMemShared2TargetPtr(&out_points_desc->mem_ptr);
         tivxMemBufferMap(out_tensor_target_ptr, out_points_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_WRITE_ONLY);
 
-        status = tiadalg_fisheye_transformation_c66
+        status = tiadalg_fisheye_transformation_cn
                 (
                     prms->fec_list_points_ptr,
                     numObjs*prms->prms_host.points_per_line*prms->prms_host.num_keypoints,

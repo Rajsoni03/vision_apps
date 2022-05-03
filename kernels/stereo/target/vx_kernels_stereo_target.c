@@ -134,7 +134,7 @@ static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
     {&tivxAddTargetKernelDisparityMerge, &tivxRemoveTargetKernelDisparityMerge},
     {&tivxAddTargetKernelMedianFilter, &tivxRemoveTargetKernelMedianFilter},
     {&tivxAddTargetKernelHoleFilling, &tivxRemoveTargetKernelHoleFilling},
-#if !defined(C71)
+#if ! (defined(C71) || defined(C7120))
     {&tivxAddTargetKernelSdeDisparityVisualize, &tivxRemoveTargetKernelSdeDisparityVisualize},
     {&tivxAddTargetKernelSdeHistogramVisualize, &tivxRemoveTargetKernelSdeHistogramVisualize},
 #endif
@@ -142,7 +142,8 @@ static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
     {&tivxAddTargetKernelExtractDisparityConfidence, &tivxRemoveTargetKernelExtractDisparityConfidence},
     {&tivxAddTargetKernelGroundEstimation, &tivxRemoveTargetKernelGroundEstimation},
     {&tivxAddTargetKernelObstacleDetection, &tivxRemoveTargetKernelObstacleDetection},
-
+    {&tivxAddTargetKernelSdeHistogramVisualize, &tivxRemoveTargetKernelSdeHistogramVisualize},
+    {&tivxAddTargetKernelSdeDisparityVisualize, &tivxRemoveTargetKernelSdeDisparityVisualize},
 #endif
 };
 

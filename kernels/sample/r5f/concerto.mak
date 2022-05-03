@@ -10,6 +10,8 @@ IDIRS       += $(VISION_APPS_PATH)/kernels/sample/host
 IDIRS       += $(TIOVX_PATH)/kernels/include
 IDIRS       += $(VXLIB_PATH)/packages
 
+SKIPBUILD=1
+
 include $(FINALE)
 endif
 

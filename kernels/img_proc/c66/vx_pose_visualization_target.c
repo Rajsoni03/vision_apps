@@ -68,7 +68,6 @@
 #include <tivx_kernels_target_utils.h>
 
 #include <tivx_pose_visualization_host.h>
-#include "tiadalg_interface.h"
 #include "itidl_ti.h"
 #include <math.h>
 static tivx_target_kernel vx_poseViz_kernel = NULL;

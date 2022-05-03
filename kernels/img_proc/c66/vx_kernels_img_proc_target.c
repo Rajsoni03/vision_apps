@@ -65,51 +65,60 @@
 #include "tivx_img_proc_kernels_priv.h"
 #include "tivx_kernels_target_utils.h"
 
-void tivxAddTargetKernelImgPreProc(void);
 void tivxAddTargetKernelOCPreProc(void);
 void tivxAddTargetKernelOCPostProc(void);
-void tivxAddTargetKernelODPostProc(void);
-void tivxAddTargetKernelDofPlaneSep(void);
-void tivxAddTargetKernelPixelViz(void);
 void tivxAddTargetKernelPoseViz(void);
-void tivxAddTargetKernelVisualLocalization(void);
 void tivxAddTargetKernelDrawKeypointDetections(void);
 void tivxAddTargetKernelDrawBoxDetections(void);
 void tivxAddTargetKernelDLPreProc(void);
 void tivxAddTargetKernelDLColorBlend(void);
 void tivxAddTargetKernelDLDrawBox(void);
-void tivxAddTargetKernelDLColorConvert(void);
+void tivxAddTargetKernelImgPreProc(void);
+void tivxAddTargetKernelPixelViz(void);
+void tivxAddTargetKernelODPostProc(void);
+void tivxAddTargetKernelDofPlaneSep(void);
+void tivxAddTargetKernelVisualLocalization(void);
 
-void tivxRemoveTargetKernelImgPreProc(void);
+#if defined(x86_64) || defined(C66)
+void tivxAddTargetKernelDLColorConvert(void);
+#endif
+
 void tivxRemoveTargetKernelOCPreProc(void);
 void tivxRemoveTargetKernelOCPostProc(void);
-void tivxRemoveTargetKernelODPostProc(void);
-void tivxRemoveTargetKernelDofPlaneSep(void);
-void tivxRemoveTargetKernelPixelViz(void);
 void tivxRemoveTargetKernelPoseViz(void);
-void tivxRemoveTargetKernelVisualLocalization(void);
 void tivxRemoveTargetKernelDrawKeypointDetections(void);
 void tivxRemoveTargetKernelDrawBoxDetections(void);
 void tivxRemoveTargetKernelDLPreProc(void);
 void tivxRemoveTargetKernelDLColorBlend(void);
 void tivxRemoveTargetKernelDLDrawBox(void);
+void tivxRemoveTargetKernelImgPreProc(void);
+void tivxRemoveTargetKernelPixelViz(void);
+void tivxRemoveTargetKernelDofPlaneSep(void);
+void tivxRemoveTargetKernelODPostProc(void);
+void tivxRemoveTargetKernelDofPlaneSep(void);
+void tivxRemoveTargetKernelVisualLocalization(void);
+
+#if defined(x86_64) || defined(C66)
 void tivxRemoveTargetKernelDLColorConvert(void);
+#endif
 
 static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgPreProc, &tivxRemoveTargetKernelImgPreProc},
     {&tivxAddTargetKernelOCPreProc, &tivxRemoveTargetKernelOCPreProc},
     {&tivxAddTargetKernelOCPostProc, &tivxRemoveTargetKernelOCPostProc},
-    {&tivxAddTargetKernelODPostProc, &tivxRemoveTargetKernelODPostProc},
-    {&tivxAddTargetKernelDofPlaneSep, &tivxRemoveTargetKernelDofPlaneSep},
-    {&tivxAddTargetKernelPixelViz, &tivxRemoveTargetKernelPixelViz},
     {&tivxAddTargetKernelPoseViz, &tivxRemoveTargetKernelPoseViz},
-    {&tivxAddTargetKernelVisualLocalization, &tivxRemoveTargetKernelVisualLocalization},
     {&tivxAddTargetKernelDrawKeypointDetections, &tivxRemoveTargetKernelDrawKeypointDetections},
     {&tivxAddTargetKernelDrawBoxDetections, &tivxRemoveTargetKernelDrawBoxDetections},
     {&tivxAddTargetKernelDLPreProc, &tivxRemoveTargetKernelDLPreProc},
     {&tivxAddTargetKernelDLColorBlend, &tivxRemoveTargetKernelDLColorBlend},
     {&tivxAddTargetKernelDLDrawBox, &tivxRemoveTargetKernelDLDrawBox},
-    {&tivxAddTargetKernelDLColorConvert, &tivxRemoveTargetKernelDLColorConvert}
+    {&tivxAddTargetKernelImgPreProc, &tivxRemoveTargetKernelImgPreProc},
+    {&tivxAddTargetKernelPixelViz, &tivxRemoveTargetKernelPixelViz},
+    {&tivxAddTargetKernelODPostProc, &tivxRemoveTargetKernelODPostProc},
+    {&tivxAddTargetKernelDofPlaneSep, &tivxRemoveTargetKernelDofPlaneSep},
+    {&tivxAddTargetKernelVisualLocalization, &tivxRemoveTargetKernelVisualLocalization},
+#if defined(x86_64) || defined(C66)
+    {&tivxAddTargetKernelDLColorConvert, &tivxRemoveTargetKernelDLColorConvert},
+#endif
 };
 
 void tivxRegisterImgProcTargetC66Kernels(void)

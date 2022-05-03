@@ -75,7 +75,15 @@
 #include <math.h>
 
 #ifndef x86_64
-#include <c6x.h>
+#if defined (__C7100__) || defined (__C7120__)
+    #include <c7x.h>
+    #if defined (C6X_MIGRATION)
+        #include <c6x_migration.h>
+    #endif
+    #define RESTRICT restrict
+#else
+    #include <c6x.h>
+#endif
 #endif
 
 static tivx_target_kernel vx_pixViz_kernel = NULL;

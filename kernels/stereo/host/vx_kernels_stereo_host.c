@@ -147,8 +147,10 @@ void tivxStereoLoadKernels(vx_context context)
         tivxRegisterStereoTargetKernels();
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterStereoTargetKernels();
-        tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
-        tivxRegisterStereoTargetKernels();
+        #if defined (SOC_J721E)
+            tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
+            tivxRegisterStereoTargetKernels();
+        #endif
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);
         tivxRegisterStereoTargetKernels();
 #endif

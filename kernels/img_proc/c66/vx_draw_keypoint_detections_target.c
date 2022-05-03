@@ -98,6 +98,8 @@ static void memcpyC66(uint8_t *restrict pOut, uint8_t *restrict pIn, int32_t siz
         }
     }
 }
+#elif defined (__C7100__) || defined (__C7120__)
+#define memcpyC66 memcpy
 #else
 static void memcpyC66(uint8_t *pOut, uint8_t *pIn, int32_t size)
 {
@@ -404,7 +406,7 @@ static void drawPoints(tivxDrawKeypointDetectionsParams *params, vx_uint8 *data_
         }
     }
 
-    if(draw_lines == 1) 
+    if(draw_lines == 1)
     {
         if(label == 1)
         {
@@ -507,7 +509,7 @@ static void drawJoinedPoints(tivxDrawKeypointDetectionsParams *params, vx_uint8 
         }
     }
 
-    if(draw_lines == 1) 
+    if(draw_lines == 1)
     {
         if(label == 1)
         {

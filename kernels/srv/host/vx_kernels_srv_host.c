@@ -130,8 +130,10 @@ void tivxSrvLoadKernels(vx_context context)
         void tivxSetSelfCpuId(vx_enum cpu_id);
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterSrvTargetC66Kernels();
-        tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
-        tivxRegisterSrvTargetC66Kernels();
+        #if defined (SOC_J721E)
+            tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
+            tivxRegisterSrvTargetC66Kernels();
+        #endif
         tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
         #endif
         #if defined(LINUX) || defined(x86_64) || defined(QNX)
