@@ -76,6 +76,7 @@
 
 #include <utils/sensors/include/app_sensors.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/sciclient/include/app_sciclient_wrapper_api.h>
 
 #include <utils/remote_service/include/app_remote_service.h>
 
@@ -127,6 +128,10 @@ int32_t appI2cInit()
 {
     uint32_t index;
     I2C_HwAttrs i2cConfig;
+
+    #ifdef SOC_J721S2
+    SET_DEVICE_STATE_ON(TISCI_DEV_I2C5);
+    #endif
 
     /* Initialize I2C Driver */
     for(index = 0; index < I2C_HWIP_MAX_CNT; index++)

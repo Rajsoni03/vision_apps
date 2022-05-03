@@ -108,12 +108,22 @@ __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
 
+#if defined (SOC_J721E)
 static uint32_t g_app_ipc_remote_proc[] =
 {
     IPC_MCU1_0, IPC_MCU1_1, IPC_MCU2_0, IPC_MCU2_1,
     IPC_MCU3_0, IPC_MCU3_1, IPC_C66X_1, IPC_C66X_2,
     IPC_C7X_1
 };
+#endif
+
+#if defined (SOC_J721S2)
+static uint32_t g_app_ipc_remote_proc[] =
+{
+    IPC_MCU1_0, IPC_MCU1_1, IPC_MCU2_0, IPC_MCU2_1,
+    IPC_MCU3_0, IPC_MCU3_1, IPC_C7X_1, IPC_C7X_2
+};
+#endif
 
 typedef struct {
 

@@ -78,7 +78,7 @@
 typedef struct
 {
     uint32_t enable_hdmi;
-    uint32_t enable_i2c1;
+    uint32_t enable_i2c;
 } app_pinmux_cfg_t;
 
 
@@ -98,12 +98,6 @@ uint64_t appC7xSecSupv2NonSecSupv ( void );
  * This API MUST be called before switching C7x to secure mode
  */
 void appC7xClecInitForNonSecAccess(void);
-
-/**
- * \brief This sets defaults for DRU input events to what TIDL needs
- *
- */
-void appC7xClecInitDru(void);
 
 /**
  * \brief API to set to DLFO bit in ACTRL register of R5F

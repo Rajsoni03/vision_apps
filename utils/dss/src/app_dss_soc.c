@@ -50,10 +50,18 @@
 #include <ti/board/src/devices/board_devices.h>
 #include <ti/board/board.h>
 #include <ti/board/board_cfg.h>
+
+#if defined (SOC_J721E)
 #include <ti/board/src/j721e_evm/include/board_control.h>
 #include <ti/board/src/j721e_evm/include/board_cfg.h>
 #include <ti/board/src/j721e_evm/include/board_pinmux.h>
 #include <ti/board/src/j721e_evm/include/board_i2c_io_exp.h>
+#elif defined (SOC_J721S2)
+#include <ti/board/src/j721s2_evm/include/board_control.h>
+#include <ti/board/src/j721s2_evm/include/board_cfg.h>
+#include <ti/board/src/j721s2_evm/include/board_pinmux.h>
+#include <ti/board/src/j721s2_evm/include/board_i2c_io_exp.h>
+#endif
 
 /* ========================================================================== */
 /*                             Global Variables                               */
@@ -143,7 +151,11 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
     appLogPrintf("DSS: SoC init ... !!!\n");
 
     /* power on DSS */
-    SET_DEVICE_STATE_ON(TISCI_DEV_DSS0);
+    #if defined (SOC_J721E)
+        SET_DEVICE_STATE_ON(TISCI_DEV_DSS0);
+    #elif defined (SOC_J721S2)
+        SET_DEVICE_STATE(TISCI_DEV_DSS0, TISCI_MSG_VALUE_DEVICE_SW_STATE_AUTO_OFF);
+    #endif
 
     if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
     {
@@ -182,11 +194,20 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
      * XXX Is it still required to have VP3 enabled in Linux for GPU
      *     driver issues?
      */
+        #if defined (SOC_J721E)
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_18_HSDIVOUT0_CLK);
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_3_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_3_IN_2X_CLK_PARENT_DPI1_EXT_CLKSEL_OUT0);
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_16_HSDIVOUT0_CLK);
         SET_CLOCK_FREQ (TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK, prm->timings.pixelClock);
         SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK, 0, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
+        #elif defined (SOC_J721S2)
+        SET_DEVICE_STATE_ON(TISCI_DEV_SERDES_10G0);
+        SET_DEVICE_STATE_ON(TISCI_DEV_DSS_EDP0);
+        SET_DEVICE_STATE_OFF(TISCI_DEV_DSS0);
+        SET_CLOCK_FREQ_ALLOW_CHANGE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_16_HSDIVOUT0_CLK, prm->timings.pixelClock);
+        SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_16_HSDIVOUT0_CLK, 0x2, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
+        SET_DEVICE_STATE_ON(TISCI_DEV_DSS0);
+        #endif
     }
     else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DPI_HDMI)
     {
@@ -206,9 +227,19 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
     }
     else if (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {
+        #if defined (SOC_J721E)
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_18_HSDIVOUT0_CLK);
         SET_CLOCK_FREQ (TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, prm->timings.pixelClock);
         SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, 0, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
+        #elif defined (SOC_J721S2)
+
+        SET_DEVICE_STATE_OFF(TISCI_DEV_DSS0);
+        SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_17_HSDIVOUT0_CLK);
+        SET_CLOCK_FREQ_ALLOW_CHANGE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_17_HSDIVOUT0_CLK, prm->timings.pixelClock);
+        SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_17_HSDIVOUT0_CLK, 0x2, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
+        SET_DEVICE_STATE_ON(TISCI_DEV_DSS0);
+
+        #endif
     }
 
     appLogPrintf("DSS: SoC init ... Done !!!\n");
@@ -227,8 +258,8 @@ void appDssConfigureBoard(app_dss_default_prm_t *prm)
     }
 
     /* ADASVISION-4188 - There seem to be an I2C conflict when ETHFW is enabled, so this is disabled when ETHFW is enabled */
-    /* If customers are not usign ETHFW then below can be enabled to support eDP to HDMI mode */ 
-    
+    /* If customers are not usign ETHFW then below can be enabled to support eDP to HDMI mode */
+
 #ifndef ENABLE_ETHFW
     if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
     {
@@ -245,7 +276,12 @@ void appDssConfigureDP(void)
     Board_IoExpCfg_t ioExpCfg;
 
     appLogPrintf("DSS: Turning on DP_PWR pin for eDP adapters ... !!!\n");
+
+    #if defined (SOC_J721E)
     ioExpCfg.i2cInst     = 1U;
+    #elif defined (SOC_J721S2)
+    ioExpCfg.i2cInst     = 4U;
+    #endif
     ioExpCfg.socDomain   = BOARD_SOC_DOMAIN_MAIN;
     ioExpCfg.slaveAddr   = 0x20;
     ioExpCfg.enableIntr  = false;
@@ -273,6 +309,7 @@ void appDssConfigureUB941AndUB925(app_dss_default_prm_t *prm)
 
     if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {
+        #if defined (SOC_J721E)
         appLogPrintf("DSS: Configuring SERDES ... !!!\n");
         status = appDssDsiSetBoardMux();
 
@@ -289,7 +326,6 @@ void appDssConfigureUB941AndUB925(app_dss_default_prm_t *prm)
                 status = Board_i2c8BitRegWr(
                     gI2cHandle, clientAddr, Ub941Ub925Config[cnt][1],
                     &Ub941Ub925Config[cnt][2], 1U, BOARD_I2C_TRANSACTION_TIMEOUT);
-
                 appLogWaitMsecs((uint32_t)Ub941Ub925Config[cnt][3]);
 
                 if (0 != status)
@@ -303,10 +339,11 @@ void appDssConfigureUB941AndUB925(app_dss_default_prm_t *prm)
 
         I2C_close(gI2cHandle);
         appLogPrintf("DSS: SERDES Configuration... Done !!!\n");
+        #endif
     }
 }
 
-
+#if defined (SOC_J721E)
 static int32_t appDssDsiSetBoardMux()
 {
     Board_I2cInitCfg_t i2cCfg;
@@ -368,8 +405,6 @@ static int32_t appDssDsiInitI2c()
         appLogPrintf("DSS: I2C Open failed!\n");
         status = FVID2_EFAIL;
     }
-
     return (status);
 }
-
-
+#endif

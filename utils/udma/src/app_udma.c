@@ -214,6 +214,12 @@ static void appUdmaCacheWb(const void *addr, int32_t size);
  */
 static struct Udma_DrvObj gAppUdmaDrvObj;
 
+#ifdef SOC_J721S2
+
+static struct Udma_DrvObj gAppUdmaDrvObjCsirxCsitx;
+
+#endif
+
 /** \brief Default channel object to be used when NULL is passed */
 static app_udma_ch_handle_t gAppUdmaDefaultChHandle;
 
@@ -295,6 +301,32 @@ int32_t appUdmaInit(void)
     return (retVal);
 }
 
+#ifdef SOC_J721S2
+
+int32_t appUdmaCsirxCsitxInit(void)
+{
+    int32_t         retVal = 0;
+    uint32_t        udmaInstId;
+    Udma_InitPrms   udmaInitPrms;
+
+    appLogPrintf("UDMA: Init ... !!!\n");
+
+    udmaInstId = UDMA_INST_ID_BCDMA_0;
+    UdmaInitPrms_init(udmaInstId, &udmaInitPrms);
+    udmaInitPrms.printFxn = (Udma_PrintFxn)appLogPrintf;
+    retVal = Udma_init(&gAppUdmaDrvObjCsirxCsitx, &udmaInitPrms);
+    if(retVal!=0)
+    {
+        appLogPrintf("UDMA: ERROR: Udma_init for CSITX/CSIRX failed !!!\n");
+    }
+
+    appLogPrintf("UDMA: Init for CSITX/CSIRX ... Done !!!\n");
+
+    return (retVal);
+}
+
+#endif
+
 int32_t appUdmaDeInit(void)
 {
     int32_t     retVal = 0;
@@ -308,9 +340,36 @@ int32_t appUdmaDeInit(void)
     return (retVal);
 }
 
+#ifdef SOC_J721S2
+
+int32_t appUdmaCsirxCsitxDeInit(void)
+{
+    int32_t     retVal = 0;
+
+    retVal = Udma_deinit(&gAppUdmaDrvObjCsirxCsitx);
+    if(retVal != 0)
+    {
+        appLogPrintf("UDMA: ERROR: Udma_deinit failed !!!\n");
+    }
+
+    return (retVal);
+}
+
+#endif
+
 void *appUdmaGetObj(void)
 {
     return (void *)&gAppUdmaDrvObj;
+}
+
+
+void *appUdmaCsirxCsitxGetObj(void)
+{
+    #if defined(SOC_J721S2)
+    return (void *)&gAppUdmaDrvObjCsirxCsitx;
+    #elif defined(SOC_J721E)
+    return (void *)&gAppUdmaDrvObj;
+    #endif
 }
 
 int32_t appUdmaCopyInit(void)

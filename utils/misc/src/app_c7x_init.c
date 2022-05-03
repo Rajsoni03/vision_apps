@@ -66,10 +66,16 @@
 void appC7xClecInitForNonSecAccess(void)
 {
     CSL_ClecEventConfig   cfgClec;
-    CSL_CLEC_EVTRegs     *clecBaseAddr = (CSL_CLEC_EVTRegs*)CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
+    #if defined(SOC_J721S2)
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_BASE;
+    #else
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
+    #endif
 
     uint32_t i;
     uint32_t max_inputs      = 2048;
+    uint32_t            secureClaim = 0U;
+
     /* make secure claim bit to FALSE so that after we switch to non-secure mode
      * we can program the CLEC MMRs
      */
@@ -80,31 +86,13 @@ void appC7xClecInitForNonSecAccess(void)
         cfgClec.rtMap             = CSL_CLEC_RTMAP_DISABLE;
         cfgClec.extEvtNum         = 0;
         cfgClec.c7xEvtNum         = 0;
-        CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
+        /* Since the CLEC module is shared b/w c7x_1 and c7x_2,
+         * Before reseting the events and disabling secure claim,
+         * check if its already done by other C7x. */
+        CSL_clecGetSecureClaimStatus(clecBaseAddr, i, &secureClaim);
+        if(secureClaim)
+        {
+            CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
+        }
     }
-}
-
-void appC7xClecInitDru(void)
-{
-    #if 1
-    CSL_ClecEventConfig   cfgClec;
-    CSL_CLEC_EVTRegs     *clecBaseAddr = (CSL_CLEC_EVTRegs*)CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
-
-    uint32_t i;
-    uint32_t dru_input_start = 192;
-    uint32_t dru_input_num   = 16;
-    /* program CLEC events from DRU used for polling by TIDL
-     * to map to required events in C7x
-     */
-    for(i=dru_input_start; i<(dru_input_start+dru_input_num); i++)
-    {
-        /* Configure CLEC */
-        cfgClec.secureClaimEnable = FALSE;
-        cfgClec.evtSendEnable     = TRUE;
-        cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_ALL;
-        cfgClec.extEvtNum         = 0;
-        cfgClec.c7xEvtNum         = (i-dru_input_start)+32;
-        CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
-    }
-    #endif
 }

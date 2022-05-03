@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2019 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -63,10 +63,10 @@
 /* ========================================================================== */
 /*                             Include Files                                  */
 /* ========================================================================== */
-#include <utils/dss/include/app_dss.h>
-#include <utils/console_io/include/app_log.h>
-#include <ti/drv/dss/dss.h>
 
+#include <ti/board/board.h>
+#include <utils/misc/include/app_misc.h>
+#include <ti/board/src/j721s2_evm/include/board_pinmux.h>
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
 /* ========================================================================== */
@@ -89,7 +89,54 @@
 /*                            Global Variables                                */
 /* ========================================================================== */
 
-/* None */
+static pinmuxPerCfg_t gI2c4PinCfg[] =
+{
+    /* MyI2C4 -> I2C4_SCL -> AD25 */
+    {
+        PIN_MCAN14_TX, PIN_MODE(8) | \
+        ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
+    },
+    /* MyI2C4 -> I2C4_SDA -> AF28 */
+    {
+        PIN_MCAN13_RX, PIN_MODE(8) | \
+        ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
+    },
+    {PINMUX_END}
+};
+
+static pinmuxModuleCfg_t gDispPinCfg[] =
+{
+    {0, TRUE, gI2c4PinCfg},
+    {PINMUX_END}
+};
+
+static pinmuxPerCfg_t gI2c5PinCfg[] =
+{
+    /* MyI2C5 -> I2C5_SCL -> Y24 */
+    {
+        PIN_MCAN15_TX, PIN_MODE(8) | \
+        ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
+    },
+    /* MyI2C5 -> I2C5_SDA -> W23 */
+    {
+        PIN_MCAN14_RX, PIN_MODE(8) | \
+        ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
+    },
+    {PINMUX_END}
+};
+
+static pinmuxModuleCfg_t gCaptPinCfg[] =
+{
+    {0, TRUE, gI2c5PinCfg},
+    {PINMUX_END}
+};
+
+static pinmuxBoardCfg_t gBasicDemoPinmuxDataInfo[] =
+{
+    {0, gDispPinCfg},
+    {1, gCaptPinCfg},
+    {PINMUX_END}
+};
 
 /* ========================================================================== */
 /*                  Internal/Private Function Declarations                    */
@@ -101,66 +148,44 @@
 /*                          Function Definitions                              */
 /* ========================================================================== */
 
-int32_t appDssInit(app_dss_init_params_t *dssParams)
+void appPinMuxCfgSetDefault(app_pinmux_cfg_t *cfg)
 {
-    int32_t retVal = 0; uint32_t i;
-    Dss_InitParams dssInitParams;
-
-    memset(&dssInitParams, 0, sizeof(Dss_InitParams));
-    Dss_initParamsInit(&dssInitParams);
-
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_0] = TRUE;
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_1] = FALSE;
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_2] = FALSE;
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_3] = FALSE;
-
-    for(i=0U; i< APP_DSS_VID_PIPE_ID_MAX; i++)
+    if (NULL != cfg)
     {
-        dssInitParams.socParams.rmInfo.isPipeAvailable[i] = dssParams->isPipeAvailable[i];
+        cfg->enable_hdmi = FALSE;
+        cfg->enable_i2c  = FALSE;
     }
-    for(i=0U; i< APP_DSS_OVERLAY_ID_MAX; i++)
-    {
-        dssInitParams.socParams.rmInfo.isOverlayAvailable[i] = dssParams->isOverlayAvailable[i];
-    }
-    for(i=0U; i< APP_DSS_VP_ID_MAX; i++)
-    {
-        dssInitParams.socParams.rmInfo.isPortAvailable[i] = dssParams->isPortAvailable[i];
-    }
-
-    dssInitParams.socParams.dpInitParams.isAvailable = dssParams->isDpAvailable;
-#if defined (SOC_J721S2)
-    dssInitParams.socParams.dpInitParams.isHpdSupported = false;
-#elif defined (SOC_J721E)
-    dssInitParams.socParams.dpInitParams.isHpdSupported = true;
-#endif
-
-    dssInitParams.socParams.dsiInitParams.isAvailable = dssParams->isDsiAvailable;
-
-    retVal = Dss_init(&dssInitParams);
-
-    if(0 != retVal)
-    {
-        appLogPrintf("DSS: ERROR: Dss_init failed !!!\n");
-    }
-
-    return retVal;
 }
 
-int32_t appDssDeInit(void)
+void appSetPinmux(app_pinmux_cfg_t *cfg)
 {
-    int32_t retVal = 0;
-
-    retVal = Dss_deInit();
-    if(0 != retVal)
+    if (NULL != cfg)
     {
-        appLogPrintf("DSS: ERROR: Dss_deInit failed !!!\n");
+        if (TRUE == cfg->enable_i2c)
+        {
+            /* Enable Pinmux for I2C0 */
+            gDispPinCfg[0].doPinConfig = TRUE;
+        }
+        else
+        {
+            /* Enable Pinmux for I2C0 */
+            gDispPinCfg[0].doPinConfig = FALSE;
+        }
+        #if 0 //TODO: Enable this
+        if (TRUE == cfg->enable_hdmi)
+        {
+            /* Enable Pinmux for vout0 */
+            gDispPinCfg[0].doPinConfig = TRUE;
+        }
+        else
+        {
+            /* Enable Pinmux for vout0 */
+            gDispPinCfg[0].doPinConfig = FALSE;
+        }
+        #endif
+
     }
 
-    return (retVal);
+    Board_pinmuxUpdate(gBasicDemoPinmuxDataInfo,
+                       BOARD_SOC_DOMAIN_MAIN);
 }
-
-/* ========================================================================== */
-/*                       Static Function Definitions                          */
-/* ========================================================================== */
-
-/* None */

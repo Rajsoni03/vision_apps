@@ -111,13 +111,11 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
     {
         rpmsg_char_id = DSP_C71_0;
     }
-    #if 0 // TODO: Enable this once we have a Linux FS
     #if defined (SOC_J721S2)
     else if (APP_IPC_CPU_C7x_2 == cpu_id)
     {
         rpmsg_char_id = DSP_C71_1;
     }
-    #endif
     #endif
 
     return rpmsg_char_id;

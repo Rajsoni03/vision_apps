@@ -7,6 +7,8 @@ TARGETTYPE  := library
 
 CSOURCES    := app_pcie_queue.c
 
+SKIPBUILD=1
+
 include $(FINALE)
 
 endif

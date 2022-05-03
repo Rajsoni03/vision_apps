@@ -463,6 +463,11 @@ extern "C" {
  */
 #define APP_DCTRL_CMD_SET_DSI_PARAMS              (APP_DCTRL_CMD_BASE + 0xAU)
 
+/**
+ * \brief Command to query whether DP is connected.
+ */
+#define APP_DCTRL_CMD_IS_DP_CONNECTED             (APP_DCTRL_CMD_BASE + 0xBU)
+
 /* @} */
 
 /* ========================================================================== */

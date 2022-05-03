@@ -94,8 +94,49 @@
 #define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (1920U)
 #define APP_UTILS_VHWA_OUT_IMG_CCSF            (FVID2_CCSF_BITS12_UNPACKED16)
 #define APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH  (2)
+
+#if defined(SOC_J721S2)
+#define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (128)
+#define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (64)
+#elif defined(SOC_J721E)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (192)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (80)
+#endif
+
+static void appVhwaVpacMscInit(Vhwa_M2mMscSl2AllocPrms *sl2Prms)
+{
+    uint32_t cnt;
+
+    #if defined(SOC_J721S2)
+    uint32_t idx;
+    #endif
+
+    #if defined(SOC_J721S2)
+    for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INST; cnt++)
+    {
+        for(idx = 0; idx < VHWA_M2M_MSC_MAX_IN_CHANNEL; idx++)
+        {
+            sl2Prms->maxInWidth[cnt][idx]    = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
+            sl2Prms->inCcsf[cnt][idx]        = APP_UTILS_VHWA_IN_IMG_CCSF;
+            sl2Prms->inBuffDepth[cnt][idx]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
+        }
+    }
+    #elif defined(SOC_J721E)
+    for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INPUT_BUFF; cnt++)
+    {
+        sl2Prms->maxInWidth[cnt]    = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
+        sl2Prms->inCcsf[cnt]        = APP_UTILS_VHWA_IN_IMG_CCSF;
+        sl2Prms->inBuffDepth[cnt]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
+    }
+    #endif
+
+    for(cnt = 0; cnt < MSC_MAX_OUTPUT; cnt++)
+    {
+        sl2Prms->maxOutWidth[cnt]   = APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH;
+        sl2Prms->outCcsf[cnt]       = APP_UTILS_VHWA_OUT_IMG_CCSF;
+        sl2Prms->outBuffDepth[cnt]  = APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH;
+    }
+}
 
 int32_t appFvid2Init(void)
 {
@@ -130,7 +171,7 @@ int32_t appCsi2RxInit(void)
     SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_RX1);
 
     Csirx_initParamsInit(&initPrmsCsirx);
-    initPrmsCsirx.drvHandle = appUdmaGetObj();
+    initPrmsCsirx.drvHandle = appUdmaCsirxCsitxGetObj();
     status = Csirx_init(&initPrmsCsirx);
     if(status!=FVID2_SOK)
     {
@@ -150,7 +191,12 @@ int32_t appCsi2TxInit(void)
     appLogPrintf("CSI2TX: Init ... !!!\n");
 
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_PSILSS0);
+    #if defined(SOC_J721S2)
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF_V2_0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF_V2_1);
+    #else
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF0);
+    #endif
     SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_TX0);
 
     regVal = CSL_REG32_RD(CSL_CTRL_MMR0_CFG0_BASE +
@@ -182,7 +228,7 @@ int32_t appCsi2TxInit(void)
     }
 
     Csitx_initParamsInit(&initPrmsCsitx);
-    initPrmsCsitx.drvHandle = appUdmaGetObj();
+    initPrmsCsitx.drvHandle = appUdmaCsirxCsitxGetObj();
     status = Csitx_init(&initPrmsCsitx);
     if(status!=FVID2_SOK)
     {
@@ -386,8 +432,6 @@ int32_t appVhwaVpacInit()
     /* MSC */
     if (0 == status)
     {
-        uint32_t cnt;
-
         Vhwa_M2mMscInitParams initPrms;
         Vhwa_M2mMscSl2AllocPrms sl2Prms;
 
@@ -403,19 +447,8 @@ int32_t appVhwaVpacInit()
 
         if (0 == status)
         {
-            for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INPUT_BUFF; cnt++)
-            {
-                sl2Prms.maxInWidth[cnt]    = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
-                sl2Prms.inCcsf[cnt]        = APP_UTILS_VHWA_IN_IMG_CCSF;
-                sl2Prms.inBuffDepth[cnt]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
-            }
+            appVhwaVpacMscInit(&sl2Prms);
 
-            for(cnt = 0; cnt < MSC_MAX_OUTPUT; cnt++)
-            {
-                sl2Prms.maxOutWidth[cnt]   = APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH;
-                sl2Prms.outCcsf[cnt]       = APP_UTILS_VHWA_OUT_IMG_CCSF;
-                sl2Prms.outBuffDepth[cnt]  = APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH;
-            }
             status = Vhwa_m2mMscAllocSl2(&sl2Prms);
             if (0 != status)
             {
@@ -499,7 +532,11 @@ int32_t appVhwaVpacInit()
         initPrms.udmaDrvHndl = appUdmaGetObj();
 
         /* Set configThroughUDMA to true to support multi handle */
+        #if defined(SOC_J721S2)
+        initPrms.configThroughUdmaFlag = false;
+        #elif defined(SOC_J721E)
         initPrms.configThroughUdmaFlag = true;
+        #endif
 
         status = Vhwa_m2mVissInit(&initPrms);
         if (0 != status)
@@ -616,15 +653,31 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 break;
 
             case APP_VPAC_720_DMPAC_480:
+                #if defined(SOC_J721S2)
+                #if 0
+                SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_J7AM_DMPAC_VPAC_PSILSS0_MAIN_CLK, 480000000);
+                SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_J7AM_DMPAC_VPAC_PSILSS0_MAIN_CLK,   720000000);
+                #endif
+                status = -1;
+                #else
                 SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 480000000);
                 SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   720000000);
                 status = 0;
+                #endif
                 break;
 
             case APP_VPAC_650_DMPAC_520:
-                SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   650000000);
+                #if defined(SOC_J721S2)
+                #if 0 // TODO: Re-enable based on what the correct clk should be--the below is now correct
+                SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_J7AM_DMPAC_VPAC_PSILSS0_MAIN_CLK, 520000000);
+                SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_J7AM_DMPAC_VPAC_PSILSS0_MAIN_CLK,   650000000);
+                #endif
+                status = -1;
+                #else
                 SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 520000000);
+                SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   650000000);
                 status = 0;
+                #endif
                 break;
         }
 

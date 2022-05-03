@@ -5,7 +5,7 @@ include $(PRELUDE)
 TARGET      := app_utils_dss
 TARGETTYPE  := library
 
-CSOURCES    := app_dss.c app_dss_j721e.c app_dctrl.c app_dss_defaults.c app_dss_dual_display_defaults.c
+CSOURCES    := app_dss.c app_dss_soc.c app_dctrl.c app_dss_defaults.c app_dss_dual_display_defaults.c
 
 ifeq ($(BUILD_ENABLE_ETHFW),yes)
 DEFS+=ENABLE_ETHFW

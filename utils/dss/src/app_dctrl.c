@@ -131,6 +131,9 @@ static int32_t appDctrlStopVpCmd(Fvid2_Handle handle,
 static int32_t appDctrlSetDsiParamsCmd(Fvid2_Handle handle,
                                  const app_dctrl_dsi_params_t *vpParams,
                                  uint32_t params_size);
+static int32_t appDctrlIsDpConnectedParamsCmd(Fvid2_Handle handle,
+                                         bool *isDpConnected,
+                                         uint32_t params_size);
 
 /* ========================================================================== */
 /*                          Function Definitions                              */
@@ -235,6 +238,10 @@ static int32_t appDctrlControl(char *serviceName,
             case APP_DCTRL_CMD_SET_DSI_PARAMS:
                 retVal = appDctrlSetDsiParamsCmd(gAppDctrlHandle,
                     (const app_dctrl_dsi_params_t *)params, size);
+                break;
+            case APP_DCTRL_CMD_IS_DP_CONNECTED:
+                retVal = appDctrlIsDpConnectedParamsCmd(gAppDctrlHandle,
+                    (bool *)params, size);
                 break;
             default:
                 appLogPrintf("DCTRL: ERROR: Unsupported command for appDctrlControl!!!\n");
@@ -538,6 +545,29 @@ static int32_t appDctrlSetDsiParamsCmd(Fvid2_Handle handle,
 
         retVal = Fvid2_control(handle, IOCTL_DSS_DCTRL_SET_DSI_PARAMS,
             &dsi_params, NULL);
+    }
+
+    return (retVal);
+}
+
+static int32_t appDctrlIsDpConnectedParamsCmd(Fvid2_Handle handle,
+                                         bool *isDpConnected,
+                                         uint32_t params_size)
+{
+    int32_t retVal = 0;
+    int32_t dpConnectedCmdArg;
+
+    if((params_size != sizeof(bool)) || (NULL == handle))
+    {
+        retVal = -1;
+    }
+
+    if(0 == retVal)
+    {
+        retVal = Fvid2_control(handle, IOCTL_DSS_DCTRL_IS_DP_CONNECTED,
+            &dpConnectedCmdArg, NULL);
+
+        *isDpConnected = dpConnectedCmdArg;
     }
 
     return (retVal);

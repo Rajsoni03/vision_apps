@@ -67,7 +67,6 @@
 #include <ti/board/board.h>
 #include <utils/misc/include/app_misc.h>
 #include <ti/board/src/j721e_evm/include/board_pinmux.h>
-
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
 /* ========================================================================== */
@@ -308,7 +307,7 @@ void appPinMuxCfgSetDefault(app_pinmux_cfg_t *cfg)
     if (NULL != cfg)
     {
         cfg->enable_hdmi = FALSE;
-        cfg->enable_i2c1 = FALSE;
+        cfg->enable_i2c  = FALSE;
     }
 }
 
@@ -316,7 +315,7 @@ void appSetPinmux(app_pinmux_cfg_t *cfg)
 {
     if (NULL != cfg)
     {
-        if (TRUE == cfg->enable_i2c1)
+        if (TRUE == cfg->enable_i2c)
         {
             /* Enable Pinmux for I2C0 */
             gDispPinCfg[1].doPinConfig = TRUE;

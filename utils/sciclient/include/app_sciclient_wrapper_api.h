@@ -74,9 +74,9 @@
     if(status == 0) { \
         if(APP_DEBUG_SCICLIENT) \
             appLogPrintf("SCICLIENT: Sciclient_pmSetModuleClkParent module=%u clk=%u parent=%u\n", MOD, CLK, PARENT); \
-	    status = Sciclient_pmSetModuleClkParent(MOD, CLK, PARENT, SCICLIENT_SERVICE_WAIT_FOREVER); \
-	    if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmSetModuleClkParent failed\n"); \
-	    else \
+        status = Sciclient_pmSetModuleClkParent(MOD, CLK, PARENT, SCICLIENT_SERVICE_WAIT_FOREVER); \
+        if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmSetModuleClkParent failed\n"); \
+        else \
         { \
             if(APP_DEBUG_SCICLIENT) \
                 appLogPrintf("SCICLIENT: Sciclient_pmSetModuleClkParent success\n"); \
@@ -91,7 +91,7 @@
             appLogPrintf("SCICLIENT: Sciclient_pmSetModuleState module=%u state=%u\n", MOD, STATE); \
         status = Sciclient_pmSetModuleState(MOD, STATE, TISCI_MSG_FLAG_AOP, SCICLIENT_SERVICE_WAIT_FOREVER); \
         if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmSetModuleState failed\n"); \
-	    else \
+        else \
         { \
             if(APP_DEBUG_SCICLIENT) \
                 appLogPrintf("SCICLIENT: Sciclient_pmSetModuleState success\n"); \
@@ -101,6 +101,8 @@
 
 #define SET_DEVICE_STATE_ON(MOD) SET_DEVICE_STATE(MOD,TISCI_MSG_VALUE_DEVICE_SW_STATE_ON)
 
+#define SET_DEVICE_STATE_OFF(MOD) SET_DEVICE_STATE(MOD,TISCI_MSG_VALUE_DEVICE_SW_STATE_AUTO_OFF)
+
 #define SET_CLOCK_STATE(MOD, CLK, FLAG, STATE) do { \
     int32_t status = 0; \
     if(status == 0) { \
@@ -108,7 +110,7 @@
             appLogPrintf("SCICLIENT: Sciclient_pmModuleClkRequest module=%u clk=%u state=%u flag=%u\n", MOD, CLK, STATE, FLAG); \
         status = Sciclient_pmModuleClkRequest(MOD, CLK, STATE, FLAG, SCICLIENT_SERVICE_WAIT_FOREVER); \
         if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmModuleClkRequest failed\n"); \
-   	    else \
+        else \
         { \
             if(APP_DEBUG_SCICLIENT) \
                 appLogPrintf("SCICLIENT: Sciclient_pmModuleClkRequest success\n"); \
@@ -124,7 +126,7 @@
             appLogPrintf("SCICLIENT: Sciclient_pmQueryModuleClkFreq module=%u clk=%u freq=%u%06u\n", MOD, CLK, (uint32_t)(FREQ / 1000000), (uint32_t)(FREQ % 1000000)); \
         status = Sciclient_pmQueryModuleClkFreq(MOD, CLK, FREQ, &freq, SCICLIENT_SERVICE_WAIT_FOREVER); \
         if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmQueryModuleClkFreq failed\n"); \
-	    else \
+        else \
         { \
             if(APP_DEBUG_SCICLIENT) \
                 appLogPrintf("SCICLIENT: Sciclient_pmQueryModuleClkFreq freq=%u%06u\n", (uint32_t)(freq / 1000000), (uint32_t)(freq % 1000000)); \
@@ -138,6 +140,21 @@
         if(APP_DEBUG_SCICLIENT) \
             appLogPrintf("SCICLIENT: Sciclient_pmSetModuleClkFreq module=%u clk=%u freq=%u%06u\n", MOD, CLK, (uint32_t)(FREQ / 1000000), (uint32_t)(FREQ % 1000000)); \
         status = Sciclient_pmSetModuleClkFreq(MOD, CLK, FREQ, 0, SCICLIENT_SERVICE_WAIT_FOREVER); \
+        if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmSetModuleClkFreq failed\n"); \
+        else \
+        { \
+            if(APP_DEBUG_SCICLIENT) \
+                appLogPrintf("SCICLIENT: Sciclient_pmSetModuleClkFreq success\n"); \
+        } \
+    } \
+} while(0)
+
+#define SET_CLOCK_FREQ_ALLOW_CHANGE(MOD, CLK, FREQ) do { \
+    int32_t status = 0; \
+    if(status == 0) { \
+        if(APP_DEBUG_SCICLIENT) \
+            appLogPrintf("SCICLIENT: Sciclient_pmSetModuleClkFreq module=%u clk=%u freq=%u%06u\n", MOD, CLK, (uint32_t)(FREQ / 1000000), (uint32_t)(FREQ % 1000000)); \
+        status = Sciclient_pmSetModuleClkFreq(MOD, CLK, FREQ, TISCI_MSG_FLAG_CLOCK_ALLOW_FREQ_CHANGE, SCICLIENT_SERVICE_WAIT_FOREVER); \
         if(status != 0) appLogPrintf("SCICLIENT: ERROR: Sciclient_pmSetModuleClkFreq failed\n"); \
         else \
         { \

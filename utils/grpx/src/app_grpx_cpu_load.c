@@ -143,7 +143,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                           );
                 snprintf(string2, APP_GRPX_STRING_MAX,
                           "%3s",
-                          "   "
+                          "+MMA"
                           );
                 break;
             #if defined(SOC_J721S2)

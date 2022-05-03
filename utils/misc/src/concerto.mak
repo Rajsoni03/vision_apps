@@ -20,7 +20,7 @@ IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel
 CSOURCES += app_cpu_hz_freertos.c
 endif
 
-ifeq ($(TARGET_CPU),C71)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120))
 IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/c7x
 IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/c7x
 endif
@@ -37,8 +37,12 @@ IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
 
 CSOURCES += app_r5f_init.c
 
-ifeq ($(BUILD_PDK_BOARD), j721e_evm)
-CSOURCES += app_pinmux.c
+ifeq ($(TARGET_PLATFORM),J721S2)
+CSOURCES += app_pinmux_j721s2.c
+endif
+
+ifeq ($(TARGET_PLATFORM),J7)
+CSOURCES += app_pinmux_j721e.c
 endif
 
 DEFS+=$(BUILD_PDK_BOARD)
