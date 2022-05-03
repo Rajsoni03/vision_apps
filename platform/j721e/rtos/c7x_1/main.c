@@ -132,12 +132,43 @@ __attribute__ ((aligned(8192)))
 
 void setup_dru_qos(void)
 {
-	unsigned int channel;
+    unsigned int channel;
 
-	for (channel = 0; channel < J7ES_DRU_NUM_CH; ++channel) 
-	{
-		writel((J721E_DDR_QOS_EXP_DRU_QUEUE_ORDER_ID << 4) | J721E_DDR_QOS_EXP_DRU_QUEUE_PRIORITY, J7ES_DRU_CFG_y(channel));
-	}
+    for (channel = 0; channel < J7ES_DRU_NUM_CH; ++channel)
+    {
+        writel((J721E_DDR_QOS_EXP_DRU_QUEUE_ORDER_ID << 4) | J721E_DDR_QOS_EXP_DRU_QUEUE_PRIORITY, J7ES_DRU_CFG_y(channel));
+    }
+}
+
+/* A copy of this function is in both C7 main files, except the cfgClec.rtMap value */
+static void appC7xClecInitDru(void)
+{
+    CSL_ClecEventConfig   cfgClec;
+    #if defined(SOC_J721S2)
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_BASE;
+    #else
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
+    #endif
+
+    uint32_t i;
+    uint32_t dru_input_start = 192;
+    uint32_t dru_input_num   = 16;
+    /* program CLEC events from DRU used for polling by TIDL
+     * to map to required events in C7x
+     */
+    for(i=dru_input_start; i<(dru_input_start+dru_input_num); i++)
+    {
+        /* Configure CLEC */
+        cfgClec.secureClaimEnable = FALSE;
+        cfgClec.evtSendEnable     = TRUE;
+
+        /* cfgClec.rtMap value is different for each C7x */
+        cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_ALL;
+
+        cfgClec.extEvtNum         = 0;
+        cfgClec.c7xEvtNum         = (i-dru_input_start)+32;
+        CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
+    }
 }
 
 int main(void)
@@ -243,7 +274,7 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs, is_secure); 
+    retVal = Mmu_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs, is_secure);
     if(retVal == FALSE)
     {
         goto mmu_exit;
@@ -340,7 +371,7 @@ void InitMmu(void)
 
     appMmuMap(FALSE);
     appMmuMap(TRUE);
-    
+
     appCacheInit();
 }
 
