@@ -42,7 +42,7 @@
 #include <TI/tivx.h>
 #include <TI/tivx_sample.h>
 #include <tivx_sample_kernels_priv.h>
-#ifdef J7
+#if defined(J7) || defined(J721S2)
 #include <app_init.h>
 #endif
 #include <tivx_utils_file_rd_wr.h>
@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
     snprintf(output_file_path, APP_MAX_FILE_PATH, "%s/output/%s", test_data_path, "mosaic_output_file.bin");
     snprintf(input1_file_path, APP_MAX_FILE_PATH, "%s/psdkra/app_opengl_mosaic/%s", test_data_path, "input1_file.bin");
 
-#ifdef J7
+#if defined(J7) || defined(J721S2)
     status = appCommonInit();
 #endif
     tivxInit();
@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
         status = vxGetStatus((vx_reference) context);
     }
     tivxSampleLoadKernels(context);
-    #if J7
+    #if defined(J7) || defined(J721S2)
     tivxRegisterSampleTargetA72Kernels();
     #endif
 
@@ -418,7 +418,7 @@ int main(int argc, char *argv[])
     vxReleaseNode(&node);
     vxReleaseGraph(&graph);
 
-    #if J7
+    #if defined(J7) || defined(J721S2)
     tivxUnRegisterSampleTargetA72Kernels();
     #endif
     tivxSampleUnLoadKernels(context);
@@ -426,7 +426,7 @@ int main(int argc, char *argv[])
 
     tivxHostDeInit();
     tivxDeInit();
-#ifdef J7
+#if defined(J7) || defined(J721S2)
     appCommonDeInit();
 #endif
     return status;

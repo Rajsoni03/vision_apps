@@ -52,7 +52,7 @@
 #include <render.h>
 #include <tivx_utils_graph_perf.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
-#ifdef J7
+#if defined(J7) || defined(J721S2)
 #include <utils/app_init/include/app_init.h>
 #endif
 #include "app_common.h"
@@ -933,7 +933,7 @@ static void app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 
 static void app_init(AppObj *obj)
 {
-#ifdef J7
+#if defined(J7) || defined(J721S2)
     appCommonInit();
 #endif
     tivxInit();
@@ -1247,7 +1247,7 @@ static void app_deinit(AppObj *obj)
     vxReleaseContext(&obj->context);
     tivxHostDeInit();
     tivxDeInit();
-#ifdef J7
+#if defined(J7) || defined(J721S2)
     appCommonDeInit();
 #endif
 }
