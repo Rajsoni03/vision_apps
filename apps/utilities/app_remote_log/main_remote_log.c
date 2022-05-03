@@ -123,6 +123,9 @@ int main(void)
     #ifdef ENABLE_IPC_C7x_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
     #endif
+    #ifdef ENABLE_IPC_C7x_2
+    log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_2] = 1;
+    #endif
 
     log_init_prm.shared_mem = (app_log_shared_mem_t *)APP_LOG_MEM_ADDR;
     log_init_prm.self_cpu_index = APP_IPC_CPU_MPU1_0;
