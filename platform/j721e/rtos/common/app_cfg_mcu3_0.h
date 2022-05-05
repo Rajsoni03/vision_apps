@@ -69,6 +69,5 @@
 
 #undef ENABLE_UDMA
 #undef ENABLE_UDMA_COPY
-#undef ENABLE_TIOVX
 
 #endif /* APP_CFG_MCU3_0_H_ */
