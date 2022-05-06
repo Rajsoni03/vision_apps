@@ -164,13 +164,13 @@ const char *app_common_get_coreName(const char *appCoreName)
     {
         return TIVX_TARGET_A72_3;
     }
-    else if (!strcmp(appCoreName, "TIVX_TARGET_IPU1_0"))
+    else if (!strcmp(appCoreName, "TIVX_TARGET_MCU2_0"))
     {
-        return TIVX_TARGET_IPU1_0;
+        return TIVX_TARGET_MCU2_0;
     }
-    else if (!strcmp(appCoreName, "TIVX_TARGET_IPU1_1"))
+    else if (!strcmp(appCoreName, "TIVX_TARGET_MCU2_1"))
     {
-        return TIVX_TARGET_IPU1_1;
+        return TIVX_TARGET_MCU2_1;
     }
 
     return NULL;

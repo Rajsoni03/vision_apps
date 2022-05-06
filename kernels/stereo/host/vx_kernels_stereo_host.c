@@ -143,7 +143,7 @@ void tivxStereoLoadKernels(vx_context context)
         /* These three lines only work on PC emulation mode ...
          * this will need to be updated when moving to target */
 #if defined(x86_64)
-        tivxSetSelfCpuId(TIVX_CPU_ID_IPU1_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MCU2_0);
         tivxRegisterStereoTargetKernels();
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterStereoTargetKernels();

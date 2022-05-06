@@ -74,7 +74,7 @@ root@j7-evm:/opt/vision_apps# [MCU2_0]      4.454941 s: ### CPU Frequency <ORG =
 [MCU2_0]     20.829334 s:  VX_ZONE_INIT:Enabled
 [MCU2_0]     20.829365 s:  VX_ZONE_ERROR:Enabled
 [MCU2_0]     20.829388 s:  VX_ZONE_WARNING:Enabled
-[MCU2_0]     20.830566 s:  VX_ZONE_INIT:[tivxPlatformCreateTargetId:55] Added target IPU1-0 
+[MCU2_0]     20.830566 s:  VX_ZONE_INIT:[tivxPlatformCreateTargetId:55] Added target MCU2-0 
 [MCU2_0]     20.830860 s:  VX_ZONE_INIT:[tivxPlatformCreateTargetId:55] Added target VPAC_NF 
 [MCU2_0]     20.831125 s:  VX_ZONE_INIT:[tivxPlatformCreateTargetId:55] Added target VPAC_LDC1 
 [MCU2_0]     20.831367 s:  VX_ZONE_INIT:[tivxPlatformCreateTargetId:55] Added target VPAC_MSC1 

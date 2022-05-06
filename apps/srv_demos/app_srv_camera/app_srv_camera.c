@@ -1387,7 +1387,7 @@ static vx_status app_create_viss_aewb(AppObj *obj)
                                   NULL,
                                   obj->ae_awb_result,
                                   obj->dcc_param_2a);
-    vxSetNodeTarget(obj->node_aewb, VX_TARGET_STRING, TIVX_TARGET_IPU1_0);
+    vxSetNodeTarget(obj->node_aewb, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
 
     if(NULL != obj->node_aewb)
         vxSetReferenceName((vx_reference)obj->node_aewb, "2A_AlgNode");

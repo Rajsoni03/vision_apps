@@ -416,7 +416,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
                                  (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, -1),
                                  (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, 0),
                                  dcc_param_2a), VX_TYPE_NODE);
-        VX_CALL(vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_IPU1_0));
+        VX_CALL(vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_MCU2_0));
         VX_CALL(vxSetReferenceName((vx_reference)node_aewb, "2A_AlgNode"));
 
         VX_CALL(vxSetReferenceName((vx_reference)delay_2a_res, "delay_object"));
@@ -744,7 +744,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
                                  tmp_user_data_object_1,
                                  tmp_user_data_object_0,
                                  dcc_param_2a), VX_TYPE_NODE);
-        vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_IPU1_0);
+        vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
         vxSetReferenceName((vx_reference)node_aewb, "2A_AlgNode");
 
         vxReplicateNode(graph, node_aewb, aewb_prms_replicate, 6u);
@@ -1079,7 +1079,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
                                  tmp_user_data_object_1,
                                  tmp_user_data_object_0,
                                  dcc_param_2a), VX_TYPE_NODE);
-        vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_IPU1_0);
+        vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
         vxSetReferenceName((vx_reference)node_aewb, "2A_AlgNode");
 
         vxReplicateNode(graph, node_aewb, aewb_prms_replicate, 6u);

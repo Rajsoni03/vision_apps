@@ -429,9 +429,9 @@ void tivxAddTargetKernelPcieTx(void)
 
     self_cpu = tivxGetSelfCpuId();
 
-    if ( self_cpu == TIVX_CPU_ID_IPU1_0 )
+    if ( self_cpu == TIVX_CPU_ID_MCU2_0 )
     {
-        strncpy(target_name, TIVX_TARGET_IPU1_0, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name, TIVX_TARGET_MCU2_0, TIVX_TARGET_MAX_NAME);
         status = VX_SUCCESS;
     }
     else

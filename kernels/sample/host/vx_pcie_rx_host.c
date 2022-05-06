@@ -207,7 +207,7 @@ vx_status tivxAddKernelPcieRx(vx_context context)
         if (status == VX_SUCCESS)
         {
             /* add supported target's */
-            tivxAddKernelTarget(kernel, TIVX_TARGET_IPU1_0);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MCU2_0);
         }
         if (status == VX_SUCCESS)
         {

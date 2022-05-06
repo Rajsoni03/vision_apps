@@ -1067,7 +1067,7 @@ vx_status app_create_aewb(AppObj *obj, uint32_t sensor_wdr_mode)
                                       NULL,
                                       obj->ae_awb_result,
                                       obj->dcc_param_2a);
-    vxSetNodeTarget(obj->node_aewb, VX_TARGET_STRING, TIVX_TARGET_IPU1_0);
+    vxSetNodeTarget(obj->node_aewb, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
     tivxSetNodeParameterNumBufByIndex(obj->node_aewb, 4u, NUM_BUFS);
     if(NULL != obj->node_aewb)
     {
