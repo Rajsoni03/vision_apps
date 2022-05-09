@@ -1217,7 +1217,7 @@ static vx_status app_create_graph(AppObj *obj)
     {
         status = vxSetGraphScheduleConfig(obj->graph,
                         VX_GRAPH_SCHEDULE_MODE_QUEUE_AUTO,
-                        list_depth,
+                        graph_parameter_index,
                         graph_parameters_queue_params_list);
     }
     if(status == VX_SUCCESS)
