@@ -82,6 +82,12 @@
 #define APP_PERF_DDR_STATS_CTR2         (0x03) /* A value of 0x03 configures counter 3 to return number of command activations */
 #define APP_PERF_DDR_STATS_CTR3         (0x1C) /* A value of 0x1C configures counter 4 to return number of queue full states   */
 
+#if defined(SOC_J721E)
+#define APP_PERF_NUM_DDR_INSTANCES      (1u)
+#elif defined (SOC_J721S2)
+#define APP_PERF_NUM_DDR_INSTANCES      (2u)
+#endif
+
 /* Define this to print counter2 and counter3 values */
 //#define APP_PERF_SHOW_DDR_STATS
 
@@ -587,35 +593,56 @@ void appPerfStatsHwaUpdateLoad(app_perf_hwa_id_t id, uint32_t active_time_in_use
 void appPerfStatsDdrStatsReadCounters(uint32_t *val0, uint32_t *val1, uint32_t *val2, uint32_t *val3, bool raw)
 {
     static uint32_t is_first_time = 1;
-    static volatile uint32_t *cnt_sel = (volatile uint32_t *)0x02980100;
-    static volatile uint32_t *cnt0    = (volatile uint32_t *)0x02980104;
-    static volatile uint32_t *cnt1    = (volatile uint32_t *)0x02980108;
-    static volatile uint32_t *cnt2    = (volatile uint32_t *)0x0298010C;
-    static volatile uint32_t *cnt3    = (volatile uint32_t *)0x02980110;
+    static volatile uint32_t *cnt_sel[APP_PERF_NUM_DDR_INSTANCES];
+    static volatile uint32_t *cnt0[APP_PERF_NUM_DDR_INSTANCES];
+    static volatile uint32_t *cnt1[APP_PERF_NUM_DDR_INSTANCES];
+    static volatile uint32_t *cnt2[APP_PERF_NUM_DDR_INSTANCES];
+    static volatile uint32_t *cnt3[APP_PERF_NUM_DDR_INSTANCES];
+
     static volatile uint32_t last_cnt0 = 0, last_cnt1 = 0, last_cnt2 = 0, last_cnt3 = 0;
-    volatile uint32_t cur_cnt0, cur_cnt1, cur_cnt2, cur_cnt3;
-    uint32_t diff_cnt0, diff_cnt1, diff_cnt2, diff_cnt3;
+    volatile uint32_t cur_cnt0 = 0, cur_cnt1 = 0, cur_cnt2 = 0, cur_cnt3 = 0;
+    uint32_t diff_cnt0, diff_cnt1, diff_cnt2, diff_cnt3, ddr_inst;
+
+    cnt_sel[0] = (volatile uint32_t *)0x02980100;
+    cnt0[0]    = (volatile uint32_t *)0x02980104;
+    cnt1[0]    = (volatile uint32_t *)0x02980108;
+    cnt2[0]    = (volatile uint32_t *)0x0298010C;
+    cnt3[0]    = (volatile uint32_t *)0x02980110;
+
+    #ifdef SOC_J721S2
+    cnt_sel[1] = (volatile uint32_t *)0x029A0100;
+    cnt0[1]    = (volatile uint32_t *)0x029A0104;
+    cnt1[1]    = (volatile uint32_t *)0x029A0108;
+    cnt2[1]    = (volatile uint32_t *)0x029A010C;
+    cnt3[1]    = (volatile uint32_t *)0x029A0110;
+    #endif
 
     if(is_first_time)
     {
         is_first_time = 0;
 
-        /* cnt0 is counting reads, cnt1 is counting writes, cnt2, cnt3 not used */
-        *cnt_sel = (APP_PERF_DDR_STATS_CTR0 <<  0u) |
-                   (APP_PERF_DDR_STATS_CTR1 <<  8u) |
-                   (APP_PERF_DDR_STATS_CTR2 << 16u) |
-                   (APP_PERF_DDR_STATS_CTR3 << 24u);
+        for (ddr_inst = 0; ddr_inst < APP_PERF_NUM_DDR_INSTANCES; ddr_inst++)
+        {
+            /* cnt0 is counting reads, cnt1 is counting writes, cnt2, cnt3 not used */
+            *cnt_sel[ddr_inst] = (APP_PERF_DDR_STATS_CTR0 <<  0u) |
+                       (APP_PERF_DDR_STATS_CTR1 <<  8u) |
+                       (APP_PERF_DDR_STATS_CTR2 << 16u) |
+                       (APP_PERF_DDR_STATS_CTR3 << 24u);
 
-        last_cnt0 = *cnt0;
-        last_cnt1 = *cnt1;
-        last_cnt2 = *cnt2;
-        last_cnt3 = *cnt3;
+            last_cnt0 += *cnt0[ddr_inst];
+            last_cnt1 += *cnt1[ddr_inst];
+            last_cnt2 += *cnt2[ddr_inst];
+            last_cnt3 += *cnt3[ddr_inst];
+        }
     }
 
-    cur_cnt0 = *cnt0;
-    cur_cnt1 = *cnt1;
-    cur_cnt2 = *cnt2;
-    cur_cnt3 = *cnt3;
+    for (ddr_inst = 0; ddr_inst < APP_PERF_NUM_DDR_INSTANCES; ddr_inst++)
+    {
+        cur_cnt0 += *cnt0[ddr_inst];
+        cur_cnt1 += *cnt1[ddr_inst];
+        cur_cnt2 += *cnt2[ddr_inst];
+        cur_cnt3 += *cnt3[ddr_inst];
+    }
 
     if(raw)
     {
