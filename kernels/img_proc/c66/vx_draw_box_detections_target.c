@@ -78,7 +78,7 @@ static tivx_target_kernel vx_DrawBoxDetections_kernel = NULL;
 static vx_int32 clip_offset(vx_int32 input, vx_int32 max);
 static void drawBox(vx_uint8 *y_data, vx_uint8 *cbcr_data, vx_int32 width, vx_int32 height, vx_int32 xmin, vx_int32 ymin, vx_int32 xmax, vx_int32 ymax, vx_int32 label, vx_uint8 color_map[][3], vx_int32 max_classes);
 
-#if 0
+#if defined(SOC_J721E)
 #ifndef x86_64
 #if CPU_COPY    /* Not enabled - change to 1 for doing CPU copy */
 static void memcpyC66(uint8_t *restrict pOut, uint8_t *restrict pIn, int32_t size)
@@ -114,6 +114,8 @@ static void memcpyC66(uint8_t *pOut, uint8_t *pIn, int32_t size)
 #else
 #define memcpyC66 memcpy
 #endif
+#else
+#define memcpyC66 memcpy
 #endif
 
 static vx_status VX_CALLBACK tivxKernelDrawBoxDetectionsCreate
@@ -227,12 +229,12 @@ static vx_status VX_CALLBACK tivxKernelDrawBoxDetectionsProcess
 
         if(output_image_desc->mem_size[0] == input_image_desc->mem_size[0])
         {
-            memcpy(output_image_target_ptr[0], input_image_target_ptr[0], output_image_desc->mem_size[0]);
+            memcpyC66(output_image_target_ptr[0], input_image_target_ptr[0], output_image_desc->mem_size[0]);
         }
 
         if(output_image_desc->mem_size[1] == input_image_desc->mem_size[1])
         {
-            memcpy(output_image_target_ptr[1], input_image_target_ptr[1], output_image_desc->mem_size[1]);
+            memcpyC66(output_image_target_ptr[1], input_image_target_ptr[1], output_image_desc->mem_size[1]);
         }
 
         tivxDrawBoxDetectionsParams *params;

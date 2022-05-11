@@ -150,11 +150,7 @@ doxy_docs:
 	-$(Q)$(MKDIR) docs/user_guide/ $(QUIET) || true
 	-$(Q)$(COPY) tools/3d_calibration_tool/PSDK_RTOS_UserGuide_3D_SurroundView_Manual_CalibTool.pdf docs/user_guide/
 	-$(Q)$(COPY) tools/3d_calibration_tool/poster_calib_chart.pdf docs/user_guide/
-ifeq ($(SOC),j721e)
-	$(DOXYGEN) internal_docs/doxy_cfg_user_guide/user_guide_linux_j721e.cfg 2> internal_docs/doxy_cfg_user_guide/doxy_warnings.txt
-else ifeq ($(SOC),j721s2)
-	$(DOXYGEN) internal_docs/doxy_cfg_user_guide/user_guide_linux_j721s2.cfg 2> internal_docs/doxy_cfg_user_guide/doxy_warnings.txt
-endif
+	$(DOXYGEN) internal_docs/doxy_cfg_user_guide/user_guide_linux_$(SOC).cfg 2> internal_docs/doxy_cfg_user_guide/doxy_warnings.txt
 	-$(Q)$(COPY) internal_docs/doxy_cfg_user_guide/theme/*.png docs/user_guide/
 	$(COPY) vision_apps_release_notes_$(SOC).html vision_apps_release_notes.html
 
@@ -163,11 +159,7 @@ doxy_design_docs:
 
 doxy_datasheet_docs:
 	-$(Q)$(MKDIR) docs/datasheet/ $(QUIET) || true
-ifeq ($(SOC),j721e)
-	$(DOXYGEN) internal_docs/doxy_cfg_datasheet/datasheet_j721e.cfg 2> internal_docs/doxy_cfg_datasheet/doxy_warnings.txt
-else ifeq ($(SOC),j721s2)
-	$(DOXYGEN) internal_docs/doxy_cfg_datasheet/datasheet_j721s2.cfg 2> internal_docs/doxy_cfg_datasheet/doxy_warnings.txt
-endif
+	$(DOXYGEN) internal_docs/doxy_cfg_datasheet/datasheet_$(SOC).cfg 2> internal_docs/doxy_cfg_datasheet/doxy_warnings.txt
 
 # Additional make targets to build various related components
 include makerules/makefile_pdk.mak

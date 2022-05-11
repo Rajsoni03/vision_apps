@@ -87,7 +87,7 @@
 #include <stdarg.h>
 
 #include "test_engine/test.h"
-#if defined(J7) || defined(J721S2)
+#ifndef PC
 #include <utils/app_init/include/app_init.h>
 #endif
 
@@ -122,7 +122,7 @@ int CT_main(int argc, char* argv[], const char* version_str);
 int main(int argc, char* argv[])
 {
     int status;
-#if defined(J7) || defined(J721S2)
+#ifndef PC
     status = appCommonInit();
 #endif
     tivxInit();
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
     TestModuleUnRegister();
     tivxHostDeInit();
     tivxDeInit();
-#if defined(J7) || defined(J721S2)
+#ifndef PC
     appCommonDeInit();
 #endif
     return status;

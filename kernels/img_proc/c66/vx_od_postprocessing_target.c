@@ -349,6 +349,9 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
 
         /*Convert detected keypoint in fish eye corrected domain*/
         /*center_x and center_y is optical center of original image resolution widthxheight*/
+        #ifdef SOC_J721S2
+        /* ADASVISION-5496: Using the natural C algorithm for tiadalg_fisheye_transformation
+         *                  for J721S2 as the recompiled version is not functional */
         status = tiadalg_fisheye_transformation_cn
                  (
                     prms->fe_points_ptr,
@@ -363,6 +366,22 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
                     prms->scratch_fwd,prms->is_scratch_fwd_filled,
                     prms->fec_points_ptr
                  );
+        #else
+        status = tiadalg_fisheye_transformation_c66
+                 (
+                    prms->fe_points_ptr,
+                    numObjs*prms->prms_host.num_keypoints,
+                    prms->prms_host.center_x,
+                    prms->prms_host.center_y,
+                    prms->prms_host.focal_length,
+                    prms->prms_host.center_x * prms->prms_host.inter_center_x_fact,
+                    prms->prms_host.center_y * prms->prms_host.inter_center_y_fact,
+                    rev_table_target_ptr,
+                    prms->prms_host.num_table_rows,
+                    prms->scratch_fwd,prms->is_scratch_fwd_filled,
+                    prms->fec_points_ptr
+                 );
+        #endif
         prms->is_scratch_fwd_filled = 0x1;
         if(status!=TIADALG_PROCESS_SUCCESS)
         {
