@@ -298,12 +298,21 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
                 hence convert the output key points into base resolution of 1280x720, widthxheight.
                 co-ordinate output from DL is normalized form [0.0 1.0].
             */
+#ifdef DEBUG_KP
+            if (pPSpots->label !=3)
+                ((vx_uint8*) out_valid_tensor_target_ptr)[i] = 0;
+
+            if (pPSpots->score <= 0.9999)
+                ((vx_uint8*) out_valid_tensor_target_ptr)[i] = 0;
+#endif
             for(j = 0; j < prms->prms_host.num_keypoints; j++)
             {
                 x = (vx_int16)((pPSpots->keyPoints[j].x * prms->prms_host.width) + 0.5);
                 y = (vx_int16)((pPSpots->keyPoints[j].y * prms->prms_host.height) + 0.5);
 
-                if((x >= prms->prms_host.width) || (y >= prms->prms_host.height))
+                if((x >= prms->prms_host.width) || (y >= prms->prms_host.height) ||
+                   (x < 0) || (y < 0)
+                  )
                 {
                     ((vx_uint8*) out_valid_tensor_target_ptr)[i] = 0;
                 }
@@ -314,15 +323,27 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
         }
 
 #ifdef DEBUG_KP
-            printf("Original detected kp--> \n");
             for(i = 0; i < numObjs; i++)
             {
-                printf("  Obj Id = %d ", i);
-                for(j = 0; j < prms->prms_host.num_keypoints; j++)
+                if(((vx_uint8*) out_valid_tensor_target_ptr)[i] !=0)
                 {
-                    printf("(%d,%d,%d) ",j,prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j],prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j+1]);
+                    for(j = 0; j < prms->prms_host.num_keypoints; j++)
+                    {
+#ifndef PRINT_ALL_KP
+                        if((prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j]>=prms->prms_host.width) ||
+                           (prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j+1]>=prms->prms_host.height) ||
+                           (prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j]<=0) ||
+                           (prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j+1] <=0)
+                            )
+#endif
+                        {
+                            printf("fe detected kp--> \n");
+                            printf("  Obj Id = %d ", i);
+                            printf("(%d,%d,%d) ",j,prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j],prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*2) + 2*j+1]);
+                            printf("\n");
+                        }
+                    }
                 }
-                printf("\n");
             }
 #endif
 
@@ -361,13 +382,14 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
 
                 /*If any of the point of object is outside the valid region then make complete object as invalid*/
 
-                if ((startPoint[0] > (prms->prms_host.width*prms->prms_host.inter_center_x_fact)) ||
-                    (startPoint[1] > (prms->prms_host.height*prms->prms_host.inter_center_y_fact)) ||
+                if ((startPoint[0] >= (prms->prms_host.width*prms->prms_host.inter_center_x_fact)) ||
+                    (startPoint[1] >= (prms->prms_host.height*prms->prms_host.inter_center_y_fact)) ||
                     (startPoint[0] < 0) ||
                     (startPoint[1] < 0))
                 {
                     ((vx_uint8*) out_valid_tensor_target_ptr)[i] = 0;
                 }
+
                 /* If the number of line parts is N, then total number  of points on line will be one extra N + 1*/
                 lineInterp(startPoint, endPoint,
                         (prms->fec_list_points_ptr +\
@@ -377,16 +399,28 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
             }
         }
 #ifdef DEBUG_KP
-        printf("fe corrected detected kp--> \n");
         for(i = 0; i < numObjs; i++)
         {
-            printf("  Obj Id = %d ", i);
-            for(j = 0; j < prms->prms_host.num_keypoints*prms->prms_host.points_per_line; j++)
+            if(((vx_uint8*) out_valid_tensor_target_ptr)[i] !=0)
             {
-                printf("(%d,%d,%d) ",j,prms->fec_list_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j],
-                    prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j+1]);
+                for(j = 0; j < prms->prms_host.num_keypoints*prms->prms_host.points_per_line; j++)
+                {
+#ifndef PRINT_ALL_KP
+                    if((prms->fec_list_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j] >= (prms->prms_host.width*prms->prms_host.inter_center_x_fact)) ||
+                    (prms->fec_list_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j+1] >= (prms->prms_host.height*prms->prms_host.inter_center_y_fact)) ||
+                    (prms->fec_list_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j] <= 0) ||
+                    (prms->fec_list_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j + 1] <= 0)
+                      )
+#endif
+                    {
+                        printf("fe corrected kp--> \n");
+                        printf("  Obj Id = %d ", i);
+                        printf("(%d,%d,%d) ",j,prms->fec_list_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j],
+                            prms->fe_points_ptr[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j+1]);
+                        printf("\n");
+                    }
+                }
             }
-            printf("\n");
         }
 #endif
         out_points_desc = (tivx_obj_desc_tensor_t *)obj_desc[TIVX_KERNEL_OD_POSTPROCESS_OUTPUT_POINTS_IDX];
@@ -411,16 +445,32 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
           prms->is_scratch_bwd_filled = 0x1;
 
 #ifdef DEBUG_KP
-        printf("final fe detected kp--> \n");
         for(i = 0; i < numObjs; i++)
         {
-            printf("  Obj Id = %d ", i);
-            for(j = 0; j < prms->prms_host.num_keypoints*prms->prms_host.points_per_line; j++)
+            pPSpots = (TIDL_ODLayerObjInfo *)((uint8_t *)pObjInfo + (i * ((vx_uint32)pHeader->objInfoSize)));
+            if(((vx_uint8*) out_valid_tensor_target_ptr)[i] !=0)
             {
-                printf("(%d,%d,%d) ",j,((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j],
-                    ((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j+1]);
+                printf(" Obj Id = %d ", i);
+                printf(" label is %f ",pPSpots->label);
+                printf(" score is %f ",pPSpots->score);
+                printf(" %f %f %f %f \n",pPSpots->xmin,pPSpots->ymin,pPSpots->xmax,pPSpots->ymax);
+
+                for(j = 0; j < prms->prms_host.num_keypoints*prms->prms_host.points_per_line; j++)
+                {
+#ifndef PRINT_ALL_KP
+                    if((((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j] >= prms->prms_host.width) ||
+                       (((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j + 1] >= prms->prms_host.height) ||
+                       (((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j] <= 0)||
+                       (((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j+1] <= 0)
+                      )
+#endif
+                      {
+                        printf("(%d,%d,%d) ",j,((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j],
+                            ((vx_uint16*)out_tensor_target_ptr)[(i*prms->prms_host.num_keypoints*prms->prms_host.points_per_line*2) + 2*j+1]);
+                      }
+                }
+                printf("\n");
             }
-            printf("\n");
         }
 #endif
 
