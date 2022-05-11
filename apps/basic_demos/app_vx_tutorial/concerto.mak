@@ -9,6 +9,8 @@ CSOURCES    := $(call all-c-files)
 
 include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
 
+STATIC_LIBS += $(TEST_LIBS)
+
 include $(FINALE)
 
 endif
