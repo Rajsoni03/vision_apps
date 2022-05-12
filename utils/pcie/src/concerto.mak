@@ -7,7 +7,9 @@ TARGETTYPE  := library
 
 CSOURCES    := app_pcie_queue.c
 
+ifeq ($(TARGET_PLATFORM),J721S2)
 SKIPBUILD=1
+endif
 
 include $(FINALE)
 

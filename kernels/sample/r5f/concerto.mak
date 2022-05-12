@@ -10,7 +10,9 @@ IDIRS       += $(VISION_APPS_PATH)/kernels/sample/host
 IDIRS       += $(TIOVX_PATH)/kernels/include
 IDIRS       += $(VXLIB_PATH)/packages
 
+ifeq ($(TARGET_PLATFORM),J721S2)
 SKIPBUILD=1
+endif
 
 include $(FINALE)
 endif
