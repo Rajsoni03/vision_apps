@@ -325,6 +325,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
 
         /* Create/Configure configuration input structure */
         memset(&params, 0, sizeof(tivx_vpac_viss_params_t));
+        tivx_vpac_viss_params_init(&params);
         ASSERT_VX_OBJECT(configuration = vxCreateUserDataObject(context, "tivx_vpac_viss_params_t",
                                                             sizeof(tivx_vpac_viss_params_t), NULL), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
 
@@ -361,7 +362,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
                                                 raw[0], NULL, NULL, viss_nv12_out_img, NULL, NULL,
                                                 h3a_aew_af, NULL, NULL, NULL), VX_TYPE_NODE);
         tivxSetNodeParameterNumBufByIndex(vissNode, 6u, NUM_BUFS);
-        tivxSetNodeParameterNumBufByIndex(vissNode, 10u, NUM_BUFS);
+        tivxSetNodeParameterNumBufByIndex(vissNode, 9u, NUM_BUFS);
 
         vxSetReferenceName((vx_reference)vissNode, "VISS_Processing");
         vxSetNodeTarget(vissNode, VX_TARGET_STRING,
@@ -618,6 +619,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
 
         /* Create/Configure configuration input structure */
         memset(&params, 0, sizeof(tivx_vpac_viss_params_t));
+        tivx_vpac_viss_params_init(&params);
         ASSERT_VX_OBJECT(configuration = vxCreateUserDataObject(context, "tivx_vpac_viss_params_t",
                                                             sizeof(tivx_vpac_viss_params_t), NULL), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
 
@@ -953,6 +955,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
 
         /* Create/Configure configuration input structure */
         memset(&params, 0, sizeof(tivx_vpac_viss_params_t));
+        tivx_vpac_viss_params_init(&params);
         ASSERT_VX_OBJECT(configuration = vxCreateUserDataObject(context, "tivx_vpac_viss_params_t",
                                                             sizeof(tivx_vpac_viss_params_t), NULL), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
 
