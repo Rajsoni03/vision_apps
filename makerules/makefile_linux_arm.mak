@@ -35,8 +35,6 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps
-	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init_$(SOC).sh $(LINUX_FS_STAGE_PATH)/opt/vision_apps/vision_apps_init.sh
-	rm $(LINUX_FS_STAGE_PATH)/opt/vision_apps/vision_apps_init_*.sh
 	chmod +x $(LINUX_FS_STAGE_PATH)/opt/vision_apps/*.sh
 
 	# copy ptk cfg files
