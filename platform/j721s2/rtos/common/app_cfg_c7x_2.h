@@ -73,6 +73,6 @@
 #define DDR_SCRATCH_SIZE      (DDR_C7X_2_SCRATCH_SIZE)
 
 /* dont need this in C7x as of now */
-#undef ENABLE_UDMA_COPY
+#define ENABLE_UDMA_COPY
 
 #endif /* APP_CFG_C7x_2_H_ */
