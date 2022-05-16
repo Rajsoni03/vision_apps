@@ -1117,7 +1117,7 @@ static vx_status app_create_graph(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
 #ifdef AVP_ENABLE_PIPELINE_FLOW
-    vx_int32 list_depth = (obj->test_mode == 1) ? 2 : 1;
+    vx_int32 list_depth = ((obj->en_out_img_write == 1) || (obj->test_mode == 1)) ? 2 : 1;
     vx_graph_parameter_queue_params_t graph_parameters_queue_params_list[list_depth];
     vx_int32 graph_parameter_index;
 #endif
@@ -1217,7 +1217,7 @@ static vx_status app_create_graph(AppObj *obj)
     {
         status = vxSetGraphScheduleConfig(obj->graph,
                         VX_GRAPH_SCHEDULE_MODE_QUEUE_AUTO,
-                        graph_parameter_index,
+                        list_depth,
                         graph_parameters_queue_params_list);
     }
     if(status == VX_SUCCESS)
