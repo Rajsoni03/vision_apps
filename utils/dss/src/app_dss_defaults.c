@@ -237,7 +237,7 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
     uint32_t cpuId = APP_IPC_CPU_MCU2_0;
     bool doAdvVpSetup = false;
     bool doHpd = false;
-    bool isDpConnected = true;
+    bool isDpConnected = false;
     app_dctrl_path_info_t pathInfo;
     app_dctrl_vp_params_t vpParams;
     app_dctrl_adv_vp_params_t advVpParams;
@@ -347,10 +347,15 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
 
     retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_REGISTER_HANDLE, &doHpd, sizeof(doHpd), 0U);
 
+    #if defined(SOC_J721S2)
     if( (FVID2_SOK == retVal) && (obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP) )
     {
         retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_IS_DP_CONNECTED, &isDpConnected, sizeof(isDpConnected), 0U);
     }
+    #elif defined(SOC_J721E)
+    /* The DP initialization should occur on J721E regardless of if it is connected or not */
+    isDpConnected = true;
+    #endif
 
     if ( (FVID2_SOK == retVal) && (true == isDpConnected) )
     {
