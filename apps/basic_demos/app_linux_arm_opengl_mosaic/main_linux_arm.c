@@ -43,7 +43,7 @@
 #include <TI/tivx_sample.h>
 #include <tivx_sample_kernels_priv.h>
 #ifndef PC
-#include <app_init.h>
+#include <utils/app_init/include/app_init.h>
 #endif
 #include <tivx_utils_file_rd_wr.h>
 #include <TI/tivx_task.h>
