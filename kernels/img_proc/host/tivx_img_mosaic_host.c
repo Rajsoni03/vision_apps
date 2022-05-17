@@ -65,6 +65,7 @@
 #include "TI/tivx_target_kernel.h"
 #include "tivx_kernels_host_utils.h"
 #include "tivx_img_mosaic_host.h"
+#include <stdio.h>
 
 static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
             const vx_reference parameters[ ],
@@ -176,108 +177,119 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
     vx_enum kernel_id;
     vx_int32 i;
 
-    status = vxAllocateUserKernelId(context, &kernel_id);
-    if(status != VX_SUCCESS)
-    {
-        VX_PRINT(VX_ZONE_ERROR, "Unable to allocate user kernel ID\n");
-    }
+    vx_char mosaic_kernel_name[VX_MAX_KERNEL_NAME];
 
-    if (status == VX_SUCCESS)
-    {
-        /* Number of parameters are configuration + output_image + background_image + input list */
-        uint32_t num_params = TIVX_IMG_MOSAIC_BASE_PARAMS + num_inputs;
-        kernel = vxAddUserKernel(
-                    context,
-                    TIVX_KERNEL_IMG_MOSAIC_NAME,
-                    kernel_id,
-                    NULL,
-                    num_params,
-                    tivxAddKernelImgMosaicValidate,
-                    NULL,
-                    NULL);
+    /* Create kernel name by concatonating Mosaic kernel name with number of inputs to create a unique kernel */
+    snprintf( mosaic_kernel_name, VX_MAX_KERNEL_NAME, "%s:%d", TIVX_KERNEL_IMG_MOSAIC_NAME, num_inputs );
 
-        status = vxGetStatus((vx_reference)kernel);
-        if((vx_status)VX_SUCCESS != status)
-        {
-            VX_PRINT(VX_ZONE_ERROR, "Unable to add user kernel!\n");
-        }
-    }
+    kernel = vxGetKernelByName(context, mosaic_kernel_name);
 
-    index = 0;
-    if (status == VX_SUCCESS)
+    if ( NULL == kernel)
     {
-       status = vxAddParameterToKernel(kernel,
-                        index,
-                        VX_INPUT,
-                        VX_TYPE_USER_DATA_OBJECT,
-                        VX_PARAMETER_STATE_REQUIRED);
-        if((vx_status)VX_SUCCESS != status)
+
+        status = vxAllocateUserKernelId(context, &kernel_id);
+        if(status != VX_SUCCESS)
         {
-            VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+            VX_PRINT(VX_ZONE_ERROR, "Unable to allocate user kernel ID\n");
         }
-        index++;
-    }
-    if (status == VX_SUCCESS)
-    {
-       status = vxAddParameterToKernel(kernel,
-                        index,
-                        VX_OUTPUT,
-                        VX_TYPE_IMAGE,
-                        VX_PARAMETER_STATE_REQUIRED);
-        if((vx_status)VX_SUCCESS != status)
-        {
-            VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
-        }
-        index++;
-    }
-    if (status == VX_SUCCESS)
-    {
-       status = vxAddParameterToKernel(kernel,
-                        index,
-                        VX_INPUT,
-                        VX_TYPE_IMAGE,
-                        VX_PARAMETER_STATE_OPTIONAL);
-        if((vx_status)VX_SUCCESS != status)
-        {
-            VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
-        }
-        index++;
-    }
-    for(i = 0; i < num_inputs; i++)
-    {
+
         if (status == VX_SUCCESS)
         {
-              status = vxAddParameterToKernel(kernel,
-                          index,
-                          VX_INPUT,
-                          VX_TYPE_OBJECT_ARRAY,
-                          VX_PARAMETER_STATE_REQUIRED);
+            /* Number of parameters are configuration + output_image + background_image + input list */
+            uint32_t num_params = TIVX_IMG_MOSAIC_BASE_PARAMS + num_inputs;
+            kernel = vxAddUserKernel(
+                        context,
+                        mosaic_kernel_name,
+                        kernel_id,
+                        NULL,
+                        num_params,
+                        tivxAddKernelImgMosaicValidate,
+                        NULL,
+                        NULL);
+
+            status = vxGetStatus((vx_reference)kernel);
+            if((vx_status)VX_SUCCESS != status)
+            {
+                VX_PRINT(VX_ZONE_ERROR, "Unable to add user kernel!\n");
+            }
+        }
+
+        index = 0;
+        if (status == VX_SUCCESS)
+        {
+           status = vxAddParameterToKernel(kernel,
+                            index,
+                            VX_INPUT,
+                            VX_TYPE_USER_DATA_OBJECT,
+                            VX_PARAMETER_STATE_REQUIRED);
             if((vx_status)VX_SUCCESS != status)
             {
                 VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
             }
             index++;
         }
-    }
-    if (status == VX_SUCCESS)
-    {
-        /* add supported target's */
-        tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC1);
-        tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC2);
-    }
-    if (status == VX_SUCCESS)
-    {
-        status = vxFinalizeKernel(kernel);
-        if((vx_status)VX_SUCCESS != status)
+        if (status == VX_SUCCESS)
         {
-            VX_PRINT(VX_ZONE_ERROR, "Unable to finalize kernel!\n");
+           status = vxAddParameterToKernel(kernel,
+                            index,
+                            VX_OUTPUT,
+                            VX_TYPE_IMAGE,
+                            VX_PARAMETER_STATE_REQUIRED);
+            if((vx_status)VX_SUCCESS != status)
+            {
+                VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+            }
+            index++;
         }
-    }
-    if (status != VX_SUCCESS)
-    {
-        vxReleaseKernel(&kernel);
-        kernel = NULL;
-        VX_PRINT(VX_ZONE_ERROR, "kernel handle is set to NULL!\n");
+        if (status == VX_SUCCESS)
+        {
+           status = vxAddParameterToKernel(kernel,
+                            index,
+                            VX_INPUT,
+                            VX_TYPE_IMAGE,
+                            VX_PARAMETER_STATE_OPTIONAL);
+            if((vx_status)VX_SUCCESS != status)
+            {
+                VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+            }
+            index++;
+        }
+        for(i = 0; i < num_inputs; i++)
+        {
+            if (status == VX_SUCCESS)
+            {
+                  status = vxAddParameterToKernel(kernel,
+                              index,
+                              VX_INPUT,
+                              VX_TYPE_OBJECT_ARRAY,
+                              VX_PARAMETER_STATE_REQUIRED);
+                if((vx_status)VX_SUCCESS != status)
+                {
+                    VX_PRINT(VX_ZONE_ERROR, "Unable to add parameter at index = %d!\n", index);
+                }
+                index++;
+            }
+        }
+        if (status == VX_SUCCESS)
+        {
+            /* add supported target's */
+            tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC1);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC2);
+        }
+        if (status == VX_SUCCESS)
+        {
+            status = vxFinalizeKernel(kernel);
+            if((vx_status)VX_SUCCESS != status)
+            {
+                VX_PRINT(VX_ZONE_ERROR, "Unable to finalize kernel!\n");
+            }
+        }
+        if (status != VX_SUCCESS)
+        {
+            vxReleaseKernel(&kernel);
+            kernel = NULL;
+            VX_PRINT(VX_ZONE_ERROR, "kernel handle is set to NULL!\n");
+        }
     }
 
     return kernel;
