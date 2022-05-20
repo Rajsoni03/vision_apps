@@ -214,6 +214,8 @@ vx_status app_init_srv(vx_context context, SRVObj *srvObj, SensorObj *sensorObj,
     vx_uint32 in_height = sensorObj->sensorParams.sensorInfo.raw_params.height;
     vx_image input_img = vxCreateImage(context, in_width, in_height, VX_DF_IMAGE_NV12);
     srvObj->input_img_arr = vxCreateObjectArray(context, (vx_reference)input_img, sensorObj->num_cameras_enabled);
+    vxReleaseImage(&input_img);
+
     status = vxGetStatus((vx_reference)srvObj->input_img_arr);
 
     if(srvObj->en_out_srv_write == 1)
@@ -320,8 +322,6 @@ vx_status app_create_graph_srv(vx_context context, vx_graph graph, SRVObj *srvOb
             APP_PRINTF("SRV write node added! \n");
         }
     }
-
-    vxReleaseObjectArray(&input_arr);
 
     return status;
 }

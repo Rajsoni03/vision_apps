@@ -81,6 +81,7 @@ vx_status app_init_img_hist(vx_context context, ImgHistObj *imgHistObj, char *ob
 void app_deinit_img_hist(ImgHistObj *imgHistObj)
 {
     vxReleaseObjectArray(&imgHistObj->output_hist_arr);
+    vxReleaseObjectArray(&imgHistObj->input_img_arr);
 }
 
 void app_delete_img_hist(ImgHistObj *imgHistObj)
@@ -106,7 +107,7 @@ vx_status app_create_graph_img_hist(vx_graph graph, ImgHistObj *imgHistObj, vx_o
     {
         input   = (vx_image)vxGetObjectArrayItem((vx_object_array)imgHistObj->input_img_arr, 0);
     }
-    
+
     imgHistObj->node = tivxImgHistNode(graph,
                                        input,
                                        histogram);
