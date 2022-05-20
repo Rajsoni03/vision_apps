@@ -67,12 +67,12 @@
 #include "tivx_img_mosaic_host.h"
 #include <stdio.h>
 
-static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
+static vx_status VX_CALLBACK tivxImgMosaicValidate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[]);
 
-static vx_status VX_CALLBACK tivxAddKernelImgMosaicValidate(vx_node node,
+static vx_status VX_CALLBACK tivxImgMosaicValidate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[])
@@ -203,7 +203,7 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
                         kernel_id,
                         NULL,
                         num_params,
-                        tivxAddKernelImgMosaicValidate,
+                        tivxImgMosaicValidate,
                         NULL,
                         NULL);
 

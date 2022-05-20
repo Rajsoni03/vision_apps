@@ -65,13 +65,14 @@
 #include "TI/tivx_target_kernel.h"
 #include "tivx_kernels_host_utils.h"
 #include "tivx_pixel_visualization_host.h"
+#include <stdio.h>
 
-static vx_status VX_CALLBACK tivxAddKernelPixelVizValidate(vx_node node,
+static vx_status VX_CALLBACK tivxPixelVizValidate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[]);
 
-static vx_status VX_CALLBACK tivxAddKernelPixelVizValidate(vx_node node,
+static vx_status VX_CALLBACK tivxPixelVizValidate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[])
@@ -202,96 +203,107 @@ vx_kernel tivxAddKernelPixelViz(vx_context context, vx_int32 num_output_tensors)
     vx_enum kernel_id;
     vx_int32 i;
 
-    status = vxAllocateUserKernelId(context, &kernel_id);
-    if(status != VX_SUCCESS)
+    vx_char kernel_name[VX_MAX_KERNEL_NAME];
+
+    /* Create kernel name by concatonating kernel name with number of outputs to create a unique kernel */
+    snprintf( kernel_name, VX_MAX_KERNEL_NAME, "%s:%d", TIVX_KERNEL_PIXEL_VISUALIZATION_NAME, num_output_tensors );
+
+    kernel = vxGetKernelByName(context, kernel_name);
+
+    if ( NULL == kernel)
     {
-        VX_PRINT(VX_ZONE_ERROR, "Unable to allocate user kernel ID\n");
-    }
+        status = vxAllocateUserKernelId(context, &kernel_id);
+        if(status != VX_SUCCESS)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Unable to allocate user kernel ID\n");
+        }
 
 
-    if (status == VX_SUCCESS)
-    {
-        /* Number of parameters are config + outArgs + input image + (output tensors * 2) */
-        uint32_t num_params = 3 + (num_output_tensors * 2);
-        kernel = vxAddUserKernel(
-                    context,
-                    TIVX_KERNEL_PIXEL_VISUALIZATION_NAME,
-                    kernel_id,
-                    NULL,
-                    num_params,
-                    tivxAddKernelPixelVizValidate,
-                    NULL,
-                    NULL);
-
-        status = vxGetStatus((vx_reference)kernel);
-    }
-
-    index = 0;
-    if (status == VX_SUCCESS)
-    {
-       status = vxAddParameterToKernel(kernel,
-                        index,
-                        VX_INPUT,
-                        VX_TYPE_USER_DATA_OBJECT,
-                        VX_PARAMETER_STATE_REQUIRED);
-       index++;
-    }
-    if (status == VX_SUCCESS)
-    {
-       status = vxAddParameterToKernel(kernel,
-                        index,
-                        VX_INPUT,
-                        VX_TYPE_USER_DATA_OBJECT,
-                        VX_PARAMETER_STATE_REQUIRED);
-       index++;
-    }
-    if (status == VX_SUCCESS)
-    {
-       status = vxAddParameterToKernel(kernel,
-                        index,
-                        VX_INPUT,
-                        VX_TYPE_IMAGE,
-                        VX_PARAMETER_STATE_REQUIRED);
-       index++;
-    }
-    for(i = 0; i < num_output_tensors; i++)
-    {
         if (status == VX_SUCCESS)
         {
-              status = vxAddParameterToKernel(kernel,
-                          index,
-                          VX_INPUT,
-                          VX_TYPE_TENSOR,
-                          VX_PARAMETER_STATE_REQUIRED);
-              index++;
+            /* Number of parameters are config + outArgs + input image + (output tensors * 2) */
+            uint32_t num_params = 3 + (num_output_tensors * 2);
+            kernel = vxAddUserKernel(
+                        context,
+                        kernel_name,
+                        kernel_id,
+                        NULL,
+                        num_params,
+                        tivxPixelVizValidate,
+                        NULL,
+                        NULL);
+
+            status = vxGetStatus((vx_reference)kernel);
         }
-    }
-    for(i = 0; i < num_output_tensors; i++)
-    {
+
+        index = 0;
         if (status == VX_SUCCESS)
         {
-              status = vxAddParameterToKernel(kernel,
-                          index,
-                          VX_OUTPUT,
-                          VX_TYPE_IMAGE,
-                          VX_PARAMETER_STATE_REQUIRED);
-              index++;
+           status = vxAddParameterToKernel(kernel,
+                            index,
+                            VX_INPUT,
+                            VX_TYPE_USER_DATA_OBJECT,
+                            VX_PARAMETER_STATE_REQUIRED);
+           index++;
         }
-    }
-    if (status == VX_SUCCESS)
-    {
-        /* add supported target's */
-        tivxKernelsHostUtilsAddKernelTargetDsp(kernel);
-    }
-    if (status == VX_SUCCESS)
-    {
-        status = vxFinalizeKernel(kernel);
-    }
-    if (status != VX_SUCCESS)
-    {
-        vxReleaseKernel(&kernel);
-        kernel = NULL;
+        if (status == VX_SUCCESS)
+        {
+           status = vxAddParameterToKernel(kernel,
+                            index,
+                            VX_INPUT,
+                            VX_TYPE_USER_DATA_OBJECT,
+                            VX_PARAMETER_STATE_REQUIRED);
+           index++;
+        }
+        if (status == VX_SUCCESS)
+        {
+           status = vxAddParameterToKernel(kernel,
+                            index,
+                            VX_INPUT,
+                            VX_TYPE_IMAGE,
+                            VX_PARAMETER_STATE_REQUIRED);
+           index++;
+        }
+        for(i = 0; i < num_output_tensors; i++)
+        {
+            if (status == VX_SUCCESS)
+            {
+                  status = vxAddParameterToKernel(kernel,
+                              index,
+                              VX_INPUT,
+                              VX_TYPE_TENSOR,
+                              VX_PARAMETER_STATE_REQUIRED);
+                  index++;
+            }
+        }
+        for(i = 0; i < num_output_tensors; i++)
+        {
+            if (status == VX_SUCCESS)
+            {
+                  status = vxAddParameterToKernel(kernel,
+                              index,
+                              VX_OUTPUT,
+                              VX_TYPE_IMAGE,
+                              VX_PARAMETER_STATE_REQUIRED);
+                  index++;
+            }
+        }
+        if (status == VX_SUCCESS)
+        {
+            /* add supported target's */
+            tivxKernelsHostUtilsAddKernelTargetDsp(kernel);
+        }
+        if (status == VX_SUCCESS)
+        {
+            status = vxFinalizeKernel(kernel);
+        }
+        if (status != VX_SUCCESS)
+        {
+            vxReleaseKernel(&kernel);
+            kernel = NULL;
+        }
     }
 
     return kernel;
 }
+
