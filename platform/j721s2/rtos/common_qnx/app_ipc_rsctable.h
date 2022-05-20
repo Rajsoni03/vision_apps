@@ -50,6 +50,12 @@ extern "C" {
 
 #if defined(CPU_c7x_1)
 #define BUILD_C7X_1
+#define BUILD_C7X
+#endif
+
+#if defined(CPU_c7x_2)
+#define BUILD_C7X_2
+#define BUILD_C7X
 #endif
 
 void *appGetIpcResourceTable()
