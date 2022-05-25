@@ -67,12 +67,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .regionId         = 1U,
         .enable           = 1U,
         .baseAddr         = 0x0U,
-#if defined(CPU_mcu1_0) || defined(CPU_mcu2_0) || defined(CPU_mcu3_0)
-        /* Use 64KB, for Core 0, to cover Lock-step mode where TCMs are combined */
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_64KB,
-#elif defined(CPU_mcu1_1) || defined(CPU_mcu2_1) || defined(CPU_mcu3_1)
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_32KB,
-#endif
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 0U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
@@ -100,12 +95,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .regionId         = 3U,
         .enable           = 1U,
         .baseAddr         = 0x41010000,
-#if defined(CPU_mcu1_0) || defined(CPU_mcu2_0) || defined(CPU_mcu3_0)
-        /* Use 64KB, for Core 0, to cover Lock-step mode where TCMs are combined */
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_64KB,
-#elif defined(CPU_mcu1_1) || defined(CPU_mcu2_1) || defined(CPU_mcu3_1)
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_32KB,
-#endif
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 0U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
@@ -171,78 +161,8 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 9 configuration: Ring buffer */
+        /* Region 10 configuration: Ring buffer */
         .regionId         = 8U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU1_0_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 10 configuration: Ring buffer */
-        .regionId         = 9U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU1_1_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 9 configuration: Ring buffer */
-        .regionId         = 10U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU2_0_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 10 configuration: Ring buffer */
-        .regionId         = 11U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU2_1_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 9 configuration: Ring buffer */
-        .regionId         = 12U,
-        .enable           = 1U,
-        .baseAddr         = DDR_MCU3_0_IPC_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
-        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
-        .exeNeverControl  = 1U,
-        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-        .shareable        = 0U,
-        .cacheable        = (uint32_t)FALSE,
-        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
-        .memAttr          = 0U,
-    },
-    {
-        /* Region 10 configuration: Ring buffer */
-        .regionId         = 13U,
         .enable           = 1U,
         .baseAddr         = DDR_MCU3_1_IPC_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
