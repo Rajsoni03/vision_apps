@@ -57,7 +57,7 @@ pdk_build:
 
 pdk: pdk_emu
 ifeq ($(BUILD_TARGET_MODE),yes)
-	$(MAKE) pdk_build -s PDK_BUILD_TARGET_LIST_ALL="pdk_libs"
+	$(MAKE) pdk_build -s PDK_BUILD_TARGET_LIST_ALL="pdk_libs pdk_app_libs"
 endif
 
 pdk_emu:
@@ -67,7 +67,7 @@ ifeq ($(BUILD_EMULATION_MODE),yes)
 endif
 
 pdk_clean:
-	$(MAKE) pdk_build PDK_BUILD_TARGET_LIST_ALL="pdk_libs_clean"
+	$(MAKE) pdk_build PDK_BUILD_TARGET_LIST_ALL="pdk_libs_clean pdk_app_libs_clean"
 
 pdk_emu_clean:
 ifeq ($(BUILD_EMULATION_MODE),yes)
