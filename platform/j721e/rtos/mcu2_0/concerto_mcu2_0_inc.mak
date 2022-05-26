@@ -82,9 +82,9 @@ ADDITIONAL_STATIC_LIBS += enetsoc.aer5f
 ADDITIONAL_STATIC_LIBS += enet.aer5f
 ADDITIONAL_STATIC_LIBS += enetphy.aer5f
 ADDITIONAL_STATIC_LIBS += enet_cfgserver.aer5f
+ADDITIONAL_STATIC_LIBS += enet_timesync_ptp.aer5f
+ADDITIONAL_STATIC_LIBS += enet_timesync_hal.aer5f
 ADDITIONAL_STATIC_LIBS += pm_lib.aer5f
-ADDITIONAL_STATIC_LIBS += ti.timesync.hal.aer5f
-ADDITIONAL_STATIC_LIBS += ti.timesync.ptp.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
 
 ifeq ($(RTOS),SYSBIOS)

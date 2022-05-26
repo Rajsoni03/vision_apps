@@ -23,9 +23,8 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/fvid2/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/i2c/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/pm/lib/$(SOC)/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/$(SOC)/r5f/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(IMAGING_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
