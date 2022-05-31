@@ -32,7 +32,7 @@ SECTIONS
     } > DDR_MCU2_1_RESOURCE_TABLE
 
     .bss:l3mem              (NOLOAD) : {} > MAIN_OCRAM_MCU2_1    
-    .bss:ddr_shared_mem     (NOLOAD) : {} > DDR_MCU2_1_LOCAL_HEAP
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_MCU2_1_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM

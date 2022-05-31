@@ -120,8 +120,8 @@ __attribute__ ((section(".bss:ipc_vring_mem")))
 __attribute__ ((aligned(4096)))
         ;
 
-uint8_t g_ddr_shared_mem[DDR_HEAP_MEM_SIZE]
-__attribute__ ((section(".bss:ddr_shared_mem")))
+uint8_t g_ddr_local_mem[DDR_HEAP_MEM_SIZE]
+__attribute__ ((section(".bss:ddr_local_mem")))
 __attribute__ ((aligned(4096)))
         ;
 
@@ -200,8 +200,8 @@ int32_t appInit()
     appIpcInitPrmSetDefault(&ipc_init_prm);
 
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR];
-    heap_prm->base = g_ddr_shared_mem;
-    strncpy(heap_prm->name, "DDR_SHARED_MEM", APP_MEM_HEAP_NAME_MAX);
+    heap_prm->base = g_ddr_local_mem;
+    strncpy(heap_prm->name, "DDR_LOCAL_MEM", APP_MEM_HEAP_NAME_MAX);
     heap_prm->size = DDR_HEAP_MEM_SIZE;
     heap_prm->flags = APP_MEM_HEAP_FLAGS_IS_SHARED;
 

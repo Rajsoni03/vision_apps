@@ -90,7 +90,7 @@ SECTIONS
     .fardata:           >  DDR_C66x_1
     .bss:taskStackSection > DDR_C66x_1
     .resource_table:    >  DDR_C66x_1_RESOURCE_TABLE
-    .bss:ddr_shared_mem     (NOLOAD) : {} > DDR_C66X_1_LOCAL_HEAP
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C66X_1_LOCAL_HEAP
     .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C66X_1_SCRATCH
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM

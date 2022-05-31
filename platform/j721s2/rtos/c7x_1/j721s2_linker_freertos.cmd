@@ -91,7 +91,7 @@ SECTIONS
     .sysmem     >       DDR_C7x_1 /* heap */
     /* .bss:taskStackSection:tiovx (NOLOAD) : {} > L2RAM_C7x_1 */
     .bss:taskStackSection       > DDR_C7x_1
-    .bss:ddr_shared_mem     (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP
     .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_1_SCRATCH
 
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
