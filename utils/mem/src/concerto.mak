@@ -22,6 +22,8 @@ IDIRS += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/resmgr/public
 CSOURCES    := app_mem_qnx.c
 endif
 
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos
+
 include $(FINALE)
 
 endif

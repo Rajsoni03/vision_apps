@@ -346,6 +346,12 @@ void  appMemCacheWb(void *ptr, uint32_t size);
  */
 void  appMemCacheWbInv(void *ptr, uint32_t size);
 
+/**
+ * \brief Print memory allocation from shared memory region
+ *
+ */
+void appMemPrintMemAllocInfo();
+
 /* @} */
 
 #endif

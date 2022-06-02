@@ -380,6 +380,10 @@ int32_t appPerfStatsCpuStatsPrintAll()
     printf("Detailed CPU performance/memory statistics,\n");
     printf("===========================================\n");
     printf("\n");
+    #ifdef LINUX
+    appMemPrintMemAllocInfo();
+    printf("\n");
+    #endif
     for(cpu_id=0; cpu_id<APP_IPC_CPU_MAX; cpu_id++)
     {
         if(appIpcIsCpuEnabled(cpu_id))

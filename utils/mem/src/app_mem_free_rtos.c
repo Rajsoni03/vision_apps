@@ -523,3 +523,8 @@ void appMemCloseDmaBufFd(int32_t dmaBufFd)
      */
     return;
 }
+
+void appMemPrintMemAllocInfo()
+{
+    return;
+}

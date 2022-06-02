@@ -386,3 +386,8 @@ int32_t appMemResetScratchHeap(uint32_t heap_id)
 {
     return(0);
 }
+
+void appMemPrintMemAllocInfo()
+{
+    return;
+}

@@ -76,7 +76,7 @@
 #include <utils/mem/include/app_mem.h>
 #include <linux/dma-heap.h>
 #include <linux/dma-buf.h>
-
+#include <app_mem_map.h>
 
 /*MACROS*/
 /* #define APP_MEM_DEBUG */
@@ -171,9 +171,10 @@ void appMemPrintMemAllocInfo()
 {
     app_mem_obj_t *obj = &g_app_mem_obj;
 
-    printf("MEM: Alloc's: %ld alloc's of %ld bytes \n", obj->num_alloc, obj->total_alloc_bytes );
-    printf("MEM: Free's : %ld free's  of %ld bytes \n", obj->num_free, obj->total_free_bytes );
-    printf("MEM: Open's : %ld allocs  of %ld bytes \n", obj->cur_alloc, obj->cur_alloc_bytes );
+    printf("DDR_SHARED_MEM: Alloc's: %ld alloc's of %ld bytes \n", obj->num_alloc, obj->total_alloc_bytes );
+    printf("DDR_SHARED_MEM: Free's : %ld free's  of %ld bytes \n", obj->num_free, obj->total_free_bytes );
+    printf("DDR_SHARED_MEM: Open's : %ld allocs  of %ld bytes \n", obj->cur_alloc, obj->cur_alloc_bytes );
+    printf("DDR_SHARED_MEM: Total size: %d bytes \n", DDR_SHARED_MEM_SIZE );
 }
 
 int32_t appMemDeInit(void)
