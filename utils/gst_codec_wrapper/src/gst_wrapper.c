@@ -243,6 +243,9 @@ int32_t push_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx)
 {
     int32_t status = 0;
     
+    if(gstPipeInst->srcType!=0){
+        return -1;
+    }
     for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
     {
         gst_memory_unmap(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0]);
@@ -273,6 +276,9 @@ int32_t push_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx)
     uint8_t refcount;
 
 
+    if(gstPipeInst->srcType!=0){
+        return -1;
+    }
     for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
     {
         refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->buff[idx][ch]->mini_object);
@@ -311,6 +317,9 @@ int32_t push_EOS(GstPipeObj *gstPipeInst)
     GstFlowReturn ret;
     int32_t status = 0;
 
+    if(gstPipeInst->srcType!=0){
+        return -1;
+    }
     for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
     {
         ret = gst_app_src_end_of_stream(GST_APP_SRC(gstPipeInst->m_srcElemArr[ch]   ));
@@ -324,33 +333,37 @@ int32_t push_EOS(GstPipeObj *gstPipeInst)
     return status;
 }
 
-int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, void* data_ptr[MAX_NUM_CHANNELS])
+int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx)
 {
     GstSample *out_sample = NULL;
     int32_t status = 0;
 
+    if(gstPipeInst->sinkType!=0){
+        return -1;
+    }
     for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
     {
         /* Pull Sample from AppSink element */
         out_sample = gst_app_sink_try_pull_sample(GST_APP_SINK(gstPipeInst->m_sinkElemArr[ch]),GST_TIMEOUT);
         if(out_sample)
         {
-            gstPipeInst->pulled_buff[ch] = gst_sample_get_buffer(out_sample);
-            gst_buffer_map(gstPipeInst->pulled_buff[ch], &gstPipeInst->pulled_map_info[ch],  GST_MAP_READ);
-            data_ptr[ch] = gstPipeInst->pulled_map_info[ch].data;
-            gst_buffer_ref(gstPipeInst->pulled_buff[ch]);
+            gstPipeInst->pulled_buff[idx][ch] = gst_sample_get_buffer(out_sample);
+            gst_buffer_map(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch],  GST_MAP_READ);
+            gstPipeInst->pulled_data_ptr[idx][ch] = gstPipeInst->pulled_map_info[idx][ch].data;
+            
+            gst_buffer_ref(gstPipeInst->pulled_buff[idx][ch]);
             gst_sample_unref(out_sample);
         }
         else if(gst_app_sink_is_eos(GST_APP_SINK(gstPipeInst->m_sinkElemArr[ch])))
         {
             // printf("gst_wrapper: Got EOS from AppSink! Total buffer count: %d\n",gstPipeInst->pull_count);
-            data_ptr[ch] = NULL;
+            gstPipeInst->pulled_data_ptr[idx][ch] = NULL;
             status = 1;
         }
         else
         {
             printf("gst_wrapper: gst_app_sink_pull_sample() FAILED!\n");
-            data_ptr[ch] = NULL;
+            gstPipeInst->pulled_data_ptr[idx][ch] = NULL;
             status = -1;
             break;
         }
@@ -361,13 +374,17 @@ int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, void* data_ptr[MAX_NUM_CHANNEL
     return status;
 }
 
-void pull_buffer_ready(GstPipeObj *gstPipeInst)
+int32_t pull_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx)
 {
+    if(gstPipeInst->sinkType!=0){
+        return -1;
+    }
     for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
     {
-        gst_buffer_unmap(gstPipeInst->pulled_buff[ch], &gstPipeInst->pulled_map_info[ch]);
-        gst_buffer_unref(gstPipeInst->pulled_buff[ch]);
+        gst_buffer_unmap(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch]);
+        gst_buffer_unref(gstPipeInst->pulled_buff[idx][ch]);
     }
+    return 0;
 }
 
 int32_t app_stop_gst_pipe(GstPipeObj *gstPipeInst)

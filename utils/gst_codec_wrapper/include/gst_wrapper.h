@@ -75,12 +75,13 @@ typedef struct
     GstElement *m_srcElemArr[MAX_NUM_CHANNELS];
     GstElement *m_sinkElemArr[MAX_NUM_CHANNELS];
 
-    GstBuffer* buff[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
-    GstMemory* mem[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2];
-    GstMapInfo map_info[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2];
+    GstBuffer*  buff[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
+    GstMemory*  mem[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2];
+    GstMapInfo  map_info[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2];
 
-    GstBuffer* pulled_buff[MAX_NUM_CHANNELS];
-    GstMapInfo pulled_map_info[MAX_NUM_CHANNELS];
+    GstBuffer*  pulled_buff[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
+    GstMapInfo  pulled_map_info[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
+    void*       pulled_data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
 
     uint32_t    push_count;
     uint32_t    pull_count;
@@ -102,9 +103,9 @@ int32_t push_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx);
 
 int32_t push_EOS(GstPipeObj *gstPipeInst);
 
-int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, void* data_ptr[MAX_NUM_CHANNELS]);
+int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx);
 
-void    pull_buffer_ready(GstPipeObj *gstPipeInst);
+int32_t pull_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx);
 
 int32_t app_stop_gst_pipe(GstPipeObj *gstPipeInst); 
 
