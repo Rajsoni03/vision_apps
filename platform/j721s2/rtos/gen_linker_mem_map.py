@@ -421,6 +421,7 @@ vision_apps_core_heaps_lo.concat(mcu2_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu2_1_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu3_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu3_1_ddr_local_heap);
+vision_apps_core_heaps_lo.concat(c7x_2_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(c7x_2_ddr_scratch);
 vision_apps_core_heaps_lo.concat(c7x_1_ddr_scratch);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
