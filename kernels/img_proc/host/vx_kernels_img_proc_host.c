@@ -157,6 +157,11 @@ void tivxImgProcLoadKernels(vx_context context)
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterImgProcTargetC66Kernels();
 
+        #if defined (SOC_J721E)
+        tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
+        tivxRegisterImgProcTargetC66Kernels();
+        #endif
+
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);
         tivxRegisterImgProcTargetC71Kernels();
 
