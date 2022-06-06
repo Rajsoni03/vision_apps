@@ -532,11 +532,7 @@ int32_t appVhwaVpacInit()
         initPrms.udmaDrvHndl = appUdmaGetObj();
 
         /* Set configThroughUDMA to true to support multi handle */
-        #if defined(SOC_J721S2)
-        initPrms.configThroughUdmaFlag = false;
-        #elif defined(SOC_J721E)
         initPrms.configThroughUdmaFlag = true;
-        #endif
 
         status = Vhwa_m2mVissInit(&initPrms);
         if (0 != status)
