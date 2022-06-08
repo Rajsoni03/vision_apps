@@ -59,69 +59,79 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+--ram_model
+-heap  0x20000
+-stack 0x20000
+--args 0x1000
+--diag_suppress=10068 /* "no matching section" */
+--cinit_compression=off
+-e _c_int00_secure
 
-#include <app.h>
-#include <utils/console_io/include/app_log.h>
-#include <utils/misc/include/app_misc.h>
-#include <stdio.h>
-#include <string.h>
-#include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
-#include <app_ipc_rsctable.h>
-
-static void appMain(void* arg0, void* arg1)
+SECTIONS
 {
-    appUtilsTaskInit();
-    appInit();
-    appRun();
-    #if 1
-    while(1)
+    boot:
     {
-        appLogWaitMsecs(100u);
+      boot.*<boot.oe71>(.text)
+    } load > DDR_C7x_1 ALIGN(0x200000)
+    /* Code sections. */
+    GROUP LOAD_START( lnkStartFlashAddress ),
+          LOAD_END( lnkEndFlashAddress )
+    {
+        .vecs                   : {} ALIGN(0x400000)
+        .secure_vecs            : {} ALIGN(0x200000)
+        .text:_c_int00_secure   : {} ALIGN(0x200000)
+        .text                   : {} ALIGN(0x200000)
+
+        .cinit                  : {}  /* could be part of const */
+        .const                  : {}
+        .KERNEL_FUNCTION LOAD_START( lnkKernelFuncStartAddr ),
+                         LOAD_END( lnkKernelFuncEndAddr )
+                                : {} palign( 0x10000 )
+    } > DDR_C7x_1
+
+    /* Data sections. */
+    GROUP  palign( 0x10000 ), LOAD_START( lnkRamStartAddr ), LOAD_END( lnkRamEndAddr )
+    {
+        .bss                    : {}  /* Zero-initialized data */
+        .data                   : {}  /* Initialized data */
+
+        .init_array             : {}  /* C++ initializations */
+        .stack                  : {} ALIGN(0x2000)
+        .args                   : {}
+        .cio                    : {}
+        .switch                 : {} /* For exception handling. */
+        .sysmem      /* heap */
+        .KERNEL_DATA LOAD_START( lnkKernelDataStartAddr ),
+                     LOAD_END( lnkKernelDataEndAddr )
+                                : {} palign( 0x800 )
+    } > DDR_C7x_1
+    
+    /* .bss:taskStackSection:tiovx (NOLOAD) : {} > L2RAM_C7x_1 */
+    .bss:taskStackSection       > DDR_C7x_1
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP
+    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_1_SCRATCH
+
+    .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
+    .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
+    .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
+
+    .bss:l1mem              (NOLOAD)(NOINIT) : {} > L1RAM_C7x_1
+    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_1
+    .bss:l3mem              (NOLOAD)(NOINIT) : {} > MSMC_C7x_1
+
+    ipc_data_buffer:       > DDR_C7x_1
+    .tracebuf                : {} align(1024)   > DDR_C7x_1
+    .resource_table > DDR_C7x_1_RESOURCE_TABLE
+
+    GROUP:              >  DDR_C7x_1
+    {
+        .data.Mmu_tableArray          : type=NOINIT
+        .data.Mmu_tableArraySlot      : type=NOINIT
+        .data.Mmu_level1Table         : type=NOINIT
+        .data.Mmu_tableArray_NS       : type=NOINIT
+        .data.Mmu_tableArraySlot_NS   : type=NOINIT
+        .data.Mmu_level1Table_NS      : type=NOINIT
     }
-    #else
-    appDeInit();
-    #endif
-}
 
-void StartupEmulatorWaitFxn (void)
-{
-    volatile uint32_t enableDebug = 1;
-    do
-    {
-    }while (enableDebug);
-}
 
-static uint8_t gTskStackMain[8*1024]
-__attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
-    ;
-
-int main(void)
-{
-    TaskP_Params tskParams;
-    TaskP_Handle task;
-
-    /* This is for debug purpose - see the description of function header */
-    StartupEmulatorWaitFxn();
-
-    OS_init();
-
-    TaskP_Params_init(&tskParams);
-    tskParams.priority = 8u;
-    tskParams.stack = gTskStackMain;
-    tskParams.stacksize = sizeof (gTskStackMain);
-    task = TaskP_create(appMain, &tskParams);
-    if(NULL == task)
-    {
-        OS_stop();
-    }
-    OS_start();
-
-    return 0;
-}
-
-uint32_t appGetDdrSharedHeapSize()
-{
-    return DDR_SHARED_MEM_SIZE;
 }

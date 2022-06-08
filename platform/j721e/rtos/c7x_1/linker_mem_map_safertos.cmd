@@ -66,36 +66,28 @@
 
 MEMORY
 {
-    /* R5F_TCMA_VECS [ size 256 B ] */
-    R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000100
-    /* R5F_TCMA [ size 31.75 KB ] */
-    R5F_TCMA                 (    X ) : ORIGIN = 0x00000100 , LENGTH = 0x00007F00
-    /* Main OCRAM for MCU2_0 [ size 256.00 KB ] */
-    MAIN_OCRAM_MCU2_0        ( RWIX ) : ORIGIN = 0x03600000 , LENGTH = 0x00040000
-    /* R5F_TCMB0 [ size 32.00 KB ] */
-    R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00008000
-    /* DDR for MCU2_0 for Linux IPC [ size 1024.00 KB ] */
-    DDR_MCU2_0_IPC           ( RWIX ) : ORIGIN = 0xA2000000 , LENGTH = 0x00100000
-    /* DDR for MCU2_0 for Linux resource table [ size 1024 B ] */
-    DDR_MCU2_0_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA2100000 , LENGTH = 0x00000400
-    /* DDR for MCU2_0 for code/data [ size 31.00 MB ] */
-    DDR_MCU2_0               ( RWIX ) : ORIGIN = 0xA2100400 , LENGTH = 0x01EFFC00
+    /* L2 for C7x_1 [ size 448.00 KB ] */
+    L2RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64800000 , LENGTH = 0x00070000
+    /* L1 for C7x_1 [ size 16.00 KB ] */
+    L1RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64E00000 , LENGTH = 0x00004000
+    /* MSMC for C7x_1 [ size  7.78 MB ] */
+    MSMC_C7x_1               ( RWIX ) : ORIGIN = 0x70020000 , LENGTH = 0x007C8000
+    /* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
+    DDR_C7x_1_IPC            ( RWIX ) : ORIGIN = 0xAA000000 , LENGTH = 0x00100000
+    /* DDR for C7x_1 for Linux resource table [ size 1024 B ] */
+    DDR_C7x_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xAA100000 , LENGTH = 0x00000400
+    /* DDR for C7x_1 for code/data [ size 78.00 MB ] */
+    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xAA200000 , LENGTH = 0x04E00000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
     IPC_VRING_MEM                     : ORIGIN = 0xB0000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
     APP_LOG_MEM                       : ORIGIN = 0xB2000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.62 MB ] */
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB2040000 , LENGTH = 0x03FA0000
-    /* Memory for IPC over PCIe using shared memory. MUST be non-cached or cache-coherent [ size 64.00 KB ] */
-    PCIE_QUEUE_SHARED_MEM             : ORIGIN = 0xB5FE0000 , LENGTH = 0x00010000
-    /* Reserved Memory for RAT mapping of remote PCIe IPC shared memory. MUST be non-cached or cache-coherent [ size 64.00 KB ] */
-    PCIE_QUEUE_MIRROR_REMOTE_SHARED_MEM          : ORIGIN = 0xB5FF0000 , LENGTH = 0x00010000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
-    /* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
-    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xD9000000 , LENGTH = 0x01000000
-    /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xFB000000 , LENGTH = 0x00800000
-    /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xFB800000 , LENGTH = 0x01800000
+    /* DDR for c7x_1 for Scratch Memory [ size 368.00 MB ] */
+    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xE4000000 , LENGTH = 0x17000000
+    /* DDR for c7x_1 for local heap [ size 256.00 MB ] */
+    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x10000000
 }

@@ -66,10 +66,10 @@
 
 MEMORY
 {
-    /* R5F_TCMA_VECS [ size 64 B ] */
-    R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000040
-    /* R5F_TCMA [ size 31.94 KB ] */
-    R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x00007FC0
+    /* R5F_TCMA_VECS [ size 256 B ] */
+    R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000100
+    /* R5F_TCMA [ size 31.75 KB ] */
+    R5F_TCMA                 (    X ) : ORIGIN = 0x00000100 , LENGTH = 0x00007F00
     /* R5F_TCMB0 [ size 32.00 KB ] */
     R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00008000
     /* DDR for MCU3_1 for Linux IPC [ size 1024.00 KB ] */

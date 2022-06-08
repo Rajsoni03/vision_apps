@@ -82,7 +82,9 @@ static void appMain(void* arg0, void* arg1)
 {
     appUtilsTaskInit();
     appInit();
+    #ifndef SAFERTOS
     appTimerInterruptInit();
+    #endif
     appRun();
     #if 1
     while(1)

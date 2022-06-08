@@ -16,6 +16,9 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
 endif
+ifeq ($(RTOS),SAFERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/safertos/$(SOC)/r5f/$(TARGET_BUILD)/
+endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/board/lib/$(BUILD_PDK_BOARD)/r5f/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/r5f/$(TARGET_BUILD)/
@@ -83,9 +86,13 @@ ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.aer5f
 endif
 
+ifeq ($(RTOS),SAFERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.safertos.aer5f
+endif
+
 ADDITIONAL_STATIC_LIBS += ti.csl.aer5f
 
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	ADDITIONAL_STATIC_LIBS += ti.csl.init.aer5f
 endif
 

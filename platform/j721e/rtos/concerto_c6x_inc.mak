@@ -15,6 +15,9 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/c66/$(TARGET_BUILD)/
 endif
+ifeq ($(RTOS),SAFERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/safertos/$(SOC)/c66/$(TARGET_BUILD)/
+endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c66/$(TARGET_BUILD)/
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -69,10 +72,13 @@ ADDITIONAL_STATIC_LIBS += mathlib.ae66
 ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.ae66
 endif
+ifeq ($(RTOS),SAFERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.safertos.ae66
+endif
 
 ADDITIONAL_STATIC_LIBS += ti.csl.ae66
 
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	ADDITIONAL_STATIC_LIBS += ti.csl.intc.ae66
 endif
 

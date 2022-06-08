@@ -1,5 +1,5 @@
 ifeq ($(TARGET_PLATFORM),J7)
-ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS))
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS SAFERTOS))
 
 include $(PRELUDE)
 TARGET      := app_rtos

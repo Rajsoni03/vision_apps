@@ -8,13 +8,30 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
 endif
+ifeq ($(RTOS),SAFERTOS)
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_safertos.cmd
+endif
 
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
 
+ifeq ($(RTOS),SAFERTOS)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/api/$(SAFERTOS_ISA_EXT_c66)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/api/PrivWrapperStd
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/config
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/kernel/include_api
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/kernel/include_prv
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_c66)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_c66)/$(SAFERTOS_COMPILER_EXT_c66)
+endif
+
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/c66xdsp_2/$(TARGET_BUILD)/
+endif
+
+ifeq ($(RTOS),SAFERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/kernel/safertos/lib/$(SOC)/c66xdsp_2/$(TARGET_BUILD)/
 endif
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/c66xdsp_2/$(TARGET_BUILD)/
@@ -25,7 +42,7 @@ include $($(_MODULE)_SDIR)/../concerto_c6x_inc.mak
 
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_c6x_2
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
 

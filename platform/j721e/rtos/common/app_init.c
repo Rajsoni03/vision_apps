@@ -643,7 +643,7 @@ int32_t appInit()
     #endif
 
     #ifdef CPU_mcu2_0
-    #ifdef FREERTOS
+    #if defined(FREERTOS) || defined(SAFERTOS)
     status = appIpcCreateTraceBufFlushTask();
     #endif
     #endif

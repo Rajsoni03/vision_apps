@@ -8,21 +8,47 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
 endif
+ifeq ($(RTOS),SAFERTOS)
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_safertos.cmd
+endif
 
-LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SYSBIOS))
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
+endif
+
+ifeq ($(RTOS),SAFERTOS)
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map_safertos.cmd
+endif
 
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
+
+
+ifeq ($(RTOS),SAFERTOS)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/api/$(SAFERTOS_ISA_EXT_c7x)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/api/PrivWrapperStd
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/config
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/kernel/include_api
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/kernel/include_prv
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_c7x)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_c7x)/$(SAFERTOS_COMPILER_EXT_c7x)
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/api/NoWrapper
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/demo_projects/SafeRTOS_TDA4VM_C7x_Demo/TI_c7x_Support
+	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/demo_projects/SafeRTOS_TDA4VM_C7x_Demo
+endif
 
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
 endif
 
+ifeq ($(RTOS),SAFERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/kernel/safertos/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
+endif
 
 include $($(_MODULE)_SDIR)/../concerto_c7x_inc.mak
 
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_c7x_1
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
 

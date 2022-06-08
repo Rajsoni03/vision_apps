@@ -60,68 +60,72 @@
  *
  */
 
-#include <app.h>
-#include <utils/console_io/include/app_log.h>
-#include <utils/misc/include/app_misc.h>
-#include <stdio.h>
-#include <string.h>
-#include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
-#include <app_ipc_rsctable.h>
+#define DEFAULT_SECTION_ALIGNMENT   ( 1K )
 
-static void appMain(void* arg0, void* arg1)
+-stack  0x2000      /* SOFTWARE STACK SIZE */
+-heap   0x1000      /* HEAP AREA SIZE      */
+-u InterruptVectorTable
+
+#define DDR_C66x_1_START 0xA8200400
+
+SECTIONS
 {
-    appUtilsTaskInit();
-    appInit();
-    appRun();
-    #if 1
-    while(1)
+   .interrupt_vectors : {. = align(1K); }  > DDR_C66x_1_BOOT 
+   .priv_code           palign( DEFAULT_SECTION_ALIGNMENT ),
+                        LOAD_START( lnkKernelFuncStartAddr ),
+                        LOAD_END( lnkKernelFuncEndAddr ) :
     {
-        appLogWaitMsecs(100u);
-    }
-    #else
-    appDeInit();
-    #endif
-}
+        *(.KERNEL_FUNCTION)
+    } > DDR_C66x_1
 
-void StartupEmulatorWaitFxn (void)
-{
-    volatile uint32_t enableDebug = 1;
-    do
+    .text:_c_int00      load >  DDR_C66x_1 ALIGN(0x10000)
+    .text:              load >  DDR_C66x_1 palign( DEFAULT_SECTION_ALIGNMENT ),
+                                     LOAD_START( lnkStartFlashAddress )
+
+    .unpriv_rodata      palign( DEFAULT_SECTION_ALIGNMENT ) :
     {
-    }while (enableDebug);
-}
+        *(.const)
+        *(.switch)
+    } > DDR_C66x_1
 
-static uint8_t gTskStackMain[8*1024]
-__attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
-    ;
+    .cinit              LOAD_END( lnkEndFlashAddress )          : {} > DDR_C66x_1
 
-int main(void)
-{
-    TaskP_Params tskParams;
-    TaskP_Handle task;
+    .KERNEL_DATA        palign( DEFAULT_SECTION_ALIGNMENT ),
+                        LOAD_START( lnkKernelDataStartAddr ),
+                        LOAD_END( lnkKernelDataEndAddr )        : {} > DDR_C66x_1_START
 
-    /* This is for debug purpose - see the description of function header */
-    StartupEmulatorWaitFxn();
-
-    OS_init();
-
-    TaskP_Params_init(&tskParams);
-    tskParams.priority = 8u;
-    tskParams.stack = gTskStackMain;
-    tskParams.stacksize = sizeof (gTskStackMain);
-    task = TaskP_create(appMain, &tskParams);
-    if(NULL == task)
+    GROUP               palign( DEFAULT_SECTION_ALIGNMENT ),
+                        LOAD_START( lnkUnprivilegedDataStartAddr ),
+                        LOAD_END( lnkUnprivilegedDataEndAddr )
     {
-        OS_stop();
-    }
-    OS_start();
+        .rodata:
+        .bss:
+        .neardata:
+        .cio:
+        .data:
+        .sysmem:
+        .fardata:
+        .far:
+    } > DDR_C66x_1
 
-    return 0;
+    .stack              palign( DEFAULT_SECTION_ALIGNMENT ),
+                        LOAD_START( lnkStacksStartAddr )        : {} > DDR_C66x_1 
+  
+    ipc_data_buffer:             > DDR_C66x_1 type=NOLOAD
+    .resource_table: 
+    { 
+        __RESOURCE_TABLE = .;
+    }                            > DDR_C66x_1_RESOURCE_TABLE
+
+    .tracebuf : {} align(1024)   > DDR_C66x_1
+
+    .bss:taskStackSection                 > DDR_C66x_1
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C66X_1_LOCAL_HEAP
+    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C66X_1_SCRATCH
+    .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
+    .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
+    .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
+
+    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C66x_1
 }
 
-uint32_t appGetDdrSharedHeapSize()
-{
-    return DDR_SHARED_MEM_SIZE;
-}
