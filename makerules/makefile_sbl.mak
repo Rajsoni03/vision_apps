@@ -148,6 +148,9 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
 endif
+ifeq ($(RTOS),SAFERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=safertos CANFUNC=none
+endif
 endif
 ifeq ($(BUILD_LINUX_A72), yes)
 ifeq ($(RTOS),SYSBIOS)
@@ -155,6 +158,9 @@ ifeq ($(RTOS),SYSBIOS)
 endif
 ifeq ($(RTOS),FREERTOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
+endif
+ifeq ($(RTOS),SAFERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=safertos CANFUNC=none
 endif
 endif
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles
@@ -173,6 +179,9 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
 endif
+ifeq ($(RTOS),SAFERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=safertos CANFUNC=none
+endif
 endif
 ifeq ($(BUILD_LINUX_A72), yes)
 ifeq ($(RTOS),SYSBIOS)
@@ -180,6 +189,9 @@ ifeq ($(RTOS),SYSBIOS)
 endif
 ifeq ($(RTOS),FREERTOS)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
+endif
+ifeq ($(RTOS),SAFERTOS)
+	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=safertos CANFUNC=none
 endif
 endif
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles

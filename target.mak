@@ -65,11 +65,7 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2))
         SYSLDIRS += $(ARP32CGT_ROOT)/lib
     endif
 
-    ifeq ($(TARGET_OS),SYSBIOS)
-        SYSIDIRS += $(BIOS_PATH)/packages
-        SYSIDIRS += $(XDCTOOLS_PATH)/packages
-    endif
-    ifeq ($(TARGET_OS), $(filter $(TARGET_OS), SYSBIOS FREERTOS))
+    ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS SAFERTOS))
         SYSIDIRS += $(PDK_PATH)/packages
     endif
 

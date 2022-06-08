@@ -7,6 +7,7 @@ MCUSW_PATH=$(PSDK_PATH)/mcusw
 # file in tiovx, ex, bios, tidl, pdk, cgtools, ...
 include $(TIOVX_PATH)/psdkra_tools_path.mak
 include $(TIOVX_PATH)/build_flags.mak
+include safertos_package_path.mk
 
 LINUX_FS_PATH ?= $(PSDK_PATH)/targetfs/
 LINUX_FS_BOOT_PATH ?= $(PSDK_PATH)/bootfs/

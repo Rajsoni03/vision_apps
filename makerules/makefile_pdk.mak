@@ -4,7 +4,6 @@
 # Edit this file to suit your specific build needs
 #
 
-
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 PDK_BUILD_PROFILE_LIST_ALL+=release
 endif
