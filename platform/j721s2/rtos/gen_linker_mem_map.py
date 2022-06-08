@@ -699,6 +699,6 @@ LinkerCmdFile(mcu3_1_mmap, "./mcu3_1/linker_mem_map.cmd").export();
 
 HtmlMmapTable(html_mmap, "./system_memory_map.html").export();
 
-CHeaderFile(c_header_mmap, "./app_mem_map.h").export();
+CHeaderFile(c_header_mmap, 0x880000000, 0x100000000, "./app_mem_map.h").export();
 
 DtsFile(dts_mmap, "./k3-j721s2-rtos-memory-map.dtsi").export();

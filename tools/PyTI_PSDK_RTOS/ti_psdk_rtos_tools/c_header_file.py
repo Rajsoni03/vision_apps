@@ -65,11 +65,13 @@ from . import *
 class CHeaderFile :
 
 
-    def __init__(self, memoryMap, name="app_mem_map.h"):
+    def __init__(self, memoryMap, phys_addr_base, virt_addr_base, name="app_mem_map.h"):
         self.memoryMap = memoryMap;
         self.name = name;
         self.indent = "    ";
         self.indent_level = 0;
+        self.phys_addr_base = phys_addr_base;
+        self.virt_addr_base = virt_addr_base;
 
     def open(self) :
         os.makedirs(os.path.dirname(self.name), exist_ok=True);
@@ -128,7 +130,9 @@ class CHeaderFile :
             string = '#define %s_SIZE (0x%08Xu)' % (memSection.name, memSection.length);
             self.write_line( string );
             self.write_line( "" );
-        self.write_line( "" );    
+        self.write_line( "#define DDR_64BIT_BASE_VADDR (0x%08Xu)"  % (self.virt_addr_base));
+        self.write_line( "#define DDR_64BIT_BASE_PADDR (0x%08Xu)"  % (self.phys_addr_base));
+        self.write_line( "" );
         self.write_line("#endif /* APP_MEM_MAP_H */");
         self.write_line( "" );
         self.close();

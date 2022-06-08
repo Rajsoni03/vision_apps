@@ -10,6 +10,7 @@ endif
 
 ifeq ($(TARGET_OS),FREERTOS)
 CSOURCES    := app_mem_free_rtos.c
+IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos
 endif
 
 ifeq ($(TARGET_OS),LINUX)

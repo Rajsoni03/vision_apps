@@ -87,7 +87,7 @@
 /* For J7ES/J721E/TDA4VM the upper 2GB DDR starts from 0x0008_8000_0000 */
 /* This address is mapped to a virtual address of 0x0001_0000_0000 */
 #define DDR_C7X_1_LOCAL_HEAP_VADDR (DDR_C7X_1_LOCAL_HEAP_ADDR)
-#define DDR_C7X_1_LOCAL_HEAP_PADDR (0x880000000u)
+#define DDR_C7X_1_LOCAL_HEAP_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_1_LOCAL_HEAP_ADDR - DDR_64BIT_BASE_VADDR))
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -375,21 +375,4 @@ void InitMmu(void)
     appMmuMap(TRUE);
 
     appCacheInit();
-}
-
-/* Offset to be added to convert virutal address to physical address */
-#define VIRT_PHY_ADDR_OFFSET (DDR_C7X_1_LOCAL_HEAP_PADDR - DDR_C7X_1_LOCAL_HEAP_VADDR)
-
-uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData)
-{
-  uint64_t phyAddr = (uint64_t)virtAddr;
-
-  if ((uint64_t)virtAddr >= DDR_C7X_1_LOCAL_HEAP_VADDR)
-  {
-    phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
-  }
-
-  return phyAddr;
 }

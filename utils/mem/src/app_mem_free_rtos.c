@@ -67,6 +67,7 @@
 #include <ti/osal/HwiP.h>
 #include <ti/osal/CacheP.h>
 #include <utils/console_io/include/app_log.h>
+#include <app_mem_map.h>
 
 #define ENABLE_CACHE_OPS
 
@@ -82,9 +83,23 @@
 #define APP_MEM_ALIGN_MIN_BYTES     (128u)
 
 #if defined(C71) || defined(C7120)
-extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+
+/* Offset to be added to convert virtual address to physical address */
+#define VIRT_PHY_ADDR_OFFSET (DDR_64BIT_BASE_PADDR - DDR_64BIT_BASE_VADDR)
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
-                                      void *appData);
+                                      void *appData)
+{
+  uint64_t phyAddr = (uint64_t)virtAddr;
+
+  if ((uint64_t)virtAddr >= DDR_64BIT_BASE_VADDR)
+  {
+    phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
+  }
+
+  return phyAddr;
+}
 #endif
 
 typedef struct {
