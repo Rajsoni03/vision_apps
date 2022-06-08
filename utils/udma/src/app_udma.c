@@ -1125,7 +1125,18 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
 
         druChannelId = Udma_chGetNum(ch_obj->drv_ch_handle);
 
-        ch_obj->wait_word =  ((uint64_t)1U << (32 + druChannelId) );
+        appLogPrintf("UDMA : druChannelId = %d!!\n", druChannelId);
+
+        #if defined (SOC_J721S2)
+        if (UDMA_CORE_ID_C7X_2==Udma_getCoreId())
+        {
+            ch_obj->wait_word =  ((uint64_t)1U << (16 + druChannelId) );
+        }
+        else
+        #endif
+        {
+            ch_obj->wait_word =  ((uint64_t)1U << (32 + druChannelId) );
+        }
     }
 
     return (retVal);

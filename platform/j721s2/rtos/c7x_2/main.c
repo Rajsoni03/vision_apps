@@ -144,9 +144,6 @@ void setup_dru_qos(void)
     #endif
 }
 
-#define ENABLE_C72_CLEC_INIT 0 // TODO: Re-enable once we enable DRU on C7X-2; will need to allocate channels specifically per core
-
-#if ENABLE_C72_CLEC_INIT
 /* A copy of this function is in both C7 main files, except the cfgClec.rtMap value */
 static void appC7xClecInitDru(void)
 {
@@ -158,10 +155,9 @@ static void appC7xClecInitDru(void)
     #endif
 
     uint32_t i;
-    uint32_t dru_input_start = 192;
-    uint32_t dru_input_num   = 16;
-    /* program CLEC events from DRU used for polling by TIDL
-     * to map to required events in C7x
+    uint32_t dru_input_start = 208;
+    uint32_t dru_input_num   = 12;
+    /* program CLEC events from DRU used by any app running on C7x-2 (Upto 12 channels)
      */
     for(i=dru_input_start; i<(dru_input_start+dru_input_num); i++)
     {
@@ -177,7 +173,6 @@ static void appC7xClecInitDru(void)
         CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
     }
 }
-#endif
 
 int main(void)
 {
@@ -187,9 +182,7 @@ int main(void)
     StartupEmulatorWaitFxn1();
     OS_init();
 
-    #if ENABLE_C72_CLEC_INIT
     appC7xClecInitDru();
-    #endif
 
     setup_dru_qos();
 
