@@ -65,12 +65,15 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/mem/include/app_mem.h>
-#include <ti/osal/LoadP.h>
 #include <ti/osal/HwiP.h>
 #include <ti/osal/SemaphoreP.h>
 #include <ti/osal/TaskP.h>
 #include "app_perf_stats_priv.h"
 #include <inttypes.h>
+
+#if defined(FREERTOS)
+#include <ti/osal/LoadP.h>
+#endif
 
 #define APP_PERF_DDR_MHZ                (1866u)  /* DDR clock speed in MHZ */
 #define APP_PERF_DDR_BUS_WIDTH          (  32u)  /* in units of bits */
@@ -182,12 +185,14 @@ void appPerfStatsResetLoadCalcAll(app_perf_stats_obj_t *obj)
 
 void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
 {
+    #if defined(FREERTOS)
     LoadP_Stats rtos_load_stat;
 
     LoadP_getTaskLoad(task, &rtos_load_stat);
 
     load->total_time = rtos_load_stat.totalTime;
     load->thread_time = rtos_load_stat.threadTime;
+    #endif
 }
 
 void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
@@ -291,7 +296,9 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
             appPerfStatsResetHwaLoadCalcAll();
             break;
         case APP_PERF_STATS_CMD_RESET_LOAD_CALC:
+            #if defined(FREERTOS)
             LoadP_reset();
+            #endif
             appPerfStatsResetLoadCalcAll(obj);
             break;
         case APP_PERF_STATS_CMD_RESET_DDR_STATS:
@@ -353,8 +360,10 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
 
                 appPerfStatsLock(obj);
 
+                #if defined(FREERTOS)
                 /* Multiplying by 100 to show decimal points when printing */
                 cpu_load->cpu_load = 100 * LoadP_getCPULoad();
+                #endif
 
                 cpu_load->hwi_load = 0U;
                 cpu_load->swi_load = 0U;
@@ -453,7 +462,9 @@ int32_t appPerfStatsInit()
 
     if(status==0)
     {
+        #if defined(FREERTOS)
         LoadP_reset();
+        #endif
         appPerfStatsResetLoadCalcAll(obj);
         appPerfStatsResetHwaLoadCalcAll();
         appPerfStatsResetDdrLoadCalcAll();

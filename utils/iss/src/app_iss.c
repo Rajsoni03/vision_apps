@@ -333,7 +333,7 @@ int32_t appDeInitImageSensor(char* sensor_name)
 
 #endif /*(A72)*/
 
-#if defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS))
+#if defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS))
 int32_t appIssInit()
 {
     int32_t status;
@@ -405,4 +405,4 @@ int32_t appIssDeInit()
     return (status|viss_status);
 }
 
-#endif /*defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS))*/
+#endif /*defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS))*/

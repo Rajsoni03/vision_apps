@@ -67,6 +67,12 @@
 
 #define  APP_LOG_RD_TASK_STACK_SIZE   (16*1024)
 
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_LOG_RD_TASK_ALIGNMENT    APP_LOG_RD_TASK_STACK_SIZE
+#else
+#define APP_LOG_RD_TASK_ALIGNMENT    (8192u)
+#endif
+
 static app_log_rd_obj_t g_app_log_rd_obj;
 
 /* IMPORTANT NOTE: For C7x,
@@ -77,7 +83,7 @@ static app_log_rd_obj_t g_app_log_rd_obj;
  */
 static uint8_t g_app_log_rd_task_stack[APP_LOG_RD_TASK_STACK_SIZE]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+__attribute__ ((aligned(APP_LOG_RD_TASK_ALIGNMENT)))
     ;
 
 void appLogInitPrmSetDefault(app_log_init_prm_t *prms)
@@ -259,7 +265,7 @@ void* appLogRdRun(app_log_rd_obj_t *obj)
     uint32_t done = 0, cpu_id;
     uint32_t num_bytes, str_len;
 
-    #if defined(FREERTOS) || defined(SYSBIOS)
+    #if defined(FREERTOS) || defined(SYSBIOS) || defined(SAFERTOS)
     appUtilsTaskInit();
     #endif
 

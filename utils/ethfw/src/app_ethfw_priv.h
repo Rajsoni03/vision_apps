@@ -100,7 +100,7 @@
 
 #endif
 
-#if defined (FREERTOS)
+#if defined (FREERTOS) || defined (SAFERTOS)
 /* lwIP core includes */
 #include "lwip/opt.h"
 #include "lwip/sys.h"

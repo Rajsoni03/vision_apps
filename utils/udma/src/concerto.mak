@@ -1,5 +1,5 @@
 ifneq ($(TARGET_PLATFORM),PC)
-ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS SAFERTOS))
 
 include $(PRELUDE)
 TARGET      := app_utils_udma

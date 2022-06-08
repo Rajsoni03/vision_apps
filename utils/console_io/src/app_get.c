@@ -64,14 +64,14 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#if defined(SYSBIOS) || defined(FREERTOS)
+#if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
 #endif
 
 char appGetChar()
 {
-#if defined(SYSBIOS) || defined(FREERTOS)
+#if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     char buf[8u];
 
     while(1)

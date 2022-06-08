@@ -1,5 +1,5 @@
 ifneq ($(TARGET_PLATFORM),PC)
-ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS SAFERTOS))
 
 include $(PRELUDE)
 
@@ -15,9 +15,20 @@ ifeq ($(TARGET_OS),SYSBIOS)
 CSOURCES += app_cpu_hz_tirtos.c
 endif
 
-ifeq ($(TARGET_OS),FREERTOS)
-IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include/
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),FREERTOS SAFERTOS))
 CSOURCES += app_cpu_hz_freertos.c
+endif
+
+ifeq ($(TARGET_OS),SAFERTOS)
+ifeq ($(TARGET_CPU),R5F)
+IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_r5f}/source_code_and_projects/SafeRTOS/config
+endif
+ifeq ($(TARGET_CPU),C66)
+IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/config
+endif
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120))
+IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/config
+endif
 endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120))

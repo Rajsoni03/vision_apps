@@ -104,9 +104,16 @@ static uint8_t g_app_rpmessage_rpmsg_rx_buf[APP_IPC_RPMESSAGE_RPMSG_RX_BUF_SIZE]
  */
 #define APP_IPC_RPMESSAGE_RX_TASK_STACK_SIZE   (64*1024u)
 #define APP_IPC_RPMESSAGE_RX_TASK_PRI          (10u)
+
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_IPC_RPMESSAGE_RX_TASK_ALIGNMENT    APP_IPC_RPMESSAGE_RX_TASK_STACK_SIZE
+#else
+#define APP_IPC_RPMESSAGE_RX_TASK_ALIGNMENT    (8192u)
+#endif
+
 static uint8_t g_app_rpmessage_rx_task_stack[APP_IPC_RPMESSAGE_RX_TASK_STACK_SIZE]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+__attribute__ ((aligned(APP_IPC_RPMESSAGE_RX_TASK_ALIGNMENT)))
     ;
 
 /* IMPORTANT NOTE: For C7x,
@@ -116,12 +123,19 @@ __attribute__ ((aligned(8192)))
  *       - 8KB chunk for the stack area is used for interrupt handling in this task context
  */
 #define APP_IPC_RPMESSAGE_CTRL_TASK_STACK_SIZE   (64*1024u)
+
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_IPC_RPMESSAGE_CTRL_TASK_ALIGNMENT    APP_IPC_RPMESSAGE_CTRL_TASK_STACK_SIZE
+#else
+#define APP_IPC_RPMESSAGE_CTRL_TASK_ALIGNMENT    (8192u)
+#endif
+
 static uint8_t g_app_rpmessage_ctrl_task_stack[APP_IPC_RPMESSAGE_CTRL_TASK_STACK_SIZE]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+__attribute__ ((aligned(APP_IPC_RPMESSAGE_CTRL_TASK_ALIGNMENT)))
     ;
 
-#ifdef FREERTOS
+#if defined(FREERTOS) || defined(SAFERTOS)
 
 typedef struct
 {
@@ -856,7 +870,7 @@ char *appIpcGetCpuName(uint32_t app_cpu_id)
     return name;
 }
 
-#ifdef FREERTOS
+#if defined(FREERTOS) || defined(SAFERTOS)
 
 static void traceBufFlush(void* arg0, void* arg1)
 {

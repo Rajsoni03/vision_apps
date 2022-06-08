@@ -81,11 +81,18 @@
 #define APP_REMOTE_SERVICE_RPMSG_TX_BUF_SIZE  IPC_RPMESSAGE_BUF_SIZE(APP_REMOTE_SERVICE_RPMSG_TX_NUM_BUF)
 static uint8_t g_app_remote_service_rpmsg_tx_buf[APP_REMOTE_SERVICE_RPMSG_TX_BUF_SIZE] __attribute__ ((aligned(1024)));
 
-#if defined(SYSBIOS) || defined(FREERTOS)
+#if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 
 #define APP_REMOTE_SERVICE_RPMSG_RX_NUM_BUF   (8u)
 #define APP_REMOTE_SERVICE_RPMSG_RX_BUF_SIZE  IPC_RPMESSAGE_BUF_SIZE(APP_REMOTE_SERVICE_RPMSG_RX_NUM_BUF)
-static uint8_t g_app_remote_service_rpmsg_rx_buf[APP_REMOTE_SERVICE_RPMSG_RX_BUF_SIZE] __attribute__ ((aligned(1024)));
+
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_REMOTE_SERVICE_RPMSG_RX_TASK_ALIGNMENT    (8192u)
+#else
+#define APP_REMOTE_SERVICE_RPMSG_RX_TASK_ALIGNMENT    (1024u)
+#endif
+
+static uint8_t g_app_remote_service_rpmsg_rx_buf[APP_REMOTE_SERVICE_RPMSG_RX_BUF_SIZE] __attribute__ ((aligned(APP_REMOTE_SERVICE_RPMSG_RX_TASK_ALIGNMENT)));
 
 /* IMPORTANT NOTE: For C7x,
  * - stack size and stack ptr MUST be 8KB aligned
@@ -95,9 +102,16 @@ static uint8_t g_app_remote_service_rpmsg_rx_buf[APP_REMOTE_SERVICE_RPMSG_RX_BUF
  */
 #define APP_REMOTE_SERVICE_RX_TASK_STACK_SIZE   (128*1024u)
 #define APP_REMOTE_SERVICE_RX_TASK_PRI          (10u)
+
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_REMOTE_SERVICE_RX_TASK_ALIGNMENT    APP_REMOTE_SERVICE_RX_TASK_STACK_SIZE
+#else
+#define APP_REMOTE_SERVICE_RX_TASK_ALIGNMENT    (8192u)
+#endif
+
 static uint8_t g_app_remote_service_rx_task_stack[APP_REMOTE_SERVICE_RX_TASK_STACK_SIZE]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+__attribute__ ((aligned(APP_REMOTE_SERVICE_RX_TASK_ALIGNMENT)))
     ;
 #endif
 
@@ -107,7 +121,7 @@ typedef struct {
     app_remote_service_init_prms_t prm;
     RPMessage_Handle rpmsg_tx_handle;
     uint32_t rpmsg_tx_endpt;
-    #if defined(SYSBIOS) || defined(FREERTOS)
+    #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     RPMessage_Handle rpmsg_rx_handle;
     TaskP_Handle task_handle;
     uint32_t task_stack_size;
@@ -149,7 +163,7 @@ static int32_t appRemoteServiceRunHandler(char *service_name, uint32_t cmd, void
     return status;
 }
 
-#if defined(SYSBIOS) || defined(FREERTOS)
+#if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 static void appRemoteServiceRxTaskMain(void *arg0, void *arg1)
 {
     app_remote_service_obj_t *obj = &g_app_remote_service_obj;
@@ -376,7 +390,7 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, u
     return status;
 }
 
-#if defined(SYSBIOS) || defined(FREERTOS)
+#if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 static int32_t appRemoteServiceCreateRpmsgRxTask(app_remote_service_obj_t *obj)
 {
     TaskP_Params task_prms;
@@ -446,12 +460,12 @@ int32_t appRemoteServiceInit(app_remote_service_init_prms_t *prm)
 
     obj->prm = *prm;
     obj->rpmsg_tx_handle = NULL;
-    #if defined(SYSBIOS) || defined(FREERTOS)
+    #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     obj->rpmsg_rx_handle = NULL;
     #endif
     obj->tx_lock = NULL;
     obj->rx_lock = NULL;
-    #if defined(SYSBIOS) || defined(FREERTOS)
+    #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     obj->task_handle = NULL;
     obj->task_stack = g_app_remote_service_rx_task_stack;
     obj->task_stack_size = APP_REMOTE_SERVICE_RX_TASK_STACK_SIZE;
@@ -510,7 +524,7 @@ int32_t appRemoteServiceInit(app_remote_service_init_prms_t *prm)
             status = -1;
         }
     }
-    #if defined(SYSBIOS) || defined(FREERTOS)
+    #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     if(status==0)
     {
         RPMessage_Params rpmsg_prm;
@@ -627,7 +641,7 @@ int32_t appRemoteServiceDeInit()
         appRemoteServiceTestDeInit();
     }
 
-    #if defined(SYSBIOS) || defined(FREERTOS)
+    #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     appRemoteServiceDeleteRpmsgRxTask(obj);
     #endif
 
@@ -636,7 +650,7 @@ int32_t appRemoteServiceDeInit()
         RPMessage_delete(&obj->rpmsg_tx_handle);
         obj->rpmsg_tx_handle = NULL;
     }
-    #if defined(SYSBIOS) || defined(FREERTOS)
+    #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     if(obj->rpmsg_rx_handle!=NULL)
     {
         RPMessage_delete(&obj->rpmsg_rx_handle);

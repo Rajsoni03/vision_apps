@@ -1,4 +1,4 @@
-ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS SAFERTOS))
 ifeq ($(TARGET_CPU),R5F)
 
 include $(PRELUDE)

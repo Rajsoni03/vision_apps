@@ -60,7 +60,12 @@
  *
  */
 
+#if defined(FREERTOS)
 #include <FreeRTOS.h>
+#elif defined(SAFERTOS)
+#include <SafeRTOSConfig.h>
+#endif
+
 #include <utils/console_io/include/app_log.h>
 
 int32_t appUtilsPrintCpuHz(void)

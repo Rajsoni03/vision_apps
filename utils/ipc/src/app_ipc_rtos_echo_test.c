@@ -58,6 +58,12 @@
 
 #define APP_IPC_ECHO_TEST_TASK_STACKSIZE       (64*1024)
 
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_IPC_ECHO_TEST_TASK_ALIGNMENT    (64*1024)
+#else
+#define APP_IPC_ECHO_TEST_TASK_ALIGNMENT    (8192u)
+#endif
+
 /* this should be >= RPMessage_getObjMemRequired() */
 #define IPC_RPMESSAGE_OBJ_SIZE  (256)
 
@@ -104,11 +110,23 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
  */
 static uint8_t  g_taskStackBuf[APP_IPC_CPU_MAX][APP_IPC_ECHO_TEST_TASK_STACKSIZE]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+__attribute__ ((aligned(APP_IPC_ECHO_TEST_TASK_ALIGNMENT)))
     ;
 
-static uint8_t  g_sendBuf[RPMSG_DATA_SIZE * APP_IPC_CPU_MAX]  __attribute__ ((aligned (128)));
-static uint8_t  g_rspBuf[RPMSG_DATA_SIZE]  __attribute__ ((aligned (128)));
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_IPC_SENDBUF_TASK_ALIGNMENT    (262144u)
+#else
+#define APP_IPC_SENDBUF_TASK_ALIGNMENT    (128u)
+#endif
+
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_IPC_RSPBUF_TASK_ALIGNMENT    (16384u)
+#else
+#define APP_IPC_RSPBUF_TASK_ALIGNMENT    (128u)
+#endif
+
+static uint8_t  g_sendBuf[RPMSG_DATA_SIZE * APP_IPC_CPU_MAX]  __attribute__ ((aligned (APP_IPC_SENDBUF_TASK_ALIGNMENT)));
+static uint8_t  g_rspBuf[RPMSG_DATA_SIZE]  __attribute__ ((aligned (APP_IPC_RSPBUF_TASK_ALIGNMENT)));
 
 uint32_t g_ipc_echo_test_status[APP_IPC_CPU_MAX];
 

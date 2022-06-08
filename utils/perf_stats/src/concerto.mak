@@ -21,7 +21,7 @@ ifeq ($(TARGET_OS),SYSBIOS)
 CSOURCES    := app_perf_stats_tirtos.c
 endif
 
-ifeq ($(TARGET_OS),FREERTOS)
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS), FREERTOS SAFERTOS))
 CSOURCES    := app_perf_stats_freertos.c
 endif
 

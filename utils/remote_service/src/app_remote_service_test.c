@@ -69,7 +69,7 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/misc/include/app_misc.h>
 
-#if defined(SYSBIOS) || defined(FREERTOS)
+#if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 /* define this to enable load test */
 #define ENABLE_LOAD_TEST
 #endif
@@ -99,9 +99,16 @@
  */
 #define APP_REMOTE_SERVICE_LOAD_TEST_TASK_STACK_SIZE   (32*1024u)
 #define APP_REMOTE_SERVICE_LOAD_TEST_TASK_PRI          (10u)
+
+#if defined(R5F) && defined(SAFERTOS)
+#define APP_REMOTE_SERVICE_LOAD_TEST_TASK_ALIGNMENT    APP_REMOTE_SERVICE_LOAD_TEST_TASK_STACK_SIZE
+#else
+#define APP_REMOTE_SERVICE_LOAD_TEST_TASK_ALIGNMENT    (8192u)
+#endif
+
 static uint8_t g_app_remote_service_rx_task_stack[APP_REMOTE_SERVICE_LOAD_TEST_TASK_STACK_SIZE]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+__attribute__ ((aligned(APP_REMOTE_SERVICE_LOAD_TEST_TASK_ALIGNMENT)))
     ;
 
 
