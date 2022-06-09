@@ -86,7 +86,7 @@ static void appMain(void* arg0, void* arg1)
 
 void StartupEmulatorWaitFxn (void)
 {
-    volatile uint32_t enableDebug = 1;
+    volatile uint32_t enableDebug = 0;
     do
     {
     }while (enableDebug);

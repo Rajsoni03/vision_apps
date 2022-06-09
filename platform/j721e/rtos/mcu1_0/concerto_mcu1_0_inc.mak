@@ -18,7 +18,7 @@ ifeq ($(RTOS),FREERTOS)
 endif
 
 ifeq ($(RTOS),SAFERTOS)
-	CSOURCES += $(SOC)_safertos_mpu_cfg.c.c
+	CSOURCES += $(SOC)_safertos_mpu_cfg.c
 	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_safertos.cmd
 endif
 
@@ -53,11 +53,7 @@ include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_mcu1_0
 
-ifeq ($(RTOS),FREERTOS)
-	STATIC_LIBS += app_rtos
-endif
-
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
 

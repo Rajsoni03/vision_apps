@@ -69,10 +69,7 @@ endif
 
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_mcu2_0
-ifeq ($(RTOS),FREERTOS)
-	STATIC_LIBS += app_rtos
-endif
-ifeq ($(RTOS),SAFERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
 STATIC_LIBS += app_utils_hwa

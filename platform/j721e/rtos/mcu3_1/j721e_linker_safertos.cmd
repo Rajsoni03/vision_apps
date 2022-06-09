@@ -79,7 +79,6 @@ SECTIONS
 
     .tracebuf                : {} align(1024)   > DDR_MCU3_1
 
-    .bss:l3mem              (NOLOAD) : {} > MAIN_OCRAM_MCU3_1
     .bss:ddr_local_mem     (NOLOAD) : {} > DDR_MCU3_1_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
