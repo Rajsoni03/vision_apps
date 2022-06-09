@@ -51,6 +51,7 @@
 #define MAX_LEN_CMD_STR   4096u
 #define MAX_LEN_ELEM_NAME   32u
 #define MAX_NUM_CHANNELS     8u
+#define MAX_BUFFER_DEPTH    16u
 #define MAX_FRAMES_TO_RUN 1800u
 
 typedef struct 
@@ -60,6 +61,8 @@ typedef struct
     char        format[8];
     uint32_t    size;
     uint8_t     num_channels;
+    uint8_t     num_planes;
+    uint8_t     buffer_depth;
 
     uint8_t     srcType;
     uint8_t     sinkType;
@@ -71,6 +74,10 @@ typedef struct
     char        m_AppSinkNameArr[MAX_NUM_CHANNELS][MAX_LEN_ELEM_NAME];
     GstElement *m_srcElemArr[MAX_NUM_CHANNELS];
     GstElement *m_sinkElemArr[MAX_NUM_CHANNELS];
+
+    GstBuffer* buff[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
+    GstMemory* mem[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2];
+    GstMapInfo map_info[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2];
 
     GstBuffer* pulled_buff[MAX_NUM_CHANNELS];
     GstMapInfo pulled_map_info[MAX_NUM_CHANNELS];
@@ -85,9 +92,13 @@ int32_t app_init_gst_pipe(GstPipeObj *gstPipeInst);
 
 int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst);
 
+int32_t wrap_buffers(GstPipeObj *gstPipeInst, void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2]);
+
 int32_t app_start_gst_pipe(GstPipeObj *gstPipeInst);
 
-int32_t push_data_buffer(GstPipeObj *gstPipeInst, void* p_dataArr[]);
+int32_t push_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx);
+
+int32_t push_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx);
 
 int32_t push_EOS(GstPipeObj *gstPipeInst);
 

@@ -153,6 +153,7 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
     {
         for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
         {
+            /* Setup AppSrc */
             gstPipeInst->m_srcElemArr[ch]  = findElementByName(gstPipeInst->m_pipeline, 
                                                         gstPipeInst->m_AppSrcNameArr[ch]);
             if (gstPipeInst->m_srcElemArr[ch] == NULL)
@@ -181,6 +182,7 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
     {
         for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
         {
+            /* Setup AppSink */
             gstPipeInst->m_sinkElemArr[ch] = findElementByName(gstPipeInst->m_pipeline, 
                                                     gstPipeInst->m_AppSinkNameArr[ch]);
             if (gstPipeInst->m_sinkElemArr[ch] == NULL)
@@ -191,6 +193,37 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
         }
     }
 
+    return status;
+}
+
+int32_t wrap_buffers(GstPipeObj *gstPipeInst, void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2])
+{
+    int32_t status = 0;
+    uint32_t plane_size = gstPipeInst->width * gstPipeInst->height;       // For NV12 buffers: plane_size of first plane
+
+    if (gstPipeInst->srcType==0)
+    {
+        for (uint8_t idx = 0; idx < gstPipeInst->buffer_depth && status==0; idx++)
+        {
+            for (uint8_t ch = 0; ch < gstPipeInst->num_channels && status==0; ch++)
+            {
+                /* Setup Push buffers */
+                gstPipeInst->buff[idx][ch] = gst_buffer_new();
+
+                gstPipeInst->mem[idx][ch][0] = gst_memory_new_wrapped (0, data_ptr[idx][ch][0], plane_size, 0, plane_size, NULL, NULL);
+                gstPipeInst->mem[idx][ch][1] = gst_memory_new_wrapped (0, data_ptr[idx][ch][1], plane_size/2, 0, plane_size/2, NULL, NULL);
+
+                gst_buffer_append_memory (gstPipeInst->buff[idx][ch], gstPipeInst->mem[idx][ch][0]);
+                gst_buffer_append_memory (gstPipeInst->buff[idx][ch], gstPipeInst->mem[idx][ch][1]);
+
+                gstPipeInst->mem[idx][ch][0] = gst_buffer_get_memory (gstPipeInst->buff[idx][ch], 0);
+                gstPipeInst->mem[idx][ch][1] = gst_buffer_get_memory (gstPipeInst->buff[idx][ch], 1);
+
+                gst_memory_map(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0], GST_MAP_WRITE);
+                gst_memory_map(gstPipeInst->mem[idx][ch][1],&gstPipeInst->map_info[idx][ch][1], GST_MAP_WRITE);
+            }
+        }
+    }
     return status;
 }
 
@@ -206,26 +239,21 @@ int32_t app_start_gst_pipe(GstPipeObj *gstPipeInst)
     return 0;
 }
 
-int32_t push_data_buffer(GstPipeObj *gstPipeInst, void* p_dataArr[])
+int32_t push_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx)
 {
     int32_t status = 0;
     
     for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
     {
-        /* Replace by GstBufferPool implementation (dequeue, update, enqueue) */
-        GstBuffer *in_buff = NULL;
-        in_buff = gst_buffer_new_wrapped (p_dataArr[ch], gstPipeInst->size);
-        if (in_buff == NULL)
-        {
-            printf("gst_wrapper: gst_buffer_new_wrapped() FAILED!\n");
-            status = -1;
-        }
+        gst_memory_unmap(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0]);
+        gst_memory_unmap(gstPipeInst->mem[idx][ch][1],&gstPipeInst->map_info[idx][ch][1]);
 
         if (status == 0)
         {
             GstFlowReturn ret;
 
-            ret = gst_app_src_push_buffer(GST_APP_SRC(gstPipeInst->m_srcElemArr[ch]), in_buff);
+            gst_buffer_ref(gstPipeInst->buff[idx][ch]);
+            ret = gst_app_src_push_buffer(GST_APP_SRC(gstPipeInst->m_srcElemArr[ch]), gstPipeInst->buff[idx][ch]);
             if (ret != GST_FLOW_OK)
             {
                 printf("gst_wrapper: Pushing buffer to AppSrc returned %d instead of GST_FLOW_OK:%d\n", ret, GST_FLOW_OK);
@@ -235,6 +263,45 @@ int32_t push_data_buffer(GstPipeObj *gstPipeInst, void* p_dataArr[])
     }
 
     if (status==0) gstPipeInst->push_count++;
+
+    return status;
+}
+
+int32_t push_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx)
+{
+    int32_t status = 0;
+    uint8_t refcount;
+
+
+    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    {
+        refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->buff[idx][ch]->mini_object);
+        while (refcount > 1)
+        {
+            refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->buff[idx][ch]->mini_object);
+        }
+        refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->mem[idx][ch][1]->mini_object);
+        while (refcount > 2)
+        {
+            refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->mem[idx][ch][1]->mini_object);
+        }
+        refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->mem[idx][ch][0]->mini_object);
+        while (refcount > 2)
+        {
+            refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->mem[idx][ch][0]->mini_object);
+        }
+
+        if(!gst_memory_map(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0], GST_MAP_WRITE)) 
+        { 
+            status = -1; 
+            break;
+        }
+        if(!gst_memory_map(gstPipeInst->mem[idx][ch][1],&gstPipeInst->map_info[idx][ch][1], GST_MAP_WRITE)) 
+        {
+            status = -1;
+            break;
+        }
+    }
 
     return status;
 }
@@ -352,6 +419,17 @@ void app_delete_gst_pipe(GstPipeObj *gstPipeInst)
     {
         for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
         {
+            for (uint8_t idx = 0; idx < gstPipeInst->buffer_depth; idx++)
+            {
+                gst_memory_unmap(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0]);
+                gst_memory_unmap(gstPipeInst->mem[idx][ch][1],&gstPipeInst->map_info[idx][ch][1]);
+
+                gst_memory_unref(gstPipeInst->mem[idx][ch][0]);
+                gst_memory_unref(gstPipeInst->mem[idx][ch][1]);
+
+                gst_buffer_unref(gstPipeInst->buff[idx][ch]);
+
+            }
             gst_object_unref (gstPipeInst->m_srcElemArr[ch]);
         }
     }
