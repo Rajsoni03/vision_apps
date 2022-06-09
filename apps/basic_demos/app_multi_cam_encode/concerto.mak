@@ -24,10 +24,22 @@ endif
 IDIRS += $(IMAGING_IDIRS)
 IDIRS += $(VISION_APPS_KERNELS_IDIRS)
 IDIRS += $(VISION_APPS_MODULES_IDIRS)
+IDIRS += $(LINUX_FS_PATH)/usr/include/gstreamer-1.0/
+IDIRS += $(LINUX_FS_PATH)/usr/include/glib-2.0/
+IDIRS += $(LINUX_FS_PATH)/usr/lib/glib-2.0/include/
 
 STATIC_LIBS += $(IMAGING_LIBS)
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(VISION_APPS_MODULES_LIBS)
+ifeq ($(TARGET_OS), LINUX)
+STATIC_LIBS += app_utils_gst_codec
+endif
+
+SHARED_LIBS += gstreamer-1.0
+SHARED_LIBS += gstapp-1.0
+SHARED_LIBS += gstbase-1.0
+SHARED_LIBS += gobject-2.0
+SHARED_LIBS += glib-2.0
 
 include $(FINALE)
 

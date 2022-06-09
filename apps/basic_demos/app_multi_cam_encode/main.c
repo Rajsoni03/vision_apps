@@ -65,6 +65,7 @@
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
 #include <utils/hwa/include/app_hwa_api.h>
+#include <utils/gst_codec_wrapper/include/gst_wrapper.h>
 #include <VX/vx_khr_pipelining.h>
 
 #include "app_common.h"
@@ -91,6 +92,7 @@ typedef struct {
     LDCObj        ldcObj;
     ImgMosaicObj  imgMosaicObj;
     DisplayObj    displayObj;
+    GstPipeObj    gstPipeObj;   
 
     vx_object_array intermediate_obj_arr[2*APP_MODULES_MAX_BUFQ_DEPTH];
     vx_object_array ldc_enq_buffer;
@@ -154,6 +156,7 @@ static void app_pipeline_params_defaults(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
+static vx_status copy_image(vx_object_array* in_arr, void* gst_data_ptr[], vx_int32 num_channels);
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -229,6 +232,13 @@ static vx_status app_run_graph_interactive(AppObj *obj)
     // FILE *fp;
     // app_perf_point_t *perf_arr[1];
 
+    status = app_start_gst_pipe(&obj->gstPipeObj);
+    if(status == VX_FAILURE)
+    {
+        printf("gst_wrapper: ERROR: Unable to Start gstPipe\n");
+        return status;
+    }
+
     status = app_run_task_create(obj);
     if(status == VX_FAILURE)
     {
@@ -292,6 +302,9 @@ static vx_status app_run_graph_interactive(AppObj *obj)
             }
         }
         app_run_task_delete(obj);
+
+        status = push_EOS(&obj->gstPipeObj);
+        status = app_stop_gst_pipe(&obj->gstPipeObj);
     }
     return status;
 }
@@ -623,6 +636,9 @@ vx_int32 app_multi_cam_encode_main(vx_int32 argc, vx_char* argv[])
     /*Optional parameter setting*/
     app_default_param_set(obj);
 
+    /* GStreamer INIT  */
+    gst_init (&argc, &argv);
+
     /*Config parameter reading*/
     app_parse_cmd_line_args(obj, argc, argv);
 
@@ -823,6 +839,12 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("Display init done!\n");
     }
 
+    if (status == VX_SUCCESS)
+    {
+        status = app_init_gst_pipe(&obj->gstPipeObj);
+        APP_PRINTF("GstPipe init done!\n");
+    }
+
     appPerfPointSetName(&obj->total_perf , "TOTAL");
     appPerfPointSetName(&obj->fileio_perf, "FILEIO");
     return status;
@@ -903,6 +925,9 @@ static void app_delete_graph(AppObj *obj)
     vxReleaseGraph(&obj->capture_graph);
     vxReleaseGraph(&obj->display_graph);
     APP_PRINTF("Graph delete done!\n");
+
+    app_delete_gst_pipe(&obj->gstPipeObj);
+    APP_PRINTF("Gst Pipeline delete done!\n");
 }
 
 static vx_status app_create_graph(AppObj *obj)
@@ -1100,6 +1125,12 @@ static vx_status app_create_graph(AppObj *obj)
         }
     }
 
+    if(status == VX_SUCCESS)
+    {
+        status = app_create_gst_pipe(&obj->gstPipeObj);
+        APP_PRINTF("Gst Pipeline done!\n");
+    }
+
     return status;
 }
 
@@ -1222,6 +1253,8 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         vx_image mosaic_output_image;
         uint32_t num_refs;
 
+        void* gst_data_ptr[MAX_NUM_CHANNELS];
+
         /* Pipeline execution for both graphs. Buffers cycled between LDC-output and Mosaic-input */
 
         status = vxGraphParameterDequeueDoneRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1, &num_refs);
@@ -1246,6 +1279,27 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         if(status==VX_SUCCESS)
         {
             status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->in_graph_parameter_index, (vx_reference*)&obj->mosaic_enq_buffer, 1);
+        }
+
+
+        if (obj->gstPipeObj.push_count==MAX_FRAMES_TO_RUN)
+        {
+            status = push_EOS(&obj->gstPipeObj);
+        }
+        else
+        {
+            if(status==VX_SUCCESS)
+            {
+                for (uint8_t ch = 0; ch < obj->gstPipeObj.num_channels; ch++)
+                {
+                    gst_data_ptr[ch] = (uint8_t*) calloc(obj->gstPipeObj.size, sizeof(uint8_t));
+                }
+                status = copy_image(&ldc_output_arr, gst_data_ptr, obj->sensorObj.num_cameras_enabled);
+            }
+            if(status==VX_SUCCESS)
+            {
+                status = push_data_buffer(&obj->gstPipeObj, gst_data_ptr);
+            }
         }
 
         if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
@@ -1388,6 +1442,94 @@ static vx_status app_run_graph(AppObj *obj)
     return status;
 }
 
+static vx_status copy_image(vx_object_array* in_arr, void* gst_data_ptr[], vx_int32 num_channels)
+{
+    vx_status status;
+    vx_int32 ch;
+
+    status = vxGetStatus((vx_reference)*in_arr);
+
+    for(ch = 0; ch<num_channels; ch++)
+    {
+        vx_rectangle_t rect;
+        vx_imagepatch_addressing_t image_addr;
+        vx_map_id map_id;
+        void * data_ptr;
+
+        vx_uint32  img_width;
+        vx_uint32  img_height;
+
+        vx_image in_img = (vx_image)vxGetObjectArrayItem(*in_arr,ch);
+
+        vxQueryImage(in_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+        vxQueryImage(in_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = img_width;
+        rect.end_y = img_height;
+
+        if (gst_data_ptr[ch] == NULL)
+        {
+            printf("copy_image(): Did not get allocated memory for gst_data_ptr!\n");
+            status = -1;
+        }
+        vx_uint32 write_idx = 0;
+
+        /* Copy Luma */
+        status = vxMapImagePatch(in_img,
+                                &rect,
+                                0,
+                                &map_id,
+                                &image_addr,
+                                &data_ptr,
+                                VX_READ_ONLY,
+                                VX_MEMORY_TYPE_HOST,
+                                VX_NOGAP_X);
+        if (status != VX_SUCCESS) {printf("copy_image(): vxMap unsuccessful"); return(status);}
+
+        for (vx_uint32 j = 0; j < img_height; j++)
+        {
+            for (vx_uint32 k = 0; k < img_width; k++)
+            {
+                *(uint8_t*)(gst_data_ptr[ch]+write_idx+k) = *(uint8_t*)(data_ptr+k);
+            }
+            data_ptr += image_addr.stride_y;
+            write_idx += image_addr.stride_y;
+        }
+
+        vxUnmapImagePatch(in_img, map_id);
+
+        /* Copy CbCr */
+        status = vxMapImagePatch(in_img,
+                                &rect,
+                                1,
+                                &map_id,
+                                &image_addr,
+                                &data_ptr,
+                                VX_READ_ONLY,
+                                VX_MEMORY_TYPE_HOST,
+                                VX_NOGAP_X);
+        if (status != VX_SUCCESS) {printf("copy_image(): vxMap unsuccessful"); return(status);}
+
+        for (vx_uint32 j = 0; j < img_height/2; j++)
+        {
+            for (vx_uint32 k = 0; k < img_width; k++)
+            {
+                *(uint8_t*)(gst_data_ptr[ch]+write_idx+k) = *(uint8_t*)(data_ptr+k);
+            }
+            data_ptr += image_addr.stride_y;
+            write_idx += image_addr.stride_y;
+        }
+
+        vxUnmapImagePatch(in_img, map_id);
+
+
+        vxReleaseReference((vx_reference*)&in_img);        
+    }
+    return(status);
+}
+
 static void set_display_defaults(DisplayObj *displayObj)
 {
     displayObj->display_option = 1;
@@ -1413,13 +1555,27 @@ static void set_sensor_defaults(SensorObj *sensorObj)
     sensorObj->sensor_gain_control_enabled = 0;
 }
 
+static void set_gst_pipe_defaults(GstPipeObj *p_gstPipeInst)
+{
+    p_gstPipeInst->width        = 1920;
+    p_gstPipeInst->height       = 1080;
+    snprintf(p_gstPipeInst->format,8,"NV12");
+    p_gstPipeInst->num_channels = 1;
+
+    p_gstPipeInst->srcType  = 2;
+    p_gstPipeInst->sinkType = 1;
+}
+
 static void app_default_param_set(AppObj *obj)
 {
     set_sensor_defaults(&obj->sensorObj);
 
     set_display_defaults(&obj->displayObj);
 
+    set_gst_pipe_defaults(&obj->gstPipeObj);
+
     app_pipeline_params_defaults(obj);
+
 
     obj->is_interactive = 1;
     obj->test_mode = 0;
@@ -1498,6 +1654,10 @@ static void app_update_param_set(AppObj *obj)
     appIssGetResizeParams(obj->sensorObj.image_width, obj->sensorObj.image_height, DISPLAY_WIDTH, DISPLAY_HEIGHT, &resized_width, &resized_height);
 
     set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled);
+
+    obj->gstPipeObj.srcType      = 0;                                       // appsrc
+    obj->gstPipeObj.sinkType     = 1;                                       // filesink
+    obj->gstPipeObj.num_channels = obj->sensorObj.num_cameras_enabled;
 
 }
 
