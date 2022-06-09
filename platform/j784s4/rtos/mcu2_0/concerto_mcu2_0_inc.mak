@@ -15,21 +15,41 @@ endif
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
+IDIRS+=$(REMOTE_DEVICE_PATH)
+IDIRS+=$(ETHFW_PATH)
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)_evm/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/csirx/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/dss/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 
+LDIRS += $(ETHFW_PATH)/out/J784S4/R5Ft/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS += $(REMOTE_DEVICE_PATH)/lib/J784S4/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+
+ifeq ($(RTOS),FREERTOS)
+    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/lib/freertos/${SOC}/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/freertos/${SOC}/r5f/$(TARGET_BUILD)/
+endif
+
 ifeq ($(RTOS),FREERTOS)
     LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 endif
 
 include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
+
+ifeq ($(BUILD_ENABLE_ETHFW),yes)
+DEFS+=ENABLE_ETHFW
+endif
 
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_mcu2_0
@@ -40,10 +60,45 @@ STATIC_LIBS += app_utils_hwa
 STATIC_LIBS += app_utils_dss
 STATIC_LIBS += app_utils_sciclient
 
+ifeq ($(BUILD_ENABLE_ETHFW),yes)
+STATIC_LIBS += app_utils_ethfw
+ETHFW_LIBS = ethfw
+ETHFW_LIBS += ethfw_callbacks
+ETHFW_LIBS += eth_intervlan
+ETHFW_LIBS += ethfw_board
+ETHFW_LIBS += lib_remoteswitchcfg_server
+ifeq ($(RTOS),FREERTOS)
+	ETHFW_LIBS += ethfw_lwip
+endif
+endif
+
+REMOTE_DEVICE_LIBS = lib_remote_device
+
+SYS_STATIC_LIBS += $(ETHFW_LIBS)
+SYS_STATIC_LIBS += $(REMOTE_DEVICE_LIBS)
+
 ADDITIONAL_STATIC_LIBS += csirx.aer5f
 ADDITIONAL_STATIC_LIBS += csitx.aer5f
 ADDITIONAL_STATIC_LIBS += dss.aer5f
 ADDITIONAL_STATIC_LIBS += vhwa.aer5f
+
+ifeq ($(BUILD_ENABLE_ETHFW),yes)
+ADDITIONAL_STATIC_LIBS += enetsoc.aer5f
+ADDITIONAL_STATIC_LIBS += enet.aer5f
+ADDITIONAL_STATIC_LIBS += enetphy.aer5f
+ADDITIONAL_STATIC_LIBS += enet_cfgserver.aer5f
+ADDITIONAL_STATIC_LIBS += enet_timesync_ptp.aer5f
+ADDITIONAL_STATIC_LIBS += enet_timesync_hal.aer5f
+ifeq ($(RTOS),FREERTOS)
+	ADDITIONAL_STATIC_LIBS += lwipstack_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipcontrib_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipport_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipif_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += lwipific_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_intercore.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_example_utils_freertos.aer5f
+endif
+endif
 
 ADDITIONAL_STATIC_LIBS += pm_lib.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f

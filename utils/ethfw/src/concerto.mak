@@ -1,4 +1,4 @@
-ifeq ($(TARGET_PLATFORM),J7)
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J784S4))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS))
 ifeq ($(TARGET_CPU),R5F)
 ifeq ($(BUILD_CPU_MCU2_0),yes)

@@ -4,14 +4,16 @@
 # Edit this file to suit your specific build needs
 #
 
+SOC_ETHFW := $(call uppercase,$(SOC))
+
 ethfw: remote_device
 ifeq ($(BUILD_TARGET_MODE),yes)
-	$(MAKE) -C ${REMOTE_DEVICE_PATH} RTOS=$(RTOS) cp_to_lib BUILD_SOC_LIST=J721E PROFILE=$(PROFILE) -s
+	$(MAKE) -C ${REMOTE_DEVICE_PATH} RTOS=$(RTOS) cp_to_lib BUILD_SOC_LIST=$(SOC_ETHFW) PROFILE=$(PROFILE) -s
 ifeq ($(RTOS),FREERTOS)
-	$(MAKE) -C $(ETHFW_PATH) BUILD_APP_TIRTOS=no BUILD_APP_FREERTOS=yes ethfw ethfw_callbacks ethfw_lwip eth_intervlan lib_remoteswitchcfg_server BUILD_CPU_MCU2_1=no BUILD_SOC_LIST=J721E PROFILE=$(PROFILE) -s
+	$(MAKE) -C $(ETHFW_PATH) BUILD_APP_TIRTOS=no BUILD_APP_FREERTOS=yes ethfw ethfw_board ethfw_callbacks ethfw_lwip eth_intervlan lib_remoteswitchcfg_server BUILD_CPU_MCU2_1=no BUILD_SOC_LIST=$(SOC_ETHFW) PROFILE=$(PROFILE) -s
 endif
 ifeq ($(RTOS),SYSBIOS)
-	$(MAKE) -C $(ETHFW_PATH) BUILD_APP_TIRTOS=yes BUILD_APP_FREERTOS=no ethfw ethfw_callbacks eth_intervlan lib_remoteswitchcfg_server BUILD_CPU_MCU2_1=no BUILD_SOC_LIST=J721E PROFILE=$(PROFILE) -s
+	$(MAKE) -C $(ETHFW_PATH) BUILD_APP_TIRTOS=yes BUILD_APP_FREERTOS=no ethfw ethfw_board ethfw_callbacks eth_intervlan lib_remoteswitchcfg_server BUILD_CPU_MCU2_1=no BUILD_SOC_LIST=$(SOC_ETHFW) PROFILE=$(PROFILE) -s
 endif
 endif
 

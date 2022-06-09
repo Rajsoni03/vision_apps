@@ -40,6 +40,8 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(SOC)_evm/mcu2_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/r5f/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/gpio/lib/$(SOC)/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(PDK_PATH)/packages/ti/drv/csirx/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
@@ -83,6 +85,7 @@ STATIC_LIBS += app_utils_ethfw
 ETHFW_LIBS = ethfw
 ETHFW_LIBS += ethfw_callbacks
 ETHFW_LIBS += eth_intervlan
+ETHFW_LIBS += ethfw_board
 ETHFW_LIBS += lib_remoteswitchcfg_server
 ifeq ($(RTOS),FREERTOS)
 	ETHFW_LIBS += ethfw_lwip
@@ -100,22 +103,13 @@ ADDITIONAL_STATIC_LIBS += dss.aer5f
 ADDITIONAL_STATIC_LIBS += vhwa.aer5f
 
 ifeq ($(BUILD_ENABLE_ETHFW),yes)
+ADDITIONAL_STATIC_LIBS += ti.drv.gpio.aer5f
 ADDITIONAL_STATIC_LIBS += enetsoc.aer5f
 ADDITIONAL_STATIC_LIBS += enet.aer5f
 ADDITIONAL_STATIC_LIBS += enetphy.aer5f
 ADDITIONAL_STATIC_LIBS += enet_cfgserver.aer5f
 ADDITIONAL_STATIC_LIBS += enet_timesync_ptp.aer5f
 ADDITIONAL_STATIC_LIBS += enet_timesync_hal.aer5f
-endif
-
-ADDITIONAL_STATIC_LIBS += pm_lib.aer5f
-ADDITIONAL_STATIC_LIBS += sciclient.aer5f
-
-ifeq ($(RTOS),SYSBIOS)
-	ADDITIONAL_STATIC_LIBS += nimuenet.aer5f
-	ADDITIONAL_STATIC_LIBS += enet_example_utils_tirtos.aer5f
-endif
-
 ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += lwipstack_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += lwipcontrib_freertos.aer5f
@@ -124,6 +118,15 @@ ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += lwipific_freertos.aer5f
 	ADDITIONAL_STATIC_LIBS += enet_intercore.aer5f
 	ADDITIONAL_STATIC_LIBS += enet_example_utils_freertos.aer5f
+endif
+endif
+
+ADDITIONAL_STATIC_LIBS += pm_lib.aer5f
+ADDITIONAL_STATIC_LIBS += sciclient.aer5f
+
+ifeq ($(RTOS),SYSBIOS)
+	ADDITIONAL_STATIC_LIBS += nimuenet.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_example_utils_tirtos.aer5f
 endif
 
 DEFS        += $(RTOS)

@@ -80,10 +80,9 @@
 #include <ti/drv/enet/include/per/cpsw.h>
 #include <ti/drv/enet/enet.h>
 #include <ti/drv/enet/examples/utils/include/enet_apputils.h>
-#include <ti/drv/enet/examples/utils/include/enet_appboardutils.h>
-#include <ti/drv/enet/examples/utils/include/enet_appsoc.h>
 
 /* EthFw header files */
+#include <utils/board/include/ethfw_board_utils.h>
 #include <utils/intervlan/include/eth_hwintervlan.h>
 #include <utils/intervlan/include/eth_swintervlan.h>
 #include <ethfw/ethfw.h>

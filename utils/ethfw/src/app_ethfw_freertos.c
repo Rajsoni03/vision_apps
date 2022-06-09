@@ -132,6 +132,11 @@ static Enet_MacPort gEthAppPorts[] =
     ENET_MAC_PORT_6, /* QSGMII sub */
     ENET_MAC_PORT_7, /* QSGMII sub */
 #endif
+#elif defined(SOC_J784S4)
+    ENET_MAC_PORT_1, /* QSGMII main */
+    ENET_MAC_PORT_2, /* QSGMII sub */
+    ENET_MAC_PORT_3, /* QSGMII sub */
+    ENET_MAC_PORT_4, /* QSGMII sub */
 #endif
 };
 
@@ -288,14 +293,24 @@ void appEthFwEarlyInit()
 int32_t appEthFwInit()
 {
     int32_t status = ETHAPP_OK;
+    uint32_t flags = 0U;
 
     appLogPrintf("ETHFW: Init ... !!!\n");
 
     gEthAppObj.coreId = EnetSoc_getCoreId();
 
     /* Board related initialization */
-    EnetBoard_initEthFw();
-    EnetAppUtils_enableClocks(gEthAppObj.enetType, gEthAppObj.instId);
+#if defined(SOC_J721E)
+    flags |= ETHFW_BOARD_GESI_ENABLE;
+#if defined(ENABLE_QSGMII_PORTS)
+    flags |= ETHFW_BOARD_QENET_ENABLE;
+#endif
+#elif defined(SOC_J784S4)
+    flags |= ETHFW_BOARD_QENET_ENABLE;
+#endif
+
+    /* Board related initialization */
+    EthFwBoard_init(flags);
 
     /* Open UDMA driver */
     gEthAppObj.hUdmaDrv = appUdmaGetObj();
@@ -389,7 +404,9 @@ static int32_t EthApp_initEthFw(void)
 {
     EthFw_Version ver;
     EthFw_Config ethFwCfg;
+    Cpsw_Cfg *cpswCfg = &ethFwCfg.cpswCfg;
     EnetUdma_Cfg dmaCfg;
+    EnetRm_MacAddressPool *pool = &cpswCfg->resCfg.macList;
     int32_t status = ETHAPP_OK;
     int32_t i;
 
@@ -398,11 +415,16 @@ static int32_t EthApp_initEthFw(void)
 
     dmaCfg.rxChInitPrms.dmaPriority = UDMA_DEFAULT_RX_CH_DMA_PRIORITY;
     dmaCfg.hUdmaDrv = gEthAppObj.hUdmaDrv;
-    ethFwCfg.cpswCfg.dmaCfg = (void *)&dmaCfg;
+    cpswCfg->dmaCfg = (void *)&dmaCfg;
+
+    /* Populate MAC address pool */
+    pool->numMacAddress = EthFwBoard_getMacAddrPool(pool->macAddress,
+                                                    ENET_ARRAYSIZE(pool->macAddress));
 
     /* Set hardware port configuration parameters */
     ethFwCfg.ports = &gEthAppPorts[0];
     ethFwCfg.numPorts = ARRAY_SIZE(gEthAppPorts);
+    ethFwCfg.setPortCfg = EthFwBoard_setPortCfg;
 
     /* Set virtual port configuration parameters */
     ethFwCfg.virtPortCfg  = &gEthApp_virtPortCfg[0];
