@@ -280,11 +280,11 @@ c66x_2_ddr_scratch_size    = 48*MB;
 c7x_1_ddr_scratch_addr     = c66x_2_ddr_scratch_addr + c66x_2_ddr_scratch_size;
 c7x_1_ddr_scratch_size     = ddr_mem_size - (c7x_1_ddr_scratch_addr - ddr_mem_addr);
 
-mcu2_1_ddr_intercore_eth_desc_addr = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
-mcu2_1_ddr_intercore_eth_desc_size = 8*MB;
+ddr_intercore_eth_desc_addr = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
+ddr_intercore_eth_desc_size = 8*MB;
 
-mcu2_1_ddr_intercore_eth_data_addr = mcu2_1_ddr_intercore_eth_desc_addr + mcu2_1_ddr_intercore_eth_desc_size;
-mcu2_1_ddr_intercore_eth_data_size = 24*MB;
+ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_desc_size;
+ddr_intercore_eth_data_size = 24*MB;
 
 c7x_1_ddr_local_heap_addr  = ddr_mem_addr_hi;
 c7x_1_ddr_local_heap_size  = ddr_mem_size_hi;
@@ -475,10 +475,10 @@ vision_apps_core_heaps_hi.setDtsName("vision_apps_core_heaps_hi", "vision-apps-c
 vision_apps_core_heaps_hi.splitOrigin(True)
 
 # This region is for ethernet firmware, multi-core, multi-cast feature
-intercore_eth_desc_mem = MemSection("INTERCORE_ETH_DESC_MEM", "", mcu2_1_ddr_intercore_eth_desc_addr, mcu2_1_ddr_intercore_eth_desc_size, "Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent");
+intercore_eth_desc_mem = MemSection("INTERCORE_ETH_DESC_MEM", "", ddr_intercore_eth_desc_addr, ddr_intercore_eth_desc_size, "Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent");
 intercore_eth_desc_mem.setDtsName("vision_apps_main_r5fss0_core0_shared_memory_queue_region", "vision-apps-r5f-virtual-eth-queues");
 
-intercore_eth_data_mem = MemSection("INTERCORE_ETH_DATA_MEM", "", mcu2_1_ddr_intercore_eth_data_addr, mcu2_1_ddr_intercore_eth_data_size, "Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent");
+intercore_eth_data_mem = MemSection("INTERCORE_ETH_DATA_MEM", "", ddr_intercore_eth_data_addr, ddr_intercore_eth_data_size, "Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent");
 intercore_eth_data_mem.setDtsName("vision_apps_main_r5fss0_core0_shared_memory_bufpool_region", "vision-apps-r5f-virtual-eth-buffers");
 
 #
