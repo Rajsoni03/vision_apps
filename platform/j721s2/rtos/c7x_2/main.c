@@ -251,6 +251,18 @@ void appMmuMap(Bool is_secure)
 
     attrs.attrIndx = Mmu_AttrIndx_MAIR7;
 
+    retVal = Mmu_map(0x80000000U, 0x80000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(0xA0000000U, 0xA0000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
     retVal = Mmu_map(0x70000000U, 0x70000000U, 0x00400000U, &attrs, is_secure); /* MSMC - 4MB */
     if(retVal == FALSE)
     {
@@ -352,7 +364,6 @@ void appCacheInit()
 
     Cache_setSize(&cacheSize);
 }
-
 
 void InitMmu(void)
 {
