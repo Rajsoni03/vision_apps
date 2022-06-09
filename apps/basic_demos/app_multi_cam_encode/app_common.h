@@ -83,7 +83,7 @@
 #include <float.h>
 #include <math.h>
 
-//#define APP_DEBUG
+#define APP_DEBUG
 
 #define APP_USE_FILEIO
 
