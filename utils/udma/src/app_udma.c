@@ -1125,8 +1125,9 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
 
         druChannelId = Udma_chGetNum(ch_obj->drv_ch_handle);
 
-        appLogPrintf("UDMA : druChannelId = %d!!\n", druChannelId);
-
+        /* Modifying the wait-word on a per core basis - as different cores are allocated
+         * a different range of channels but the C7x eventID associated for all cores starts
+         * from 32 (Assuming the first 32 event bits are being used by the RTOS kernel) */
         #if defined (SOC_J721S2)
         if (UDMA_CORE_ID_C7X_2==Udma_getCoreId())
         {
