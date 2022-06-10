@@ -97,6 +97,14 @@ ifeq ($(BUILD_CPU_C7x_2),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_2.xe71
 	$(CGT7X_ROOT)/bin/strip7x -p $(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_2.xe71
 endif
+ifeq ($(BUILD_CPU_C7x_3),yes)
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_3.out $(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_3.xe71
+	$(CGT7X_ROOT)/bin/strip7x -p $(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_3.xe71
+endif
+ifeq ($(BUILD_CPU_C7x_4),yes)
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_4.out $(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_4.xe71
+	$(CGT7X_ROOT)/bin/strip7x -p $(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_4.xe71
+endif
 
 ##############################
 ## Combined bootapp image
@@ -144,7 +152,19 @@ else
   IMG8=
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
-  #IMG2=c7x_2,$(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_2.xe71
+  IMG9=c7x_2,$(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_2.xe71
+else
+  IMG9=
+endif
+ifeq ($(BUILD_CPU_C7x_3),yes)
+  IMG10=c7x_3,$(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_3.xe71
+else
+  IMG10=
+endif
+ifeq ($(BUILD_CPU_C7x_4),yes)
+  IMG11=c7x_4,$(INPUT_IMG_PATH)/vx_app_rtos_qnx_c7x_4.xe71
+else
+  IMG11=
 endif
 
 sbl_qnx_combined_bootimage: atf_optee sbl_vision_apps

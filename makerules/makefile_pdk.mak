@@ -33,6 +33,12 @@ endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
 PDK_CORE_LIST_ALL+=mcu3_1
 endif
+ifeq ($(BUILD_CPU_MCU4_0),yes)
+PDK_CORE_LIST_ALL+=mcu4_0
+endif
+ifeq ($(BUILD_CPU_MCU4_1),yes)
+PDK_CORE_LIST_ALL+=mcu4_1
+endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
 PDK_CORE_LIST_ALL+=c66xdsp_1
 endif
@@ -44,6 +50,12 @@ PDK_CORE_LIST_ALL+=c7x_1
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 PDK_CORE_LIST_ALL+=c7x_2
+endif
+ifeq ($(BUILD_CPU_C7x_3),yes)
+PDK_CORE_LIST_ALL+=c7x_3
+endif
+ifeq ($(BUILD_CPU_C7x_4),yes)
+PDK_CORE_LIST_ALL+=c7x_4
 endif
 
 pdk_build:

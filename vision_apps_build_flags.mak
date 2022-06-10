@@ -28,6 +28,19 @@ BUILD_CPU_MCU3_0?=no
 BUILD_CPU_MCU3_1?=no
 BUILD_CPU_C7x_1?=yes
 BUILD_CPU_C7x_2?=yes
+else ifeq ($(SOC),j784s4)
+BUILD_CPU_MPU1?=yes
+BUILD_CPU_MCU1_0?=no
+BUILD_CPU_MCU2_0?=yes
+BUILD_CPU_MCU2_1?=yes
+BUILD_CPU_MCU3_0?=yes
+BUILD_CPU_MCU3_1?=yes
+BUILD_CPU_MCU4_0?=yes
+BUILD_CPU_MCU4_1?=yes
+BUILD_CPU_C7x_1?=yes
+BUILD_CPU_C7x_2?=yes
+BUILD_CPU_C7x_3?=yes
+BUILD_CPU_C7x_4?=yes
 endif
 
 BUILD_ENABLE_ETHFW?=yes
@@ -88,6 +101,8 @@ ifeq ($(SOC),j721e)
 LINK_SHARED_OBJ?=yes
 else ifeq ($(SOC),j721s2)
 LINK_SHARED_OBJ?=no
+else ifeq ($(SOC),j784s4)
+LINK_SHARED_OBJ?=no
 endif
 
 # Since MCU R5F runs in locked step mode in vision apps, dont set these to 'yes'
@@ -102,7 +117,7 @@ BUILD_APP_RTOS_LINUX?=$(BUILD_LINUX_A72)
 # Build RTOS + QNX binaries
 BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
 
-# PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm
+# PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm
 BUILD_PDK_BOARD=$(SOC)_evm
 
 # Flag to select silicon revision: 1_1 for ES 1.1, 1_0 for ES 1.0
@@ -124,7 +139,7 @@ BUILD_ISA_C6x=yes
 else
 BUILD_ISA_C6x=no
 endif
-ifneq (,$(filter yes,$(BUILD_CPU_C7x_1) $(BUILD_CPU_C7x_2)))
+ifneq (,$(filter yes,$(BUILD_CPU_C7x_1) $(BUILD_CPU_C7x_2) $(BUILD_CPU_C7x_3) $(BUILD_CPU_C7x_4)))
 BUILD_ISA_C7x=yes
 else
 BUILD_ISA_C7x=no

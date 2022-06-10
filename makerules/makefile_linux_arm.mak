@@ -15,6 +15,8 @@ ifeq ($(SOC),j721e)
 LINUX_FIRMWARE_PREFIX=j7
 else ifeq ($(SOC),j721s2)
 LINUX_FIRMWARE_PREFIX=j721s2
+else ifeq ($(SOC),j784s4)
+LINUX_FIRMWARE_PREFIX=j784s4
 endif
 
 FIRMWARE_SUBFOLDER?=vision_apps_evm
@@ -153,6 +155,20 @@ ifeq ($(BUILD_CPU_C7x_2),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(CGT7X_ROOT)/bin/strip7x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
 	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_1-fw
+endif
+ifeq ($(BUILD_CPU_C7x_3),yes)
+	# copy remote firmware files for c7x_3
+	$(eval IMAGE_NAME := vx_app_rtos_linux_c7x_3.out)
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
+	$(CGT7X_ROOT)/bin/strip7x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_2-fw
+endif
+ifeq ($(BUILD_CPU_C7x_4),yes)
+	# copy remote firmware files for c7x_4
+	$(eval IMAGE_NAME := vx_app_rtos_linux_c7x_4.out)
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
+	$(CGT7X_ROOT)/bin/strip7x -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_3-fw
 endif
 	sync
 

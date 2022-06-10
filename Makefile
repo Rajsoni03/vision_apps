@@ -26,6 +26,8 @@ ifeq ($(SOC),j721e)
     BUILD_DEFS += SOC_J721E
 else ifeq ($(SOC),j721s2)
     BUILD_DEFS += SOC_J721S2
+else ifeq ($(SOC),j784s4)
+    BUILD_DEFS += SOC_J784S4
 endif
 
 ifeq ($(BUILD_VPAC3),yes)
@@ -218,6 +220,23 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 endif
 
 sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub ptk_scrub vxlib_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_clean
+endif
+else ifeq ($(SOC),j784s4)
+sdk: sdk_check_paths pdk ethfw remote_device imaging vxlib tiovx tiadalg qnx
+	$(MAKE) vision_apps
+	$(MAKE) tidl_rt
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot
+endif
+
+sdk_clean: sdk_check_paths pdk_clean ethfw_clean remote_device_clean imaging_clean vxlib_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean tidl_rt_clean
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_clean
+endif
+
+sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scrub vxlib_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif

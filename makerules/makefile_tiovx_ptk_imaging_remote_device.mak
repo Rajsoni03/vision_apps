@@ -34,7 +34,7 @@ ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
 endif
 endif
-ifeq ($(SOC),j721s2)
+ifeq ($(SOC), $(filter $(SOC),j721s2 j784s4))
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=$(C7X_TARGET) TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=$(C7X_TARGET) TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib

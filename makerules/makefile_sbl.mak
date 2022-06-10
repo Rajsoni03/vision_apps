@@ -12,6 +12,11 @@ else ifeq ($(SOC),j721s2)
 SCICLIENT_VERSION=V4
 K3_USART=0x8
 CFG_CONSOLE_UART=0x8
+else ifeq ($(SOC),j784s4)
+SCICLIENT_VERSION=V6
+# TODO
+K3_USART=0x8
+CFG_CONSOLE_UART=0x8
 endif
 
 #OSPI DATA
@@ -76,6 +81,12 @@ ifeq ($(BUILD_CPU_C7x_1),yes)
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	REMOTE_CORE_LIST_LATEAPP2+=13 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
+endif
+ifeq ($(BUILD_CPU_C7x_3),yes)
+	REMOTE_CORE_LIST_LATEAPP2+=14 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_3.out.rprc
+endif
+ifeq ($(BUILD_CPU_C7x_4),yes)
+	REMOTE_CORE_LIST_LATEAPP2+=15 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
 endif
 
 ifeq ($(BUILD_LINUX_A72), yes)
@@ -242,6 +253,14 @@ endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
+endif
+ifeq ($(BUILD_CPU_C7x_3),yes)
+	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_3.out
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_3.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_3.out.rprc
+endif
+ifeq ($(BUILD_CPU_C7x_4),yes)
+	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_4.out
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_4.out $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(VISION_APPS_PATH)/out/sbl_bootfiles/lateapp2 $(REMOTE_CORE_LIST_LATEAPP2)
 
