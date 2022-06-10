@@ -95,7 +95,7 @@
 #define APP_UTILS_VHWA_OUT_IMG_CCSF            (FVID2_CCSF_BITS12_UNPACKED16)
 #define APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH  (2)
 
-#if defined(SOC_J721S2)
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (128)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (64)
 #elif defined(SOC_J721E)
@@ -107,11 +107,11 @@ static void appVhwaVpacMscInit(Vhwa_M2mMscSl2AllocPrms *sl2Prms)
 {
     uint32_t cnt;
 
-    #if defined(SOC_J721S2)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     uint32_t idx;
     #endif
 
-    #if defined(SOC_J721S2)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INST; cnt++)
     {
         for(idx = 0; idx < VHWA_M2M_MSC_MAX_IN_CHANNEL; idx++)
@@ -191,7 +191,7 @@ int32_t appCsi2TxInit(void)
     appLogPrintf("CSI2TX: Init ... !!!\n");
 
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_PSILSS0);
-    #if defined(SOC_J721S2)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF_V2_0);
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF_V2_1);
     #else
@@ -648,6 +648,7 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 }
                 break;
 
+#ifndef SOC_J784S4
             case APP_VPAC_720_DMPAC_480:
                 SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 480000000);
                 #if defined(SOC_J721S2)
@@ -667,6 +668,7 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 #endif
                 status = 0;
                 break;
+#endif
         }
 
         if (0 == status)

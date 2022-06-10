@@ -61,6 +61,11 @@
 #include <ti/board/src/j721s2_evm/include/board_cfg.h>
 #include <ti/board/src/j721s2_evm/include/board_pinmux.h>
 #include <ti/board/src/j721s2_evm/include/board_i2c_io_exp.h>
+#elif defined (SOC_J784S4)
+#include <ti/board/src/j784s4_evm/include/board_control.h>
+#include <ti/board/src/j784s4_evm/include/board_cfg.h>
+#include <ti/board/src/j784s4_evm/include/board_pinmux.h>
+#include <ti/board/src/j784s4_evm/include/board_i2c_io_exp.h>
 #endif
 
 /* ========================================================================== */
@@ -248,6 +253,7 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
 void appDssConfigureBoard(app_dss_default_prm_t *prm)
 {
     appLogPrintf("DSS: Board init ... !!!\n");
+    #if defined(SOC_J721E)
     if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DPI_HDMI)
     {
         /* Not need, since default takes care, also this conflicts with Linux */
@@ -256,6 +262,7 @@ void appDssConfigureBoard(app_dss_default_prm_t *prm)
         /* Set board mux for DPI/HDMI, ok to keep this even when using eDP */
         Board_control(BOARD_CTRL_CMD_SET_HDMI_PD_HIGH, (void*) 0U);
     }
+    #endif
 
     /* ADASVISION-4188 - There seem to be an I2C conflict when ETHFW is enabled, so this is disabled when ETHFW is enabled */
     /* If customers are not usign ETHFW then below can be enabled to support eDP to HDMI mode */

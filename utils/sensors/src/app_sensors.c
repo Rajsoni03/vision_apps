@@ -129,7 +129,7 @@ int32_t appI2cInit()
     uint32_t index;
     I2C_HwAttrs i2cConfig;
 
-    #ifdef SOC_J721S2
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     SET_DEVICE_STATE_ON(TISCI_DEV_I2C5);
     #endif
 

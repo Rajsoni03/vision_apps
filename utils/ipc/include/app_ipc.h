@@ -138,6 +138,41 @@
 #define APP_IPC_CPU_INVALID (0xFFu)
 #endif
 
+#if defined (SOC_J784S4)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MPU1_0  ( 0u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU1_0  ( 1u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU1_1  ( 2u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU2_0  ( 3u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU2_1  ( 4u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU3_0  ( 5u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU3_1  ( 6u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU4_0  ( 7u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU4_1  ( 8u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_1   ( 9u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_2   (10u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_3   (11u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_4   (12u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MPU1_1  (13u)
+/** \brief Max CPU ID */
+#define APP_IPC_CPU_MAX     (14u)
+/** \brief Invalid CPU ID */
+#define APP_IPC_CPU_INVALID (0xFFu)
+#endif
+
 /* @} */
 
 /** \brief Max lock ID for HW locks */

@@ -89,6 +89,8 @@
 #define APP_PERF_NUM_DDR_INSTANCES      (1u)
 #elif defined (SOC_J721S2)
 #define APP_PERF_NUM_DDR_INSTANCES      (2u)
+#elif defined (SOC_J784S4)
+#define APP_PERF_NUM_DDR_INSTANCES      (4u)
 #endif
 
 /* Define this to print counter2 and counter3 values */

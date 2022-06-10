@@ -139,8 +139,13 @@ void appRemoteServiceLoadTestTaskLoad(uint32_t ld)
     if (cpu_id == APP_IPC_CPU_C7x_1)
         ld = (ld / 2) + (ld / 20);
 
-    #if defined(SOC_J721S2)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     if (cpu_id == APP_IPC_CPU_C7x_2)
+        ld = (ld / 2) + (ld / 20);
+    #endif
+
+    #if defined(SOC_J784S4)
+    if (cpu_id == APP_IPC_CPU_C7x_3 || cpu_id == APP_IPC_CPU_C7x_4)
         ld = (ld / 2) + (ld / 20);
     #endif
 

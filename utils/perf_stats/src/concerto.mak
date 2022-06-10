@@ -11,7 +11,7 @@ include $(FINALE)
 
 endif
 
-ifeq ($(TARGET_PLATFORM),$(filter $(TARGET_PLATFORM), J7 J721S2))
+ifeq ($(TARGET_PLATFORM),$(filter $(TARGET_PLATFORM), J7 J721S2 J784S4))
 
 include $(PRELUDE)
 TARGET      := app_utils_perf_stats

@@ -214,7 +214,7 @@ static void appUdmaCacheWb(const void *addr, int32_t size);
  */
 static struct Udma_DrvObj gAppUdmaDrvObj;
 
-#ifdef SOC_J721S2
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
 
 static struct Udma_DrvObj gAppUdmaDrvObjCsirxCsitx;
 
@@ -301,7 +301,7 @@ int32_t appUdmaInit(void)
     return (retVal);
 }
 
-#ifdef SOC_J721S2
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
 
 int32_t appUdmaCsirxCsitxInit(void)
 {
@@ -340,7 +340,7 @@ int32_t appUdmaDeInit(void)
     return (retVal);
 }
 
-#ifdef SOC_J721S2
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
 
 int32_t appUdmaCsirxCsitxDeInit(void)
 {
@@ -365,10 +365,11 @@ void *appUdmaGetObj(void)
 
 void *appUdmaCsirxCsitxGetObj(void)
 {
-    #if defined(SOC_J721S2)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     return (void *)&gAppUdmaDrvObjCsirxCsitx;
     #elif defined(SOC_J721E)
     return (void *)&gAppUdmaDrvObj;
+    #elif defined(SOC_J784S4)
     #endif
 }
 

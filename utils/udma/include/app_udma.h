@@ -266,7 +266,7 @@ int32_t appUdmaDeInit(void);
  */
 void *appUdmaGetObj(void);
 
-#ifdef SOC_J721S2
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
 
 /**
  *  \brief Performs initializations needed for UDMA BCDMA instance

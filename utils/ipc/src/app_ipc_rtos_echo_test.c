@@ -102,6 +102,26 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
 };
 #endif
 
+#if defined (SOC_J784S4)
+static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
+{
+    IPC_MPU1_0,
+    IPC_MCU1_0,
+    IPC_MCU1_1,
+    IPC_MCU2_0,
+    IPC_MCU2_1,
+    IPC_MCU3_0,
+    IPC_MCU3_1,
+    IPC_MCU4_0,
+    IPC_MCU4_1,
+    IPC_C7X_1,
+    IPC_C7X_2,
+    IPC_C7X_3,
+    IPC_C7X_4,
+    IPC_MPU1_1
+};
+#endif
+
 /* IMPORTANT NOTE: For C7x,
  * - stack size and stack ptr MUST be 8KB aligned
  * - AND min stack size MUST be 16KB

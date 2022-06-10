@@ -159,6 +159,38 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                           );
                 break;
             #endif
+            #if defined(SOC_J784S4)
+            case APP_IPC_CPU_C7x_2:
+                snprintf(string1, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "C7x2"
+                          );
+                snprintf(string2, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "+MMA"
+                          );
+                break;
+            case APP_IPC_CPU_C7x_3:
+                snprintf(string1, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "C7x3"
+                          );
+                snprintf(string2, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "+MMA"
+                          );
+                break;
+            case APP_IPC_CPU_C7x_4:
+                snprintf(string1, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "C7x4"
+                          );
+                snprintf(string2, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "+MMA"
+                          );
+                break;
+            #endif
             #if defined(SOC_J721E)
             case APP_IPC_CPU_C6x_1:
                 snprintf(string1, APP_GRPX_STRING_MAX,

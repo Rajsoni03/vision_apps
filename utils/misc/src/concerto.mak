@@ -52,13 +52,7 @@ IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
 
 CSOURCES += app_r5f_init.c
 
-ifeq ($(TARGET_PLATFORM),J721S2)
-CSOURCES += app_pinmux_j721s2.c
-endif
-
-ifeq ($(TARGET_PLATFORM),J7)
-CSOURCES += app_pinmux_j721e.c
-endif
+CSOURCES += app_pinmux_$(SOC).c
 
 DEFS+=$(BUILD_PDK_BOARD)
 

@@ -66,7 +66,7 @@
 
 #include <ti/board/board.h>
 #include <utils/misc/include/app_misc.h>
-#include <ti/board/src/j721s2_evm/include/board_pinmux.h>
+#include <ti/board/src/j784s4_evm/include/board_pinmux.h>
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
 /* ========================================================================== */
@@ -91,12 +91,12 @@
 
 static pinmuxPerCfg_t gI2c4PinCfg[] =
 {
-    /* MyI2C4 -> I2C4_SCL -> AD25 */
+    /* MyI2C4 -> I2C4_SCL -> AG33 */
     {
         PIN_MCAN14_TX, PIN_MODE(8) | \
         ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
     },
-    /* MyI2C4 -> I2C4_SDA -> AF28 */
+    /* MyI2C4 -> I2C4_SDA -> AH33 */
     {
         PIN_MCAN13_RX, PIN_MODE(8) | \
         ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
@@ -112,12 +112,12 @@ static pinmuxModuleCfg_t gDispPinCfg[] =
 
 static pinmuxPerCfg_t gI2c5PinCfg[] =
 {
-    /* MyI2C5 -> I2C5_SCL -> Y24 */
+    /* MyI2C5 -> I2C5_SCL -> AG34 */
     {
         PIN_MCAN15_TX, PIN_MODE(8) | \
         ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
     },
-    /* MyI2C5 -> I2C5_SDA -> W23 */
+    /* MyI2C5 -> I2C5_SDA -> AK36 */
     {
         PIN_MCAN14_RX, PIN_MODE(8) | \
         ((PIN_PULL_DISABLE | PIN_INPUT_ENABLE) & (~PIN_PULL_DIRECTION))
