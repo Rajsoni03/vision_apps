@@ -72,8 +72,9 @@
 #define APP_GRPX_STRING_MAX (32u)
 
 
-#define APP_GRPX_LOAD_BAR_HEIGHT    (100u)
-#define APP_GRPX_LOAD_PAD_Y         (5u)
+#define APP_GRPX_LOAD_BAR_HEIGHT      (100u)
+#define APP_GRPX_LOAD_PAD_Y           (5u)
+#define APP_GRPX_LOAD_BAR_NUM_CHAR    (4u)
 
 typedef struct
 {

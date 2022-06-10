@@ -99,7 +99,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
     Draw2D_FontProperty fontProp;
     Draw2D_FontProperty fontProp2;
     uint32_t startX, startY1, startY2;
-    uint32_t barWidth, padX, padY;
+    uint32_t barWidth, charWidth, padX, padY;
     uint32_t cpu_load;
 
     fontPrm.fontIdx = 2;
@@ -108,7 +108,8 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
     Draw2D_getFontProperty(&fontPrm, &fontProp);
     Draw2D_getFontProperty(&fontPrm2, &fontProp2);
 
-    barWidth = fontProp.width*3;
+    barWidth  = fontProp.width*3;
+    charWidth = fontProp.width*APP_GRPX_LOAD_BAR_NUM_CHAR;
     padX = fontProp.width/2;
     padY = APP_GRPX_LOAD_PAD_Y;
 
@@ -139,7 +140,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
             case APP_IPC_CPU_C7x_1:
                 snprintf(string1, APP_GRPX_STRING_MAX,
                           "%3s",
-                          "C7x"
+                          "C7x1"
                           );
                 snprintf(string2, APP_GRPX_STRING_MAX,
                           "%3s",
@@ -150,7 +151,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
             case APP_IPC_CPU_C7x_2:
                 snprintf(string1, APP_GRPX_STRING_MAX,
                           "%3s",
-                          "C7x"
+                          "C7x2"
                           );
                 snprintf(string2, APP_GRPX_STRING_MAX,
                           "%3s",
@@ -296,7 +297,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                   &fontPrm
                   );
 
-       startX += barWidth + padX;
+       startX += charWidth + padX;
     }
 
     return 0;
@@ -347,7 +348,7 @@ int32_t appGrpxGetDimCpuLoad(uint16_t *width, uint16_t *height)
     if(status==0)
     {
         *height = APP_GRPX_LOAD_BAR_HEIGHT + prop.height*2 + prop2.height + APP_GRPX_LOAD_PAD_Y*2 + APP_GRPX_LOAD_PAD_Y/2;
-        *width  = (prop.width*3 + prop.width/2)*appGrpxGetNumCpu();
+        *width  = (prop.width*APP_GRPX_LOAD_BAR_NUM_CHAR + prop.width/2)*appGrpxGetNumCpu();
     }
     return status;
 }
