@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2021 Texas Instruments Incorporated
+ * Copyright (c) 2018 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,114 +59,100 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 #include <stdio.h>
-#include <TI/tivx.h>
+#include <string.h>
+#include <stdint.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/app_init/include/app_init.h>
 
-#if defined(TARGET_X86_64)
-#include <sys/resource.h>
-#include <errno.h>
+#define APP_ASSERT_SUCCESS(x)  { if((x)!=0) while(1); }
 
-/* The value below has been set to a value based on what has been
- * observed in trial conformance test runs. It is around 1024 and the
- * following value should suffice for the current conformance test
- * execution and this value needs to be adjusted if memory allocation
- * failures are noticed in future due to test case updates that pushes
- * the limit of the max simultaneous memory allocations which directly
- * determines the maximum number of open files.
- */
-#define APP_INIT_MAX_NUM_OPEN_FILES     (2048U)
+#define MAX_NUM     (64)
 
-/* Function to increase the number of open files at a process
- * level. The default number of open files is 1024 and this causes
- * memory allocation errors since the PC emulation mode uses shm_open()
- * for memory allocations.
- *
- * The logic below allows setting the upper limit on the max number of
- * open files.
- */
-static int32_t increaseOpenFileLimits(int32_t  maxOpenFiles)
+void appMemAllocTest()
 {
-  struct rlimit limit;
-  
-  limit.rlim_cur = maxOpenFiles;
-  limit.rlim_max = maxOpenFiles;
+    void *ptr[MAX_NUM];
+    int dmaBufFd[MAX_NUM];
+    uint64_t phyPtr = 0;
+    uint32_t size = 128*1024;
+    uint32_t loop = 16;
+    uint32_t i;
+    uint32_t offset;
+    uint64_t cur_time;
 
-  if (setrlimit(RLIMIT_NOFILE, &limit) != 0)
-  {
-      printf("setrlimit() failed with errno=%d\n", errno);
-      return -1;
-  }
-
-  /* Get max number of files. */
-  if (getrlimit(RLIMIT_NOFILE, &limit) != 0)
-  {
-      printf("getrlimit() failed with errno=%d\n", errno);
-      return -1;
-  }
-
-  printf("The soft limit is %lu\n", limit.rlim_cur);
-  printf("The hard limit is %lu\n", limit.rlim_max);
-
-  return 0;
-}
-
-int32_t appCommonInit()
-{
-    int32_t status;
-
-    status = increaseOpenFileLimits(APP_INIT_MAX_NUM_OPEN_FILES);
-
-    if (status != 0)
+    for(i=0; i<loop; i++)
     {
-        printf("APP: ERROR: increaseOpenFileLimits failed !!!\n");
-    }
-    else
-    {
-        status = appMemInit(NULL);
-
-        if (status != 0)
+        ptr[i] = appMemAlloc(APP_MEM_HEAP_DDR, size, 1);
+        if(ptr[i])
         {
-            printf("APP: ERROR: Memory init failed !!!\n");
+            printf("APP_MEM: %d: Allocated memory @ %p of size %d bytes \n", i, ptr[i], size);
+
+            phyPtr = appMemGetVirt2PhyBufPtr((uint64_t)ptr[i], APP_MEM_HEAP_DDR);
+            printf("APP_MEM: %d: Translated virtual addr = %p -> phyical addr = %lx \n", i, ptr[i], phyPtr);
+
+            dmaBufFd[i] = appMemGetDmaBufFd(ptr[i], &offset);
+            printf("APP_MEM: %d: Exported dmaBufId %d with offset %d\n", i, dmaBufFd[i], offset);
+        }
+        else
+        {
+            printf("APP_MEM: %d: ERROR: Unable to allocate memory size %d bytes \n", i, size);
+        }
+    }
+    for(i=0; i<loop; i++)
+    {
+        if(ptr[i])
+        {
+            uint32_t k;
+            uint8_t *ptr8 = (uint8_t*)ptr[i];
+
+            for(k=0; k<size; k++)
+            {
+                ptr8[k] = k;
+            }
+            for(k=0; k<size; k++)
+            {
+                ptr8[k] = k*k;
+            }
+        }
+    }
+    for(i=1; i<loop; i++)
+    {
+        if(ptr[i] && ptr[i-1])
+        {
+            uint32_t k;
+            uint8_t *dst8 = (uint8_t*)ptr[i];
+            uint8_t *src8 = (uint8_t*)ptr[i-1];
+
+            for(k=0; k<size; k++)
+            {
+                dst8[k] = src8[k]*dst8[k];
+            }
         }
     }
 
-    return status;
+    for(i=0; i<loop; i++)
+    {
+        if(ptr[i])
+        {
+            appMemFree(APP_MEM_HEAP_DDR, ptr[i], size);
+            printf("APP_MEM: %d: Free'ed memory @ %p of size %d bytes \n", i, ptr[i], size);
+        }
+    }
+
 }
 
-int32_t appCommonDeInit()
+int main(void)
 {
-    appMemDeInit();
-
-    return 0;
-}
-#endif // defined(TARGET_X86_64)
-
-int32_t appInit()
-{
-    int32_t status;
+    int32_t status = 0;
 
     status = appCommonInit();
 
     if (status == 0)
     {
-        tivxInit();
-        tivxHostInit();
+        appMemAllocTest();
+        status = appCommonDeInit();
     }
 
     return status;
 }
-
-int32_t appDeInit()
-{
-    int32_t status;
-
-    tivxHostDeInit();
-    tivxDeInit();
-
-    status = appCommonDeInit();
-
-    return status;
-}
-

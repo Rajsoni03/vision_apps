@@ -177,16 +177,39 @@ static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
     return status;
 }
 
+static int32_t App_deInit(App_Context *appCntxt)
+{
+    int32_t status = 0;
+
+    if (appCntxt->initDone == 1)
+    {
+        /* De-allocate any allocated objects. */
+        App_Common_DeAllocImageObjects(appCntxt->refs,
+                                       appCntxt->numValidObjs);
+
+        vxReleaseContext(&appCntxt->vxContext);
+
+        status = appDeInit();
+
+        if (appCntxt->sockId >= 0)
+        {
+            close(appCntxt->sockId);
+        }
+
+        appCntxt->initDone = 0;
+    }
+
+    return status;
+}
+
 static void App_intSigHandler(int sig)
 {
     App_Context    *appCntxt = &gAppCntxt;
+    int32_t         status;
 
-    if (appCntxt->sockId >= 0)
-    {
-        close(appCntxt->sockId);
-    }
+    status = App_deInit(appCntxt);
 
-    exit(0);
+    exit(status);
 }
 
 static int32_t App_init(App_Context *appCntxt)
@@ -228,27 +251,6 @@ static int32_t App_init(App_Context *appCntxt)
                 appCntxt->initDone = 1;
             }
         }
-    }
-
-    return status;
-}
-
-static int32_t App_deInit(App_Context *appCntxt)
-{
-    int32_t status = 0;
-
-    if (appCntxt->initDone == 1)
-    {
-        vxReleaseContext(&appCntxt->vxContext);
-
-        status = appDeInit();
-
-        if (appCntxt->sockId >= 0)
-        {
-            close(appCntxt->sockId);
-        }
-
-        appCntxt->initDone = 0;
     }
 
     return status;
@@ -413,7 +415,6 @@ int main(int argc, char *argv[])
     App_Context        *appCntxt = &gAppCntxt;
     App_CmdLineParams   cmdParams = {0};
     int32_t             status = 0;
-    int32_t             status_before_deinit = 0;
 
     /* Register the signal handler. */
     signal(SIGINT, App_intSigHandler);
@@ -445,26 +446,11 @@ int main(int argc, char *argv[])
         VX_PRINT(VX_ZONE_ERROR, "App_msgProcThread() failed.\n");
     }
 
-    /* De-allocate any allocated objects. */
-    status = App_Common_DeAllocImageObjects(appCntxt->refs,
-                                            appCntxt->numValidObjs);
-
-
-    /* Do not collect return status here unless already passing */
-    if (status != 0)
-    {
-        status_before_deinit = status;
-    }
-
     status = App_deInit(appCntxt);
 
     if (status < 0)
     {
         VX_PRINT(VX_ZONE_ERROR, "App_deInit() failed.\n");
-    }
-    else if (status_before_deinit)
-    {
-        status = status_before_deinit;
     }
 
     return status;

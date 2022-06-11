@@ -48,7 +48,7 @@ extern "C" {
 
 #define APP_PRINT(msg, ...)         printf("[%s:%d] "msg, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
-#define APP_UNIX_STRM_PATH_NAME     ("linux_fd_exchange")
+#define APP_UNIX_STRM_PATH_NAME     ("/tmp/linux_fd_exchange")
 #define APP_MAX_MSG_SIZE            (sizeof(App_BuffDesc))
 #define APP_MAX_MSG_BUFF_SIZE       (APP_MAX_MSG_SIZE)
 

@@ -1,13 +1,20 @@
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
 ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 
 include $(PRELUDE)
 
 TARGETTYPE  := exe
 TARGET      := vx_app_arm_mem
-CSOURCES    := $(call all-c-files)
 
+ifeq ($(TARGET_CPU),A72)
+CSOURCES    := main_mem.c
 include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+endif
+
+ifeq ($(TARGET_CPU), x86_64)
+CSOURCES    := main_mem_x86.c
+include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
+endif
 
 include $(FINALE)
 
