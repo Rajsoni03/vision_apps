@@ -62,8 +62,8 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
 else
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build   ex02_bios_multicore_echo_testb_freertos CORE=mcu1_0 BOARD=$(BOARD) SOC=$(SOC) BUILD_PROFILE=release -s
-	cp $(PDK_PATH)/packages/ti/binary/ex02_bios_multicore_echo_testb_freertos/bin/$(BOARD)/ex02_bios_multicore_echo_testb_freertos_mcu1_0_release_strip.xer5f $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build   ipc_qnx_echo_testb_freertos CORE=mcu1_0 BOARD=$(BOARD) SOC=$(SOC) BUILD_PROFILE=release -s
+	cp $(PDK_PATH)/packages/ti/binary/ipc_qnx_echo_testb_freertos/bin/$(BOARD)/ipc_qnx_echo_testb_freertos_mcu1_0_release_strip.xer5f $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
 endif
 ifeq ($(BUILD_CPU_MCU2_0),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu2_0.xer5f
