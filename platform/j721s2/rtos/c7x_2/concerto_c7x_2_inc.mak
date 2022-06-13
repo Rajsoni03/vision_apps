@@ -27,7 +27,7 @@ STATIC_LIBS += vx_target_kernels_park_assist
 STATIC_LIBS += vx_target_kernels_stereo
 STATIC_LIBS += vx_app_ptk_demo_common
 
-#ADDITIONAL_STATIC_LIBS += libtiadalg_structure_from_motion.a
+ADDITIONAL_STATIC_LIBS += dmautils.ae71
 ADDITIONAL_STATIC_LIBS += libtiadalg_fisheye_transformation.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_image_preprocessing.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_dof_plane_seperation.a
