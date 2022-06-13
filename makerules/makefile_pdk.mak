@@ -4,11 +4,6 @@
 # Edit this file to suit your specific build needs
 #
 
-ifeq ($(RTOS), FREERTOS)
-PDK_BUILD_OS_TYPE=freertos
-else
-PDK_BUILD_OS_TYPE=tirtos
-endif
 
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 PDK_BUILD_PROFILE_LIST_ALL+=release
@@ -53,7 +48,7 @@ PDK_CORE_LIST_ALL+=c7x_2
 endif
 
 pdk_build:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build BOARD=$(BUILD_PDK_BOARD) BUILD_OS_TYPE=$(PDK_BUILD_OS_TYPE) custom_target BUILD_PROFILE_LIST_ALL="$(PDK_BUILD_PROFILE_LIST_ALL)" CORE_LIST_ALL="$(PDK_CORE_LIST_ALL)" BUILD_TARGET_LIST_ALL="$(PDK_BUILD_TARGET_LIST_ALL)" -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build BOARD=$(BUILD_PDK_BOARD) custom_target BUILD_PROFILE_LIST_ALL="$(PDK_BUILD_PROFILE_LIST_ALL)" CORE_LIST_ALL="$(PDK_CORE_LIST_ALL)" BUILD_TARGET_LIST_ALL="$(PDK_BUILD_TARGET_LIST_ALL)" -s
 
 pdk: pdk_emu
 ifeq ($(BUILD_TARGET_MODE),yes)
