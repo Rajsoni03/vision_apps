@@ -77,6 +77,7 @@
 #include "app_test.h"
 
 #include "multi_cam_encode_ldc_module.h"
+#include "multi_cam_encode_scaler_module.h"
 #include "multi_cam_encode_img_mosaic_module.h"
 
 #define APP_BUFFER_Q_DEPTH   (4)
@@ -90,15 +91,17 @@ typedef struct {
     VISSObj       vissObj;
     AEWBObj       aewbObj;
     LDCObj        ldcObj;
+    ScalerObj     scalerObj;
     ImgMosaicObj  imgMosaicObj;
     DisplayObj    displayObj;
     GstPipeObj    gstPipeObj;   
 
+    vx_object_array ldc_out_arr_q[APP_MODULES_MAX_BUFQ_DEPTH];
+
     vx_object_array intermediate_obj_arr[2*APP_MODULES_MAX_BUFQ_DEPTH];
     void* data_ptr[2*APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][2];
     vx_map_id map_id[2*APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][2];
-    // vx_object_array ldc_enq_buffer;
-    // vx_object_array mosaic_enq_buffer;
+
     vx_uint8 ldc_enq_id;
     vx_uint8 mosaic_enq_id;
 
@@ -108,6 +111,8 @@ typedef struct {
     vx_context context;
     vx_graph   capture_graph;
     vx_graph   display_graph;
+
+    vx_int32 capt_out_graph_parameter_index;
 
     vx_int32 en_out_img_write;
     vx_int32 test_mode;
@@ -130,6 +135,8 @@ typedef struct {
     int32_t enable_viss;
     int32_t enable_aewb;
     int32_t enable_mosaic;
+
+    int32_t downscale;
 
     int32_t pipeline;
 
@@ -159,7 +166,6 @@ static void app_pipeline_params_defaults(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
-// static vx_status copy_image(vx_object_array in_arr, void* gst_data_ptr[], vx_int32 num_channels);
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][2], vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
 static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
 
@@ -305,7 +311,6 @@ static vx_status app_run_graph_interactive(AppObj *obj)
             }
         }
         app_run_task_delete(obj);
-
     }
     return status;
 }
@@ -489,6 +494,20 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 {
                     token[strlen(token)-1]=0;
                     obj->sensorObj.ch_mask = atoi(token);
+                }
+            }
+            /* Add option to enable dowscaling to 720p if num_channels>1 */
+            else
+            if(strcmp(token, "en_downscale")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    obj->downscale = atoi(token);
+                    if(obj->downscale > 1)
+                    {
+                        obj->downscale = 1;
+                    }
                 }
             }
             else
@@ -691,9 +710,7 @@ vx_int32 app_multi_cam_encode_main(vx_int32 argc, vx_char* argv[])
         APP_PRINTF("App Run Graph Done! \n");
     }
 
-    APP_PRINTF("Waiting on GstBuffer [%d]\n",obj->mosaic_enq_id);
     push_buffer_wait(&obj->gstPipeObj,obj->mosaic_enq_id);
-    APP_PRINTF("UnMapping object arr [%d]\n",obj->mosaic_enq_id);
     unmap_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->gstPipeObj.num_channels);
     push_EOS(&obj->gstPipeObj);
     app_stop_gst_pipe(&obj->gstPipeObj);
@@ -793,9 +810,48 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("LDC init done!\n");
     }
 
+    if((obj->downscale == 1) && (status == VX_SUCCESS))
+    {
+        vx_image ldc_out_img = vxCreateImage(obj->context, obj->ldcObj.table_width, obj->ldcObj.table_height, VX_DF_IMAGE_NV12);
+        status = vxGetStatus((vx_reference)ldc_out_img);
+        vx_int32 q;
+        if(status == VX_SUCCESS)
+        {
+            for(q = 0; q < APP_BUFFER_Q_DEPTH; q++)
+            {
+                obj->ldc_out_arr_q[q] = vxCreateObjectArray(obj->context, (vx_reference)ldc_out_img, obj->sensorObj.num_cameras_enabled);
+                status = vxGetStatus((vx_reference)obj->ldc_out_arr_q[q]);
+                if(status != VX_SUCCESS)
+                {
+                    printf("[APP_INIT]: Unable to create image object array! \n");
+                    break;
+                }
+                else
+                {
+                    vx_char name[VX_MAX_REFERENCE_NAME];
+
+                    snprintf(name, VX_MAX_REFERENCE_NAME, "ldc_out_arr_q_%d", q);
+
+                    vxSetReferenceName((vx_reference)obj->ldc_out_arr_q[q], name);
+                }
+            }
+            vxReleaseImage(&ldc_out_img);
+        }
+        else
+        {
+            printf("[APP_INIT]: Unable to create ldc_out_img\n");
+        }
+    }
+
+    if((obj->downscale == 1) && (status == VX_SUCCESS))
+    {
+        status = app_init_scaler(obj->context, &obj->scalerObj, "scaler_obj", obj->sensorObj.num_cameras_enabled, 1);
+        APP_PRINTF("Scaler init done!\n");
+    }
+
     if(status==VX_SUCCESS)
     {
-        vx_image intermediate_img = vxCreateImage(obj->context, obj->ldcObj.table_width, obj->ldcObj.table_height, VX_DF_IMAGE_NV12);
+        vx_image intermediate_img = vxCreateImage(obj->context, obj->gstPipeObj.width, obj->gstPipeObj.height, VX_DF_IMAGE_NV12);
         status = vxGetStatus((vx_reference)intermediate_img);
         vx_int32 q;
         if(status == VX_SUCCESS)
@@ -872,6 +928,17 @@ static void app_deinit(AppObj *obj)
     app_deinit_ldc(&obj->ldcObj);
     APP_PRINTF("LDC deinit done!\n");
 
+    if (obj->downscale == 1)
+    {
+        for(vx_int32 i = 0; i < APP_BUFFER_Q_DEPTH; i++)
+        {
+            vxReleaseObjectArray(&obj->ldc_out_arr_q[i]);
+        }
+
+        app_deinit_scaler(&obj->scalerObj);
+        APP_PRINTF("Scaler deinit done!\n");
+    }
+
     for(vx_int32 i = 0; i < 10; i++)
     {
         vxReleaseObjectArray(&obj->intermediate_obj_arr[i]);
@@ -908,6 +975,9 @@ static void app_delete_graph(AppObj *obj)
 
     app_delete_ldc(&obj->ldcObj);
     APP_PRINTF("LDC delete done!\n");
+
+    app_delete_scaler(&obj->scalerObj);
+    APP_PRINTF("Scaler delete done!\n");
 
     app_delete_img_mosaic(&obj->imgMosaicObj);
     APP_PRINTF("Img Mosaic delete done!\n");
@@ -985,13 +1055,28 @@ static vx_status app_create_graph(AppObj *obj)
     {
         ldc_in_arr = obj->captureObj.raw_image_arr[0];
     }
-    obj->ldcObj.output_arr = obj->intermediate_obj_arr[0];
+    if (1 == obj->downscale)
+    {
+        obj->ldcObj.output_arr = obj->ldc_out_arr_q[0];
+    }
+    else
+    {
+        obj->ldcObj.output_arr = obj->intermediate_obj_arr[0];
+    }
     if (status == VX_SUCCESS)
     {
         status = app_create_graph_ldc(obj->capture_graph, &obj->ldcObj, ldc_in_arr);
         APP_PRINTF("LDC graph done!\n");
     }
 
+    if (1 == obj->downscale && status == VX_SUCCESS)
+    {
+        obj->scalerObj.output[0].width = obj->gstPipeObj.width;
+        obj->scalerObj.output[0].height = obj->gstPipeObj.height;
+        obj->scalerObj.output[0].arr = obj->intermediate_obj_arr[0];
+        status = app_create_graph_scaler(obj->context, obj->capture_graph, &obj->scalerObj, obj->ldc_out_arr_q[0]);
+        APP_PRINTF("Scaler graph done!\n");
+    }
 
     vx_int32 idx = 0;
     vx_image display_in_image;
@@ -1028,12 +1113,26 @@ static vx_status app_create_graph(AppObj *obj)
         capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->captureObj.raw_image_arr[0];
         capt_graph_parameter_index++;
 
-        add_graph_parameter_by_node_index(obj->capture_graph, obj->ldcObj.node, 7);
-        obj->ldcObj.graph_parameter_index = capt_graph_parameter_index;
-        capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
-        capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = 10;
-        capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
-        capt_graph_parameter_index++;
+        if (1 == obj->downscale)
+        {
+            add_graph_parameter_by_node_index(obj->capture_graph, obj->scalerObj.node, 1);
+            obj->scalerObj.graph_parameter_index = capt_graph_parameter_index;
+            obj->capt_out_graph_parameter_index = capt_graph_parameter_index;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = 10;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
+            capt_graph_parameter_index++;
+        }
+        else
+        {
+            add_graph_parameter_by_node_index(obj->capture_graph, obj->ldcObj.node, 7);
+            obj->ldcObj.graph_parameter_index = capt_graph_parameter_index;
+            obj->capt_out_graph_parameter_index = capt_graph_parameter_index;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = 10;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
+            capt_graph_parameter_index++;
+        }
 
         disp_graph_parameter_index = 0;
         add_graph_parameter_by_node_index(obj->display_graph, obj->imgMosaicObj.node, 3);
@@ -1091,6 +1190,10 @@ static vx_status app_create_graph(AppObj *obj)
                 status = tivxSetNodeParameterNumBufByIndex(obj->aewbObj.node, 4, APP_BUFFER_Q_DEPTH);
             }
         }
+        if((obj->downscale == 1) && (status == VX_SUCCESS))
+        {
+            status = tivxSetNodeParameterNumBufByIndex(obj->ldcObj.node, 7, APP_BUFFER_Q_DEPTH);
+        }
         if((obj->enable_mosaic == 1) && (status == VX_SUCCESS))
         {
             if(!((obj->en_out_img_write == 1) || (obj->test_mode == 1)))
@@ -1118,7 +1221,7 @@ static vx_status app_verify_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-            status = vxVerifyGraph(obj->display_graph);
+        status = vxVerifyGraph(obj->display_graph);
     }
     if(status == VX_SUCCESS)
     {
@@ -1149,11 +1252,6 @@ static vx_status app_verify_graph(AppObj *obj)
         }
     }
 
-    for (vx_int8 buf_id=0; buf_id<10; buf_id++){
-        // APP_PRINTF("data_ptrs[%d][:][0] =\t%p\t%p\t%p\t%p\n",buf_id,obj->data_ptr[buf_id][0][0],obj->data_ptr[buf_id][1][0],obj->data_ptr[buf_id][2][0],obj->data_ptr[buf_id][3][0]);
-        APP_PRINTF("data_ptrs[%d][:][0] =\t%p\n",buf_id,obj->data_ptr[buf_id][0][0]);
-    }
-
     if(VX_SUCCESS == status)
     {
         status = wrap_buffers(&obj->gstPipeObj, obj->data_ptr);
@@ -1175,13 +1273,11 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 {
     vx_status status = VX_SUCCESS;
 
-    APP_PRINTF("app_run_graph_for_one_pipeline: frame %d beginning\nldc_enq_id : %d,\tmosaic_enq_id : %d.\n", frame_id, obj->ldc_enq_id, obj->mosaic_enq_id);
+    APP_PRINTF("app_run_graph_for_one_pipeline: frame %d beginning\n", frame_id);
     appPerfPointBegin(&obj->total_perf);
 
     ImgMosaicObj *imgMosaicObj = &obj->imgMosaicObj;
     CaptureObj *captureObj = &obj->captureObj;
-    LDCObj *ldcObj = &obj->ldcObj;
-
 
     /* checksum_actual is the checksum determined by the realtime test
         checksum_expected is the checksum that is expected to be the pipeline output */
@@ -1196,7 +1292,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         /* Enqueue buffers during pipeup for Capture graph */
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
             obj->ldc_enq_id++;
             obj->ldc_enq_id   = (obj->ldc_enq_id  >= 10)? 0 : obj->ldc_enq_id;
         }
@@ -1220,25 +1316,23 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         status = vxGraphParameterDequeueDoneRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1, &num_refs);
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
+            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
         }
 
         /* Enqueue buffers during pipeup for GstPipeline */
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Mapping object arr [%d]\n",0);
             status = map_vx_object_arr(obj->intermediate_obj_arr[0], obj->data_ptr[0], obj->map_id[0], obj->gstPipeObj.num_channels);
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Pushing GstBuffer [%d]\n",0);
             status = push_buffer_ready(&obj->gstPipeObj,0);
             obj->mosaic_enq_id = 0;
         }
 
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
             obj->ldc_enq_id++;
             obj->ldc_enq_id   = (obj->ldc_enq_id  >= 10)? 0 : obj->ldc_enq_id;
         }
@@ -1262,23 +1356,20 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         status = vxGraphParameterDequeueDoneRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1, &num_refs);
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
+            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Waiting on GstBuffer [%d]\n",obj->mosaic_enq_id);
             status = push_buffer_wait(&obj->gstPipeObj,obj->mosaic_enq_id);
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("UnMapping object arr [%d]\n",obj->mosaic_enq_id);
             status = unmap_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->gstPipeObj.num_channels);
         }
 
-
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
             obj->ldc_enq_id++;
             obj->ldc_enq_id   = (obj->ldc_enq_id  >= 10)? 0 : obj->ldc_enq_id;
         }
@@ -1300,12 +1391,10 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Mapping object arr [%d]\n",obj->mosaic_enq_id);
             status = map_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->data_ptr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->gstPipeObj.num_channels);
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Pushing GstBuffer [%d]\n",obj->mosaic_enq_id);
             status = push_buffer_ready(&obj->gstPipeObj,obj->mosaic_enq_id);
         }
 
@@ -1323,11 +1412,10 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         uint32_t num_refs;
 
         /* Pipeline execution for both graphs and GstPipeline. Buffers cycled between LDC-output and Mosaic-input */
-
         status = vxGraphParameterDequeueDoneRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1, &num_refs);
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
+            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
         }
         if (status == VX_SUCCESS)
         {
@@ -1335,12 +1423,10 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Waiting on GstBuffer [%d]\n",obj->mosaic_enq_id);
             status = push_buffer_wait(&obj->gstPipeObj,obj->mosaic_enq_id);
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("UnMapping object arr [%d]\n",obj->mosaic_enq_id);
             status = unmap_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->gstPipeObj.num_channels);
         }
 
@@ -1388,7 +1474,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         }
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, ldcObj->graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
             obj->ldc_enq_id++;
             obj->ldc_enq_id   = (obj->ldc_enq_id  >= 10)? 0 : obj->ldc_enq_id;
         }
@@ -1400,17 +1486,12 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Mapping object arr [%d]\n",obj->mosaic_enq_id);
             status = map_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->data_ptr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->gstPipeObj.num_channels);
         }
         if(status==VX_SUCCESS)
         {
-            APP_PRINTF("Pushing GstBuffer [%d]\n",obj->mosaic_enq_id);
             status = push_buffer_ready(&obj->gstPipeObj,obj->mosaic_enq_id);
         }
-
-        // obj->ldc_enq_buffer = mosaic_input_arr;
-        // obj->mosaic_enq_buffer = ldc_output_arr;
 
         obj->enqueueCnt++;
         obj->dequeueCnt++;
@@ -1461,9 +1542,6 @@ static vx_status app_run_graph(AppObj *obj)
         obj->num_frames_to_run = TEST_BUFFER + 30;
     }
 
-    // obj->ldc_enq_buffer = obj->intermediate_obj_arr[2*APP_BUFFER_Q_DEPTH];
-    // obj->mosaic_enq_buffer = obj->intermediate_obj_arr[2*APP_BUFFER_Q_DEPTH+1];
-
     for(frame_id = 0; frame_id < obj->num_frames_to_run; frame_id++)
     {
         if(obj->write_file == 1)
@@ -1511,93 +1589,6 @@ static vx_status app_run_graph(AppObj *obj)
     return status;
 }
 
-// static vx_status copy_image(vx_object_array* in_arr, void* gst_data_ptr[], vx_int32 num_channels)
-// {
-//     vx_status status;
-//     vx_int32 ch;
-
-//     status = vxGetStatus((vx_reference)*in_arr);
-
-//     for(ch = 0; ch<num_channels; ch++)
-//     {
-//         vx_rectangle_t rect;
-//         vx_imagepatch_addressing_t image_addr;
-//         vx_map_id map_id;
-//         void * data_ptr;
-
-//         vx_uint32  img_width;
-//         vx_uint32  img_height;
-
-//         vx_image in_img = (vx_image)vxGetObjectArrayItem(*in_arr,ch);
-
-//         vxQueryImage(in_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
-//         vxQueryImage(in_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
-
-//         rect.start_x = 0;
-//         rect.start_y = 0;
-//         rect.end_x = img_width;
-//         rect.end_y = img_height;
-
-//         if (gst_data_ptr[ch] == NULL)
-//         {
-//             printf("copy_image(): Did not get allocated memory for gst_data_ptr!\n");
-//             status = -1;
-//         }
-//         vx_uint32 write_idx = 0;
-
-//         /* Copy Luma */
-//         status = vxMapImagePatch(in_img,
-//                                 &rect,
-//                                 0,
-//                                 &map_id,
-//                                 &image_addr,
-//                                 &data_ptr,
-//                                 VX_READ_ONLY,
-//                                 VX_MEMORY_TYPE_HOST,
-//                                 VX_NOGAP_X);
-//         if (status != VX_SUCCESS) {printf("copy_image(): vxMap unsuccessful"); return(status);}
-
-//         for (vx_uint32 j = 0; j < img_height; j++)
-//         {
-//             for (vx_uint32 k = 0; k < img_width; k++)
-//             {
-//                 *(uint8_t*)(gst_data_ptr[ch]+write_idx+k) = *(uint8_t*)(data_ptr+k);
-//             }
-//             data_ptr += image_addr.stride_y;
-//             write_idx += image_addr.stride_y;
-//         }
-
-//         vxUnmapImagePatch(in_img, map_id);
-
-//         /* Copy CbCr */
-//         status = vxMapImagePatch(in_img,
-//                                 &rect,
-//                                 1,
-//                                 &map_id,
-//                                 &image_addr,
-//                                 &data_ptr,
-//                                 VX_READ_ONLY,
-//                                 VX_MEMORY_TYPE_HOST,
-//                                 VX_NOGAP_X);
-//         if (status != VX_SUCCESS) {printf("copy_image(): vxMap unsuccessful"); return(status);}
-
-//         for (vx_uint32 j = 0; j < img_height/2; j++)
-//         {
-//             for (vx_uint32 k = 0; k < img_width; k++)
-//             {
-//                 *(uint8_t*)(gst_data_ptr[ch]+write_idx+k) = *(uint8_t*)(data_ptr+k);
-//             }
-//             data_ptr += image_addr.stride_y;
-//             write_idx += image_addr.stride_y;
-//         }
-
-//         vxUnmapImagePatch(in_img, map_id);
-
-
-//         vxReleaseReference((vx_reference*)&in_img);        
-//     }
-//     return(status);
-// }
 
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][2], vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels)
 {
@@ -1610,8 +1601,6 @@ static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NU
     {
         vx_rectangle_t rect;
         vx_imagepatch_addressing_t image_addr;
-        // vx_map_id map_id;
-        // void * data_ptr;
 
         vx_uint32  img_width;
         vx_uint32  img_height;
@@ -1638,8 +1627,6 @@ static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NU
                                 VX_NOGAP_X);
         if (status != VX_SUCCESS) {printf("map_obj_arr(): vxMap unsuccessful"); return(status);}
 
-        // vxUnmapImagePatch(in_img, map_id);
-
         /* Map CbCr */
         status = vxMapImagePatch(in_img,
                                 &rect,
@@ -1651,8 +1638,6 @@ static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NU
                                 VX_MEMORY_TYPE_HOST,
                                 VX_NOGAP_X);
         if (status != VX_SUCCESS) {printf("copy_image(): vxMap unsuccessful"); return(status);}
-
-        // vxUnmapImagePatch(in_img, map_id);
 
         vxReleaseReference((vx_reference*)&in_img);
     }
@@ -1731,7 +1716,6 @@ static void app_default_param_set(AppObj *obj)
 
     app_pipeline_params_defaults(obj);
 
-
     obj->is_interactive = 1;
     obj->test_mode = 0;
     obj->write_file = 0;
@@ -1741,6 +1725,8 @@ static void app_default_param_set(AppObj *obj)
     obj->sensorObj.ch_mask = 0x1;
     obj->sensorObj.usecase_option = APP_SENSOR_FEATURE_CFG_UC0;
     obj->sensorObj.is_interactive = 0;
+
+    obj->downscale = 0;
 }
 
 static vx_int32 calc_grid_size(vx_uint32 ch)
@@ -1809,12 +1795,23 @@ static void app_update_param_set(AppObj *obj)
     vx_uint16 resized_width, resized_height;
     appIssGetResizeParams(obj->sensorObj.image_width, obj->sensorObj.image_height, DISPLAY_WIDTH, DISPLAY_HEIGHT, &resized_width, &resized_height);
 
+    if (obj->sensorObj.num_cameras_enabled == 1)    // No need to downscale if single channel.
+        obj->downscale = 0;
+
     set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled);
 
     obj->gstPipeObj.srcType      = 0;                                       // appsrc
     obj->gstPipeObj.sinkType     = 1;                                       // filesink
     obj->gstPipeObj.num_channels = obj->sensorObj.num_cameras_enabled;
     obj->gstPipeObj.buffer_depth = 10;
+    // obj->gstPipeObj.width = resized_width;
+    // obj->gstPipeObj.height = resized_height;
+
+    if (obj->downscale == 1)
+    {
+        obj->gstPipeObj.width = 1280;
+        obj->gstPipeObj.height = 720;
+    }
 
 }
 
