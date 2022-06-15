@@ -19,6 +19,7 @@ IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
 LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu4_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu4_0/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu4_0/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu4_0/$(TARGET_BUILD)/
 
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu4_0/$(TARGET_BUILD)/
@@ -31,8 +32,10 @@ STATIC_LIBS += app_rtos_common_mcu4_0
 ifeq ($(RTOS),FREERTOS)
 	STATIC_LIBS += app_rtos
 endif
+STATIC_LIBS += app_utils_hwa
 STATIC_LIBS += app_utils_sciclient
 
+ADDITIONAL_STATIC_LIBS += vhwa.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
 
 DEFS        += $(RTOS)
