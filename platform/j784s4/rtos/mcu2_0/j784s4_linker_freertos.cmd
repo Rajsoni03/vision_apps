@@ -72,6 +72,9 @@ SECTIONS
         __RESOURCE_TABLE = .;
     }                                           > DDR_MCU2_0_RESOURCE_TABLE
 
+    intercore_eth_desc_mem (NOLOAD) : {} palign(128) > INTERCORE_ETH_DESC_MEM
+    intercore_eth_data_mem (NOLOAD) : {} palign(128) > INTERCORE_ETH_DATA_MEM
+
     .tracebuf                : {} align(1024)   > DDR_MCU2_0
 
     .bss:l3mem              (NOLOAD) : {} > MAIN_OCRAM_MCU2_0

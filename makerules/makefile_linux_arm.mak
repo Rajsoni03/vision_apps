@@ -13,10 +13,8 @@ endif
 
 ifeq ($(SOC),j721e)
 LINUX_FIRMWARE_PREFIX=j7
-else ifeq ($(SOC),j721s2)
-LINUX_FIRMWARE_PREFIX=j721s2
-else ifeq ($(SOC),j784s4)
-LINUX_FIRMWARE_PREFIX=j784s4
+else
+LINUX_FIRMWARE_PREFIX=$(SOC)
 endif
 
 FIRMWARE_SUBFOLDER?=vision_apps_evm

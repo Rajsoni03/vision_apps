@@ -97,13 +97,7 @@ BUILD_QNX_A72?=no
 
 # Set to 'yes' to link all .out files against libtivision_apps.so instead of static libs
 # (Only supported on A72, ignored on x86_64)
-ifeq ($(SOC),j721e)
 LINK_SHARED_OBJ?=yes
-else ifeq ($(SOC),j721s2)
-LINK_SHARED_OBJ?=no
-else ifeq ($(SOC),j784s4)
-LINK_SHARED_OBJ?=no
-endif
 
 # Since MCU R5F runs in locked step mode in vision apps, dont set these to 'yes'
 BUILD_CPU_MCU1_1?=no

@@ -15,10 +15,8 @@ endif
 
 ifeq ($(SOC),j721e)
 QNX_FIRMWARE_PREFIX=j7
-else ifeq ($(SOC),j721s2)
-QNX_FIRMWARE_PREFIX=j721s2
-else ifeq ($(SOC),j784s4)
-QNX_FIRMWARE_PREFIX=j784s4
+else
+QNX_FIRMWARE_PREFIX=$(SOC)
 endif
 
 qnx:
