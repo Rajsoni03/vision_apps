@@ -770,7 +770,23 @@ int32_t appPerfStatsExportAll(FILE *fp, app_perf_point_t *perf_points[], uint32_
 
 char *appPerfStatsGetHwaName(app_perf_hwa_id_t hwa_id)
 {
-    static char *hwa_name[] = { " VISS", " LDC ", " BLNF", " MSC0", " MSC1", " DOF ", " SDE ", " GPU ", "INVAL"};
+    static char *hwa_name[] = { 
+        " VISS",
+        " LDC ",
+        " BLNF",
+        " MSC0",
+        " MSC1",
+        " DOF ",
+        " SDE ",
+        " GPU ",
+#if defined(SOC_J784S4)
+        " VISS_1",
+        " LDC_1",
+        " BLNF_1",
+        " MSC0_1",
+        " MSC1_1",
+#endif
+        "INVAL"};
     char *name;
 
     if(hwa_id < APP_PERF_HWA_MAX)

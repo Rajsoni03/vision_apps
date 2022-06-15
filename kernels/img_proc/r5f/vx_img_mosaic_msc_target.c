@@ -392,18 +392,18 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
     {
         if (msc_obj->max_msc_instances == 2)
         {
-            msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_MSC0;
-            msc_obj->app_hwa_inst_id[1] = APP_PERF_HWA_MSC1;
+            msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_VPAC1_MSC0;
+            msc_obj->app_hwa_inst_id[1] = APP_PERF_HWA_VPAC1_MSC1;
         }
         else if(msc_obj->max_msc_instances == 1)
         {
             if(msc_obj->msc_instance == 0)
             {
-                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_MSC0;
+                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_VPAC1_MSC0;
             }
             else if (msc_obj->msc_instance == 1)
             {
-                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_MSC1;
+                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_VPAC1_MSC1;
             }
         }
 
