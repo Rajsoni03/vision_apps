@@ -73,19 +73,19 @@ MEMORY
     /* R5F_TCMB0 [ size 32.00 KB ] */
     R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00008000
     /* DDR for MCU4_1 for Linux IPC [ size 1024.00 KB ] */
-    DDR_MCU4_1_IPC           ( RWIX ) : ORIGIN = 0xA9000000 , LENGTH = 0x00100000
+    DDR_MCU4_1_IPC           ( RWIX ) : ORIGIN = 0xAA000000 , LENGTH = 0x00100000
     /* DDR for MCU4_1 for Linux resource table [ size 1024 B ] */
-    DDR_MCU4_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA9100000 , LENGTH = 0x00000400
+    DDR_MCU4_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xAA100000 , LENGTH = 0x00000400
     /* DDR for MCU4_1 for code/data [ size 15.00 MB ] */
-    DDR_MCU4_1               ( RWIX ) : ORIGIN = 0xA9100400 , LENGTH = 0x00EFFC00
+    DDR_MCU4_1               ( RWIX ) : ORIGIN = 0xAA100400 , LENGTH = 0x00EFFC00
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xBF000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xB5000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xC1000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xB7000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xC1040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB7040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC7000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xBD000000 , LENGTH = 0x20000000
     /* DDR for MCU4_1 for local heap [ size  8.00 MB ] */
-    DDR_MCU4_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xEB800000 , LENGTH = 0x00800000
+    DDR_MCU4_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE1800000 , LENGTH = 0x00800000
 }

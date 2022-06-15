@@ -79,13 +79,13 @@ MEMORY
     /* DDR for MCU3_0 for code/data [ size 15.00 MB ] */
     DDR_MCU3_0               ( RWIX ) : ORIGIN = 0xA6100400 , LENGTH = 0x00EFFC00
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xBF000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xB5000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xC1000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xB7000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xC1040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB7040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC7000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xBD000000 , LENGTH = 0x20000000
     /* DDR for MCU3_0 for local heap [ size  8.00 MB ] */
-    DDR_MCU3_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xEA000000 , LENGTH = 0x00800000
+    DDR_MCU3_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE0000000 , LENGTH = 0x00800000
 }

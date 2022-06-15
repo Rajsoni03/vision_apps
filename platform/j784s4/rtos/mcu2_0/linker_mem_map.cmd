@@ -81,17 +81,17 @@ MEMORY
     /* DDR for MCU2_0 for code/data [ size 31.00 MB ] */
     DDR_MCU2_0               ( RWIX ) : ORIGIN = 0xA2100400 , LENGTH = 0x01EFFC00
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xBF000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xB5000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xC1000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xB7000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xC1040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB7040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC7000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xBD000000 , LENGTH = 0x20000000
     /* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
-    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE8000000 , LENGTH = 0x01000000
+    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xDE000000 , LENGTH = 0x01000000
     /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xFC000000 , LENGTH = 0x00800000
+    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xF2000000 , LENGTH = 0x00800000
     /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xFC800000 , LENGTH = 0x01800000
+    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xF2800000 , LENGTH = 0x01800000
 }
