@@ -500,7 +500,7 @@ c7x_2_ddr_total.concat(c7x_2_ddr);
 c7x_2_ddr_total.setDtsName("vision_apps_c71_1_memory_region", "vision-apps-c71_1-memory");
 
 c7x_3_ddr_ipc             = MemSection("DDR_C7x_3_IPC", "RWIX", c7x_3_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for C7x_3 for Linux IPC");
-c7x_3_ddr_ipc.setDtsName("vision_apps_c71_2_dma_memory_region", "vision-apps-c71-dma-memory");
+c7x_3_ddr_ipc.setDtsName("vision_apps_c71_2_dma_memory_region", "vision-apps-c71_2-dma-memory");
 c7x_3_ddr_resource_table  = MemSection("DDR_C7x_3_RESOURCE_TABLE", "RWIX", c7x_3_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_3 for Linux resource table");
 c7x_3_ddr_boot            = MemSection("DDR_C7x_3_BOOT", "RWIX", c7x_3_ddr_boot_addr, c7x_3_ddr_boot_size, "DDR for C7x_3 for boot section");
 c7x_3_ddr_vecs            = MemSection("DDR_C7x_3_VECS", "RWIX", c7x_3_ddr_vecs_addr, c7x_3_ddr_vecs_size, "DDR for C7x_3 for vecs section");
@@ -517,7 +517,7 @@ c7x_3_ddr_total.concat(c7x_3_ddr);
 c7x_3_ddr_total.setDtsName("vision_apps_c71_2_memory_region", "vision-apps-c71_2-memory");
 
 c7x_4_ddr_ipc             = MemSection("DDR_C7x_4_IPC", "RWIX", c7x_4_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for C7x_4 for Linux IPC");
-c7x_4_ddr_ipc.setDtsName("vision_apps_c71_3_dma_memory_region", "vision-apps-c71-dma-memory");
+c7x_4_ddr_ipc.setDtsName("vision_apps_c71_3_dma_memory_region", "vision-apps-c71_3-dma-memory");
 c7x_4_ddr_resource_table  = MemSection("DDR_C7x_4_RESOURCE_TABLE", "RWIX", c7x_4_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_4 for Linux resource table");
 c7x_4_ddr_boot            = MemSection("DDR_C7x_4_BOOT", "RWIX", c7x_4_ddr_boot_addr, c7x_4_ddr_boot_size, "DDR for C7x_4 for boot section");
 c7x_4_ddr_vecs            = MemSection("DDR_C7x_4_VECS", "RWIX", c7x_4_ddr_vecs_addr, c7x_4_ddr_vecs_size, "DDR for C7x_4 for vecs section");
@@ -947,6 +947,8 @@ dts_mmap.addMemSection( mcu3_0_ddr_ipc     );
 dts_mmap.addMemSection( mcu3_0_ddr_total   );
 dts_mmap.addMemSection( mcu3_1_ddr_ipc     );
 dts_mmap.addMemSection( mcu3_1_ddr_total   );
+dts_mmap.addMemSection( mcu4_0_ddr_ipc     );
+dts_mmap.addMemSection( mcu4_0_ddr_total   );
 dts_mmap.addMemSection( mcu4_1_ddr_ipc     );
 dts_mmap.addMemSection( mcu4_1_ddr_total   );
 dts_mmap.addMemSection( c7x_1_ddr_ipc      );
