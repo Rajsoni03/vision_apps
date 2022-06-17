@@ -190,35 +190,59 @@ static tivx_target_kernel vx_imgMosaicMsc2_kernel = NULL;
 
 void tivxAddTargetKernelImgMosaicMsc(void)
 {
-    char target_name[TIVX_TARGET_MAX_NAME];
+    char target_name[TIVX_IMAGE_MOSAIC_MSC_MAX_INST][TIVX_TARGET_MAX_NAME];
+    vx_enum self_cpu;
+    vx_status status = (vx_status)VX_SUCCESS;
 
-    /* Both scalars are used, but the target used it always MSC0 */
-    strncpy(target_name, TIVX_TARGET_VPAC_MSC1, TIVX_TARGET_MAX_NAME);
-    vx_imgMosaicMsc1_kernel = tivxAddTargetKernelByName(
-                                 TIVX_KERNEL_IMG_MOSAIC_NAME,
-                                 target_name,
-                                 tivxKernelImgMosaicMscProcess,
-                                 tivxKernelImgMosaicMscCreate,
-                                 tivxKernelImgMosaicMscDelete,
-                                 NULL,
-                                 NULL);
-    if(NULL == vx_imgMosaicMsc1_kernel)
+    self_cpu = tivxGetSelfCpuId();
+
+    if ((vx_enum)TIVX_CPU_ID_MCU2_0 == self_cpu )
     {
-        VX_PRINT(VX_ZONE_ERROR, "Failed to Add Img Mosaic MSC TargetKernel\n");
+        /* Both scalars are used, but the target used it always MSC0 */
+        strncpy(target_name[0], TIVX_TARGET_VPAC_MSC1, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[1], TIVX_TARGET_VPAC_MSC2, TIVX_TARGET_MAX_NAME);
+    }
+    #if defined(SOC_J784S4)
+    else if ((vx_enum)TIVX_CPU_ID_MCU4_0 == self_cpu)
+    {
+        /* Both scalars are used, but the target used it always MSC0 */
+        strncpy(target_name[0], TIVX_TARGET_VPAC2_MSC1, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[1], TIVX_TARGET_VPAC2_MSC2, TIVX_TARGET_MAX_NAME);
+    }
+    #endif
+    else
+    {
+        VX_PRINT(VX_ZONE_ERROR, "Invalid CPU ID\n");
+        status = (vx_status)VX_FAILURE;
     }
 
-    strncpy(target_name, TIVX_TARGET_VPAC_MSC2, TIVX_TARGET_MAX_NAME);
-    vx_imgMosaicMsc2_kernel = tivxAddTargetKernelByName(
-                                 TIVX_KERNEL_IMG_MOSAIC_NAME,
-                                 target_name,
-                                 tivxKernelImgMosaicMscProcess,
-                                 tivxKernelImgMosaicMscCreate,
-                                 tivxKernelImgMosaicMscDelete,
-                                 NULL,
-                                 NULL);
-    if(NULL == vx_imgMosaicMsc2_kernel)
+    if ((vx_status)VX_SUCCESS == status)
     {
-        VX_PRINT(VX_ZONE_ERROR, "Failed to Add Img Mosaic MSC TargetKernel\n");
+        vx_imgMosaicMsc1_kernel = tivxAddTargetKernelByName(
+                                     TIVX_KERNEL_IMG_MOSAIC_NAME,
+                                     target_name[0],
+                                     tivxKernelImgMosaicMscProcess,
+                                     tivxKernelImgMosaicMscCreate,
+                                     tivxKernelImgMosaicMscDelete,
+                                     NULL,
+                                     NULL);
+        if(NULL == vx_imgMosaicMsc1_kernel)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Failed to Add Img Mosaic MSC TargetKernel\n");
+        }
+
+        vx_imgMosaicMsc2_kernel = tivxAddTargetKernelByName(
+                                     TIVX_KERNEL_IMG_MOSAIC_NAME,
+                                     target_name[1],
+                                     tivxKernelImgMosaicMscProcess,
+                                     tivxKernelImgMosaicMscCreate,
+                                     tivxKernelImgMosaicMscDelete,
+                                     NULL,
+                                     NULL);
+        if(NULL == vx_imgMosaicMsc2_kernel)
+        {
+            VX_PRINT(VX_ZONE_ERROR, "Failed to Add Img Mosaic MSC TargetKernel\n");
+        }
     }
 }
 
@@ -390,20 +414,41 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
 
     if(VX_SUCCESS == status)
     {
+        vx_enum                 self_cpu;
+        app_perf_hwa_id_t       app_hwa_inst_id_0, app_hwa_inst_id_1;
+        uint32_t                inst_id_offset;
+
+        self_cpu = tivxGetSelfCpuId();
+
+        if ((vx_enum)TIVX_CPU_ID_MCU2_0 == self_cpu)
+        {
+            app_hwa_inst_id_0   = APP_PERF_HWA_VPAC1_MSC0;
+            app_hwa_inst_id_1   = APP_PERF_HWA_VPAC1_MSC1;
+            inst_id_offset      = 0U;
+        }
+        #if defined(SOC_J784S4)
+        else if ((vx_enum)TIVX_CPU_ID_MCU4_0 == self_cpu)
+        {
+            app_hwa_inst_id_0   = APP_PERF_HWA_VPAC2_MSC0;
+            app_hwa_inst_id_1   = APP_PERF_HWA_VPAC2_MSC1;
+            inst_id_offset = 2U;
+        }
+        #endif
+
         if (msc_obj->max_msc_instances == 2)
         {
-            msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_VPAC1_MSC0;
-            msc_obj->app_hwa_inst_id[1] = APP_PERF_HWA_VPAC1_MSC1;
+            msc_obj->app_hwa_inst_id[0] = app_hwa_inst_id_0;
+            msc_obj->app_hwa_inst_id[1] = app_hwa_inst_id_1;
         }
         else if(msc_obj->max_msc_instances == 1)
         {
             if(msc_obj->msc_instance == 0)
             {
-                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_VPAC1_MSC0;
+                msc_obj->app_hwa_inst_id[0] = app_hwa_inst_id_0;
             }
             else if (msc_obj->msc_instance == 1)
             {
-                msc_obj->app_hwa_inst_id[0] = APP_PERF_HWA_VPAC1_MSC1;
+                msc_obj->app_hwa_inst_id[0] = app_hwa_inst_id_1;
             }
         }
 
@@ -419,7 +464,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
             }
 
             /* MSC driver create */
-            status = tivxKernelImgMosaicMscDrvCreate(&msc_obj->inst_obj[i], i);
+            status = tivxKernelImgMosaicMscDrvCreate(&msc_obj->inst_obj[i], i+inst_id_offset);
         }
     }
 
