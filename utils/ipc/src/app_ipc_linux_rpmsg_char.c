@@ -111,10 +111,20 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
     {
         rpmsg_char_id = DSP_C71_0;
     }
-    #if defined (SOC_J721S2) // TODO for J784S4
+    #if defined (SOC_J721S2) || defined(SOC_J784S4)
     else if (APP_IPC_CPU_C7x_2 == cpu_id)
     {
         rpmsg_char_id = DSP_C71_1;
+    }
+    #endif
+    #if defined(SOC_J784S4)
+    else if (APP_IPC_CPU_C7x_3 == cpu_id)
+    {
+        rpmsg_char_id = DSP_C71_2;
+    }
+    else if (APP_IPC_CPU_C7x_4 == cpu_id)
+    {
+        rpmsg_char_id = DSP_C71_3;
     }
     #endif
 
