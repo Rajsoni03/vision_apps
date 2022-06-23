@@ -285,7 +285,7 @@ c7x_4_ddr_size = 40*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
 #
 
 ipc_vring_mem_addr      = c7x_4_ddr_addr  + c7x_4_ddr_size;
-ipc_vring_mem_size      = 32*MB;
+ipc_vring_mem_size      = 48*MB;
 
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
 app_log_mem_size        = 256*KB;
