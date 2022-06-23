@@ -163,8 +163,25 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 9 configuration: Ring buffer */
+        /* Region 8 configuration: TIOVX Log RT Mem */
+        /* Note: with the increased IPC VRING memory, the previous
+         * entry does not cover the entire non-cached region.
+         * Separating this out in order to mark the size correctly */
         .regionId         = 8U,
+        .enable           = 1U,
+        .baseAddr         = TIOVX_LOG_RT_MEM_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_32MB,
+        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
+        .exeNeverControl  = 1U,
+        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+        .shareable        = 0U,
+        .cacheable        = (uint32_t)FALSE,
+        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
+        .memAttr          = 0U,
+    },
+    {
+        /* Region 9 configuration: MCU2-0 IPC */
+        .regionId         = 9U,
         .enable           = 1U,
         .baseAddr         = DDR_MCU2_0_IPC_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
@@ -183,7 +200,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
          * next MPU region as non-cached. This leaves the remaining
          * 24MB as cached for INTERCORE_ETH_DATA_MEM_ADDR
          */
-        .regionId         = 9U,
+        .regionId         = 10U,
         .enable           = 1U,
         .baseAddr         = INTERCORE_ETH_DESC_MEM_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_32MB,
@@ -199,7 +216,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         /* Region 11 configuration:
          * INTERCORE_ETH_DESC_MEM as non-cache 8 MB
          */
-        .regionId         = 10U,
+        .regionId         = 11U,
         .enable           = 1U,
         .baseAddr         = INTERCORE_ETH_DESC_MEM_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_8MB,

@@ -161,8 +161,25 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 10 configuration: Ring buffer */
+        /* Region 8 configuration: TIOVX Log RT Mem */
+        /* Note: with the increased IPC VRING memory, the previous
+         * entry does not cover the entire non-cached region.
+         * Separating this out in order to mark the size correctly */
         .regionId         = 8U,
+        .enable           = 1U,
+        .baseAddr         = TIOVX_LOG_RT_MEM_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_32MB,
+        .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
+        .exeNeverControl  = 1U,
+        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+        .shareable        = 0U,
+        .cacheable        = (uint32_t)FALSE,
+        .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
+        .memAttr          = 0U,
+    },
+    {
+        /* Region 10 configuration: MCU4-1 IPC */
+        .regionId         = 9U,
         .enable           = 1U,
         .baseAddr         = DDR_MCU4_1_IPC_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_1MB,
