@@ -128,7 +128,7 @@ int32_t appDssInit(app_dss_init_params_t *dssParams)
     }
 
     dssInitParams.socParams.dpInitParams.isAvailable = dssParams->isDpAvailable;
-#if defined (SOC_J721S2)
+#if defined (SOC_J721S2) || defined (SOC_J784S4)
     dssInitParams.socParams.dpInitParams.isHpdSupported = false;
 #elif defined (SOC_J721E)
     dssInitParams.socParams.dpInitParams.isHpdSupported = true;
