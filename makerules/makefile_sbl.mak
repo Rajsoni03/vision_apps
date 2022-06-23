@@ -59,34 +59,40 @@ REMOTE_CORE_LIST_LATEAPP2=
 CERT_SCRIPT=$(PDK_PATH)/packages/ti/build/makerules/x509CertificateGen.sh
 
 ifeq ($(BUILD_CPU_MCU2_0),yes)
-	REMOTE_CORE_LIST_LATEAPP1+=6 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
+	REMOTE_CORE_LIST_LATEAPP1+=10 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
-	REMOTE_CORE_LIST_LATEAPP1+=7 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP1+=11 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_0),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=8 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=12 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=9 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=13 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
+endif
+ifeq ($(BUILD_CPU_MCU4_0),yes)
+	REMOTE_CORE_LIST_LATEAPP2+=14 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu4_0.out.rprc
+endif
+ifeq ($(BUILD_CPU_MCU4_1),yes)
+	REMOTE_CORE_LIST_LATEAPP2+=15 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_mcu4_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=10 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=16 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=11 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=17 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=12 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=18 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=13 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=19 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_3),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=14 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_3.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=20 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_3.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_4),yes)
-	REMOTE_CORE_LIST_LATEAPP2+=15 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
+	REMOTE_CORE_LIST_LATEAPP2+=21 $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
 endif
 
 ifeq ($(BUILD_LINUX_A72), yes)

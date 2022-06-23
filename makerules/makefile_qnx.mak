@@ -96,6 +96,16 @@ ifeq ($(BUILD_CPU_MCU3_1),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f1_1-fw
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f1_1-fw
 endif
+ifeq ($(BUILD_CPU_MCU4_0),yes)
+	# copy remote firmware files for mcu4_0
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_0.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f2_0-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f2_0-fw
+endif
+ifeq ($(BUILD_CPU_MCU4_1),yes)
+	# copy remote firmware files for mcu4_1
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f2_1-fw
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-main-r5f2_1-fw
+endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
 	# copy remote firmware files for c6x_1
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(QNX_AUX_FS_PATH)/lib/firmware/$(QNX_FIRMWARE_PREFIX)-c66_0-fw

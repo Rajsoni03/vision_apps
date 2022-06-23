@@ -115,6 +115,20 @@ ifeq ($(BUILD_CPU_MCU3_1),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
 	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f1_1-fw
 endif
+ifeq ($(BUILD_CPU_MCU4_0),yes)
+	# copy remote firmware files for mcu4_0
+	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu4_0.out)
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f2_0-fw
+endif
+ifeq ($(BUILD_CPU_MCU4_1),yes)
+	# copy remote firmware files for mcu4_1
+	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu4_1.out)
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
+	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
+	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-main-r5f2_1-fw
+endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
 	# copy remote firmware files for c6x_1
 	$(eval IMAGE_NAME := vx_app_rtos_linux_c6x_1.out)
