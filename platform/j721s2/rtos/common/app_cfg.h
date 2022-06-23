@@ -85,10 +85,6 @@
 
 #define ENABLE_IPC_ECHO_TEST
 
-#define APP_LOG_MEM_SIZE                   (0x00040000u)
-#define TIOVX_OBJ_DESC_SHARED_MEM_SIZE     (0x00FC0000u)
-#define IPC_VRING_MEM_SIZE                 (0x02000000u)
-
 #define APP_ASSERT_SUCCESS(x)  { if((x)!=0) while(1); }
 
 

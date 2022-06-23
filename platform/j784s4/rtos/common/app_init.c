@@ -109,7 +109,7 @@ __attribute__ ((section(".bss:app_log_mem")))
 __attribute__ ((aligned(4096)))
         ;
 
-uint8_t g_tiovx_obj_desc_mem[TIOVX_OBJ_DESC_SHARED_MEM_SIZE]
+uint8_t g_tiovx_obj_desc_mem[TIOVX_OBJ_DESC_MEM_SIZE]
 __attribute__ ((section(".bss:tiovx_obj_desc_mem")))
 __attribute__ ((aligned(4096)))
         ;
@@ -322,7 +322,7 @@ int32_t appInit()
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
     #endif
     ipc_init_prm.tiovx_obj_desc_mem = (void*)g_tiovx_obj_desc_mem;
-    ipc_init_prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_SHARED_MEM_SIZE;
+    ipc_init_prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_MEM_SIZE;
     ipc_init_prm.tiovx_log_rt_mem   = (void*)TIOVX_LOG_RT_MEM_ADDR;
     ipc_init_prm.tiovx_log_rt_mem_size   = TIOVX_LOG_RT_MEM_SIZE;
     ipc_init_prm.ipc_vring_mem = g_ipc_vring_mem;
