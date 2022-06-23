@@ -3,7 +3,6 @@
 #
 
 sdk_check_paths:
-	@if [ ! -d $(GCC_SYSBIOS_ARM_ROOT) ]; then echo 'ERROR: $(GCC_SYSBIOS_ARM_ROOT) not found !!!'; echo 'Ensure all dependencies have been downloaded as per http://software-dl.ti.com/jacinto7/esd/processor-sdk-rtos-jacinto7/latest/exports/docs/vision_apps/docs/user_guide/ENVIRONMENT_SETUP.html#ADDITIONAL_DOWNLOADS'; exit 1; fi
 	@if [ ! -d $(GCC_LINUX_ARM_ROOT) ]; then echo 'ERROR: $(GCC_LINUX_ARM_ROOT) not found !!!'; echo 'Ensure all dependencies have been downloaded as per http://software-dl.ti.com/jacinto7/esd/processor-sdk-rtos-jacinto7/latest/exports/docs/vision_apps/docs/user_guide/ENVIRONMENT_SETUP.html#ADDITIONAL_DOWNLOADS'; exit 1; fi
 	@if [ ! -d $(CGT7X_ROOT) ]; then echo 'ERROR: $(CGT7X_ROOT) not found !!!'; exit 1; fi
 	@if [ ! -d $(TIARMCGT_LLVM_ROOT) ]; then echo 'ERROR: $(TIARMCGT_LLVM_ROOT) not found !!!'; exit 1; fi
