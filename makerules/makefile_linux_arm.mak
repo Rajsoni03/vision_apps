@@ -241,6 +241,10 @@ linux_fs_install_sd: linux_fs_install
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_SD_FS_ROOT_PATH))
 
 	$(call MODIFY_FS,$(LINUX_SD_FS_ROOT_PATH),$(LINUX_SD_FS_BOOT_PATH))
+
+ifeq ($(SOC),j784s4)
+	sudo cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/k3-j784s4-vision-apps.dtbo $(1)/boot/.
+endif
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_linux_install_sd
 endif
