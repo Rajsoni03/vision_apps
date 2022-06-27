@@ -49,6 +49,9 @@ endif
 vxlib_scrub:
 	$(MAKE) -C $(VXLIB_PATH) scrub
 
+vxlib_clean:
+	$(MAKE) -C $(VXLIB_PATH) clean
+
 tiovx:
 	$(MAKE) -C $(TIOVX_PATH)
 
