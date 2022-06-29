@@ -75,16 +75,12 @@
 #include <ti/sysbios/family/c66/Cache.h>
 #endif
 
-void appTimerInterruptInit(void);
 void appCacheMarInit(void);
 
 static void appMain(void* arg0, void* arg1)
 {
     appUtilsTaskInit();
     appInit();
-    #ifndef SAFERTOS
-    appTimerInterruptInit();
-    #endif
     appRun();
     #if 1
     while(1)
@@ -166,40 +162,3 @@ void appCacheMarInit(void)
     CacheP_setMar((void *)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, CacheP_Mar_DISABLE);
 #endif
 }
-
-/* To set C66 timer interrupts */
-void appTimerInterruptInit(void)
-{
-#if defined (_TMS320C6X)
-    int32_t status = 0;
-
-    struct tisci_msg_rm_irq_set_req     rmIrqReq;
-    struct tisci_msg_rm_irq_set_resp    rmIrqResp;
-
-    /* On C66x builds we define OS timer tick in the configuration file to
-     * trigger event #21 for C66x_1 and #20 for C66x_2. Map
-     * DMTimer 0 interrupt to these events through DMSC RM API.
-     */
-    rmIrqReq.valid_params           = TISCI_MSG_VALUE_RM_DST_ID_VALID |
-                                      TISCI_MSG_VALUE_RM_DST_HOST_IRQ_VALID;
-    rmIrqReq.src_id                 = TISCI_DEV_TIMER0;
-    rmIrqReq.src_index              = 0U;
-    rmIrqReq.dst_id                 = TISCI_DEV_C66SS0_CORE0;
-    rmIrqReq.dst_host_irq           = 21U;
-    /* Unused params */
-    rmIrqReq.global_event           = 0U;
-    rmIrqReq.ia_id                  = 0U;
-    rmIrqReq.vint                   = 0U;
-    rmIrqReq.vint_status_bit_index  = 0U;
-    rmIrqReq.secondary_host         = TISCI_MSG_VALUE_RM_UNUSED_SECONDARY_HOST;
-
-    status = Sciclient_rmIrqSet(&rmIrqReq, &rmIrqResp, SCICLIENT_SERVICE_WAIT_FOREVER);
-    if(status != 0)
-    {
-        appLogPrintf(" ERROR: failed to setup timer interrupt !!!\n" );
-    }
-#endif
-
-    return;
-}
-
