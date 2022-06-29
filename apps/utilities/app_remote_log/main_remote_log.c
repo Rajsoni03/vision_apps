@@ -114,6 +114,12 @@ int main(void)
     #ifdef ENABLE_IPC_MCU3_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU3_1] = 1;
     #endif
+    #ifdef ENABLE_IPC_MCU4_0
+    log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU4_0] = 1;
+    #endif
+    #ifdef ENABLE_IPC_MCU4_1
+    log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU4_1] = 1;
+    #endif
     #ifdef ENABLE_IPC_C6x_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C6x_1] = 1;
     #endif
@@ -125,6 +131,12 @@ int main(void)
     #endif
     #ifdef ENABLE_IPC_C7x_2
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_2] = 1;
+    #endif
+    #ifdef ENABLE_IPC_C7x_3
+    log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
+    #endif
+    #ifdef ENABLE_IPC_C7x_4
+    log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
     #endif
 
     log_init_prm.shared_mem = (app_log_shared_mem_t *)APP_LOG_MEM_ADDR;
