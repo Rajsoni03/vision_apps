@@ -99,6 +99,12 @@ BUILD_QNX_A72?=no
 # (Only supported on A72, ignored on x86_64)
 LINK_SHARED_OBJ?=yes
 
+ifeq ($(SOC),j784s4)
+ifeq ($(BUILD_QNX_A72),yes)
+LINK_SHARED_OBJ=no
+endif
+endif
+
 # Since MCU R5F runs in locked step mode in vision apps, dont set these to 'yes'
 BUILD_CPU_MCU1_1?=no
 
