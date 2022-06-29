@@ -74,14 +74,14 @@
 //#define ENABLE_IPC_MCU1_1
 #define ENABLE_IPC_MCU2_0
 #define ENABLE_IPC_MCU2_1
-//#define ENABLE_IPC_MCU3_0
-//#define ENABLE_IPC_MCU3_1
-//#define ENABLE_IPC_MCU4_0
-//#define ENABLE_IPC_MCU4_1
+#define ENABLE_IPC_MCU3_0
+#define ENABLE_IPC_MCU3_1
+#define ENABLE_IPC_MCU4_0
+#define ENABLE_IPC_MCU4_1
 #define ENABLE_IPC_C7x_1
 #define ENABLE_IPC_C7x_2
-//#define ENABLE_IPC_C7x_3
-//#define ENABLE_IPC_C7x_4
+#define ENABLE_IPC_C7x_3
+#define ENABLE_IPC_C7x_4
 
 #define ENABLE_UDMA
 #define ENABLE_UDMA_COPY
