@@ -129,7 +129,7 @@ static uint32_t g_app_ipc_remote_proc[] =
 static uint32_t g_app_ipc_remote_proc[] =
 {
     IPC_MCU1_0, IPC_MCU1_1, IPC_MCU2_0, IPC_MCU2_1,
-    IPC_MCU3_0, IPC_MCU3_1, IPC_MCU3_0, IPC_MCU3_1,
+    IPC_MCU3_0, IPC_MCU3_1, IPC_MCU4_0, IPC_MCU4_1,
     IPC_C7X_1, IPC_C7X_2, IPC_C7X_3, IPC_C7X_4
 };
 #endif
