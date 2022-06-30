@@ -97,6 +97,16 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
     {
         rpmsg_char_id = R5F_MAIN1_1;
     }
+    #if defined(SOC_J784S4)
+    else if (APP_IPC_CPU_MCU4_0 == cpu_id)
+    {
+        rpmsg_char_id = R5F_MAIN2_0;
+    }
+    else if (APP_IPC_CPU_MCU4_1 == cpu_id)
+    {
+        rpmsg_char_id = R5F_MAIN2_1;
+    }
+    #endif
     #if defined (SOC_J721E)
     else if (APP_IPC_CPU_C6x_1 == cpu_id)
     {
