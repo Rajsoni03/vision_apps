@@ -69,7 +69,7 @@
 
 #define DDR_HEAP_MEM_SIZE               (DDR_MCU2_1_LOCAL_HEAP_SIZE)
 #define ENABLE_FVID2
-#define ENABLE_VHWA_VPAC
+#undef ENABLE_VHWA_VPAC
 #define ENABLE_VHWA_DMPAC
 
 
