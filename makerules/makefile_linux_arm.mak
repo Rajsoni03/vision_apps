@@ -285,3 +285,9 @@ linux_fs_install_tar: linux_fs_install_nfs linux_fs_install_nfs_test_data
 	# Creating rootfs tar - using lzma compression, but parallelized to increase performance (-I pxz)
 	# (-J would do lzma compression, but without parallelization)
 	cd $(LINUX_FS_PATH) && sudo tar -I pxz -cpf $(VISION_APPS_PATH)/rootfs.tar.xz .
+
+linux_fs_install_from_custom_stage:
+	# Internal Testing
+	# Set LINUX_FS_PATH=destination dir
+	# Set LINUX_FS_STAGE_PATH=source dir
+	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_FS_PATH))
