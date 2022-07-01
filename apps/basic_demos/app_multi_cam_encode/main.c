@@ -78,7 +78,7 @@
 
 #include "multi_cam_encode_ldc_module.h"
 #include "multi_cam_encode_scaler_module.h"
-#include "multi_cam_encode_img_mosaic_module.h"
+#include "tiovx_img_mosaic_module.h"
 
 #define APP_BUFFER_Q_DEPTH   (4)
 #define GST_BUFFER_Q_DEPTH   (2)
@@ -95,7 +95,7 @@ typedef struct {
     AEWBObj       aewbObj;
     LDCObj        ldcObj;
     ScalerObj     scalerObj;
-    ImgMosaicObj  imgMosaicObj;
+    TIOVXImgMosaicModuleObj  imgMosaicObj;
     DisplayObj    displayObj;
     GstPipeObj    gstPipeObj;   
 
@@ -182,9 +182,8 @@ static void app_default_param_set(AppObj *obj);
 static void app_querry_param_set(AppObj *obj);
 static void app_update_param_set(AppObj *obj);
 static void app_pipeline_params_defaults(AppObj *obj);
-static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static vx_int32 calc_grid_size(vx_uint32 ch);
-static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
+static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
 static vx_status copy_data(void* gst_data_ptr[], void* data_ptr[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
 static vx_status step_capture_graph(AppObj* obj);
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][2], vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
@@ -939,7 +938,7 @@ static vx_status app_init(AppObj *obj)
 
     if((obj->enable_mosaic == 1) && (status == VX_SUCCESS))
     {
-        status = app_init_img_mosaic(obj->context, &obj->imgMosaicObj, "img_mosaic_obj", APP_BUFFER_Q_DEPTH);
+        status = tiovx_img_mosaic_module_init(obj->context, &obj->imgMosaicObj);
         APP_PRINTF("Img Mosaic init done!\n");
     }
 
@@ -1004,7 +1003,7 @@ static void app_deinit(AppObj *obj)
 
     if(obj->enable_mosaic == 1)
     {
-        app_deinit_img_mosaic(&obj->imgMosaicObj, APP_BUFFER_Q_DEPTH);
+        tiovx_img_mosaic_module_deinit(&obj->imgMosaicObj);
         APP_PRINTF("Img Mosaic deinit done!\n");
     }
 
@@ -1037,7 +1036,7 @@ static void app_delete_graph(AppObj *obj)
     app_delete_scaler(&obj->scalerObj);
     APP_PRINTF("Scaler delete done!\n");
 
-    app_delete_img_mosaic(&obj->imgMosaicObj);
+    tiovx_img_mosaic_module_delete(&obj->imgMosaicObj);
     APP_PRINTF("Img Mosaic delete done!\n");
 
     app_delete_display(&obj->displayObj);
@@ -1139,16 +1138,17 @@ static vx_status app_create_graph(AppObj *obj)
         APP_PRINTF("Scaler graph done!\n");
     }
 
-    vx_int32 idx = 0;
     vx_image display_in_image;
     if(obj->enable_mosaic == 1)
     {
-        obj->imgMosaicObj.input_arr[idx++] = obj->intermediate_obj_arr[APP_BUFFER_Q_DEPTH];
-        obj->imgMosaicObj.num_inputs = idx;
+        // obj->imgMosaicObj.inputs[idx++].arr[0] = obj->intermediate_obj_arr[APP_BUFFER_Q_DEPTH];
+
+        vx_object_array mosaic_input_arr[1];
+        mosaic_input_arr[0] = obj->intermediate_obj_arr[APP_BUFFER_Q_DEPTH];
 
         if(status == VX_SUCCESS)
         {
-            status = app_create_graph_img_mosaic(obj->display_graph, &obj->imgMosaicObj, NULL);
+            status = tiovx_img_mosaic_module_create(obj->display_graph, &obj->imgMosaicObj, NULL, mosaic_input_arr, TIVX_TARGET_VPAC_MSC1);
             APP_PRINTF("Img Mosaic graph done!\n");
         }
         display_in_image = obj->imgMosaicObj.output_image[0];
@@ -1197,7 +1197,7 @@ static vx_status app_create_graph(AppObj *obj)
 
         disp_graph_parameter_index = 0;
         add_graph_parameter_by_node_index(obj->display_graph, obj->imgMosaicObj.node, 3);
-        obj->imgMosaicObj.in_graph_parameter_index = disp_graph_parameter_index;
+        obj->imgMosaicObj.inputs[0].graph_parameter_index = disp_graph_parameter_index;
         disp_graph_parameters_queue_params_list[disp_graph_parameter_index].graph_parameter_index = disp_graph_parameter_index;
         disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list_size = obj->num_vx_refs;
         disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
@@ -1206,7 +1206,7 @@ static vx_status app_create_graph(AppObj *obj)
         if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
         {
             add_graph_parameter_by_node_index(obj->display_graph, obj->imgMosaicObj.node, 1);
-            obj->imgMosaicObj.out_graph_parameter_index = disp_graph_parameter_index;
+            obj->imgMosaicObj.output_graph_parameter_index = disp_graph_parameter_index;
             disp_graph_parameters_queue_params_list[disp_graph_parameter_index].graph_parameter_index = disp_graph_parameter_index;
             disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
             disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list = (vx_reference*)&obj->imgMosaicObj.output_image[0];
@@ -1350,7 +1350,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     APP_PRINTF("app_run_graph_for_one_pipeline: frame %d beginning\n", frame_id);
     appPerfPointBegin(&obj->total_perf);
 
-    ImgMosaicObj *imgMosaicObj = &obj->imgMosaicObj;
+    TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
     CaptureObj *captureObj = &obj->captureObj;
 
     /* ----------- Pipeup for Capture graph ----------- */
@@ -1457,11 +1457,11 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         }
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->in_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->mosaic_enq_id], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->mosaic_enq_id], 1);
         }
         if ((obj->en_out_img_write == 1) || (obj->test_mode == 1))
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->out_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->enqueueCnt], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->enqueueCnt], 1);
         }
 
         /* Dequeue and Enqueue_next Capture graph */
@@ -1558,7 +1558,7 @@ static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
 {
     vx_status status = VX_SUCCESS;
 
-    ImgMosaicObj *imgMosaicObj = &obj->imgMosaicObj;
+    TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
 
     /* checksum_actual is the checksum determined by the realtime test
         checksum_expected is the checksum that is expected to be the pipeline output */
@@ -1574,7 +1574,7 @@ static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
 
     if (status == VX_SUCCESS)
     {
-        status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->in_graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
+        status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
     }
     if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
     {
@@ -1583,7 +1583,7 @@ static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
         /* Dequeue output */
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->out_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
+            status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
         }
         if ((status == VX_SUCCESS) && (obj->test_mode == 1) && (frame_id > TEST_BUFFER))
         {
@@ -1603,19 +1603,19 @@ static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
             snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
             if (status == VX_SUCCESS)
             {
-                status = writeMosaicOutput(output_file_name, mosaic_output_image);
+                // status = writeMosaicOutput(output_file_name, mosaic_output_image);
             }
             appPerfPointEnd(&obj->fileio_perf);
         }
         /* Enqueue output */
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->out_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1);
         }
     }
     if (status == VX_SUCCESS)
     {
-        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->in_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->mosaic_enq_id], 1);
+        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->mosaic_enq_id], 1);
     }
 
     obj->mosaic_enq_id++;
@@ -2102,14 +2102,23 @@ static vx_int32 calc_grid_size(vx_uint32 ch)
     }
 }
 
-static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh)
+static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh)
 {
     vx_int32 idx, ch;
     vx_int32 grid_size = calc_grid_size(numCh);
 
     imgMosaicObj->out_width    = DISPLAY_WIDTH;
     imgMosaicObj->out_height   = DISPLAY_HEIGHT;
+    imgMosaicObj->out_bufq_depth = APP_BUFFER_Q_DEPTH;
+    imgMosaicObj->color_format = VX_DF_IMAGE_NV12;
+
     imgMosaicObj->num_inputs   = 1;
+    imgMosaicObj->num_channels = numCh;
+
+    imgMosaicObj->inputs[0].width = in_width;
+    imgMosaicObj->inputs[0].height = in_height;
+    imgMosaicObj->inputs[0].bufq_depth = APP_BUFFER_Q_DEPTH;
+    imgMosaicObj->inputs[0].color_format = VX_DF_IMAGE_NV12;
 
     idx = 0;
 
@@ -2159,15 +2168,4 @@ static void app_update_param_set(AppObj *obj)
         obj->gstPipeObj.height = 720;
     }
 
-}
-
-/*
- * Utility API used to add a graph parameter from a node, node parameter index
- */
-static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index)
-{
-    vx_parameter parameter = vxGetParameterByIndex(node, node_parameter_index);
-
-    vxAddParameterToGraph(graph, parameter);
-    vxReleaseParameter(&parameter);
 }
