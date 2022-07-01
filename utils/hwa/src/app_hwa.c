@@ -75,6 +75,7 @@
 #include <ti/drv/vhwa/include/vhwa_m2mNf.h>
 #include <ti/drv/vhwa/include/vhwa_m2mSde.h>
 #include <ti/drv/vhwa/include/vhwa_m2mViss.h>
+#include <TI/j7_viss_srvr_remote.h>
 
 #define APP_DEBUG_VHWA
 
@@ -727,5 +728,38 @@ int32_t appVhwaRemoteServiceDeInit()
     }
 
     return status;
+}
+
+int32_t appVissRemoteServiceDeInit()
+{
+    int32_t viss_status;
+
+    viss_status = VissRemoteServer_DeInit();
+    if(viss_status!=0)
+    {
+        appLogPrintf(" appVissRemoteServiceDeInit: ERROR: Failed to deinitialize VISS remote server \n");
+    }
+
+    return (viss_status);
+}
+
+int32_t appVissRemoteServiceInit()
+{
+    int32_t viss_status;
+
+    appLogPrintf("VISS REMOTE SERVICE: Init ... !!!\n");
+
+    viss_status = VissRemoteServer_Init();
+    if(viss_status!=0)
+    {
+        appLogPrintf("ISS: Error: Failed to create remote VISS remote server failed. Live tuning will not work !!!\n");
+        return -1;
+    }
+    else
+    {
+        appLogPrintf("VISS REMOTE SERVICE: Init ... Done !!!\n");
+    }
+
+    return viss_status;
 }
 

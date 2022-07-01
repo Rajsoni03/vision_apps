@@ -669,6 +669,11 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
 
+    #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
+    status = appVissRemoteServiceInit();
+    APP_ASSERT_SUCCESS(status);
+    #endif
+
     #ifdef ENABLE_UDMA_COPY
     status = appUdmaCopyInit();
     APP_ASSERT_SUCCESS(status);
@@ -755,6 +760,10 @@ void appDeInit()
 
     #ifdef ENABLE_I2C
     appI2cDeInit();
+    #endif
+
+    #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
+    appVissRemoteServiceDeInit();
     #endif
 
     #if defined(ENABLE_I2C) && defined(ENABLE_CSI2RX)

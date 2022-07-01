@@ -244,6 +244,16 @@ int32_t appVhwaRemoteServiceInit();
  */
 int32_t appVhwaRemoteServiceDeInit();
 
+/** \brief Performs registration of remote service for VISS node
+ *
+ */
+int32_t appVissRemoteServiceInit();
+
+/** \brief Performs unregistration of remote service for VISS node
+ *
+ */
+int32_t appVissRemoteServiceDeInit();
+
 /* @} */
 
 #endif

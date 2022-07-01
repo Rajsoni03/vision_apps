@@ -354,17 +354,6 @@ int32_t appIssInit()
         appLogPrintf("IssSensor_Init ... Done !!!\n");
     }
 
-    viss_status = VissRemoteServer_Init();
-    if(viss_status!=0)
-    {
-        printf("ISS: Error: Failed to create remote VISS remote server failed. Live tuning will not work !!!\n");
-        return -1;
-    }
-    else
-    {
-        appLogPrintf("vissRemoteServer_Init ... Done !!!\n");
-    }
-
     itt_status = IttRemoteServer_Init();
     if(itt_status!=0)
     {
@@ -382,15 +371,8 @@ int32_t appIssDeInit()
 {
     int32_t status;
     int32_t itt_status;
-    int32_t viss_status;
     status = IssSensor_DeInit();
     if(status!=0)
-    {
-        printf(" appIssDeInit: ERROR: Failed to deinitialize ISS sensor \n");
-    }
-
-    viss_status = VissRemoteServer_DeInit();
-    if(viss_status!=0)
     {
         printf(" appIssDeInit: ERROR: Failed to deinitialize ISS sensor \n");
     }
@@ -402,7 +384,7 @@ int32_t appIssDeInit()
     }
 
     appLogPrintf("APP ISS: Deinit ... Done !!!\n");
-    return (status|viss_status);
+    return (status);
 }
 
 #endif /*defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS))*/
