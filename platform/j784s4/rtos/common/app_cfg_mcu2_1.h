@@ -71,6 +71,6 @@
 #define ENABLE_FVID2
 #define ENABLE_VHWA_VPAC1
 #define ENABLE_VHWA_DMPAC
-
+#undef ENABLE_UDMA_COPY
 
 #endif /* APP_CFG_MCU2_1_H_ */
