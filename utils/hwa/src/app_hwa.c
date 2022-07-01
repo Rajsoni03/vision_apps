@@ -374,14 +374,28 @@ int32_t appVhwaDmpacInit()
 
 }
 
-int32_t appVhwaVpacInit()
+int32_t appVhwaVpacInit(uint32_t vpacInst)
 {
     int32_t  status = FVID2_SOK;
 
     appLogPrintf("VHWA: VPAC Init ... !!!\n");
 
     #if defined(ENABLE_LDC) || defined(ENABLE_MSC) || defined(ENABLE_NF) || defined(ENABLE_VISS)
-    SET_DEVICE_STATE_ON(TISCI_DEV_VPAC0);
+    if (0u==vpacInst)
+    {
+        SET_DEVICE_STATE_ON(TISCI_DEV_VPAC0);
+    }
+    #if defined(SOC_J784S4)
+    else if (1u==vpacInst)
+    {
+        SET_DEVICE_STATE_ON(TISCI_DEV_VPAC1);
+    }
+    #endif
+    else
+    {
+        appLogPrintf("VHWA: ERROR: Unsupported VPAC instance!!!\n");
+        status = FVID2_EFAIL;
+    }
     #endif
 
 #ifdef ENABLE_LDC

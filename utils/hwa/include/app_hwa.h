@@ -209,7 +209,7 @@ int32_t appCsi2TxInit(void);
 /** \brief Performs initializations needed for VHWA drivers
  *
  */
-int32_t appVhwaVpacInit(void);
+int32_t appVhwaVpacInit(uint32_t vpacInst);
 int32_t appVhwaDmpacInit(void);
 
 /** \brief Performs de-initializations needed for CSI2RX driver

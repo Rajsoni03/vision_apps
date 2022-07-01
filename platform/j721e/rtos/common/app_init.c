@@ -594,7 +594,7 @@ int32_t appInit()
     #endif
 
     #ifdef ENABLE_VHWA_VPAC
-    status = appVhwaVpacInit();
+    status = appVhwaVpacInit(0u);
     APP_ASSERT_SUCCESS(status);
     #endif
 

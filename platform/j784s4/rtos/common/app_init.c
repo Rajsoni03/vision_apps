@@ -624,8 +624,17 @@ int32_t appInit()
     }
     #endif
 
-    #ifdef ENABLE_VHWA_VPAC
-    status = appVhwaVpacInit();
+    #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
+    uint32_t vpacInst;
+
+    #if defined(ENABLE_VHWA_VPAC0)
+    vpacInst = 0u;
+    #endif
+    #if defined(ENABLE_VHWA_VPAC1)
+    vpacInst = 1u;
+    #endif
+
+    status = appVhwaVpacInit(vpacInst);
     APP_ASSERT_SUCCESS(status);
     #endif
 
@@ -698,7 +707,7 @@ void appDeInit()
     #endif
     tivxDeInit();
     #endif
-    #ifdef ENABLE_VHWA_VPAC
+    #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
     appVhwaVpacDeInit();
     #endif
     #ifdef ENABLE_VHWA_DMPAC
@@ -770,7 +779,7 @@ static void appRegisterOpenVXTargetKernels()
 {
     #ifdef ENABLE_TIOVX
     appLogPrintf("APP: OpenVX Target kernel init ... !!!\n");
-        #ifdef ENABLE_VHWA_VPAC
+        #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxRegisterHwaTargetVpacMscKernels();
         tivxRegisterHwaTargetVpacLdcKernels();
         tivxRegisterHwaTargetVpacVissKernels();
@@ -810,8 +819,10 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterImgProcTargetC66Kernels();
         #endif
         #endif
-        #ifdef ENABLE_VHWA_VPAC
+        #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxRegisterImgProcTargetR5FKernels();
+        #endif
+        #if defined(ENABLE_VHWA_VPAC0)
         tivxRegisterImagingTargetAewbKernels();
         #endif
     appLogPrintf("APP: OpenVX Target kernel init ... Done !!!\n");
@@ -822,7 +833,7 @@ static void appUnRegisterOpenVXTargetKernels()
 {
     #ifdef ENABLE_TIOVX
     appLogPrintf("APP: OpenVX Target kernel deinit ... !!!\n");
-        #ifdef ENABLE_VHWA_VPAC
+        #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxUnRegisterHwaTargetVpacMscKernels();
         tivxUnRegisterHwaTargetVpacLdcKernels();
         tivxUnRegisterHwaTargetVpacNfKernels();
@@ -862,8 +873,10 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterImgProcTargetC66Kernels();
         #endif
         #endif
-        #ifdef ENABLE_VHWA_VPAC
+        #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxUnRegisterImgProcTargetR5FKernels();
+        #endif
+        #if defined(ENABLE_VHWA_VPAC0)
         tivxUnRegisterImagingTargetAewbKernels();
         #endif
     appLogPrintf("APP: OpenVX Target kernel deinit ... Done !!!\n");

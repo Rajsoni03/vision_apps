@@ -116,7 +116,7 @@
 
 
 #define ENABLE_FVID2
-#define ENABLE_VHWA_VPAC
+#define ENABLE_VHWA_VPAC0
 #undef ENABLE_VHWA_DMPAC
 
 #if defined (ENABLE_DSS_DSI) && !defined(ENABLE_I2C)

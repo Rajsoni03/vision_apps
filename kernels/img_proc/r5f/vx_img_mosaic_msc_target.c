@@ -203,7 +203,7 @@ void tivxAddTargetKernelImgMosaicMsc(void)
         strncpy(target_name[1], TIVX_TARGET_VPAC_MSC2, TIVX_TARGET_MAX_NAME);
     }
     #if defined(SOC_J784S4)
-    else if ((vx_enum)TIVX_CPU_ID_MCU4_0 == self_cpu)
+    else if ((vx_enum)TIVX_CPU_ID_MCU2_1 == self_cpu)
     {
         /* Both scalars are used, but the target used it always MSC0 */
         strncpy(target_name[0], TIVX_TARGET_VPAC2_MSC1, TIVX_TARGET_MAX_NAME);
@@ -427,7 +427,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
             inst_id_offset      = 0U;
         }
         #if defined(SOC_J784S4)
-        else if ((vx_enum)TIVX_CPU_ID_MCU4_0 == self_cpu)
+        else if ((vx_enum)TIVX_CPU_ID_MCU2_1 == self_cpu)
         {
             app_hwa_inst_id_0   = APP_PERF_HWA_VPAC2_MSC0;
             app_hwa_inst_id_1   = APP_PERF_HWA_VPAC2_MSC1;
