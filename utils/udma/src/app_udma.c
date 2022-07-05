@@ -369,7 +369,6 @@ void *appUdmaCsirxCsitxGetObj(void)
     return (void *)&gAppUdmaDrvObjCsirxCsitx;
     #elif defined(SOC_J721E)
     return (void *)&gAppUdmaDrvObj;
-    #elif defined(SOC_J784S4)
     #endif
 }
 
