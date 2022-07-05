@@ -79,13 +79,13 @@ MEMORY
     /* DDR for MCU4_1 for code/data [ size 15.00 MB ] */
     DDR_MCU4_1               ( RWIX ) : ORIGIN = 0xAA100400 , LENGTH = 0x00EFFC00
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 48.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xB5000000 , LENGTH = 0x03000000
+    IPC_VRING_MEM                     : ORIGIN = 0xB8000000 , LENGTH = 0x03000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xB8000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xBB000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB8040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xBB040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
     /* DDR for MCU4_1 for local heap [ size  8.00 MB ] */
-    DDR_MCU4_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE2800000 , LENGTH = 0x00800000
+    DDR_MCU4_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE5800000 , LENGTH = 0x00800000
 }

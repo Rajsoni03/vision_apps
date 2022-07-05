@@ -245,7 +245,7 @@ c7x_1_ddr_vecs_size = 16*KB;
 c7x_1_ddr_secure_vecs_addr = c7x_1_ddr_resource_table_addr + 5*MB;
 c7x_1_ddr_secure_vecs_size = 16*KB;
 c7x_1_ddr_addr = c7x_1_ddr_secure_vecs_addr + c7x_1_ddr_secure_vecs_size;
-c7x_1_ddr_size = 40*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
+c7x_1_ddr_size = 52*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
 
 c7x_2_ddr_ipc_addr = c7x_1_ddr_addr + c7x_1_ddr_size;
 c7x_2_ddr_resource_table_addr = c7x_2_ddr_ipc_addr + linux_ddr_ipc_size;
@@ -256,7 +256,7 @@ c7x_2_ddr_vecs_size = 16*KB;
 c7x_2_ddr_secure_vecs_addr = c7x_2_ddr_resource_table_addr + 5*MB;
 c7x_2_ddr_secure_vecs_size = 16*KB;
 c7x_2_ddr_addr = c7x_2_ddr_secure_vecs_addr + c7x_2_ddr_secure_vecs_size;
-c7x_2_ddr_size = 40*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
+c7x_2_ddr_size = 52*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
 
 c7x_3_ddr_ipc_addr = c7x_2_ddr_addr + c7x_2_ddr_size;
 c7x_3_ddr_resource_table_addr = c7x_3_ddr_ipc_addr + linux_ddr_ipc_size;
@@ -267,7 +267,7 @@ c7x_3_ddr_vecs_size = 16*KB;
 c7x_3_ddr_secure_vecs_addr = c7x_3_ddr_resource_table_addr + 5*MB;
 c7x_3_ddr_secure_vecs_size = 16*KB;
 c7x_3_ddr_addr = c7x_3_ddr_secure_vecs_addr + c7x_3_ddr_secure_vecs_size;
-c7x_3_ddr_size = 40*MB - (c7x_3_ddr_addr-c7x_3_ddr_ipc_addr);
+c7x_3_ddr_size = 52*MB - (c7x_3_ddr_addr-c7x_3_ddr_ipc_addr);
 
 c7x_4_ddr_ipc_addr =c7x_3_ddr_addr + c7x_3_ddr_size;
 c7x_4_ddr_resource_table_addr = c7x_4_ddr_ipc_addr + linux_ddr_ipc_size;
@@ -278,7 +278,7 @@ c7x_4_ddr_vecs_size = 16*KB;
 c7x_4_ddr_secure_vecs_addr = c7x_4_ddr_resource_table_addr + 5*MB;
 c7x_4_ddr_secure_vecs_size = 16*KB;
 c7x_4_ddr_addr = c7x_4_ddr_secure_vecs_addr + c7x_4_ddr_secure_vecs_size;
-c7x_4_ddr_size = 40*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
+c7x_4_ddr_size = 52*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
 
 #
 # DDR memory allocation for various shared memories
