@@ -89,6 +89,25 @@
 
 typedef struct {
 
+    vx_object_array arr[APP_MODULES_MAX_BUFQ_DEPTH];
+
+    void           *data_ptr[APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
+    vx_map_id       map_id[APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
+
+    vx_int32        bufq_depth;
+    vx_int32        num_channels;
+    vx_int32        num_planes;
+
+    vx_int32        width;
+    vx_int32        height;
+    vx_df_image     format;
+
+    vx_int32        graph_parameter_index;
+
+} AppGraphParamRefPool;
+
+typedef struct {
+
     SensorObj     sensorObj;
     CaptureObj    captureObj;
     VISSObj       vissObj;
@@ -101,11 +120,9 @@ typedef struct {
 
     vx_object_array ldc_out_arr_q[APP_MODULES_MAX_BUFQ_DEPTH];
 
-    vx_object_array intermediate_obj_arr[2*APP_MODULES_MAX_BUFQ_DEPTH];
-    void* data_ptr[2*APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][2];
-    vx_map_id map_id[2*APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][2];
+    AppGraphParamRefPool enc_pool;
+    AppGraphParamRefPool dec_pool;
 
-    vx_uint8 num_vx_refs;
     vx_uint8 num_gst_bufs;
 
     vx_uint8 ldc_enq_id;
@@ -117,16 +134,12 @@ typedef struct {
     vx_uint8 appsink_pull_id;
     vx_status pull_status;
 
-    // void* gst_data_ptr[MAX_NUM_CHANNELS];
-
     vx_char output_file_path[APP_MAX_FILE_PATH];
 
     /* OpenVX references */
     vx_context context;
     vx_graph   capture_graph;
     vx_graph   display_graph;
-
-    vx_int32 capt_out_graph_parameter_index;
 
     vx_int32 en_out_img_write;
     vx_int32 test_mode;
@@ -156,10 +169,8 @@ typedef struct {
 
     int32_t downscale;
 
-    int32_t pipeline;
-
-    int32_t enqueueCnt;
-    int32_t dequeueCnt;
+    int32_t capture_id;
+    int32_t display_id;
 
     int32_t write_file;
 
@@ -184,13 +195,13 @@ static void app_update_param_set(AppObj *obj);
 static void app_pipeline_params_defaults(AppObj *obj);
 static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
-static vx_status copy_data(void* gst_data_ptr[], void* data_ptr[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
-static vx_status step_capture_graph(AppObj* obj);
-static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][2], vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
-static vx_status step_gst_pipeline(AppObj* obj);
+static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels);
+static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels);
+static vx_status capture_encode(AppObj* obj, vx_int32 frame_id);
+static vx_status copy_data(void* from_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], void* to_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 img_width, vx_uint32 img_height, vx_int32 num_channels);
 static vx_status step_copy_data(AppObj *obj);
-static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels);
 static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id);
+static vx_status decode_display(AppObj* obj, vx_int32 frame_id);
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -905,15 +916,15 @@ static vx_status app_init(AppObj *obj)
 
     if(status==VX_SUCCESS)
     {
-        vx_image intermediate_img = vxCreateImage(obj->context, obj->gstPipeObj.width, obj->gstPipeObj.height, VX_DF_IMAGE_NV12);
+        vx_image intermediate_img = vxCreateImage(obj->context, obj->enc_pool.width, obj->enc_pool.height, VX_DF_IMAGE_NV12);
         status = vxGetStatus((vx_reference)intermediate_img);
         vx_int32 q;
         if(status == VX_SUCCESS)
         {
-            for(q = 0; q < obj->num_vx_refs; q++)
+            for(q = 0; q < obj->enc_pool.bufq_depth; q++)
             {
-                obj->intermediate_obj_arr[q] = vxCreateObjectArray(obj->context, (vx_reference)intermediate_img, obj->sensorObj.num_cameras_enabled);
-                status = vxGetStatus((vx_reference)obj->intermediate_obj_arr[q]);
+                obj->enc_pool.arr[q] = vxCreateObjectArray(obj->context, (vx_reference)intermediate_img, obj->sensorObj.num_cameras_enabled);
+                status = vxGetStatus((vx_reference)obj->enc_pool.arr[q]);
                 if(status != VX_SUCCESS)
                 {
                     printf("[APP_INIT]: Unable to create image object array! \n");
@@ -923,9 +934,42 @@ static vx_status app_init(AppObj *obj)
                 {
                     vx_char name[VX_MAX_REFERENCE_NAME];
 
-                    snprintf(name, VX_MAX_REFERENCE_NAME, "intermediate_obj_arr_%d", q);
+                    snprintf(name, VX_MAX_REFERENCE_NAME, "enc_pool.arr_%d", q);
 
-                    vxSetReferenceName((vx_reference)obj->intermediate_obj_arr[q], name);
+                    vxSetReferenceName((vx_reference)obj->enc_pool.arr[q], name);
+                }
+            }
+            vxReleaseImage(&intermediate_img);
+        }
+        else
+        {
+            printf("[APP_INIT]: Unable to create intermediate_img\n");
+        }
+    }
+
+    if(status==VX_SUCCESS)
+    {
+        vx_image intermediate_img = vxCreateImage(obj->context, obj->dec_pool.width, obj->dec_pool.height, VX_DF_IMAGE_NV12);
+        status = vxGetStatus((vx_reference)intermediate_img);
+        vx_int32 q;
+        if(status == VX_SUCCESS)
+        {
+            for(q = 0; q < obj->dec_pool.bufq_depth; q++)
+            {
+                obj->dec_pool.arr[q] = vxCreateObjectArray(obj->context, (vx_reference)intermediate_img, obj->sensorObj.num_cameras_enabled);
+                status = vxGetStatus((vx_reference)obj->dec_pool.arr[q]);
+                if(status != VX_SUCCESS)
+                {
+                    printf("[APP_INIT]: Unable to create image object array! \n");
+                    break;
+                }
+                else
+                {
+                    vx_char name[VX_MAX_REFERENCE_NAME];
+
+                    snprintf(name, VX_MAX_REFERENCE_NAME, "dec_pool.arr_%d", q);
+
+                    vxSetReferenceName((vx_reference)obj->dec_pool.arr[q], name);
                 }
             }
             vxReleaseImage(&intermediate_img);
@@ -996,9 +1040,14 @@ static void app_deinit(AppObj *obj)
         APP_PRINTF("Scaler deinit done!\n");
     }
 
-    for(vx_int32 i = 0; i < obj->num_vx_refs; i++)
+    for(vx_int32 i = 0; i < obj->enc_pool.bufq_depth; i++)
     {
-        vxReleaseObjectArray(&obj->intermediate_obj_arr[i]);
+        vxReleaseObjectArray(&obj->enc_pool.arr[i]);
+    }
+
+    for(vx_int32 i = 0; i < obj->dec_pool.bufq_depth; i++)
+    {
+        vxReleaseObjectArray(&obj->dec_pool.arr[i]);
     }
 
     if(obj->enable_mosaic == 1)
@@ -1121,7 +1170,7 @@ static vx_status app_create_graph(AppObj *obj)
     }
     else
     {
-        obj->ldcObj.output_arr = obj->intermediate_obj_arr[0];
+        obj->ldcObj.output_arr = obj->enc_pool.arr[0];
     }
     if (status == VX_SUCCESS)
     {
@@ -1131,9 +1180,9 @@ static vx_status app_create_graph(AppObj *obj)
 
     if (1 == obj->downscale && status == VX_SUCCESS)
     {
-        obj->scalerObj.output[0].width = obj->gstPipeObj.width;
-        obj->scalerObj.output[0].height = obj->gstPipeObj.height;
-        obj->scalerObj.output[0].arr = obj->intermediate_obj_arr[0];
+        obj->scalerObj.output[0].width = obj->enc_pool.width;
+        obj->scalerObj.output[0].height = obj->enc_pool.height;
+        obj->scalerObj.output[0].arr = obj->enc_pool.arr[0];
         status = app_create_graph_scaler(obj->context, obj->capture_graph, &obj->scalerObj, obj->ldc_out_arr_q[0]);
         APP_PRINTF("Scaler graph done!\n");
     }
@@ -1141,10 +1190,10 @@ static vx_status app_create_graph(AppObj *obj)
     vx_image display_in_image;
     if(obj->enable_mosaic == 1)
     {
-        // obj->imgMosaicObj.inputs[idx++].arr[0] = obj->intermediate_obj_arr[APP_BUFFER_Q_DEPTH];
+        // obj->imgMosaicObj.inputs[idx++].arr[0] = obj->dec_pool.arr[0];
 
         vx_object_array mosaic_input_arr[1];
-        mosaic_input_arr[0] = obj->intermediate_obj_arr[APP_BUFFER_Q_DEPTH];
+        mosaic_input_arr[0] = obj->dec_pool.arr[0];
 
         if(status == VX_SUCCESS)
         {
@@ -1178,29 +1227,30 @@ static vx_status app_create_graph(AppObj *obj)
         {
             add_graph_parameter_by_node_index(obj->capture_graph, obj->scalerObj.node, 1);
             obj->scalerObj.graph_parameter_index = capt_graph_parameter_index;
-            obj->capt_out_graph_parameter_index = capt_graph_parameter_index;
+            obj->enc_pool.graph_parameter_index = capt_graph_parameter_index;
             capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
-            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = obj->num_vx_refs;
-            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = obj->enc_pool.bufq_depth;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->enc_pool.arr[0];
             capt_graph_parameter_index++;
         }
         else
         {
             add_graph_parameter_by_node_index(obj->capture_graph, obj->ldcObj.node, 7);
             obj->ldcObj.graph_parameter_index = capt_graph_parameter_index;
-            obj->capt_out_graph_parameter_index = capt_graph_parameter_index;
+            obj->enc_pool.graph_parameter_index = capt_graph_parameter_index;
             capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
-            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = obj->num_vx_refs;
-            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = obj->enc_pool.bufq_depth;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->enc_pool.arr[0];
             capt_graph_parameter_index++;
         }
 
         disp_graph_parameter_index = 0;
         add_graph_parameter_by_node_index(obj->display_graph, obj->imgMosaicObj.node, 3);
         obj->imgMosaicObj.inputs[0].graph_parameter_index = disp_graph_parameter_index;
+        obj->dec_pool.graph_parameter_index = disp_graph_parameter_index;
         disp_graph_parameters_queue_params_list[disp_graph_parameter_index].graph_parameter_index = disp_graph_parameter_index;
-        disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list_size = obj->num_vx_refs;
-        disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list = (vx_reference*)&obj->intermediate_obj_arr[0];
+        disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list_size = obj->dec_pool.bufq_depth;
+        disp_graph_parameters_queue_params_list[disp_graph_parameter_index].refs_list = (vx_reference*)&obj->dec_pool.arr[0];
         disp_graph_parameter_index++;
 
         if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
@@ -1310,32 +1360,26 @@ static vx_status app_verify_graph(AppObj *obj)
 
     if ( obj->encode ) 
     {
-        for (vx_int8 buf_id=0; buf_id<obj->num_vx_refs; buf_id++)
+        for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++)
         {
             if(VX_SUCCESS == status)
             {
-                status = map_vx_object_arr(obj->intermediate_obj_arr[buf_id], obj->data_ptr[buf_id], obj->map_id[buf_id], obj->gstPipeObj.num_channels);
+                status = map_vx_object_arr(obj->enc_pool.arr[buf_id], obj->enc_pool.data_ptr[buf_id], obj->enc_pool.map_id[buf_id], obj->enc_pool.num_channels);
             }
         }
 
         if(VX_SUCCESS == status)
         {
-            status = wrap_buffers(&obj->gstPipeObj, obj->data_ptr);
+            status = wrap_buffers(&obj->gstPipeObj, obj->enc_pool.data_ptr);
         }
         
-        for (vx_int8 buf_id=0; buf_id<obj->num_vx_refs; buf_id++){
+        for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++){
             if(VX_SUCCESS == status)
             {
-                status = unmap_vx_object_arr(obj->intermediate_obj_arr[buf_id], obj->map_id[buf_id], obj->gstPipeObj.num_channels);
+                status = unmap_vx_object_arr(obj->enc_pool.arr[buf_id], obj->enc_pool.map_id[buf_id], obj->enc_pool.num_channels);
             }
         }
     }
-
-    // for (uint8_t ch = 0; ch < obj->gstPipeObj.num_channels; ch++)
-    // {
-    //     obj->gst_data_ptr[ch] = (uint8_t*) calloc(obj->gstPipeObj.size, sizeof(uint8_t));
-    //     memset(obj->gst_data_ptr[ch],ch*60,obj->gstPipeObj.size/3);
-    // }
 
     /* wait a while for prints to flush */
     tivxTaskWaitMsecs(100);
@@ -1350,204 +1394,21 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     APP_PRINTF("app_run_graph_for_one_pipeline: frame %d beginning\n", frame_id);
     appPerfPointBegin(&obj->total_perf);
 
-    TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
-    CaptureObj *captureObj = &obj->captureObj;
-
-    /* ----------- Pipeup for Capture graph ----------- */
-    if(obj->pipeline < APP_BUFFER_Q_DEPTH)
-    {
-        APP_PRINTF("\nldc_enq:%d\n",obj->ldc_enq_id);
-
-        /* Enqueue Capture graph */
-        if (status == VX_SUCCESS)
-        {
-            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->enqueueCnt], 1);
-        }
-        if (status == VX_SUCCESS)
-        {
-            status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
-        }
-
-        obj->enqueueCnt++;
-        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-        obj->ldc_enq_id++;
-        obj->ldc_enq_id         = (obj->ldc_enq_id  >= obj->num_vx_refs)? 0 : obj->ldc_enq_id;
-
-        obj->pipeline++;
-    }
-
-    /* ----------- Pipeup for GstPipeline ----------- */
-    else if(obj->pipeline-APP_BUFFER_Q_DEPTH < GST_BUFFER_Q_DEPTH)
-    {
-        APP_PRINTF("\nldc_enq:%d;\tappsrc_push:%d\n",obj->ldc_enq_id,obj->appsrc_push_id);
-
-        /* Dequeue and Enqueue_next Capture graph */
-        if(status==VX_SUCCESS)
-        {
-            status = step_capture_graph(obj);
-        }
-        if(status==VX_SUCCESS)
-        {
-            status = map_vx_object_arr(obj->intermediate_obj_arr[obj->appsrc_push_id], obj->data_ptr[obj->appsrc_push_id], obj->map_id[obj->appsrc_push_id], obj->sensorObj.num_cameras_enabled);
-        }
-
-        /* Enqueue GstPipeline */
-        if(status==VX_SUCCESS && obj->encode==1)
-        {
-            status = push_buffer_ready(&obj->gstPipeObj,obj->appsrc_push_id);
-        }
-        obj->pull_status = -2;
-
-        obj->enqueueCnt++;
-        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-        obj->dequeueCnt++;
-        obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
-        obj->appsrc_push_id++;
-        obj->appsrc_push_id     = (obj->appsrc_push_id  >= obj->num_vx_refs)? 0 : obj->appsrc_push_id;
-
-        obj->pipeline++;
-    }
-
-    /* ----------- Pipeup for SW Copy ----------- */
-    else if(obj->pipeline-APP_BUFFER_Q_DEPTH-GST_BUFFER_Q_DEPTH < COPY_BUFFER_Q_DEPTH)
-    {
-        APP_PRINTF("\nldc_enq:%d;\tappsrc_push:%d;\tcopy_to:%d\n",obj->ldc_enq_id,obj->appsrc_push_id,obj->copy_to_id);
-        APP_PRINTF("          \t              \tcopy_from:%d\n",obj->copy_from_id);
-
-        /* Dequeue and Enqueue_next Capture graph */
-        if(status==VX_SUCCESS)
-        {
-            status = step_capture_graph(obj);
-        }
-        if(status==VX_SUCCESS)
-        {
-            status = map_vx_object_arr(obj->intermediate_obj_arr[obj->appsrc_push_id], obj->data_ptr[obj->appsrc_push_id], obj->map_id[obj->appsrc_push_id], obj->sensorObj.num_cameras_enabled);
-        }
-
-        /* Dequeue and Enqueue_next GstPipeline */
-        if(status==VX_SUCCESS)
-        {
-            status = step_gst_pipeline(obj);
-        }
-
-        /* Enqueue & Dequeue Copy data */
-        if(status==VX_SUCCESS)
-        {
-            status = step_copy_data(obj);
-        }
-        
-        obj->enqueueCnt++;
-        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-        obj->dequeueCnt++;
-        obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
-
-        obj->pipeline++;
-    }
-
-    /* ----------- Pipeup for Display Graph ----------- */
-    else if(obj->pipeline-APP_BUFFER_Q_DEPTH-GST_BUFFER_Q_DEPTH-COPY_BUFFER_Q_DEPTH < APP_BUFFER_Q_DEPTH)
-    {
-        APP_PRINTF("\nldc_enq:%d;\tappsrc_push:%d;\tcopy_to:%d;\tmosaic_enq:%d\n",obj->ldc_enq_id,obj->appsrc_push_id,obj->copy_to_id,obj->mosaic_enq_id);
-        APP_PRINTF("         \tappsink_pull:%d;\tcopy_from:%d\n",obj->appsink_pull_id,obj->copy_from_id);
-        /* Copy assumed to be completed from appsink_pull_id to mosaic_enq_id in previous execution */
-        /* Enqueue Display graph */
-        if(status==VX_SUCCESS)
-        {
-            status = unmap_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
-        }
-        if (status == VX_SUCCESS)
-        {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->mosaic_enq_id], 1);
-        }
-        if ((obj->en_out_img_write == 1) || (obj->test_mode == 1))
-        {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->enqueueCnt], 1);
-        }
-
-        /* Dequeue and Enqueue_next Capture graph */
-        if(status==VX_SUCCESS)
-        {
-            status = step_capture_graph(obj);
-        }
-        if(status==VX_SUCCESS)
-        {
-            status = map_vx_object_arr(obj->intermediate_obj_arr[obj->appsrc_push_id], obj->data_ptr[obj->appsrc_push_id], obj->map_id[obj->appsrc_push_id], obj->sensorObj.num_cameras_enabled);
-        }
-
-        /* Dequeue and Enqueue_next GstPipeline */
-        if(status==VX_SUCCESS)
-        {
-            status = step_gst_pipeline(obj);
-        }
-
-        /* Enqueue & Dequeue Copy data */
-        if(status==VX_SUCCESS)
-        {
-            status = step_copy_data(obj);
-        }
-
-        obj->enqueueCnt++;
-        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-        obj->dequeueCnt++;
-        obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
-        obj->mosaic_enq_id++;
-        obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= obj->num_vx_refs)? 0 : obj->mosaic_enq_id;
-
-        obj->pipeline++;
-    }
-
-    /* ----------- Complete Pipeline execution ----------- */
-    else
-    {
         APP_PRINTF("\nldc_enq:%d;\tappsrc_push:%d;\tcopy_to:%d;\tmosaic_enq:%d\n",obj->ldc_enq_id,obj->appsrc_push_id,obj->copy_to_id,obj->mosaic_enq_id);
         APP_PRINTF("         \tappsink_pull:%d;\tcopy_from:%d\n",obj->appsink_pull_id,obj->copy_from_id);
         /* Copy assumed to be completed from appsink_pull_id to mosaic_enq_id in previous execution */
  
-        /* Dequeue and Enqueue_next Display graph */
-        if(status==VX_SUCCESS)
+        /* enc_pool buffer recycling */
+        if (status==VX_SUCCESS && (obj->encode==1 || obj->decode==0))
         {
-            status = unmap_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
-        }
-        if(status==VX_SUCCESS)
-        {
-            status = step_display_graph(obj, frame_id);
-        }
-        
-        /* Dequeue and Enqueue_next Capture graph */
-        if(status==VX_SUCCESS)
-        {
-            status = step_capture_graph(obj);
-        }
-        if(status==VX_SUCCESS)
-        {
-            status = map_vx_object_arr(obj->intermediate_obj_arr[obj->appsrc_push_id], obj->data_ptr[obj->appsrc_push_id], obj->map_id[obj->appsrc_push_id], obj->sensorObj.num_cameras_enabled);
+            status = capture_encode(obj, frame_id);
         }
 
-        /* Dequeue and Enqueue_next GstPipeline */
-        if(status==VX_SUCCESS)
+        /* dec_pool and gst_pool buffer recycling */
+        if (status==VX_SUCCESS && (obj->encode==0 || obj->decode==1) && frame_id>=obj->enc_pool.bufq_depth)
         {
-            status = step_gst_pipeline(obj);
+            status = decode_display(obj,frame_id-obj->enc_pool.bufq_depth);
         }
-        if (obj->pull_status==1)
-        {
-            APP_PRINTF("[APP]: Pulled EOS from gstPipeObj. Total pull_count=%d\n",obj->gstPipeObj.pull_count);
-            obj->EOS=1;
-            obj->stop_task=1;
-        }
-
-        /* Enqueue & Dequeue Copy data */
-        if(status==VX_SUCCESS)
-        {
-            status = step_copy_data(obj);
-        }
-
-        obj->enqueueCnt++;
-        obj->enqueueCnt         = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-        obj->dequeueCnt++;
-        obj->dequeueCnt         = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
-
-        obj->pipeline++;
-    }
 
     appPerfPointEnd(&obj->total_perf);
     return status;
@@ -1559,6 +1420,7 @@ static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
     vx_status status = VX_SUCCESS;
 
     TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
+    AppGraphParamRefPool *dec_pool = &obj->dec_pool;
 
     /* checksum_actual is the checksum determined by the realtime test
         checksum_expected is the checksum that is expected to be the pipeline output */
@@ -1572,123 +1434,179 @@ static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
     vx_image mosaic_output_image;
     uint32_t num_refs;
 
-    if (status == VX_SUCCESS)
+    if (frame_id >= APP_BUFFER_Q_DEPTH )
     {
-        status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
-    }
-    if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
-    {
-        vx_char output_file_name[APP_MAX_FILE_PATH];
-
-        /* Dequeue output */
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
+            status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
         }
-        if ((status == VX_SUCCESS) && (obj->test_mode == 1) && (frame_id > TEST_BUFFER))
+        if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
         {
-            /* calculate the checksum of the mosaic output */
+            vx_char output_file_name[APP_MAX_FILE_PATH];
 
-            if ((app_test_check_image(mosaic_output_image, checksums_expected[obj->sensorObj.sensor_index][obj->sensorObj.num_cameras_enabled-1],
-                                    &checksum_actual) != vx_true_e) && (frame_id > stability_frame))
-            {
-                test_result = vx_false_e;
-                /* in case test fails and needs to change */
-                populate_gatherer(obj->sensorObj.sensor_index, obj->sensorObj.num_cameras_enabled-1, checksum_actual);
-            }
-        }
-
-        if (obj->en_out_img_write == 1) {
-            appPerfPointBegin(&obj->fileio_perf);
-            snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
+            /* Dequeue output */
             if (status == VX_SUCCESS)
             {
-                // status = writeMosaicOutput(output_file_name, mosaic_output_image);
+                status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
             }
-            appPerfPointEnd(&obj->fileio_perf);
+            if ((status == VX_SUCCESS) && (obj->test_mode == 1) && (frame_id > TEST_BUFFER))
+            {
+                /* calculate the checksum of the mosaic output */
+
+                if ((app_test_check_image(mosaic_output_image, checksums_expected[obj->sensorObj.sensor_index][obj->sensorObj.num_cameras_enabled-1],
+                                        &checksum_actual) != vx_true_e) && (frame_id > stability_frame))
+                {
+                    test_result = vx_false_e;
+                    /* in case test fails and needs to change */
+                    populate_gatherer(obj->sensorObj.sensor_index, obj->sensorObj.num_cameras_enabled-1, checksum_actual);
+                }
+            }
+
+            if (obj->en_out_img_write == 1) {
+                appPerfPointBegin(&obj->fileio_perf);
+                snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
+                if (status == VX_SUCCESS)
+                {
+                    // status = writeMosaicOutput(output_file_name, mosaic_output_image);
+                }
+                appPerfPointEnd(&obj->fileio_perf);
+            }
         }
-        /* Enqueue output */
+    }
+
+    if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
+    {
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->display_id], 1);
         }
     }
     if (status == VX_SUCCESS)
     {
-        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->mosaic_enq_id], 1);
+        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&dec_pool->arr[obj->mosaic_enq_id], 1);
     }
 
-    obj->mosaic_enq_id++;
-    obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= obj->num_vx_refs)? 0 : obj->mosaic_enq_id;
+    obj->display_id++;
+    obj->display_id         = (obj->display_id  >= APP_BUFFER_Q_DEPTH)? 0 : obj->display_id;
 
     return status;
 }
 
-static vx_status step_capture_graph(AppObj* obj)
+static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
 {
+    APP_PRINTF("capture_encode: frame %d beginning\n", frame_id);
     vx_status status = VX_SUCCESS;
 
     CaptureObj *captureObj = &obj->captureObj;
+    AppGraphParamRefPool *enc_pool = &obj->enc_pool;
 
     vx_object_array capture_input_arr;
     vx_object_array ldc_output_arr;
     uint32_t num_refs;
 
-    if (status == VX_SUCCESS)
+    if ( frame_id >= APP_BUFFER_Q_DEPTH )
     {
-        status = vxGraphParameterDequeueDoneRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1, &num_refs);
-    }
-    if (status == VX_SUCCESS)
-    {
-        status = vxGraphParameterDequeueDoneRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
-    }
-    if (status == VX_SUCCESS)
-    {
-        status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1);
-    }
-    if (status == VX_SUCCESS)
-    {
-        status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, obj->capt_out_graph_parameter_index, (vx_reference*)&obj->intermediate_obj_arr[obj->ldc_enq_id], 1);
+        if (status == VX_SUCCESS)
+        {
+            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_arr, 1, &num_refs);
+        }
+        if (status == VX_SUCCESS)
+        {
+            status = vxGraphParameterDequeueDoneRef(obj->capture_graph, enc_pool->graph_parameter_index, (vx_reference*)&ldc_output_arr, 1, &num_refs);
+        }
+
+        if ( frame_id >= enc_pool->bufq_depth )
+        {
+            if (status == VX_SUCCESS && obj->encode==1)
+            {
+                status = push_buffer_wait(&obj->gstPipeObj,obj->ldc_enq_id);
+            }
+            if(status==VX_SUCCESS)
+            {
+                status = unmap_vx_object_arr(enc_pool->arr[obj->ldc_enq_id], enc_pool->map_id[obj->ldc_enq_id], obj->sensorObj.num_cameras_enabled);
+            }
+        }
+
+        if(status==VX_SUCCESS)
+        {
+            status = map_vx_object_arr(enc_pool->arr[obj->appsrc_push_id], enc_pool->data_ptr[obj->appsrc_push_id], enc_pool->map_id[obj->appsrc_push_id], obj->sensorObj.num_cameras_enabled);
+        }
+        if(status==VX_SUCCESS && obj->encode==1)
+        {
+            status = push_buffer_ready(&obj->gstPipeObj,obj->appsrc_push_id);
+        }
+        obj->appsrc_push_id++;
+        obj->appsrc_push_id     = (obj->appsrc_push_id  >= enc_pool->bufq_depth)? 0 : obj->appsrc_push_id;
     }
 
+    if (status == VX_SUCCESS)
+    {
+        status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->capture_id], 1);
+    }
+    if (status == VX_SUCCESS)
+    {
+        status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, enc_pool->graph_parameter_index, (vx_reference*)&enc_pool->arr[obj->ldc_enq_id], 1);
+    }
     obj->ldc_enq_id++;
-    obj->ldc_enq_id         = (obj->ldc_enq_id  >= obj->num_vx_refs)? 0 : obj->ldc_enq_id;
+    obj->ldc_enq_id         = (obj->ldc_enq_id  >= enc_pool->bufq_depth)? 0 : obj->ldc_enq_id;
+    obj->capture_id++;
+    obj->capture_id         = (obj->capture_id  >= APP_BUFFER_Q_DEPTH)? 0 : obj->capture_id;
 
     return status;
 }
 
-static vx_status step_gst_pipeline(AppObj* obj)
+static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
 {
+    APP_PRINTF("decode_display: frame %d beginning\n", frame_id);
     vx_status status = VX_SUCCESS;
+    AppGraphParamRefPool *dec_pool = &obj->dec_pool;
 
     int8_t pull_status = -2;
-
-    if (status == VX_SUCCESS && obj->encode==1)
-    {
-        status = push_buffer_wait(&obj->gstPipeObj,obj->copy_to_id);
-    }
     if (status == VX_SUCCESS && obj->decode==1)
     {
         pull_status = pull_buffer_wait(&obj->gstPipeObj,obj->copy_from_id);
+        if (pull_status==-1)
+        {
+            APP_PRINTF("[APP]: WARNING: Pulled NULL sample from gstPipeObj (pull_sample failed or timed out).\n");
+        }
+        if (pull_status==1)
+        {
+            APP_PRINTF("[APP]: Pulled EOS from gstPipeObj. Total pull_count=%d\n",obj->gstPipeObj.pull_count);
+            obj->EOS=1;
+            obj->stop_task=1;
+        }
     }
 
-    if (obj->pull_status==0 && obj->decode==1)
+    if ( frame_id >= 1 )
     {
-        pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
+        if(status==VX_SUCCESS)
+        {
+            status = unmap_vx_object_arr(dec_pool->arr[obj->mosaic_enq_id], dec_pool->map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
+        }
+        if (status == VX_SUCCESS)
+        {
+            /* Enqueue - Dequeue the Display OVX Graph (Enq : mosaic_enq_id, Deq : copy_to_id) */
+            status = step_display_graph(obj, frame_id - 1);
+        }
+        if (obj->pull_status==0 && obj->decode==1)
+        {
+            pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
+        }
     }
-    if(status==VX_SUCCESS && obj->encode==1)
+
+    if(status==VX_SUCCESS)
     {
-        status = push_buffer_ready(&obj->gstPipeObj,obj->appsrc_push_id);
+        status = map_vx_object_arr(dec_pool->arr[obj->copy_to_id], dec_pool->data_ptr[obj->copy_to_id], dec_pool->map_id[obj->copy_to_id], obj->sensorObj.num_cameras_enabled);
     }
+
     obj->pull_status = pull_status;
-    if (obj->pull_status==-1)
-    {
-        APP_PRINTF("[APP]: WARNING: Pulled NULL sample from gstPipeObj (pull_sample failed or timed out).\n");
-    }
-
-    obj->appsrc_push_id++;
-    obj->appsrc_push_id     = (obj->appsrc_push_id  >= obj->num_vx_refs)? 0 : obj->appsrc_push_id;
     obj->appsink_pull_id    = obj->copy_from_id;
+    obj->mosaic_enq_id      = obj->copy_to_id;
+
+    if(status==VX_SUCCESS)
+    {
+        status = step_copy_data(obj);
+    }
 
     return status;
 }
@@ -1700,11 +1618,14 @@ static vx_status step_copy_data(AppObj *obj)
     if (obj->pull_status==0 && status==VX_SUCCESS)
     {
         APP_PRINTF("Copying data over\n");
-        status = copy_data(obj->gstPipeObj.pulled_data_ptr[obj->copy_from_id],obj->data_ptr[obj->copy_to_id],obj->gstPipeObj.num_channels);
+        status = copy_data(obj->gstPipeObj.pulled_data_ptr[obj->copy_from_id],obj->dec_pool.data_ptr[obj->copy_to_id],
+                            obj->dec_pool.width, 
+                            obj->dec_pool.height, 
+                            obj->dec_pool.num_channels);
     }
 
     obj->copy_to_id++;
-    obj->copy_to_id         = (obj->copy_to_id  >= obj->num_vx_refs)? 0 : obj->copy_to_id;
+    obj->copy_to_id         = (obj->copy_to_id  >= obj->dec_pool.bufq_depth)? 0 : obj->copy_to_id;
     obj->copy_from_id++;
     obj->copy_from_id       = (obj->copy_from_id  >= obj->num_gst_bufs)? 0 : obj->copy_from_id;
 
@@ -1729,6 +1650,7 @@ static vx_status app_run_graph(AppObj *obj)
     }
 
     // if test_mode is enabled, don't fail the program if the sensor init fails
+    if( obj->encode==1 || obj->decode==0 ) {
     if( (obj->test_mode) || (obj->captureObj.enable_error_detection) )
     {
         appStartImageSensor(sensorObj->sensor_name, ch_mask);
@@ -1737,6 +1659,7 @@ static vx_status app_run_graph(AppObj *obj)
     {
         status = appStartImageSensor(sensorObj->sensor_name, ch_mask);
         APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
+    }
     }
 
     if(0 == obj->enable_viss)
@@ -1786,20 +1709,27 @@ static vx_status app_run_graph(AppObj *obj)
           break;
     }
 
-    unmap_vx_object_arr(obj->intermediate_obj_arr[obj->mosaic_enq_id], obj->map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
     for(uint8_t x=0; x<GST_BUFFER_Q_DEPTH; x++){
         if ( obj->encode==1 ) 
         {
-            push_buffer_wait(&obj->gstPipeObj,obj->copy_to_id);
+            push_buffer_wait(&obj->gstPipeObj,obj->ldc_enq_id);
         }
-        unmap_vx_object_arr(obj->intermediate_obj_arr[obj->copy_to_id], obj->map_id[obj->copy_to_id], obj->sensorObj.num_cameras_enabled);
-        obj->copy_to_id++;
-        obj->copy_to_id         = (obj->copy_to_id  >= obj->num_vx_refs)? 0 : obj->copy_to_id;
+        if ( obj->encode==1 || obj->decode==0 ) 
+        {
+            unmap_vx_object_arr(obj->enc_pool.arr[obj->ldc_enq_id], obj->enc_pool.map_id[obj->ldc_enq_id], obj->sensorObj.num_cameras_enabled);
+            obj->ldc_enq_id++;
+            obj->ldc_enq_id         = (obj->ldc_enq_id  >= obj->enc_pool.bufq_depth)? 0 : obj->ldc_enq_id;
+        }
     }
     if ( obj->encode==1 ) 
     {
         APP_PRINTF("Pushing EoS to GstPipeline.\n");
         status = push_EOS(&obj->gstPipeObj);
+    }
+
+    if ( obj->encode==0 || obj->decode==1 ) 
+    {
+        unmap_vx_object_arr(obj->dec_pool.arr[obj->mosaic_enq_id], obj->dec_pool.map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
     }
     if ( obj->decode==1 && obj->pull_status==0 )
     {
@@ -1811,11 +1741,11 @@ static vx_status app_run_graph(AppObj *obj)
         app_stop_gst_pipe(&obj->gstPipeObj);
     }
 
-    if (status == VX_SUCCESS)
+    if (status == VX_SUCCESS && (obj->encode==1 || obj->decode==0 ))
     {
         status = vxWaitGraph(obj->capture_graph);
     }
-    if (status == VX_SUCCESS)
+    if (status == VX_SUCCESS && (obj->encode==0 || obj->decode==1 ))
     {
         status = vxWaitGraph(obj->display_graph);
     }
@@ -1829,49 +1759,36 @@ static vx_status app_run_graph(AppObj *obj)
     return status;
 }
 
-static vx_status copy_data(void* gst_data_ptr[], void* data_ptr[MAX_NUM_CHANNELS][2], vx_int32 num_channels)
+static vx_status copy_data(void* from_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], void* to_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 img_width, vx_uint32 img_height, vx_int32 num_channels)
 {
     vx_status status = 0;
     vx_int32 ch;
-    vx_uint32  img_width = 1920;
-    vx_uint32  img_height = 1080;
 
     for(ch = 0; ch<num_channels; ch++)
     {
-        if (gst_data_ptr[ch] == NULL)
-        {
-            printf("copy_image(): Did not get allocated memory for gst_data_ptr!\n");
-            status = -1;
-        }
-
-        vx_uint32 read_idx = 0;
         vx_uint32 write_idx = 0;
         for (vx_uint32 j = 0; j < img_height; j++)
         {
             for (vx_uint32 k = 0; k < img_width; k++)
             {
-                 *(uint8_t*)(data_ptr[ch][0]+write_idx+k) = *(uint8_t*)(gst_data_ptr[ch]+read_idx+k);
+                 *(uint8_t*)(to_data_ptr[ch][0]+write_idx+k) = *(uint8_t*)(from_data_ptr[ch][0]+write_idx+k);
             }
-            read_idx += img_width;
             write_idx += img_width;
         }
-
-        read_idx += 8*img_width;        // Gstreamer pipeline giving 1088 height buffers
         write_idx = 0;
         for (vx_uint32 j = 0; j < img_height/2; j++)
         {
             for (vx_uint32 k = 0; k < img_width; k++)
             {
-                *(uint8_t*)(data_ptr[ch][1]+write_idx+k) = *(uint8_t*)(gst_data_ptr[ch]+read_idx+k);
+                *(uint8_t*)(to_data_ptr[ch][1]+write_idx+k) = *(uint8_t*)(from_data_ptr[ch][1]+write_idx+k);
             }
-            read_idx += img_width;
             write_idx += img_width;
         }
     }
     return(status);
 }
 
-static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][2], vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels)
+static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels)
 {
     vx_status status;
     vx_int32 ch;
@@ -1925,7 +1842,7 @@ static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NU
     return(status);
 }
 
-static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][2], vx_int32 num_channels)
+static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels)
 {
     vx_status status;
     vx_int32 ch;
@@ -1954,12 +1871,8 @@ static void set_display_defaults(DisplayObj *displayObj)
 
 static void app_pipeline_params_defaults(AppObj *obj)
 {
-    obj->num_vx_refs    = APP_BUFFER_Q_DEPTH + GST_BUFFER_Q_DEPTH + COPY_BUFFER_Q_DEPTH + APP_BUFFER_Q_DEPTH;
-    obj->num_gst_bufs   = GST_BUFFER_Q_DEPTH + COPY_BUFFER_Q_DEPTH;
-
-    obj->pipeline       = 0;
-    obj->enqueueCnt     = 0;
-    obj->dequeueCnt     = 0;
+    obj->capture_id     = 0;
+    obj->display_id     = 0;
     obj->ldc_enq_id     = 0;
     obj->appsrc_push_id = 0;
     obj->copy_to_id     = 0;
@@ -1967,6 +1880,7 @@ static void app_pipeline_params_defaults(AppObj *obj)
 
     obj->copy_from_id   = 0;
     obj->appsink_pull_id= 0;
+    obj->pull_status    = -2;
 }
 
 static void set_sensor_defaults(SensorObj *sensorObj)
@@ -1980,19 +1894,22 @@ static void set_sensor_defaults(SensorObj *sensorObj)
     sensorObj->sensor_wdr_enabled = 0;
     sensorObj->sensor_exp_control_enabled = 0;
     sensorObj->sensor_gain_control_enabled = 0;
+
+    sensorObj->enable_ldc = 1;
+    sensorObj->num_cameras_enabled = 1;
+    sensorObj->ch_mask = 0x1;
+    sensorObj->usecase_option = APP_SENSOR_FEATURE_CFG_UC0;
+    sensorObj->is_interactive = 0;
 }
 
-static void set_gst_pipe_defaults(GstPipeObj *p_gstPipeInst)
+static void set_ref_pool_defaults(AppGraphParamRefPool *poolObj)
 {
-    p_gstPipeInst->width        = 1920;
-    p_gstPipeInst->height       = 1080;
-    snprintf(p_gstPipeInst->format,8,"NV12");
-    p_gstPipeInst->num_channels = 1;
-
-    p_gstPipeInst->buffer_depth = 1;
-
-    p_gstPipeInst->srcType  = 1;
-    p_gstPipeInst->sinkType = 1;
+    poolObj->width          = 1920;
+    poolObj->height         = 1080;
+    poolObj->format         = VX_DF_IMAGE_NV12;
+    poolObj->num_planes     = 2;
+    poolObj->num_channels   = 1;
+    poolObj->bufq_depth     = 1;
 }
 
 static void app_default_param_set(AppObj *obj)
@@ -2001,7 +1918,8 @@ static void app_default_param_set(AppObj *obj)
 
     set_display_defaults(&obj->displayObj);
 
-    set_gst_pipe_defaults(&obj->gstPipeObj);
+    set_ref_pool_defaults(&obj->enc_pool);
+    set_ref_pool_defaults(&obj->dec_pool);
 
     app_pipeline_params_defaults(obj);
 
@@ -2011,11 +1929,9 @@ static void app_default_param_set(AppObj *obj)
     obj->encode = 0;
     obj->decode = 0;
 
-    obj->sensorObj.enable_ldc = 1;
-    obj->sensorObj.num_cameras_enabled = 1;
-    obj->sensorObj.ch_mask = 0x1;
-    obj->sensorObj.usecase_option = APP_SENSOR_FEATURE_CFG_UC0;
-    obj->sensorObj.is_interactive = 0;
+    obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + GST_BUFFER_Q_DEPTH;
+    obj->dec_pool.bufq_depth    = COPY_BUFFER_Q_DEPTH + APP_BUFFER_Q_DEPTH;    
+    obj->num_gst_bufs           = 2;
 
     obj->downscale = 0;
 }
@@ -2144,6 +2060,32 @@ static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint
     imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
 }
 
+static void set_gst_pipe_params(AppObj *obj)
+{
+    GstPipeObj *gstPipeObj = &obj->gstPipeObj;
+    AppGraphParamRefPool *enc_pool = &obj->enc_pool;
+    AppGraphParamRefPool *dec_pool = &obj->dec_pool;
+
+    gstPipeObj->input.width        = enc_pool->width;
+    gstPipeObj->input.height       = enc_pool->height;
+    snprintf(gstPipeObj->input.format,8,"NV12");
+    gstPipeObj->input.num_planes   = enc_pool->num_planes;
+    gstPipeObj->input.num_channels = enc_pool->num_channels;
+    gstPipeObj->input.buffer_depth = enc_pool->bufq_depth;
+
+    gstPipeObj->output.width        = dec_pool->width;
+    gstPipeObj->output.height       = dec_pool->height;
+    snprintf(gstPipeObj->output.format,8,"NV12");
+    gstPipeObj->output.num_planes   = dec_pool->num_planes;
+    gstPipeObj->output.num_channels = dec_pool->num_channels;
+    gstPipeObj->output.buffer_depth = dec_pool->bufq_depth;
+
+    gstPipeObj->srcType  = 1;
+    gstPipeObj->sinkType = 1;
+    if (obj->encode == 1)    {gstPipeObj->srcType  = 0;}
+    if (obj->decode == 1)    {gstPipeObj->sinkType = 0;}
+}
+
 static void app_update_param_set(AppObj *obj)
 {
 
@@ -2155,17 +2097,22 @@ static void app_update_param_set(AppObj *obj)
 
     set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled);
 
-    if (obj->encode == 1)    {obj->gstPipeObj.srcType  = 0;}
-    if (obj->decode == 1)    {obj->gstPipeObj.sinkType = 0;}
-    obj->gstPipeObj.num_channels = obj->sensorObj.num_cameras_enabled;
-    obj->gstPipeObj.buffer_depth = obj->num_vx_refs;
-    // obj->gstPipeObj.width = resized_width;
-    // obj->gstPipeObj.height = resized_height;
+    obj->enc_pool.num_channels = obj->sensorObj.num_cameras_enabled;
+    obj->dec_pool.num_channels = obj->sensorObj.num_cameras_enabled;
 
     if (obj->downscale == 1)
     {
-        obj->gstPipeObj.width = 1280;
-        obj->gstPipeObj.height = 720;
+        obj->enc_pool.width = 1280;
+        obj->enc_pool.height = 720;
+        obj->dec_pool.width = 1280;
+        obj->dec_pool.height = 720;
     }
+    else
+    {
+        /* decoder outputs 16 byte alligned buffers */
+        obj->dec_pool.height = 1088;
+    }
+
+    set_gst_pipe_params(obj);
 
 }
