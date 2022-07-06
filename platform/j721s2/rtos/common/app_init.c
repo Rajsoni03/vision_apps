@@ -754,6 +754,7 @@ static void appRegisterOpenVXTargetKernels()
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxRegisterHwaTargetDisplayKernels();
+        tivxRegisterHwaTargetDisplayM2MKernels();
         #endif
         #ifdef C7120
         #ifdef CPU_c7x_1
@@ -799,6 +800,7 @@ static void appUnRegisterOpenVXTargetKernels()
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxUnRegisterHwaTargetDisplayKernels();
+        tivxUnRegisterHwaTargetDisplayM2MKernels();
         #endif
         #ifdef ENABLE_CSI2RX
         tivxUnRegisterHwaTargetCaptureKernels();
