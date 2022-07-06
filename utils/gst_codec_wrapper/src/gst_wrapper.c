@@ -38,18 +38,49 @@
 
 #define GST_TIMEOUT  100*GST_MSECOND
 
+static void bufferInfoInit(bufferInfo *buf_Info)
+{
+    uint32_t temp = buf_Info->width * buf_Info->height;
+
+    if (!strcmp(buf_Info->format, "RGB"))
+    {
+        /* 3 * height * width. */
+        buf_Info->num_planes = 3;
+        buf_Info->plane_sizes[0] = temp;
+        buf_Info->plane_sizes[1] = temp;
+        buf_Info->plane_sizes[2] = temp;
+        buf_Info->size = 3 * temp;
+    }
+    else if (!strcmp(buf_Info->format, "NV12"))
+    {
+        /* 1.5 * height * width. */
+        buf_Info->num_planes = 2;
+        buf_Info->plane_sizes[0] = temp;
+        buf_Info->plane_sizes[1] = temp/2;
+        buf_Info->size = temp + temp/2;
+    }
+    else if (!strcmp(buf_Info->format, "UYVY"))
+    {
+        /* 2 * height * width. */
+        buf_Info->num_planes = 2;
+        buf_Info->plane_sizes[0] = temp;
+        buf_Info->plane_sizes[1] = temp;
+        buf_Info->size = 2 * temp;
+    }
+}
+
 static void construct_gst_strings(GstPipeObj *gstPipeInst)
 {
     int32_t i = 0;
 
-    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels; ch++)
     {
         if (gstPipeInst->srcType == 0){
             snprintf(gstPipeInst->m_AppSrcNameArr[ch] , MAX_LEN_ELEM_NAME, "myAppSrc%d" , ch);
 
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"appsrc format=GST_FORMAT_TIME is-live=true do-timestamp=true block=false name=%s ! queue \n",gstPipeInst->m_AppSrcNameArr[ch]);
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
-                                                                                            gstPipeInst->width, gstPipeInst->height, gstPipeInst->format);
+                                                                                            gstPipeInst->input.width, gstPipeInst->input.height, gstPipeInst->input.format);
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
         }
         else if (gstPipeInst->srcType == 1){
@@ -59,7 +90,7 @@ static void construct_gst_strings(GstPipeObj *gstPipeInst)
         else if (gstPipeInst->srcType == 2){
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"videotestsrc is-live=true do-timestamp=true num-buffers=%d \n",MAX_FRAMES_TO_RUN);
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
-                                                                                            gstPipeInst->width, gstPipeInst->height, gstPipeInst->format);
+                                                                                            gstPipeInst->input.width, gstPipeInst->input.height, gstPipeInst->input.format);
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
         }
 
@@ -70,7 +101,7 @@ static void construct_gst_strings(GstPipeObj *gstPipeInst)
 
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
-                                                                                        gstPipeInst->format);
+                                                                                        gstPipeInst->output.format);
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",gstPipeInst->m_AppSinkNameArr[ch]);
         }
         else if (gstPipeInst->sinkType == 1){
@@ -80,7 +111,7 @@ static void construct_gst_strings(GstPipeObj *gstPipeInst)
         else if (gstPipeInst->sinkType == 2){
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
-                                                                                        gstPipeInst->format);
+                                                                                        gstPipeInst->output.format);
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! fakesink \n");
         }
     }
@@ -112,23 +143,8 @@ int32_t app_init_gst_pipe(GstPipeObj *gstPipeInst)
     gstPipeInst->pull_count = 0;
 
     /* Calculate buffer size for the saved caps */
-    gstPipeInst->size = gstPipeInst->width * gstPipeInst->height;
-
-    if (!strcmp(gstPipeInst->format, "RGB"))
-    {
-        /* 3 * size * width. */
-        gstPipeInst->size *= 3;
-    }
-    else if (!strcmp(gstPipeInst->format, "NV12"))
-    {
-        /* 1.5 * size * width. */
-        gstPipeInst->size += gstPipeInst->size/2;
-    }
-    else if (!strcmp(gstPipeInst->format, "UYVY"))
-    {
-        /* 2 * size * width. */
-        gstPipeInst->size *= 2;
-    }
+    bufferInfoInit(&gstPipeInst->input);
+    bufferInfoInit(&gstPipeInst->output);
 
     printf("gst_wrapper: GstCmdString:\n%s\n",gstPipeInst->m_cmdString);
 
@@ -151,7 +167,7 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
 
     if (status == 0 && gstPipeInst->srcType==0)
     {
-        for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+        for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels; ch++)
         {
             /* Setup AppSrc */
             gstPipeInst->m_srcElemArr[ch]  = findElementByName(gstPipeInst->m_pipeline, 
@@ -164,9 +180,9 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
             else
             {
                 caps = gst_caps_new_simple("video/x-raw",
-                                        "width", G_TYPE_INT, gstPipeInst->width,
-                                        "height", G_TYPE_INT, gstPipeInst->height,
-                                        "format", G_TYPE_STRING, gstPipeInst->format,
+                                        "width", G_TYPE_INT, gstPipeInst->input.width,
+                                        "height", G_TYPE_INT, gstPipeInst->input.height,
+                                        "format", G_TYPE_STRING, gstPipeInst->input.format,
                                         NULL);
                 if (caps == NULL)
                 {
@@ -180,7 +196,7 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
 
     if (status == 0 && gstPipeInst->sinkType==0)
     {
-        for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+        for (uint8_t ch = 0; ch < gstPipeInst->output.num_channels; ch++)
         {
             /* Setup AppSink */
             gstPipeInst->m_sinkElemArr[ch] = findElementByName(gstPipeInst->m_pipeline, 
@@ -196,16 +212,16 @@ int32_t app_create_gst_pipe(GstPipeObj *gstPipeInst)
     return status;
 }
 
-int32_t wrap_buffers(GstPipeObj *gstPipeInst, void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][2])
+int32_t wrap_buffers(GstPipeObj *gstPipeInst, void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES])
 {
     int32_t status = 0;
-    uint32_t plane_size = gstPipeInst->width * gstPipeInst->height;       // For NV12 buffers: plane_size of first plane
+    uint32_t plane_size = gstPipeInst->input.width * gstPipeInst->input.height;       // For NV12 buffers: plane_size of first plane
 
     if (gstPipeInst->srcType==0)
     {
-        for (uint8_t idx = 0; idx < gstPipeInst->buffer_depth && status==0; idx++)
+        for (uint8_t idx = 0; idx < gstPipeInst->input.buffer_depth && status==0; idx++)
         {
-            for (uint8_t ch = 0; ch < gstPipeInst->num_channels && status==0; ch++)
+            for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels && status==0; ch++)
             {
                 /* Setup Push buffers */
                 gstPipeInst->buff[idx][ch] = gst_buffer_new();
@@ -246,7 +262,7 @@ int32_t push_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx)
     if(gstPipeInst->srcType!=0){
         return -1;
     }
-    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels; ch++)
     {
         gst_memory_unmap(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0]);
         gst_memory_unmap(gstPipeInst->mem[idx][ch][1],&gstPipeInst->map_info[idx][ch][1]);
@@ -279,7 +295,7 @@ int32_t push_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx)
     if(gstPipeInst->srcType!=0){
         return -1;
     }
-    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels; ch++)
     {
         refcount = GST_MINI_OBJECT_REFCOUNT_VALUE(&gstPipeInst->buff[idx][ch]->mini_object);
         while (refcount > 1)
@@ -320,7 +336,7 @@ int32_t push_EOS(GstPipeObj *gstPipeInst)
     if(gstPipeInst->srcType!=0){
         return -1;
     }
-    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels; ch++)
     {
         ret = gst_app_src_end_of_stream(GST_APP_SRC(gstPipeInst->m_srcElemArr[ch]   ));
         if (ret != GST_FLOW_OK)
@@ -341,29 +357,34 @@ int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx)
     if(gstPipeInst->sinkType!=0){
         return -1;
     }
-    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    for (uint8_t ch = 0; ch < gstPipeInst->output.num_channels; ch++)
     {
         /* Pull Sample from AppSink element */
         out_sample = gst_app_sink_try_pull_sample(GST_APP_SINK(gstPipeInst->m_sinkElemArr[ch]),GST_TIMEOUT);
         if(out_sample)
         {
+            int32_t prev_size = 0;
+
             gstPipeInst->pulled_buff[idx][ch] = gst_sample_get_buffer(out_sample);
             gst_buffer_map(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch],  GST_MAP_READ);
-            gstPipeInst->pulled_data_ptr[idx][ch] = gstPipeInst->pulled_map_info[idx][ch].data;
+
+            for(int32_t p = 0; p < gstPipeInst->output.num_planes; p++)
+            {
+                gstPipeInst->pulled_data_ptr[idx][ch][p] = (void *)((uint8_t *)gstPipeInst->pulled_map_info[idx][ch].data + prev_size);
+                prev_size += gstPipeInst->output.plane_sizes[p];
+            }
             
             gst_buffer_ref(gstPipeInst->pulled_buff[idx][ch]);
             gst_sample_unref(out_sample);
         }
         else if(gst_app_sink_is_eos(GST_APP_SINK(gstPipeInst->m_sinkElemArr[ch])))
         {
-            // printf("gst_wrapper: Got EOS from AppSink! Total buffer count: %d\n",gstPipeInst->pull_count);
-            gstPipeInst->pulled_data_ptr[idx][ch] = NULL;
             status = 1;
+            break;
         }
         else
         {
-            printf("gst_wrapper: gst_app_sink_pull_sample() FAILED!\n");
-            gstPipeInst->pulled_data_ptr[idx][ch] = NULL;
+            printf("gst_wrapper: WARNING: gst_app_sink_pull_sample() FAILED!\n");
             status = -1;
             break;
         }
@@ -379,10 +400,18 @@ int32_t pull_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx)
     if(gstPipeInst->sinkType!=0){
         return -1;
     }
-    for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+    for (uint8_t ch = 0; ch < gstPipeInst->output.num_channels; ch++)
     {
-        gst_buffer_unmap(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch]);
-        gst_buffer_unref(gstPipeInst->pulled_buff[idx][ch]);
+        if ( gstPipeInst->pulled_buff[idx][ch] != NULL )
+        {
+            for(int32_t p = 0; p < gstPipeInst->output.num_planes; p++)
+            {
+                gstPipeInst->pulled_data_ptr[idx][ch][p] = NULL;
+            }
+            gst_buffer_unmap(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch]);
+            gst_buffer_unref(gstPipeInst->pulled_buff[idx][ch]);
+            gstPipeInst->pulled_buff[idx][ch] = NULL;
+        }
     }
     return 0;
 }
@@ -427,16 +456,16 @@ void app_delete_gst_pipe(GstPipeObj *gstPipeInst)
 {
     if(gstPipeInst->sinkType==0)
     {
-        for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+        for (uint8_t ch = 0; ch < gstPipeInst->output.num_channels; ch++)
         {
             gst_object_unref (gstPipeInst->m_sinkElemArr[ch]);
         }
     }
     if(gstPipeInst->srcType==0)
     {
-        for (uint8_t ch = 0; ch < gstPipeInst->num_channels; ch++)
+        for (uint8_t ch = 0; ch < gstPipeInst->input.num_channels; ch++)
         {
-            for (uint8_t idx = 0; idx < gstPipeInst->buffer_depth; idx++)
+            for (uint8_t idx = 0; idx < gstPipeInst->input.buffer_depth; idx++)
             {
                 gst_memory_unmap(gstPipeInst->mem[idx][ch][0],&gstPipeInst->map_info[idx][ch][0]);
                 gst_memory_unmap(gstPipeInst->mem[idx][ch][1],&gstPipeInst->map_info[idx][ch][1]);
