@@ -45,7 +45,7 @@ endif
 
 BUILD_ENABLE_ETHFW?=yes
 
-ifeq ($(SOC),j721s2)
+ifeq (,$(filter $(SOC),j721s2 j784s4))
 BUILD_ENABLE_ETHFW=no
 endif
 
