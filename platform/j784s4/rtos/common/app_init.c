@@ -566,7 +566,7 @@ int32_t appInit()
         prm.display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_EDP;
         #endif
 
-        prm.enableM2m            = true;
+        prm.enableM2m            = false;
         /* Do not rely on "init". Always provide known good tmings */
         prm.timings.width        = 1920U;
         prm.timings.height       = 1080U;
@@ -604,7 +604,7 @@ int32_t appInit()
         /* default parameters are enough to enable both EDP and HDMI */
         appDssDualDisplayDefaultSetDefaultPrm(&prm);
 
-        prm.enableM2m                           = true;
+        prm.enableM2m                           = false;
         /* Do not rely on "init". Always provide known good tmings */
         for(i=0; i<2; i++)
         {
