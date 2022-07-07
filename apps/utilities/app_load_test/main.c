@@ -73,9 +73,11 @@
 #include <utils/console_io/include/app_log.h>
 
 #define APP_TEST_DURATION   (30*1000)
-#define R5F_FAMILY 4
-#define C6X_FAMILY 5
-#define C7X_FAMILY 2
+#define MCU2_FAMILY 4
+#define MCU3_FAMILY 6
+#define MCU4_FAMILY 7
+#define C6X_FAMILY  5
+#define C7X_FAMILY  2
 
 vx_status appCpuLoadPrint(uint32_t cpu_id)
 {
@@ -99,7 +101,7 @@ vx_status appCpuLoadPrint(uint32_t cpu_id)
 int main(int argc, char *argv[])
 {
     vx_status status = 0;
-    int load, time, core, core_id[2], core_cnt = 2, i;
+    int load, time, core, core_id[4], core_cnt = 2, i;
     uint64_t startTime, elaspedTime;
 
     if (argc != 4)
@@ -114,7 +116,7 @@ int main(int argc, char *argv[])
     load = atoi(argv[2]);
     time = atoi(argv[3]);
 
-    if (core == R5F_FAMILY)
+    if (core == MCU2_FAMILY)
     {
         core_id[0] = APP_IPC_CPU_MCU2_0;
         core_id[1] = APP_IPC_CPU_MCU2_1;
@@ -124,6 +126,18 @@ int main(int argc, char *argv[])
     {
         core_id[0] = APP_IPC_CPU_C6x_1;
         core_id[1] = APP_IPC_CPU_C6x_2;
+    }
+    #endif
+    else if (core == MCU3_FAMILY)
+    {
+        core_id[0] = APP_IPC_CPU_MCU3_0;
+        core_id[1] = APP_IPC_CPU_MCU3_1;
+    }
+    #if defined(SOC_J784S4)
+    else if (core == MCU4_FAMILY)
+    {
+        core_id[0] = APP_IPC_CPU_MCU4_0;
+        core_id[1] = APP_IPC_CPU_MCU4_1;
     }
     #endif
     else if (core == C7X_FAMILY)
@@ -136,6 +150,12 @@ int main(int argc, char *argv[])
         #if defined(SOC_J721E)
         core_cnt = 1;
         #endif
+        #if defined(SOC_J784S4)
+        core_id[1] = APP_IPC_CPU_C7x_2;
+        core_id[2] = APP_IPC_CPU_C7x_3;
+        core_id[3] = APP_IPC_CPU_C7x_4;
+        core_cnt = 4;
+        #endif
     }
     else
     {
@@ -143,7 +163,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    printf("core is %d The load is %d perecnt time is %d seconds\n", core, load, time);
+    printf("core is %d The load is %d percent time is %d seconds\n", core, load, time);
 
     if(status == VX_SUCCESS)
     {
