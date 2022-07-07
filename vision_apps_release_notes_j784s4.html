@@ -73,13 +73,9 @@
 <li>
 <a href="#Validation">Validation Information</a> </li>
 <li>
-<a href="#Fixed_Issues">Fixed Issues</a> </li>
-<li>
 <a href="#Open_Defects">Open Defects</a> </li>
 <li>
 <a href="#Known_Issues">Known Issues</a> </li>
-<li>
-<a href="#Change_Requests">Change Requests</a> </li>
 <li>
 <a href="#Support">Technical Support</a> </li>
 <li>
@@ -131,7 +127,7 @@ Refer to following documentation for further details:<p>
 <p>
 <h2><a class="anchor" name="Whats_New"></a>What's New</h2>
 
-New features in this release are highlighted in <strong>bold</strong>
+New features in this release are highlighted in <strong>bold</strong> (Note: Deep learning demos utilizing TIDL have not been validated in this EEA release)
 
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
@@ -142,40 +138,9 @@ New features in this release are highlighted in <strong>bold</strong>
     </ul>
 </li>
 
-<li>Deep Learning demos
-    <ul>
-    <li>Image Classification demo</li>
-        <ul>
-        <li>File based</li>
-        <li>Camera based</li>
-        </ul>
-    <li>Standalone Semantic Segmentation application</li>
-        <ul>
-        <li>File based</li>
-        <li>Camera based</li>
-        </ul>
-    <li>Standalone Object Detection application</li>
-        <ul>
-        <li>File based</li>
-        <li>Camera based</li>
-        </ul>
-    <li>Auto valet parking (AVP) demo
-        <ul>
-        <li>semantic segmentation, Parking spot detect and Vehicle detect algorithms</li>
-        <li>1 channel, 3 algo mode</li>
-        <li>3 channel, 3 algo mode (combined network for parking spot and vehicle detect)</li>
-        <li>3 channel, 5 algo mode - combined network for parking spot and vehicle detect + Three task network for Semantic Segmentation, Motion Segmentation and Depth Estimation (AVP3 demo)</li>
-        </ul>
-    </li>
-    <li>DKAZE-based Visual Localization application</li>
-    <li>Debug support for the ability to debug intermediate layer information from TIDL node</li>
-    </ul>
-</li>
-
 <li>Surround View demos
     <ul>
     <li>3D surround view using GPU on 4x 2MP 30fps live camera input</li>
-    <li>3D surround view calibration application</li>
     </ul>
 </li>
 
@@ -184,19 +149,12 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
-    <li>C7x algorithm offload demo (with DMA acceleration)</li>
-    </ul>
-</li>
-
-<li>CV Demos
-    <ul>
-    <li>Structure from motion</li>
     </ul>
 </li>
 
 <li>OpenVX target nodes
     <ul>
-    <li>image pre-processing (YUV 2 RGB) nodes for DL demos</li>
+    <li>image pre-processing (YUV 2 RGB) nodes for DL demos (not yet validated on J784S4)</li>
     <li>image post-processing and visualization nodes for deep learning, DOF, Stereo demos</li>
     <li>OpenGL nodes for surround view</li>
     <li>Multi-threading support in MSC mosaic node</li>
@@ -227,81 +185,6 @@ Refer Processor SDK RTOS release notes <a href="../psdk_rtos/docs/user_guide/rel
 <p>
 The tools used to validate this package are listed in top level user guide <a href="../psdk_rtos/docs/user_guide/sdk_components.html" target="_blank">[HTML]</a>
 
-<hr>
-<p>
-<h2><a class="anchor" name="Fixed_Issues"></a>Fixed Issues</h2>
-<p>
-<table>
-<thead>
-<tr class="header">
-<th align="center">ID</th>
-<th align="left">Summary</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">ADASVISION-5232</td>
-<td align="left"><span>MSC error observed in many of the vision apps</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5125</td>
-<td align="left"><span>RTOS bootloader doc points to an out-of-date doc for details on the boot component</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5124</td>
-<td align="left"><span>RTOS bootloader diff table in SDK doc missing a key item</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5118</td>
-<td align="left"><span>SBL flow not working with QNX on J721S2</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5067</td>
-<td align="left"><span>C7X-2 requires a 10s delay during init</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5064</td>
-<td align="left"><span>Instability seen on cold boot requiring a reboot</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10513">ADASVISION-4864</a></td>
-<td align="left"><span>Instability in heterogeneous camera</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-4874</td>
-<td align="left"><span>Color flashes on display with 8-camera use case with FreeRTOS</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10711">ADASVISION-5039</a></td>
-<td align="left"><span>TIDL preemption test fails when TIDL logs are used</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5101</td>
-<td align="left"><span>YUV or RAW test pattern input fails</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5119</td>
-<td align="left"><span>Installed ATF and OPTEE are out-dated</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5120</td>
-<td align="left"><span>The alignment for the Cache Line size is too high, 256bytes</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5142</td>
-<td align="left"><span>Update Recommended MicroSD card size from 16Gb --> 32Gb for both data sets</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5321</td>
-<td align="left"><span>16bit inference in PC mode for app_tidl_seg is incorrect</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5372</td>
-<td align="left"><span>Incorrect calculation for Free Memory in percentage</span></td>
-</tr>
-</tbody>
-</table>
-
 <p>
 <hr>
 <h2><a class="anchor" name="Open_Defects"></a>Open Defects</h2>
@@ -315,72 +198,44 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
+<td align="center">ADASVISION-5566</td>
+<td align="left"><span>SDE crashes with 12-bit input</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5555</td>
+<td align="left"><span>SDE disparity artifacts on EVM</span></td>
+</tr>
+<tr class="even">
 <td align="center">ADASVISION-5399</td>
-<td align="left"><span>VPAC/DMPAC Func clock not enabled for j721s2</span></td>
+<td align="left"><span>VPAC/DMPAC Func clock not enabled for j721s2/j784s4</span></td>
 </tr>
 <tr class="odd">
 <td align="center">ADASVISION-5375</td>
-<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5334</td>
-<td align="left"><span>Errors observed in parking spot and vehicle detections in AVP apps</span></td>
+<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2/J784S4</span></td>
 </tr>
 <tr class="odd">
 <td align="center">ADASVISION-5231</td>
-<td align="left"><span>EDP to HDMI adapter is not enabled in J721S2</span></td>
+<td align="left"><span>EDP to HDMI adapter is not enabled in J721S2/J784S4</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5065</td>
 <td align="left"><span>OCMC RAM Init fails on MCU2-0</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5333</td>
-<td align="left"><span>TIDL Performance Degradation on SDK (J721S2)</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5063</td>
-<td align="left"><span>A72 cache is disabled due to coherency issue between A72 and R5</span></td>
-</tr>
-<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
 <td align="left"><span>AVP4 freezes in first second of running on QNX</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
-<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
 <td align="left"><span>Frozen frame running OpenVX graphs back to back </span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10510">ADASVISION-4876</a></td>
-<td align="left"><span>Performance degradation observed on some vision apps demos</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10512">ADASVISION-4873</a></td>
-<td align="left"><span>[IMGPreProcNode]: BT601 limited range CSC coefficients causes clipping</span></td>
-</tr>
-<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10514">ADASVISION-4799</a></td>
 <td align="left"><span>Broadcast Mode Unreliable</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10517">ADASVISION-4412</a></td>
-<td align="left"><span>Performance measurement incorrect for display node</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10519">ADASVISION-4411</a></td>
-<td align="left"><span>Performance measurement incorrect for capture node</span></td>
-</tr>
-<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10520">ADASVISION-4386</a></td>
 <td align="left"><span>QNX SBL debug binaries not working on R5F</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10522">ADASVISION-4198</a></td>
-<td align="left"><span>Partial failure observed for IPC test when MCU1_0 is enabled due to secure mode boot</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10525">ADASVISION-4039</a></td>
@@ -410,46 +265,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tbody>
 </table>
 </table>
-<h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
-<table>
-<thead>
-<tr class="header">
-<th align="center">ID</th>
-<th align="left">Headline</th>
-<th align="left">Original Fix Version</th>
-<th align="left">New Fix Version</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">JACINTOREQ-2446</a></td>
-<td align="left"><span>Descope codecs application from 8.2 release</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>08.04.00</span></td>
-</tr>
-<tr class="even">
-<td align="center">JACINTOREQ-2446</a></td>
-<td align="left"><span>VPAC TIOVX Scope Change</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>09.00.00</span></td>
-</tr>
-<tr class="odd">
-<td align="center">JACINTOREQ-2444</a></td>
-<td align="left"><span>SafeRTOS Vision Apps Integration Testing Descope</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>08.04.00</span></td>
-</tr>
-<tr class="even">
-<td align="center">JACINTOREQ-2347</a></td>
-<td align="left"><span>De-scope BAM enablement on J7 from 8.2</span></td>
-<td align="left"><span>08.02.00</span></td>
-<td align="left"><span>08.05.00</span></td>
-</tr>
-</tbody>
-</table>
-<p>
-<hr>
-<p>
 <h2><a class="anchor" name="Support"></a>Technical Support</h2>
 For technical support and additional assistance, contact local TI Field Application Engineer <p>
 <hr>
