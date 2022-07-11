@@ -168,7 +168,7 @@ static void appC7xClecInitDru(void)
 
         cfgClec.extEvtNum         = 0;
         cfgClec.c7xEvtNum         = (i-dru_input_start)+32;
-        cfgClec.acDru             = 1;
+        cfgClec.acDru             = 0;
         CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
     }
 }
