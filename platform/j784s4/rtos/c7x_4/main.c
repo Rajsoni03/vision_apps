@@ -183,7 +183,7 @@ static void appC7xClecInitDru(void)
         cfgClec.evtSendEnable     = TRUE;
 
         /* cfgClec.rtMap value is different for each C7x */
-        cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_7;
+        cfgClec.rtMap             = CSL_clecGetC7xRtmapCpuId();
 
         cfgClec.extEvtNum         = 0;
         cfgClec.c7xEvtNum         = (i-dru_input_start)+32;
