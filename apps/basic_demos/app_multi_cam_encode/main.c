@@ -81,7 +81,7 @@
 #include "tiovx_img_mosaic_module.h"
 
 #define APP_BUFFER_Q_DEPTH   (4)
-#define GST_BUFFER_Q_DEPTH   (2)
+#define GST_ENC_BUFQ_DEPTH   (2)
 #define COPY_BUFFER_Q_DEPTH   (1)
 
 #define CAPTURE_PIPELINE_DEPTH   (5)
@@ -198,10 +198,9 @@ static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels);
 static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels);
 static vx_status capture_encode(AppObj* obj, vx_int32 frame_id);
-static vx_status copy_data(void* from_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], void* to_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 img_width, vx_uint32 img_height, vx_int32 num_channels);
-static vx_status step_copy_data(AppObj *obj);
-static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id);
 static vx_status decode_display(AppObj* obj, vx_int32 frame_id);
+static vx_status delete_array_image_buffers(vx_object_array arr);
+static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 sizes[MAX_NUM_PLANES]);
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -1381,6 +1380,17 @@ static vx_status app_verify_graph(AppObj *obj)
         }
     }
 
+    if ( obj->decode ) 
+    {
+        for (vx_int8 buf_id=0; buf_id<obj->dec_pool.bufq_depth; buf_id++)
+        {
+            if(VX_SUCCESS == status)
+            {
+                status = delete_array_image_buffers(obj->dec_pool.arr[buf_id]);
+            }
+        }
+    }
+
     /* wait a while for prints to flush */
     tivxTaskWaitMsecs(100);
 
@@ -1391,21 +1401,16 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 {
     vx_status status = VX_SUCCESS;
 
-    APP_PRINTF("app_run_graph_for_one_pipeline: frame %d beginning\n", frame_id);
     appPerfPointBegin(&obj->total_perf);
 
-        APP_PRINTF("\nldc_enq:%d;\tappsrc_push:%d;\tcopy_to:%d;\tmosaic_enq:%d\n",obj->ldc_enq_id,obj->appsrc_push_id,obj->copy_to_id,obj->mosaic_enq_id);
-        APP_PRINTF("         \tappsink_pull:%d;\tcopy_from:%d\n",obj->appsink_pull_id,obj->copy_from_id);
-        /* Copy assumed to be completed from appsink_pull_id to mosaic_enq_id in previous execution */
- 
         /* enc_pool buffer recycling */
-        if (status==VX_SUCCESS && (obj->encode==1 || obj->decode==0))
+        if (status==VX_SUCCESS && (obj->encode==1))
         {
             status = capture_encode(obj, frame_id);
         }
 
-        /* dec_pool and gst_pool buffer recycling */
-        if (status==VX_SUCCESS && (obj->encode==0 || obj->decode==1) && frame_id>=obj->enc_pool.bufq_depth)
+        /* dec_pool buffer recycling */
+        if (status==VX_SUCCESS && (obj->decode==1) && frame_id>=obj->enc_pool.bufq_depth)
         {
             status = decode_display(obj,frame_id-obj->enc_pool.bufq_depth);
         }
@@ -1414,83 +1419,6 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     return status;
 }
 
-
-static vx_status step_display_graph(AppObj* obj, vx_int32 frame_id)
-{
-    vx_status status = VX_SUCCESS;
-
-    TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
-    AppGraphParamRefPool *dec_pool = &obj->dec_pool;
-
-    /* checksum_actual is the checksum determined by the realtime test
-        checksum_expected is the checksum that is expected to be the pipeline output */
-    uint32_t checksum_actual = 0;
-
-    /* This is the number of frames required for the pipeline AWB and AE algorithms to stabilize
-        (note that 15 is only required for the 6-8 camera use cases - others converge quicker) */
-    uint8_t stability_frame = 15;
-
-    vx_object_array mosaic_input_arr;
-    vx_image mosaic_output_image;
-    uint32_t num_refs;
-
-    if (frame_id >= APP_BUFFER_Q_DEPTH )
-    {
-        if (status == VX_SUCCESS)
-        {
-            status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
-        }
-        if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
-        {
-            vx_char output_file_name[APP_MAX_FILE_PATH];
-
-            /* Dequeue output */
-            if (status == VX_SUCCESS)
-            {
-                status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
-            }
-            if ((status == VX_SUCCESS) && (obj->test_mode == 1) && (frame_id > TEST_BUFFER))
-            {
-                /* calculate the checksum of the mosaic output */
-
-                if ((app_test_check_image(mosaic_output_image, checksums_expected[obj->sensorObj.sensor_index][obj->sensorObj.num_cameras_enabled-1],
-                                        &checksum_actual) != vx_true_e) && (frame_id > stability_frame))
-                {
-                    test_result = vx_false_e;
-                    /* in case test fails and needs to change */
-                    populate_gatherer(obj->sensorObj.sensor_index, obj->sensorObj.num_cameras_enabled-1, checksum_actual);
-                }
-            }
-
-            if (obj->en_out_img_write == 1) {
-                appPerfPointBegin(&obj->fileio_perf);
-                snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
-                if (status == VX_SUCCESS)
-                {
-                    // status = writeMosaicOutput(output_file_name, mosaic_output_image);
-                }
-                appPerfPointEnd(&obj->fileio_perf);
-            }
-        }
-    }
-
-    if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
-    {
-        if (status == VX_SUCCESS)
-        {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->display_id], 1);
-        }
-    }
-    if (status == VX_SUCCESS)
-    {
-        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&dec_pool->arr[obj->mosaic_enq_id], 1);
-    }
-
-    obj->display_id++;
-    obj->display_id         = (obj->display_id  >= APP_BUFFER_Q_DEPTH)? 0 : obj->display_id;
-
-    return status;
-}
 
 static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
 {
@@ -1559,76 +1487,202 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
 {
     APP_PRINTF("decode_display: frame %d beginning\n", frame_id);
     vx_status status = VX_SUCCESS;
+
+    TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
     AppGraphParamRefPool *dec_pool = &obj->dec_pool;
 
+    /* checksum_actual is the checksum determined by the realtime test
+        checksum_expected is the checksum that is expected to be the pipeline output */
+    uint32_t checksum_actual = 0;
+
+    /* This is the number of frames required for the pipeline AWB and AE algorithms to stabilize
+        (note that 15 is only required for the 6-8 camera use cases - others converge quicker) */
+    uint8_t stability_frame = 15;
+
+    vx_object_array mosaic_input_arr;
+    vx_image mosaic_output_image;
+    uint32_t num_refs;
+
     int8_t pull_status = -2;
+
+
     if (status == VX_SUCCESS && obj->decode==1)
     {
-        pull_status = pull_buffer_wait(&obj->gstPipeObj,obj->copy_from_id);
-        if (pull_status==-1)
+        pull_status = pull_buffer_wait(&obj->gstPipeObj,obj->appsink_pull_id);
+        if (pull_status == 1)
         {
-            APP_PRINTF("[APP]: WARNING: Pulled NULL sample from gstPipeObj (pull_sample failed or timed out).\n");
-        }
-        if (pull_status==1)
-        {
-            APP_PRINTF("[APP]: Pulled EOS from gstPipeObj. Total pull_count=%d\n",obj->gstPipeObj.pull_count);
             obj->EOS=1;
             obj->stop_task=1;
+            goto exit;
+        }
+        else if (pull_status != 0)
+        {
+            goto exit;
         }
     }
 
-    if ( frame_id >= 1 )
+    if ( frame_id >= dec_pool->bufq_depth )
     {
-        if(status==VX_SUCCESS)
-        {
-            status = unmap_vx_object_arr(dec_pool->arr[obj->mosaic_enq_id], dec_pool->map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
-        }
         if (status == VX_SUCCESS)
         {
-            /* Enqueue - Dequeue the Display OVX Graph (Enq : mosaic_enq_id, Deq : copy_to_id) */
-            status = step_display_graph(obj, frame_id - 1);
+            status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
         }
-        if (obj->pull_status==0 && obj->decode==1)
+        if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
         {
-            pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
+            vx_char output_file_name[APP_MAX_FILE_PATH];
+
+            /* Dequeue output */
+            if (status == VX_SUCCESS)
+            {
+                status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
+            }
+            if ((status == VX_SUCCESS) && (obj->test_mode == 1) && (frame_id > TEST_BUFFER))
+            {
+                /* calculate the checksum of the mosaic output */
+
+                if ((app_test_check_image(mosaic_output_image, checksums_expected[obj->sensorObj.sensor_index][obj->sensorObj.num_cameras_enabled-1],
+                                        &checksum_actual) != vx_true_e) && (frame_id > stability_frame))
+                {
+                    test_result = vx_false_e;
+                    /* in case test fails and needs to change */
+                    populate_gatherer(obj->sensorObj.sensor_index, obj->sensorObj.num_cameras_enabled-1, checksum_actual);
+                }
+            }
+
+            if (obj->en_out_img_write == 1) {
+                appPerfPointBegin(&obj->fileio_perf);
+                snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
+                if (status == VX_SUCCESS)
+                {
+                    // status = writeMosaicOutput(output_file_name, mosaic_output_image);
+                }
+                appPerfPointEnd(&obj->fileio_perf);
+            }
         }
     }
 
-    if(status==VX_SUCCESS)
+    if(status==VX_SUCCESS && obj->decode==1)
     {
-        status = map_vx_object_arr(dec_pool->arr[obj->copy_to_id], dec_pool->data_ptr[obj->copy_to_id], dec_pool->map_id[obj->copy_to_id], obj->sensorObj.num_cameras_enabled);
+        status = assign_array_image_buffers(
+                        dec_pool->arr[obj->mosaic_enq_id], 
+                        obj->gstPipeObj.pulled_data_ptr[obj->appsink_pull_id],
+                        obj->gstPipeObj.output.plane_sizes);
     }
 
-    obj->pull_status = pull_status;
-    obj->appsink_pull_id    = obj->copy_from_id;
-    obj->mosaic_enq_id      = obj->copy_to_id;
-
-    if(status==VX_SUCCESS)
+    if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
     {
-        status = step_copy_data(obj);
+        if (status == VX_SUCCESS)
+        {
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->display_id], 1);
+        }
+    }
+    if (status == VX_SUCCESS)
+    {
+        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&dec_pool->arr[obj->mosaic_enq_id], 1);
+    }
+
+    obj->display_id++;
+    obj->display_id         = (obj->display_id  >= APP_BUFFER_Q_DEPTH)? 0 : obj->display_id;
+    obj->mosaic_enq_id++;
+    obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= dec_pool->bufq_depth)? 0 : obj->mosaic_enq_id;
+    obj->appsink_pull_id++;
+    obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_gst_bufs)? 0 : obj->appsink_pull_id;
+
+exit:
+    if (obj->decode==1)
+    {
+        pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
     }
 
     return status;
 }
 
-static vx_status step_copy_data(AppObj *obj)
+static vx_status delete_array_image_buffers(vx_object_array arr)
 {
     vx_status status = VX_SUCCESS;
+    vx_size num_ch, img_size;
+    void* data_ptr[MAX_NUM_PLANES];
+    vx_uint32 sizes[MAX_NUM_PLANES], num_planes;
 
-    if (obj->pull_status==0 && status==VX_SUCCESS)
+    status = vxQueryObjectArray(arr, VX_OBJECT_ARRAY_NUMITEMS, &num_ch, sizeof(num_ch));
+    for (vx_uint32 ch = 0; status==VX_SUCCESS && ch<num_ch; ch++)
     {
-        APP_PRINTF("Copying data over\n");
-        status = copy_data(obj->gstPipeObj.pulled_data_ptr[obj->copy_from_id],obj->dec_pool.data_ptr[obj->copy_to_id],
-                            obj->dec_pool.width, 
-                            obj->dec_pool.height, 
-                            obj->dec_pool.num_channels);
+        vx_image image = (vx_image)vxGetObjectArrayItem(arr, ch);
+        
+        if (status == VX_SUCCESS)
+        {
+            status = vxQueryImage(image, VX_IMAGE_SIZE, &img_size, sizeof(img_size));
+        }
+        if (status == VX_SUCCESS)
+        {
+            status = tivxReferenceExportHandle(
+                (vx_reference)image,
+                data_ptr,
+                sizes,
+                MAX_NUM_PLANES,
+                &num_planes);
+        }
+        if (status == VX_SUCCESS)
+        {
+            /* Free only the first plane_addr as the remaining ones were
+                derrived in allocate_single_image_buffer */
+            tivxMemFree(data_ptr[0], img_size, TIVX_MEM_EXTERNAL);
+
+            /* Mark the handle as NULL */
+            vx_int32 p;
+            for(p = 0; p < num_planes; p++)
+            {
+                data_ptr[p] = NULL;
+            }
+
+            /* Assign NULL handles to the OpenVx objects as it will avoid
+                doing a tivxMemFree twice, once now and once during release */
+            status = tivxReferenceImportHandle((vx_reference)image,
+                                                (const void **)data_ptr,
+                                                (const uint32_t *)sizes,
+                                                num_planes);
+        }
+        
+        vxReleaseReference((vx_reference*)&image);
     }
+    return status;
+}
 
-    obj->copy_to_id++;
-    obj->copy_to_id         = (obj->copy_to_id  >= obj->dec_pool.bufq_depth)? 0 : obj->copy_to_id;
-    obj->copy_from_id++;
-    obj->copy_from_id       = (obj->copy_from_id  >= obj->num_gst_bufs)? 0 : obj->copy_from_id;
 
+static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 sizes[MAX_NUM_PLANES])
+{
+    vx_status status = VX_SUCCESS;
+    vx_size num_ch, num_planes;
+    void* empty_data_ptr[MAX_NUM_PLANES] = {NULL};
+
+    status = vxQueryObjectArray(arr, VX_OBJECT_ARRAY_NUMITEMS, &num_ch, sizeof(num_ch));
+    for (vx_uint32 ch = 0; status==VX_SUCCESS && ch<num_ch; ch++)
+    {
+        vx_image image = (vx_image)vxGetObjectArrayItem(arr, ch);
+        status = vxQueryImage(image, VX_IMAGE_PLANES, &num_planes, sizeof(num_planes));
+
+        if (status == VX_SUCCESS)
+        {
+            if (data_ptr == NULL)
+            {
+                status = tivxReferenceImportHandle(
+                            (vx_reference)image,
+                            (const void **)empty_data_ptr,
+                            (const uint32_t *)sizes,
+                            num_planes);
+            }
+            else
+            {
+                status = tivxReferenceImportHandle(
+                            (vx_reference)image,
+                            (const void **)data_ptr[ch],
+                            (const uint32_t *)sizes,
+                            num_planes);
+            }
+        }   
+        
+        vxReleaseReference((vx_reference*)&image);
+    }
     return status;
 }
 
@@ -1709,7 +1763,7 @@ static vx_status app_run_graph(AppObj *obj)
           break;
     }
 
-    for(uint8_t x=0; x<GST_BUFFER_Q_DEPTH; x++){
+    for(uint8_t x=0; x<GST_ENC_BUFQ_DEPTH; x++){
         if ( obj->encode==1 ) 
         {
             push_buffer_wait(&obj->gstPipeObj,obj->ldc_enq_id);
@@ -1727,15 +1781,28 @@ static vx_status app_run_graph(AppObj *obj)
         status = push_EOS(&obj->gstPipeObj);
     }
 
-    if ( obj->encode==0 || obj->decode==1 ) 
+    if ( obj->decode==1 )
     {
-        unmap_vx_object_arr(obj->dec_pool.arr[obj->mosaic_enq_id], obj->dec_pool.map_id[obj->mosaic_enq_id], obj->sensorObj.num_cameras_enabled);
-    }
-    if ( obj->decode==1 && obj->pull_status==0 )
-    {
-        pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
-    }
+        for(uint8_t x=0; x<obj->dec_pool.bufq_depth; x++)
+        {
+            vx_object_array mosaic_input_arr;
+            uint32_t num_refs;
 
+            vxGraphParameterDequeueDoneRef(obj->display_graph, obj->imgMosaicObj.inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
+        
+            status = assign_array_image_buffers(
+                        obj->dec_pool.arr[obj->mosaic_enq_id], 
+                        NULL,
+                        obj->gstPipeObj.output.plane_sizes);
+        
+            obj->mosaic_enq_id++;
+            obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= obj->dec_pool.bufq_depth)? 0 : obj->mosaic_enq_id;
+            obj->appsink_pull_id++;
+            obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_gst_bufs)? 0 : obj->appsink_pull_id;
+        
+            pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
+        }
+    }
     if ( obj->encode==1 || obj->decode==1 ) 
     {
         app_stop_gst_pipe(&obj->gstPipeObj);
@@ -1757,35 +1824,6 @@ static vx_status app_run_graph(AppObj *obj)
     }
 
     return status;
-}
-
-static vx_status copy_data(void* from_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], void* to_data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 img_width, vx_uint32 img_height, vx_int32 num_channels)
-{
-    vx_status status = 0;
-    vx_int32 ch;
-
-    for(ch = 0; ch<num_channels; ch++)
-    {
-        vx_uint32 write_idx = 0;
-        for (vx_uint32 j = 0; j < img_height; j++)
-        {
-            for (vx_uint32 k = 0; k < img_width; k++)
-            {
-                 *(uint8_t*)(to_data_ptr[ch][0]+write_idx+k) = *(uint8_t*)(from_data_ptr[ch][0]+write_idx+k);
-            }
-            write_idx += img_width;
-        }
-        write_idx = 0;
-        for (vx_uint32 j = 0; j < img_height/2; j++)
-        {
-            for (vx_uint32 k = 0; k < img_width; k++)
-            {
-                *(uint8_t*)(to_data_ptr[ch][1]+write_idx+k) = *(uint8_t*)(from_data_ptr[ch][1]+write_idx+k);
-            }
-            write_idx += img_width;
-        }
-    }
-    return(status);
 }
 
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels)
@@ -1929,9 +1967,9 @@ static void app_default_param_set(AppObj *obj)
     obj->encode = 0;
     obj->decode = 0;
 
-    obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + GST_BUFFER_Q_DEPTH;
-    obj->dec_pool.bufq_depth    = COPY_BUFFER_Q_DEPTH + APP_BUFFER_Q_DEPTH;    
-    obj->num_gst_bufs           = 2;
+    obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + GST_ENC_BUFQ_DEPTH;
+    obj->dec_pool.bufq_depth    = APP_BUFFER_Q_DEPTH;    
+    obj->num_gst_bufs           = obj->dec_pool.bufq_depth + 1;
 
     obj->downscale = 0;
 }
