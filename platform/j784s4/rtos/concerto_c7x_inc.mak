@@ -23,6 +23,8 @@ LDIRS += $(VXLIB_PATH)/lib/$(TARGET_PLATFORM)/C7120/NO_OS/$(TARGET_BUILD)
 LDIRS += $(VISION_APPS_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(MMALIB_PATH)/lib/$(C7X_VERSION)/release
 LDIRS += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
+LDIRS += $(PDK_PATH)/packages/ti/board/lib/$(BUILD_PDK_BOARD)/c7x/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/c7x/$(TARGET_BUILD)/
 
 STATIC_LIBS += app_utils_mem
 STATIC_LIBS += app_utils_console_io
@@ -71,5 +73,8 @@ endif
 ADDITIONAL_STATIC_LIBS += ti.csl.ae71
 
 ADDITIONAL_STATIC_LIBS += libc.a
+
+ADDITIONAL_STATIC_LIBS += ti.board.ae71
+ADDITIONAL_STATIC_LIBS += ti.drv.uart.ae71
 
 endif
