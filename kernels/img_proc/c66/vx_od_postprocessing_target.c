@@ -349,7 +349,7 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
 
         /*Convert detected keypoint in fish eye corrected domain*/
         /*center_x and center_y is optical center of original image resolution widthxheight*/
-        #ifdef SOC_J721S2
+        #if defined(SOC_J721S2) || defined(SOC_J784S4)
         /* ADASVISION-5496: Using the natural C algorithm for tiadalg_fisheye_transformation
          *                  for J721S2 as the recompiled version is not functional */
         status = tiadalg_fisheye_transformation_cn
