@@ -100,6 +100,7 @@ SECTIONS
 
     .bss:l1mem              (NOLOAD)(NOINIT) : {} > L1RAM_C7x_3
     .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_3
+    .bss:l3mem              (NOLOAD)(NOINIT) : {} > MSMC_C7x_3
 
     ipc_data_buffer:       > DDR_C7x_3
     .tracebuf                : {} align(1024)   > DDR_C7x_3
