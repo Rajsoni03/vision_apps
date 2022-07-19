@@ -164,15 +164,19 @@ void setup_dru_qos(void)
 #define ENABLE_C7X_3_CLEC_INIT 1
 
 #if ENABLE_C7X_3_CLEC_INIT
-/* A copy of this function is in both C7 main files, except the cfgClec.rtMap value */
+/* Important Note: The CLEC configuration in this file corresponds to the default UDMA
+ * partitioning of events as found in pdk/packages/ti/drv/udma/soc/j784s4/udma_rmcfg.c
+ * for the UDMA_RM_C7X_MSMC_DRU6.  Starting at event 8, the next 20 events are configured
+ * for C7X-3, so enabling these CLEC events for C7X-3 here.  If the default UDMA event
+ * partitioning is changed, this mapping of events will need a corresponding change */
 static void appC7xClecInitDru(void)
 {
     CSL_ClecEventConfig   cfgClec;
     CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_BASE;
 
     uint32_t i;
-    uint32_t dru_input_start = 664 + 96*C7X_CORE_ID;
-    uint32_t dru_input_num   = 16;
+    uint32_t dru_input_start = 664 + 96*C7X_CORE_ID + 8;
+    uint32_t dru_input_num   = 20;
     /* program CLEC events from DRU used for polling by TIDL
      * to map to required events in C7x
      */
