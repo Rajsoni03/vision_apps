@@ -253,6 +253,28 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                           "3-1"
                           );
                 break;
+            #if defined(SOC_J784S4)
+            case APP_IPC_CPU_MCU4_0:
+                snprintf(string1, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "R5F"
+                          );
+                snprintf(string2, APP_GRPX_STRING_MAX,
+                          "%3s\n",
+                          "4-0"
+                          );
+                break;
+            case APP_IPC_CPU_MCU4_1:
+                snprintf(string1, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "R5F"
+                          );
+                snprintf(string2, APP_GRPX_STRING_MAX,
+                          "%3s",
+                          "4-1"
+                          );
+                break;
+            #endif
             case APP_IPC_CPU_MCU1_0:
                 snprintf(string1, APP_GRPX_STRING_MAX,
                           "%3s",
