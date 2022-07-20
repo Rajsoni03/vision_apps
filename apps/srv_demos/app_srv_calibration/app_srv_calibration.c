@@ -465,10 +465,12 @@ int app_srv_calibration_main(int argc, char* argv[])
             APP_PRINTF("app_create_graph done\n");
             if(obj->is_interactive)
             {
+                APP_PRINTF("starting interactive graph\n");
                 app_run_graph_interactive(obj);
             }
             else
             {
+                APP_PRINTF("starting non-interactive graph\n");
                 app_run_graph(obj);
             }
             APP_PRINTF("app_run_graph done\n");
@@ -498,12 +500,12 @@ static vx_status app_init(SrvCalibAppObj *obj)
     obj->stop_task = 0;
     obj->resume = 0;
     obj->stop_task_done = 0;
-    obj->is_interactive = 0;
+    obj->is_interactive = 1;
     obj->write_file = 0;
     obj->write_capture_file = 0;
     obj->run_calibration = 0;
-    #if defined(J7)
-    obj->is_interactive = 1;
+    #if defined(x86_64)
+    obj->is_interactive = 0;
     #endif
 
     obj->context = vxCreateContext();

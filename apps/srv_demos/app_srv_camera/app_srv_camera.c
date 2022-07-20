@@ -561,13 +561,13 @@ static void app_show_usage(int argc, char* argv[])
 
 static void app_set_cfg_default(AppObj *obj)
 {
-    obj->is_interactive = 0;
     obj->test_mode = 0;
-    #if defined(J7) && (defined(LINUX) || defined(QNX))
     obj->is_interactive = 1;
-    #endif
     obj->is_enable_gui = 1;
     obj->is_enable_yuyv = 0;
+    #if defined(x86_64)
+    obj->is_interactive = 0;
+    #endif
 }
 
 static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
