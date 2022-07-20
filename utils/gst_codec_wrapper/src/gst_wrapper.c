@@ -35,6 +35,7 @@
 
 /* Module headers. */
 #include <utils/gst_codec_wrapper/include/gst_wrapper.h>
+#include <utils/gst_codec_wrapper/include/gsttiovximagemeta.h>
 
 #define GST_TIMEOUT  100*GST_MSECOND
 
@@ -102,6 +103,7 @@ static void construct_gst_strings(GstPipeObj *gstPipeInst)
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
                                                                                         gstPipeInst->output.format);
+            i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=7 \n");
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",gstPipeInst->m_AppSinkNameArr[ch]);
         }
         else if (gstPipeInst->sinkType == 1){
@@ -112,6 +114,7 @@ static void construct_gst_strings(GstPipeObj *gstPipeInst)
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
                                                                                         gstPipeInst->output.format);
+            i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=7 \n");
             i += snprintf(&gstPipeInst->m_cmdString[i], MAX_LEN_CMD_STR-i,"! fakesink \n");
         }
     }
@@ -130,6 +133,59 @@ static GstElement *findElementByName(GstElement* pipeline,
     }
 
     return elem;
+}
+
+static int32_t exportgsttiovxbuffer(GstBuffer* buf, void* data_ptr[MAX_NUM_PLANES])
+{
+    vx_status status = VX_SUCCESS;
+    void* p_status = NULL;
+    GstTIOVXImageMeta *tiovxmeta = NULL;
+    vx_reference img1;
+    vx_enum img1_type = VX_TYPE_INVALID;
+    uint32_t img1_num_planes = 0;
+    uint32_t sizes[MAX_NUM_PLANES] = { 0 };
+
+    tiovxmeta = (GstTIOVXImageMeta *) gst_buffer_iterate_meta(buf, &p_status);
+    if (!tiovxmeta)
+    {
+        printf("gst_wrapper: ERROR: TIOVX meta not found in pulled buffer!\n");
+        return -1;
+    }
+    
+    img1 = vxGetObjectArrayItem (tiovxmeta->array, 0);
+    status = vxGetStatus((vx_reference) img1 );
+    if ( status != VX_SUCCESS)
+    {
+        printf("gst_wrapper: ERROR: Could not get vx_reference from TIOVX meta!\n");
+        return status;
+    }
+ 
+    status = vxQueryReference ((vx_reference) img1, (vx_enum) VX_REFERENCE_TYPE, &img1_type, sizeof (vx_enum));
+    if (VX_SUCCESS != status) {
+        printf("gst_wrapper: ERROR: Failed to verify VX_REFERENCE_TYPE!\n");
+        vxReleaseReference (&img1);
+        return status;
+    }
+    else if(VX_TYPE_IMAGE != img1_type) {
+        printf("gst_wrapper: ERROR: vx_reference is not a vx_image!\n");
+        vxReleaseReference (&img1);
+        return VX_ERROR_INVALID_TYPE;
+    }
+
+    status = tivxReferenceExportHandle(
+                (vx_reference) img1,
+                data_ptr,
+                sizes,
+                MAX_NUM_PLANES,
+                &img1_num_planes);
+    if (VX_SUCCESS != status) {
+        printf("gst_wrapper: ERROR: Could not export handles from vx_image!\n");
+        vxReleaseReference (&img1);
+        return status;
+    }
+    
+    vxReleaseReference (&img1);
+    return status;
 }
 
 int32_t app_init_gst_pipe(GstPipeObj *gstPipeInst)
@@ -363,17 +419,13 @@ int32_t pull_buffer_wait(GstPipeObj *gstPipeInst, uint8_t idx)
         out_sample = gst_app_sink_try_pull_sample(GST_APP_SINK(gstPipeInst->m_sinkElemArr[ch]),GST_TIMEOUT);
         if(out_sample)
         {
-            int32_t prev_size = 0;
-
             gstPipeInst->pulled_buff[idx][ch] = gst_sample_get_buffer(out_sample);
-            gst_buffer_map(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch],  GST_MAP_READ);
 
-            for(int32_t p = 0; p < gstPipeInst->output.num_planes; p++)
-            {
-                gstPipeInst->pulled_data_ptr[idx][ch][p] = (void *)((uint8_t *)gstPipeInst->pulled_map_info[idx][ch].data + prev_size);
-                prev_size += gstPipeInst->output.plane_sizes[p];
+            status = exportgsttiovxbuffer(gstPipeInst->pulled_buff[idx][ch], gstPipeInst->pulled_data_ptr[idx][ch]);
+            if (status != 0){
+                break;
             }
-            
+
             gst_buffer_ref(gstPipeInst->pulled_buff[idx][ch]);
             gst_sample_unref(out_sample);
         }
@@ -408,7 +460,6 @@ int32_t pull_buffer_ready(GstPipeObj *gstPipeInst, uint8_t idx)
             {
                 gstPipeInst->pulled_data_ptr[idx][ch][p] = NULL;
             }
-            gst_buffer_unmap(gstPipeInst->pulled_buff[idx][ch], &gstPipeInst->pulled_map_info[idx][ch]);
             gst_buffer_unref(gstPipeInst->pulled_buff[idx][ch]);
             gstPipeInst->pulled_buff[idx][ch] = NULL;
         }

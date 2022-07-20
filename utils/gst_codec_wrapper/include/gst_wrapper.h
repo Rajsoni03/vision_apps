@@ -88,7 +88,6 @@ typedef struct
     GstMapInfo  map_info[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
 
     GstBuffer*  pulled_buff[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
-    GstMapInfo  pulled_map_info[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS];
     void*       pulled_data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
 
     uint32_t    push_count;
