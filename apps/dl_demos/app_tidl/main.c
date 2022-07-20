@@ -797,6 +797,8 @@ static vx_status app_create_graph(AppObj *obj)
     obj->tidl_node = tivxTIDLNode(obj->graph, obj->kernel, params, obj->input_tensors, obj->output_tensors);
     APP_ASSERT_VALID_REF(obj->tidl_node)
 
+    vxSetNodeTarget(obj->tidl_node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_1);
+
     if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (obj->display_option == 1))
     {
         /* Create OpenVx Graph */

@@ -246,7 +246,7 @@ vx_status app_create_graph_tidl_od(vx_context context, vx_graph graph, TIDLObj *
     tidlObj->node = tivxTIDLNode(graph, tidlObj->kernel, params, input_tensor, output_tensor);
     status = vxGetStatus((vx_reference)tidlObj->node);
     vxSetReferenceName((vx_reference)tidlObj->node, "ODTIDLNode");
-
+    vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_1);
     vx_bool replicate[] = {vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e, vx_true_e, vx_true_e};
     vxReplicateNode(graph, tidlObj->node, replicate, TIVX_KERNEL_TIDL_NUM_BASE_PARAMETERS + tidlObj->num_input_tensors + tidlObj->num_output_tensors);
 
@@ -423,7 +423,7 @@ vx_status app_create_graph_tidl_pc(vx_context context, vx_graph graph, TIDLObj *
     tidlObj->node = tivxTIDLNode(graph, tidlObj->kernel, params, input_tensor, output_tensor);
     status = vxGetStatus((vx_reference)tidlObj->node);
     vxSetReferenceName((vx_reference)tidlObj->node, "PCTIDLNode");
-
+    vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_1);
     vx_bool replicate[] = {vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e, vx_true_e, vx_true_e};
     vxReplicateNode(graph, tidlObj->node, replicate, TIVX_KERNEL_TIDL_NUM_BASE_PARAMETERS + tidlObj->num_input_tensors + tidlObj->num_output_tensors);
 

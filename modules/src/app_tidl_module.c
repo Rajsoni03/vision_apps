@@ -264,6 +264,7 @@ vx_status app_create_graph_tidl(vx_context context, vx_graph graph, TIDLObj *tid
     tidlObj->node = tivxTIDLNode(graph, tidlObj->kernel, params, input_tensor, output_tensor);
     status = vxGetStatus((vx_reference)tidlObj->node);
     vxSetReferenceName((vx_reference)tidlObj->node, "tidl_node");
+    vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_1);
 
     vx_bool replicate[16];
     replicate[TIVX_KERNEL_TIDL_IN_CONFIG_IDX] = vx_false_e;
