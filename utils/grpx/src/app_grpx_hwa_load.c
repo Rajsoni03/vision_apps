@@ -164,7 +164,7 @@ int32_t appGrpxDrawHwaLoad(app_grpx_obj_t *obj,
                   &fontPrm
                   );
 
-       startX += fontProp2.width*8 + padX;
+       startX += fontProp2.width*APP_GRPX_LOAD_BAR_WIDTH_FACTOR + padX;
     }
 
     return 0;
@@ -297,7 +297,7 @@ int32_t appGrpxGetDimHwaLoad(uint16_t *width, uint16_t *height)
     if(status==0)
     {
         *height = APP_GRPX_LOAD_BAR_HEIGHT + prop.height*2 + prop2.height + APP_GRPX_LOAD_PAD_Y*2 + APP_GRPX_LOAD_PAD_Y/2;
-        *width  = (prop2.width*8 + prop.width/2)*appGrpxGetNumHwa();
+        *width  = (prop2.width*APP_GRPX_LOAD_BAR_WIDTH_FACTOR + prop.width/2)*appGrpxGetNumHwa();
     }
     return status;
 }
