@@ -133,14 +133,43 @@ New features in this release are highlighted in <strong>bold</strong> (Note: Dee
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
     <li> Free RTOS on C7x and R5F and Linux or QNX on A72</li>
-    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
-    <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
+    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
+    <li>Integrates all major HW components like CSI2 camera, eDP display, UART, I2C, SD card</li>
+    </ul>
+</li>
+
+<li>Deep Learning demos
+    <ul>
+    <li>Image Classification demo</li>
+        <ul>
+        <li>File based</li>
+        <li>Camera based</li>
+        </ul>
+    <li>Standalone Semantic Segmentation application</li>
+        <ul>
+        <li>File based</li>
+        <li>Camera based</li>
+        </ul>
+    <li>Standalone Object Detection application</li>
+        <ul>
+        <li>File based</li>
+        <li>Camera based</li>
+        </ul>
+    <li>Auto valet parking (AVP) demo
+        <ul>
+        <li>semantic segmentation, Parking spot detect and Vehicle detect algorithms</li>
+        <li>1 channel, 3 algo mode</li>
+        </ul>
+    </li>
+    <li>DKAZE-based Visual Localization application</li>
+    <li>Debug support for the ability to debug intermediate layer information from TIDL node</li>
     </ul>
 </li>
 
 <li>Surround View demos
     <ul>
     <li>3D surround view using GPU on 4x 2MP 30fps live camera input</li>
+    <li>3D surround view calibration application</li>
     </ul>
 </li>
 
@@ -154,7 +183,7 @@ New features in this release are highlighted in <strong>bold</strong> (Note: Dee
 
 <li>OpenVX target nodes
     <ul>
-    <li>image pre-processing (YUV 2 RGB) nodes for DL demos (not yet validated on J784S4)</li>
+    <li>image pre-processing (YUV 2 RGB) nodes for DL demos</li>
     <li>image post-processing and visualization nodes for deep learning, DOF, Stereo demos</li>
     <li>OpenGL nodes for surround view</li>
     <li>Multi-threading support in MSC mosaic node</li>
@@ -171,8 +200,15 @@ New features in this release are highlighted in <strong>bold</strong> (Note: Dee
 <p>
 <h2><a class="anchor" name="Compatibility"></a>Upgrade and Compatibility Information</h2>
 <p>
-The J784S4 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
-what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.
+
+<ul>
+<li>The J784S4 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
+what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.</li>
+
+<li>There is an existing workaround in the C7X-1 code to enable power for the DRU4-DRU7.  Therefore, if these DRU's need to be used, the C7X-1 should be
+enabled in the build.  This is already enabled in the default SDK build.</li>
+</ul>
+
 <p>
 <hr>
 <p>
@@ -197,6 +233,22 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="even">
+<td align="center">ADASVISION-5576</td>
+<td align="left"><span>MCU1-0 IPC sync failing for J7AHP</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5575</td>
+<td align="left"><span>Graphics bar not rendering all CPU's on J7AHP</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5573</td>
+<td align="left"><span>AVP2/AVP3 apps fail on J7AHP due to TIDL models</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5572</td>
+<td align="left"><span>Run_app_tidl_seg16.sh hangs on J7AHP</span></td>
+</tr>
 <tr class="even">
 <td align="center">ADASVISION-5566</td>
 <td align="left"><span>SDE crashes with 12-bit input</span></td>
