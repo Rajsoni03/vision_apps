@@ -53,9 +53,6 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(QNX_FS_PATH)/tilib
 	# app_linux_fs_files are not very OS specific. Only input file paths change
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/* $(QNX_FS_PATH)/vision_apps
-	# Note: using the J721E version that does not have the enable_gpu_out
-	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init_j721e.sh $(QNX_FS_PATH)/vision_apps/vision_apps_init.sh
-	rm $(QNX_FS_PATH)/vision_apps/vision_apps_init_*.sh
 	# Rename file paths in app cfg files
 	sed -i 's/\/opt\//\/ti_fs\//g' $(QNX_FS_PATH)/vision_apps/*.cfg
 	sed -i 's/\/opt\//\/ti_fs\//g' $(QNX_FS_PATH)/vision_apps/app_srv_avp_cfg/*.cfg
