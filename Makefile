@@ -179,6 +179,7 @@ include makerules/makefile_ethfw.mak
 include makerules/makefile_ipk.mak
 include makerules/makefile_uboot.mak
 include makerules/makefile_sbl_combined_appimage.mak
+include makerules/makefile_edgeai.mak
 
 vision_apps: sdk_check_paths
 	$(MAKE) all
