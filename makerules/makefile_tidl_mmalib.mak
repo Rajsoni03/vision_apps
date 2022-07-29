@@ -37,18 +37,7 @@ ifeq ($(BUILD_LINUX_A72),yes)
 endif
 
 tidl_rt:
-ifeq ($(BUILD_LINUX_A72),yes)
-ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/../ tidl_rt PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
-    )
-endif
-ifeq ($(BUILD_TARGET_MODE),yes)
-	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/../ tidl_rt PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_BUILD=$(current_profile); \
-    )
-endif
-endif
+
 
 tidl_rt_scrub tidl_rt_clean:
 ifeq ($(BUILD_LINUX_A72),yes)
