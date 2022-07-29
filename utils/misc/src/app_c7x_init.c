@@ -66,7 +66,11 @@
 void appC7xClecInitForNonSecAccess(void)
 {
     CSL_ClecEventConfig   cfgClec;
+    #if defined(SOC_J784S4)
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_BASE;
+    #else
     CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
+    #endif
 
     uint32_t i;
     uint32_t max_inputs      = 2048;
