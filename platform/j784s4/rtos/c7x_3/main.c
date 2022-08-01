@@ -172,7 +172,7 @@ void setup_dru_qos(void)
 static void appC7xClecInitDru(void)
 {
     CSL_ClecEventConfig   cfgClec;
-    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_BASE;
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
 
     uint32_t i;
     uint32_t dru_input_start = 664 + 96*C7X_CORE_ID + 8;
