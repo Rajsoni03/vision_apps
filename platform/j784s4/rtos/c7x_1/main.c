@@ -278,8 +278,8 @@ void appMmuMap(Bool is_secure)
 
     /*The region mapped by the MMU is intentionally set to 2MB for L2 SRAM since
       page sizes are a function of the region size and having smaller page sizes
-      negatively affects the performance of L2 SRAM as the table walks with the 
-      translation table in DDR are expensive, especially in context of high- 
+      negatively affects the performance of L2 SRAM as the table walks with the
+      translation table in DDR are expensive, especially in context of high-
       throughput, low-latency memory like L2 SRAM*/
     retVal = Mmu_map(L2RAM_C7x_1_ADDR, L2RAM_C7x_1_ADDR, 0x00200000, &attrs, is_secure); /* L2 sram 448KB   */
     if(retVal == FALSE)
@@ -312,6 +312,17 @@ void appMmuMap(Bool is_secure)
     }
 
     attrs.attrIndx = Mmu_AttrIndx_MAIR4;
+
+    /*The region mapped by the MMU is intentionally set to 2MB for L1 SRAM since
+      page sizes are a function of the region size and having smaller page sizes
+      negatively affects the performance of L1 SRAM as the table walks with the
+      translation table in DDR are expensive, especially in context of high-
+      throughput, low-latency memory like L1 SRAM*/
+    retVal = Mmu_map(L1RAM_C7x_1_ADDR, L1RAM_C7x_1_ADDR, 0x00200000, &attrs, is_secure); /* L1 sram */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
 
     retVal = Mmu_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs, is_secure);
     if(retVal == FALSE)
