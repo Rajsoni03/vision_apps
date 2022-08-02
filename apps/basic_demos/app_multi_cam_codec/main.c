@@ -2108,7 +2108,7 @@ static void construct_gst_strings(app_gst_wrapper_params_t* params, uint8_t srcT
             i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
         }
         else if (srcType == 1){
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"filesrc location=/home/root/test_video_1080p30.mp4 \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"filesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.mp4 \n");
             i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! qtdemux \n");
         }
         else if (srcType == 2){
