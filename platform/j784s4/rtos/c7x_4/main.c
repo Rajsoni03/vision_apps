@@ -311,6 +311,12 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(MSMC_C7x_4_ADDR, MSMC_C7x_4_ADDR, MSMC_C7x_4_SIZE, &attrs, is_secure); /* Local MSMC   */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
     retVal = Mmu_map(DDR_C7x_4_DTS_ADDR, DDR_C7x_4_DTS_ADDR, DDR_C7x_4_DTS_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
