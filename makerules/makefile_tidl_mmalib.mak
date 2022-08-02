@@ -39,6 +39,8 @@ endif
 tidl_rt:
 ifeq ($(BUILD_LINUX_A72),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
+	sed -i -e "s/ti-cgt-c7000_2.1.1.LTS/ti-cgt-c7000_3.0.0.STS/" $(TIDL_PATH)/../makerules/config.mk
+	sed -i -e "s/ti-cgt-c7000_3.0.0A22186/ti-cgt-c7000_3.0.0.STS/" $(TIDL_PATH)/../makerules/config.mk
 	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH)/../ tidl_rt PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
     )
