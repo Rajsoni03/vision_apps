@@ -13,12 +13,6 @@ IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/host
 IDIRS       += $(VISION_APPS_KERNELS_IDIRS)
 IDIRS       += $(PTK_PATH)/include
 
-ifeq ($(TARGET_CPU),A72)
-CPPSOURCES  += cm_dlr_node_cntxt.cpp
-
-IDIRS       += $(LINUX_FS_PATH)/usr/include
-endif # ($(TARGET_CPU),A72)
-
 include $(FINALE)
 
 endif

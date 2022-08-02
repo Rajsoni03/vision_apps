@@ -11,6 +11,8 @@ include $(VISION_APPS_PATH)/apps/ptk_demos/concerto_inc.mak
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(TIADALG_LIBS)
 
+SKIPBUILD=1
+
 include $(FINALE)
 
 endif #ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))

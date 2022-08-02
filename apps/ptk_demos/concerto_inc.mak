@@ -86,9 +86,6 @@ STATIC_LIBS     += vx_kernels_lidar vx_target_kernels_lidar_arm
 STATIC_LIBS     += vx_kernels_stereo vx_target_kernels_stereo
 STATIC_LIBS     += vx_kernels_park_assist vx_target_kernels_park_assist
 STATIC_LIBS     += vx_applib_common
-ifeq ($(TARGET_CPU),A72)
-STATIC_LIBS     += vx_applib_semseg_cnn
-endif
 
 endif  # ifeq ($(LINK_STATIC_LIBS),yes)
 
