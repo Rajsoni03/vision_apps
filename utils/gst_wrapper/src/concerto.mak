@@ -1,23 +1,10 @@
-# ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64))
-
-# include $(PRELUDE)
-
-# TARGET      := app_utils_gst_codec
-# TARGETTYPE  := library
-
-# CSOURCES += app_hwa_api_x86.c
-
-# include $(FINALE)
-
-# endif
-
 ifneq ($(TARGET_PLATFORM),PC)
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX))
 
 include $(PRELUDE)
 
-TARGET      := app_utils_gst_codec
+TARGET      := app_utils_gst_wrapper
 TARGETTYPE  := library
 
 CSOURCES    := gst_wrapper.c
