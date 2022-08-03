@@ -311,12 +311,6 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(MSMC_C7x_3_ADDR, MSMC_C7x_3_ADDR, MSMC_C7x_3_SIZE, &attrs, is_secure); /* Local MSMC   */
-    if(retVal == FALSE)
-    {
-        goto mmu_exit;
-    }
-
     retVal = Mmu_map(DDR_C7x_3_DTS_ADDR, DDR_C7x_3_DTS_ADDR, DDR_C7x_3_DTS_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
@@ -343,12 +337,7 @@ void appMmuMap(Bool is_secure)
 
     attrs.attrIndx = Mmu_AttrIndx_MAIR4;
 
-    /*The region mapped by the MMU is intentionally set to 2MB for L1 SRAM since
-      page sizes are a function of the region size and having smaller page sizes
-      negatively affects the performance of L1 SRAM as the table walks with the
-      translation table in DDR are expensive, especially in context of high-
-      throughput, low-latency memory like L1 SRAM*/
-    retVal = Mmu_map(L1RAM_C7x_3_ADDR, L1RAM_C7x_3_ADDR, 0x00200000, &attrs, is_secure); /* L1 sram */
+    retVal = Mmu_map(MSMC_C7x_3_ADDR, MSMC_C7x_3_ADDR, MSMC_C7x_3_SIZE, &attrs, is_secure); /* Local MSMC   */
     if(retVal == FALSE)
     {
         goto mmu_exit;
