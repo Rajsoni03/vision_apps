@@ -43,11 +43,10 @@ CFLAGS          += -DPLATFORM_EGL -DEGL_NO_X11
 CPPFLAGS        += -DPLATFORM_EGL
 IDIRS           += $(LINUX_FS_PATH)/usr/include/freetype2
 LDIRS           += $(LINUX_FS_PATH)/lib
-LDIRS           += $(LINUX_FS_PATH)/usr/lib/python3.8/site-packages/dlr
 
 SYS_SHARED_LIBS += pthread
 SYS_SHARED_LIBS += rt GLESv2 EGL gbm
-SYS_SHARED_LIBS += dl dlr
+SYS_SHARED_LIBS += dl
 endif
 
 # This section is for apps to link against static libs instead of tivision_apps library
