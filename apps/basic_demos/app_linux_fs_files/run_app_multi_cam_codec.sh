@@ -1,0 +1,1 @@
+/opt/vision_apps/vx_app_multi_cam_codec.out --cfg /opt/vision_apps/app_multi_cam_codec.cfg

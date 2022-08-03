@@ -60,7 +60,7 @@
  *
  */
 
-#include "tiovx_img_mosaic_module.h"
+#include "multi_cam_codec_img_mosaic_module.h"
 
 static vx_status tiovx_img_mosaic_module_configure_params(vx_context context, TIOVXImgMosaicModuleObj *obj)
 {

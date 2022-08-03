@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2021 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,17 +59,84 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#include <TI/tivx.h>
+#ifndef _TIOVX_IMG_MOSAIC_MODULE
+#define _TIOVX_IMG_MOSAIC_MODULE
 
-int app_multi_cam_encode_main(int argc, char* argv[]);
+/**
+ * \defgroup group_tiovx_img_mosaic_modules Software image mosaic module using MSC
+ *
+ * \brief This section contains APIs for using the tivxImgMosaicNode
+ *
+ * \ingroup group_tiovx_modules
+ *
+ * @{
+ */
 
-int main(int argc, char* argv[])
-{
-    int status;
+#include "multi_cam_codec_modules_common.h"
 
-    tivxInit();
-    status = app_multi_cam_encode_main(argc, argv);
-    tivxDeInit();
+/** \brief HW Mosaic Module Data Structure
+ *
+ * Contains the data objects required to use tivxImgMosaicNode
+ *
+ */
+typedef struct {
+    /*! MSC HW Mosaic node object */
+    vx_node  node;
 
-    return status;
-}
+    /*! MSC HW Mosaic kernel object */
+    vx_kernel kernel;
+
+    /*! MSC HW Mosaic node user data object for configuration of node */
+    vx_user_data_object config;
+
+    /*! Mosaic node params structure to initialize config object */
+    tivxImgMosaicParams params;
+
+    /*! Color format used by img mosaic node; supported values of \ref VX_DF_IMAGE_U8 and \ref VX_DF_IMAGE_NV12 */
+    vx_int32 color_format;
+
+    /*! Array of input image objects  */
+    ImgObj inputs[TIVX_IMG_MOSAIC_MAX_INPUTS];
+
+    /*! Total number of input channels */
+    vx_int32 num_channels;
+
+    /*! Total number of inputs to mosaic node */
+    vx_int32 num_inputs;
+
+    /*! Buffer array of output images of mosaic node */
+    vx_image output_image[TIOVX_MODULES_MAX_BUFQ_DEPTH];
+
+    /*! Width of mosaic node output image */
+    vx_int32 out_width;
+
+    /*! Height of mosaic node output image */
+    vx_int32 out_height;
+
+    /*! Bufq depth of output image */
+    vx_int32 out_bufq_depth;
+
+    /*! Flag to write mosaic output to file */
+    vx_int32 write_img_mosaic_output;
+
+    /*! Mosaic node graph parameter index of output */
+    vx_int32 output_graph_parameter_index;
+
+    /*! Mosaic node graph parameter index of background */
+    vx_int32 background_graph_parameter_index;
+
+    /*! Background image applied to output */
+    vx_image background_image[TIOVX_MODULES_MAX_BUFQ_DEPTH];
+
+} TIOVXImgMosaicModuleObj;
+
+vx_status tiovx_img_mosaic_module_init(vx_context context, TIOVXImgMosaicModuleObj *obj);
+vx_status tiovx_img_mosaic_module_deinit(TIOVXImgMosaicModuleObj *obj);
+vx_status tiovx_img_mosaic_module_delete(TIOVXImgMosaicModuleObj *obj);
+vx_status tiovx_img_mosaic_module_create(vx_graph graph, TIOVXImgMosaicModuleObj *obj, vx_image background_image, vx_object_array input_arr_user[], const char* target_string);
+vx_status tiovx_img_mosaic_module_release_buffers(TIOVXImgMosaicModuleObj *obj);
+
+vx_status tiovx_img_mosaic_module_add_write_output_node(vx_graph graph, TIOVXImgMosaicModuleObj *obj);
+vx_status tiovx_img_mosaic_module_send_write_output_cmd(TIOVXImgMosaicModuleObj *obj, vx_uint32 start_frame, vx_uint32 num_frames, vx_uint32 num_skip);
+
+#endif

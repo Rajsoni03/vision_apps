@@ -59,7 +59,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#include "app_scaler_module.h"
+#include "multi_cam_codec_scaler_module.h"
 
 static vx_status configure_scaler_coeffs(vx_context context, ScalerObj *scalerObj)
 {

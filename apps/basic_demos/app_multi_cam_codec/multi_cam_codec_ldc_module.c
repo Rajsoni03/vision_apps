@@ -60,7 +60,7 @@
  *
  */
 
-#include "multi_cam_encode_ldc_module.h"
+#include "multi_cam_codec_ldc_module.h"
 #include "ldc_lut_1920x1080.h"
 
 static uint8_t  g_ldc_lut[] = LDC_LUT_1920_1080;

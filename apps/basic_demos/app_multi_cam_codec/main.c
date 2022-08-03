@@ -65,7 +65,7 @@
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
 #include <utils/hwa/include/app_hwa_api.h>
-#include <utils/gst_codec_wrapper/include/gst_wrapper.h>
+#include <utils/gst_wrapper/include/gst_wrapper.h>
 #include <VX/vx_khr_pipelining.h>
 
 #include "app_common.h"
@@ -76,9 +76,9 @@
 #include "app_display_module.h"
 #include "app_test.h"
 
-#include "multi_cam_encode_ldc_module.h"
-#include "multi_cam_encode_scaler_module.h"
-#include "tiovx_img_mosaic_module.h"
+#include "multi_cam_codec_ldc_module.h"
+#include "multi_cam_codec_scaler_module.h"
+#include "multi_cam_codec_img_mosaic_module.h"
 
 #define APP_BUFFER_Q_DEPTH   (4)
 #define GST_ENC_BUFQ_DEPTH   (2)
@@ -93,6 +93,7 @@ typedef struct {
 
     void           *data_ptr[APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
     vx_map_id       map_id[APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
+    vx_uint32       plane_sizes[MAX_NUM_PLANES];
 
     vx_int32        bufq_depth;
     vx_int32        num_channels;
@@ -116,23 +117,11 @@ typedef struct {
     ScalerObj     scalerObj;
     TIOVXImgMosaicModuleObj  imgMosaicObj;
     DisplayObj    displayObj;
-    GstPipeObj    gstPipeObj;   
 
-    vx_object_array ldc_out_arr_q[APP_MODULES_MAX_BUFQ_DEPTH];
+    app_gst_wrapper_params_t gst_pipe_params;
 
     AppGraphParamRefPool enc_pool;
     AppGraphParamRefPool dec_pool;
-
-    vx_uint8 num_gst_bufs;
-
-    vx_uint8 ldc_enq_id;
-    vx_uint8 appsrc_push_id;
-    vx_uint8 copy_to_id;
-    vx_uint8 mosaic_enq_id;
-
-    vx_uint8 copy_from_id;
-    vx_uint8 appsink_pull_id;
-    vx_status pull_status;
 
     vx_char output_file_path[APP_MAX_FILE_PATH];
 
@@ -140,11 +129,15 @@ typedef struct {
     vx_context context;
     vx_graph   capture_graph;
     vx_graph   display_graph;
+    vx_object_array ldc_out_arr_q[APP_MODULES_MAX_BUFQ_DEPTH];
 
     vx_int32 en_out_img_write;
     vx_int32 test_mode;
 
     vx_uint32 is_interactive;
+
+    vx_uint32  num_gst_bufs;
+    vx_uint32 num_ch;
 
     vx_uint32 num_frames_to_run;
 
@@ -163,14 +156,16 @@ typedef struct {
     int32_t enable_viss;
     int32_t enable_aewb;
     int32_t enable_mosaic;
-
     int32_t encode;
     int32_t decode;
-
     int32_t downscale;
 
-    int32_t capture_id;
-    int32_t display_id;
+    vx_uint32 ldc_enq_id;
+    vx_uint32 appsrc_push_id;
+    vx_uint32 mosaic_enq_id;
+    vx_uint32 appsink_pull_id;
+    vx_uint32 capture_id;
+    vx_uint32 display_id;
 
     int32_t write_file;
 
@@ -308,6 +303,8 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                     appPerfPointPrintFPS(&obj->total_perf);
                     appPerfPointReset(&obj->total_perf);
                     printf("\n");
+                    appGstPrintStats();
+                    printf("\n");
 
                     vx_reference refs[1];
                     refs[0] = (vx_reference)obj->captureObj.raw_image_arr[0];
@@ -320,7 +317,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                     break;
                 case 'e':
                     perf_arr[0] = &obj->total_perf;
-                    fp = appPerfStatsExportOpenFile(".", "basic_demos_app_multi_cam_encode");
+                    fp = appPerfStatsExportOpenFile(".", "basic_demos_app_multi_cam_codec");
                     if (NULL != fp)
                     {
                         appPerfStatsExportAll(fp, perf_arr, 1);
@@ -657,22 +654,22 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
         if(strcmp(argv[i], "--test")==0)
         {
             set_test_mode = vx_true_e;
-            // check to see if there is another argument following --test
+            /* check to see if there is another argument following --test */
             if (argc > i+1)
             {
                 num_test_cams = atoi(argv[i+1]);
-                // increment i again to avoid this arg
+                /* increment i again to avoid this arg */
                 i++;
             }
         }
         else
         if(strcmp(argv[i], "--sensor")==0)
         {
-            // check to see if there is another argument following --sensor
+            /* check to see if there is another argument following --sensor */
             if (argc > i+1)
             {
                 sensor_override = atoi(argv[i+1]);
-                // increment i again to avoid this arg
+                /* increment i again to avoid this arg */
                 i++;
             }
         }
@@ -686,7 +683,7 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
         obj->enable_configure_hwa_freq = 0;
         obj->hwa_freq_config = 0;
         obj->sensorObj.is_interactive = 0;
-        // set the number of test cams from cmd line
+        /* set the number of test cams from cmd line */
         if (num_test_cams != 0xFF)
         {
             obj->sensorObj.num_cameras_enabled = num_test_cams;
@@ -700,7 +697,7 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
     return;
 }
 
-vx_int32 app_multi_cam_encode_main(vx_int32 argc, vx_char* argv[])
+vx_int32 app_multi_cam_codec_main(vx_int32 argc, vx_char* argv[])
 {
     vx_status status = VX_SUCCESS;
 
@@ -734,12 +731,8 @@ vx_int32 app_multi_cam_encode_main(vx_int32 argc, vx_char* argv[])
         app_querry_param_set(obj);
     }
 
-    /*Update of parameters are config file read*/
+    /*Update of parameters read from config files or from user input*/
     app_update_param_set(obj);
-
-    /* GStreamer INIT  */
-    if ( obj->encode || obj->decode ) gst_init (&argc, &argv);
-    else     APP_PRINTF("NOT USING GSTREAMER.\n");
 
     if (status == VX_SUCCESS)
     {
@@ -991,15 +984,6 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("Display init done!\n");
     }
 
-    if ( obj->encode || obj->decode ) 
-    {
-        if (status == VX_SUCCESS)
-        {
-            status = app_init_gst_pipe(&obj->gstPipeObj);
-            APP_PRINTF("GstPipe init done!\n");
-        }
-    }
-
     appPerfPointSetName(&obj->total_perf , "TOTAL");
     appPerfPointSetName(&obj->fileio_perf, "FILEIO");
     return status;
@@ -1096,7 +1080,7 @@ static void app_delete_graph(AppObj *obj)
 
     if ( obj->encode || obj->decode ) 
     {
-        app_delete_gst_pipe(&obj->gstPipeObj);
+        appGstDeInit();
         APP_PRINTF("Gst Pipeline delete done!\n");
     }
 }
@@ -1189,8 +1173,6 @@ static vx_status app_create_graph(AppObj *obj)
     vx_image display_in_image;
     if(obj->enable_mosaic == 1)
     {
-        // obj->imgMosaicObj.inputs[idx++].arr[0] = obj->dec_pool.arr[0];
-
         vx_object_array mosaic_input_arr[1];
         mosaic_input_arr[0] = obj->dec_pool.arr[0];
 
@@ -1318,7 +1300,7 @@ static vx_status app_create_graph(AppObj *obj)
     {
         if(status == VX_SUCCESS)
         {
-            status = app_create_gst_pipe(&obj->gstPipeObj);
+            status = appGstInit(&obj->gst_pipe_params);
             APP_PRINTF("Gst Pipeline done!\n");
         }
     }
@@ -1369,10 +1351,12 @@ static vx_status app_verify_graph(AppObj *obj)
 
         if(VX_SUCCESS == status)
         {
-            status = wrap_buffers(&obj->gstPipeObj, obj->enc_pool.data_ptr);
+            status = appGstSrcInit(obj->enc_pool.data_ptr);
+            APP_PRINTF("appGstSrcInit Done!\n");
         }
         
-        for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++){
+        for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++)
+        {
             if(VX_SUCCESS == status)
             {
                 status = unmap_vx_object_arr(obj->enc_pool.arr[buf_id], obj->enc_pool.map_id[buf_id], obj->enc_pool.num_channels);
@@ -1388,6 +1372,11 @@ static vx_status app_verify_graph(AppObj *obj)
             {
                 status = delete_array_image_buffers(obj->dec_pool.arr[buf_id]);
             }
+        }
+        if(VX_SUCCESS == status)
+        {
+            status = appGstSinkInit(obj->dec_pool.data_ptr);
+            APP_PRINTF("appGstSinkInit Done!\n");
         }
     }
 
@@ -1447,7 +1436,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
         {
             if (status == VX_SUCCESS && obj->encode==1)
             {
-                status = push_buffer_wait(&obj->gstPipeObj,obj->ldc_enq_id);
+                status = appGstDeqAppSrc(obj->ldc_enq_id);
             }
             if(status==VX_SUCCESS)
             {
@@ -1461,7 +1450,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
         }
         if(status==VX_SUCCESS && obj->encode==1)
         {
-            status = push_buffer_ready(&obj->gstPipeObj,obj->appsrc_push_id);
+            status = appGstEnqAppSrc(obj->appsrc_push_id);
         }
         obj->appsrc_push_id++;
         obj->appsrc_push_id     = (obj->appsrc_push_id  >= enc_pool->bufq_depth)? 0 : obj->appsrc_push_id;
@@ -1508,7 +1497,7 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
 
     if (status == VX_SUCCESS && obj->decode==1)
     {
-        pull_status = pull_buffer_wait(&obj->gstPipeObj,obj->appsink_pull_id);
+        pull_status = appGstDeqAppSink(obj->appsink_pull_id);
         if (pull_status == 1)
         {
             obj->EOS=1;
@@ -1554,7 +1543,8 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
                 snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
                 if (status == VX_SUCCESS)
                 {
-                    // status = writeMosaicOutput(output_file_name, mosaic_output_image);
+                    /* TODO: Correct checksums not added yet. 
+                     * status = writeMosaicOutput(output_file_name, mosaic_output_image); */
                 }
                 appPerfPointEnd(&obj->fileio_perf);
             }
@@ -1565,8 +1555,8 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
     {
         status = assign_array_image_buffers(
                         dec_pool->arr[obj->mosaic_enq_id], 
-                        obj->gstPipeObj.pulled_data_ptr[obj->appsink_pull_id],
-                        obj->gstPipeObj.output.plane_sizes);
+                        dec_pool->data_ptr[obj->appsink_pull_id],
+                        dec_pool->plane_sizes);
     }
 
     if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
@@ -1591,7 +1581,7 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
 exit:
     if (obj->decode==1)
     {
-        pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
+        appGstEnqAppSink(obj->appsink_pull_id);
     }
 
     return status;
@@ -1703,8 +1693,8 @@ static vx_status app_run_graph(AppObj *obj)
         return VX_FAILURE;
     }
 
-    // if test_mode is enabled, don't fail the program if the sensor init fails
-    if( obj->encode==1 || obj->decode==0 ) {
+    /* if test_mode is enabled, don't fail the program if the sensor init fails */
+    if( obj->encode==1 ) {
     if( (obj->test_mode) || (obj->captureObj.enable_error_detection) )
     {
         appStartImageSensor(sensorObj->sensor_name, ch_mask);
@@ -1722,7 +1712,7 @@ static vx_status app_run_graph(AppObj *obj)
     }
 
     if (obj->test_mode == 1) {
-        // The buffer allows AWB/AE algos to converge before checksums are calculated
+        /* The buffer allows AWB/AE algos to converge before checksums are calculated */
         obj->num_frames_to_run = TEST_BUFFER + 30;
     }
 
@@ -1730,7 +1720,8 @@ static vx_status app_run_graph(AppObj *obj)
     {
         if ( obj->encode || obj->decode ) 
         {
-            status = app_start_gst_pipe(&obj->gstPipeObj);
+            status = appGstStart();
+            APP_PRINTF("appGstStart Done!\n");
         }
     }
 
@@ -1766,7 +1757,7 @@ static vx_status app_run_graph(AppObj *obj)
     for(uint8_t x=0; x<GST_ENC_BUFQ_DEPTH; x++){
         if ( obj->encode==1 ) 
         {
-            push_buffer_wait(&obj->gstPipeObj,obj->ldc_enq_id);
+            appGstDeqAppSrc(obj->ldc_enq_id);
         }
         if ( obj->encode==1 || obj->decode==0 ) 
         {
@@ -1778,7 +1769,7 @@ static vx_status app_run_graph(AppObj *obj)
     if ( obj->encode==1 ) 
     {
         APP_PRINTF("Pushing EoS to GstPipeline.\n");
-        status = push_EOS(&obj->gstPipeObj);
+        status = appGstEnqEosAppSrc();
     }
 
     if ( obj->decode==1 )
@@ -1793,19 +1784,20 @@ static vx_status app_run_graph(AppObj *obj)
             status = assign_array_image_buffers(
                         obj->dec_pool.arr[obj->mosaic_enq_id], 
                         NULL,
-                        obj->gstPipeObj.output.plane_sizes);
+                        obj->dec_pool.plane_sizes);
         
             obj->mosaic_enq_id++;
             obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= obj->dec_pool.bufq_depth)? 0 : obj->mosaic_enq_id;
             obj->appsink_pull_id++;
             obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_gst_bufs)? 0 : obj->appsink_pull_id;
         
-            pull_buffer_ready(&obj->gstPipeObj,obj->appsink_pull_id);
+            appGstEnqAppSink(obj->appsink_pull_id);
         }
     }
     if ( obj->encode==1 || obj->decode==1 ) 
     {
-        app_stop_gst_pipe(&obj->gstPipeObj);
+        appGstStop();
+        APP_PRINTF("appGstStop Done!\n");
     }
 
     if (status == VX_SUCCESS && (obj->encode==1 || obj->decode==0 ))
@@ -1818,9 +1810,11 @@ static vx_status app_run_graph(AppObj *obj)
     }
     obj->stop_task = 1;
 
+    if (obj->encode==1){
     if (status == VX_SUCCESS)
     {
         status = appStopImageSensor(obj->sensorObj.sensor_name, ch_mask);
+    }
     }
 
     return status;
@@ -1913,12 +1907,8 @@ static void app_pipeline_params_defaults(AppObj *obj)
     obj->display_id     = 0;
     obj->ldc_enq_id     = 0;
     obj->appsrc_push_id = 0;
-    obj->copy_to_id     = 0;
     obj->mosaic_enq_id  = 0;
-
-    obj->copy_from_id   = 0;
     obj->appsink_pull_id= 0;
-    obj->pull_status    = -2;
 }
 
 static void set_sensor_defaults(SensorObj *sensorObj)
@@ -1948,6 +1938,8 @@ static void set_ref_pool_defaults(AppGraphParamRefPool *poolObj)
     poolObj->num_planes     = 2;
     poolObj->num_channels   = 1;
     poolObj->bufq_depth     = 1;
+    poolObj->plane_sizes[0] = poolObj->width*poolObj->height;
+    poolObj->plane_sizes[1] = poolObj->width*poolObj->height/2;
 }
 
 static void app_default_param_set(AppObj *obj)
@@ -1964,14 +1956,14 @@ static void app_default_param_set(AppObj *obj)
     obj->is_interactive = 1;
     obj->test_mode = 0;
     obj->write_file = 0;
-    obj->encode = 0;
-    obj->decode = 0;
+
+    obj->encode     = 1;
+    obj->decode     = 1;
+    obj->downscale  = 0;
 
     obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + GST_ENC_BUFQ_DEPTH;
     obj->dec_pool.bufq_depth    = APP_BUFFER_Q_DEPTH;    
     obj->num_gst_bufs           = obj->dec_pool.bufq_depth + 1;
-
-    obj->downscale = 0;
 }
 
 static void app_querry_param_set(AppObj *obj)
@@ -1996,6 +1988,7 @@ static void app_querry_param_set(AppObj *obj)
         {
             encSelected = vx_true_e;
         }
+        ch = getchar();
     }
     while (decSelected != vx_true_e)
     {
@@ -2012,20 +2005,23 @@ static void app_querry_param_set(AppObj *obj)
         {
             decSelected = vx_true_e;
         }
+        ch = getchar();
     }
     while (obj->sensorObj.num_cameras_enabled == 0)
     {
         fflush(stdin);
         printf("Max number of cameras supported by sensor %s = %d \n", obj->sensorObj.sensor_name, obj->sensorObj.sensorParams.num_channels);
-        printf("Please enter number of cameras to be enabled \n");
+        printf("Please enter number of channels to be enabled \n");
         ch = getchar();
         obj->sensorObj.num_cameras_enabled = ch - '0';
-        if((obj->sensorObj.num_cameras_enabled > obj->sensorObj.sensorParams.num_channels) || (obj->sensorObj.num_cameras_enabled <= 0))
+        if(((obj->sensorObj.num_cameras_enabled > obj->sensorObj.sensorParams.num_channels) || (obj->sensorObj.num_cameras_enabled <= 0)))
         {
             obj->sensorObj.num_cameras_enabled = 0;
             printf("Invalid selection %c. Try again \n", ch);
         }
+        ch = getchar();
     }
+    obj->num_ch = obj->sensorObj.num_cameras_enabled;
     obj->sensorObj.ch_mask = (1<<obj->sensorObj.num_cameras_enabled) - 1;
 }
 
@@ -2098,30 +2094,80 @@ static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint
     imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
 }
 
+static void construct_gst_strings(app_gst_wrapper_params_t* params, uint8_t srcType, uint8_t sinkType)
+{
+    int32_t i = 0;
+
+    for (uint8_t ch = 0; ch < params->in_num_channels; ch++)
+    {
+        if (srcType == 0){
+            snprintf(params->m_AppSrcNameArr[ch] , MAX_LEN_ELEM_NAME, "myAppSrc%d" , ch);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"appsrc format=GST_FORMAT_TIME is-live=true do-timestamp=true block=false name=%s ! queue \n",params->m_AppSrcNameArr[ch]);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
+                                                                                            params->in_width, params->in_height, params->in_format);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
+        }
+        else if (srcType == 1){
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"filesrc location=/home/root/test_video_1080p30.mp4 \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! qtdemux \n");
+        }
+        else if (srcType == 2){
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"videotestsrc is-live=true do-timestamp=true num-buffers=%d \n",1800);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
+                                                                                            params->in_width, params->in_height, params->in_format);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
+        }
+
+        i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! h264parse \n");
+
+        if (sinkType == 0){
+            snprintf(params->m_AppSinkNameArr[ch], MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+                                                                                        params->out_format);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
+        }
+        else if (sinkType == 1){
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! mp4mux \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! filesink location=output_video_%d.mp4 \n", ch);
+        }
+        else if (sinkType == 2){
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+                                                                                        params->out_format);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! fakesink \n");
+        }
+    }
+}
+
 static void set_gst_pipe_params(AppObj *obj)
 {
-    GstPipeObj *gstPipeObj = &obj->gstPipeObj;
     AppGraphParamRefPool *enc_pool = &obj->enc_pool;
     AppGraphParamRefPool *dec_pool = &obj->dec_pool;
+    app_gst_wrapper_params_t *gst_pipe_params = &obj->gst_pipe_params;
+    uint8_t srcType     = 0;
+    uint8_t sinkType    = 0;
 
-    gstPipeObj->input.width        = enc_pool->width;
-    gstPipeObj->input.height       = enc_pool->height;
-    snprintf(gstPipeObj->input.format,8,"NV12");
-    gstPipeObj->input.num_planes   = enc_pool->num_planes;
-    gstPipeObj->input.num_channels = enc_pool->num_channels;
-    gstPipeObj->input.buffer_depth = enc_pool->bufq_depth;
+    gst_pipe_params->in_width        = enc_pool->width;
+    gst_pipe_params->in_height       = enc_pool->height;
+    snprintf(gst_pipe_params->in_format,8,"NV12");
+    gst_pipe_params->in_num_planes   = enc_pool->num_planes;
+    gst_pipe_params->in_num_channels = enc_pool->num_channels;
+    gst_pipe_params->in_buffer_depth = enc_pool->bufq_depth;
 
-    gstPipeObj->output.width        = dec_pool->width;
-    gstPipeObj->output.height       = dec_pool->height;
-    snprintf(gstPipeObj->output.format,8,"NV12");
-    gstPipeObj->output.num_planes   = dec_pool->num_planes;
-    gstPipeObj->output.num_channels = dec_pool->num_channels;
-    gstPipeObj->output.buffer_depth = dec_pool->bufq_depth;
+    gst_pipe_params->out_width        = dec_pool->width;
+    gst_pipe_params->out_height       = dec_pool->height;
+    snprintf(gst_pipe_params->out_format,8,"NV12");
+    gst_pipe_params->out_num_planes   = dec_pool->num_planes;
+    gst_pipe_params->out_num_channels = dec_pool->num_channels;
+    gst_pipe_params->out_buffer_depth = dec_pool->bufq_depth;
 
-    gstPipeObj->srcType  = 1;
-    gstPipeObj->sinkType = 1;
-    if (obj->encode == 1)    {gstPipeObj->srcType  = 0;}
-    if (obj->decode == 1)    {gstPipeObj->sinkType = 0;}
+    if (obj->encode==0) srcType = 1;
+    if (obj->decode==0) sinkType = 1;
+
+    construct_gst_strings(gst_pipe_params,srcType,sinkType);
 }
 
 static void app_update_param_set(AppObj *obj)
@@ -2130,7 +2176,8 @@ static void app_update_param_set(AppObj *obj)
     vx_uint16 resized_width, resized_height;
     appIssGetResizeParams(obj->sensorObj.image_width, obj->sensorObj.image_height, DISPLAY_WIDTH, DISPLAY_HEIGHT, &resized_width, &resized_height);
 
-    if (obj->sensorObj.num_cameras_enabled == 1)    // No need to downscale if single channel.
+    /* Don't allow downscaling to 720p if single channel */
+    if (obj->sensorObj.num_cameras_enabled == 1)
         obj->downscale = 0;
 
     set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled);
@@ -2150,6 +2197,10 @@ static void app_update_param_set(AppObj *obj)
         /* decoder outputs 16 byte alligned buffers */
         obj->dec_pool.height = 1088;
     }
+    obj->enc_pool.plane_sizes[0] = obj->enc_pool.width * obj->enc_pool.height;
+    obj->enc_pool.plane_sizes[1] = obj->enc_pool.width * obj->enc_pool.height/2;
+    obj->dec_pool.plane_sizes[0] = obj->dec_pool.width * obj->dec_pool.height;
+    obj->dec_pool.plane_sizes[1] = obj->dec_pool.width * obj->dec_pool.height/2;
 
     set_gst_pipe_params(obj);
 

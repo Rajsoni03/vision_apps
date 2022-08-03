@@ -75,9 +75,9 @@ int main(int argc, char *argv[])
 
     if(status==0)
     {
-        int app_multi_cam_encode_main(int argc, char* argv[]);
+        int app_multi_cam_codec_main(int argc, char* argv[]);
 
-        status = app_multi_cam_encode_main(argc, argv);
+        status = app_multi_cam_codec_main(argc, argv);
         appDeInit();
     }
 

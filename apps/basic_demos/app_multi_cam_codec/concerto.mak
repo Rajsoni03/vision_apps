@@ -2,10 +2,10 @@ ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
 
 include $(PRELUDE)
 
-TARGET      := vx_app_multi_cam_encode
+TARGET      := vx_app_multi_cam_codec
 TARGETTYPE  := exe
 
-CSOURCES    := main.c multi_cam_encode_ldc_module.c multi_cam_encode_scaler_module.c tiovx_img_mosaic_module.c app_common.c
+CSOURCES    := main.c multi_cam_codec_ldc_module.c multi_cam_codec_scaler_module.c multi_cam_codec_img_mosaic_module.c app_common.c
 
 ifeq ($(TARGET_CPU),x86_64)
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
@@ -24,15 +24,12 @@ endif
 IDIRS += $(IMAGING_IDIRS)
 IDIRS += $(VISION_APPS_KERNELS_IDIRS)
 IDIRS += $(VISION_APPS_MODULES_IDIRS)
-IDIRS += $(LINUX_FS_PATH)/usr/include/gstreamer-1.0/
-IDIRS += $(LINUX_FS_PATH)/usr/include/glib-2.0/
-IDIRS += $(LINUX_FS_PATH)/usr/lib/glib-2.0/include/
 
 STATIC_LIBS += $(IMAGING_LIBS)
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(VISION_APPS_MODULES_LIBS)
 ifeq ($(TARGET_OS), LINUX)
-STATIC_LIBS += app_utils_gst_codec
+STATIC_LIBS += app_utils_gst_wrapper
 endif
 
 SHARED_LIBS += gstreamer-1.0

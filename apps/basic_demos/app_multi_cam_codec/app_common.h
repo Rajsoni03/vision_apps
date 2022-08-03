@@ -85,7 +85,7 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_get.h>
 
-#include "tiovx_modules_common.h"
+#include "multi_cam_codec_modules_common.h"
 
 //#define APP_DEBUG
 #define APP_USE_FILEIO
