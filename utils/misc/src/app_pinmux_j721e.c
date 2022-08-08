@@ -322,7 +322,7 @@ void appSetPinmux(app_pinmux_cfg_t *cfg)
         }
         else
         {
-            /* Enable Pinmux for I2C0 */
+            /* Disable Pinmux for I2C0 */
             gDispPinCfg[1].doPinConfig = FALSE;
         }
         if (TRUE == cfg->enable_hdmi)
@@ -332,7 +332,7 @@ void appSetPinmux(app_pinmux_cfg_t *cfg)
         }
         else
         {
-            /* Enable Pinmux for vout0 */
+            /* Disable Pinmux for vout0 */
             gDispPinCfg[0].doPinConfig = FALSE;
         }
 

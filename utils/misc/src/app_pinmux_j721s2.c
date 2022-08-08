@@ -168,7 +168,7 @@ void appSetPinmux(app_pinmux_cfg_t *cfg)
         }
         else
         {
-            /* Enable Pinmux for I2C4 */
+            /* Disable Pinmux for I2C4 */
             gDispPinCfg[0].doPinConfig = FALSE;
         }
     }
