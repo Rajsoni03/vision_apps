@@ -93,7 +93,7 @@ MEMORY
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xBA000000 , LENGTH = 0x20000000
     /* DDR for c7x_1 for Scratch Memory [ size 400.00 MB ] */
-    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xE3000000 , LENGTH = 0x19000000
+    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0x105000000 , LENGTH = 0x19000000
     /* DDR for c7x_1 for local heap [ size 256.00 MB ] */
-    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x10000000
+    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x11E000000 , LENGTH = 0x10000000
 }

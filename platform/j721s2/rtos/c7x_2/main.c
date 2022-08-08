@@ -84,6 +84,14 @@
 #include <ti/sysbios/family/c7x/Mmu.h>
 #endif
 
+/* For J7ES/J721E/TDA4VM the upper 2GB DDR starts from 0x0008_8000_0000 */
+/* This address is mapped to a virtual address of 0x0001_0000_0000 */
+#define DDR_C7X_2_LOCAL_HEAP_VADDR (DDR_C7X_2_LOCAL_HEAP_ADDR)
+#define DDR_C7X_2_LOCAL_HEAP_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_2_LOCAL_HEAP_ADDR - DDR_64BIT_BASE_VADDR))
+
+#define DDR_C7X_2_SCRATCH_VADDR    (DDR_C7X_2_SCRATCH_ADDR)
+#define DDR_C7X_2_SCRATCH_PADDR    (DDR_64BIT_BASE_PADDR + (DDR_C7X_2_SCRATCH_ADDR - DDR_64BIT_BASE_VADDR))
+
 static void appMain(void* arg0, void* arg1)
 {
     appInit();
@@ -288,13 +296,13 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_2_LOCAL_HEAP_ADDR, DDR_C7X_2_LOCAL_HEAP_ADDR, DDR_C7X_2_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_2_LOCAL_HEAP_VADDR, DDR_C7X_2_LOCAL_HEAP_PADDR, DDR_C7X_2_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_2_SCRATCH_ADDR, DDR_C7X_2_SCRATCH_ADDR, DDR_C7X_2_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_2_SCRATCH_VADDR, DDR_C7X_2_SCRATCH_PADDR, DDR_C7X_2_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;

@@ -204,19 +204,19 @@
 #define DDR_MCU3_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for c7x_2 for local heap [ size 16.00 MB ] */
-#define DDR_C7X_2_LOCAL_HEAP_ADDR (0xDE000000u)
+#define DDR_C7X_2_LOCAL_HEAP_ADDR (0x100000000u)
 #define DDR_C7X_2_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for c7x_2 for Scratch Memory [ size 64.00 MB ] */
-#define DDR_C7X_2_SCRATCH_ADDR (0xDF000000u)
+#define DDR_C7X_2_SCRATCH_ADDR (0x101000000u)
 #define DDR_C7X_2_SCRATCH_SIZE (0x04000000u)
 
 /* DDR for c7x_1 for Scratch Memory [ size 400.00 MB ] */
-#define DDR_C7X_1_SCRATCH_ADDR (0xE3000000u)
+#define DDR_C7X_1_SCRATCH_ADDR (0x105000000u)
 #define DDR_C7X_1_SCRATCH_SIZE (0x19000000u)
 
 /* DDR for c7x_1 for local heap [ size 256.00 MB ] */
-#define DDR_C7X_1_LOCAL_HEAP_ADDR (0x100000000u)
+#define DDR_C7X_1_LOCAL_HEAP_ADDR (0x11E000000u)
 #define DDR_C7X_1_LOCAL_HEAP_SIZE (0x10000000u)
 
 #define DDR_64BIT_BASE_VADDR (0x100000000u)

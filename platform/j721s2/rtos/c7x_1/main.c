@@ -89,6 +89,9 @@
 #define DDR_C7X_1_LOCAL_HEAP_VADDR (DDR_C7X_1_LOCAL_HEAP_ADDR)
 #define DDR_C7X_1_LOCAL_HEAP_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_1_LOCAL_HEAP_ADDR - DDR_64BIT_BASE_VADDR))
 
+#define DDR_C7X_1_SCRATCH_VADDR    (DDR_C7X_1_SCRATCH_ADDR)
+#define DDR_C7X_1_SCRATCH_PADDR    (DDR_64BIT_BASE_PADDR + (DDR_C7X_1_SCRATCH_ADDR - DDR_64BIT_BASE_VADDR))
+
 static void appMain(void* arg0, void* arg1)
 {
     appInit();
@@ -291,7 +294,7 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_1_SCRATCH_VADDR, DDR_C7X_1_SCRATCH_PADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;

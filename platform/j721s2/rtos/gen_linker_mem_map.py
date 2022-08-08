@@ -118,7 +118,7 @@ ddr_mem_size  = 1*GB + 448*MB; # Last 64MB is used by Linux
 
 ddr_mem_addr_hi_phy = 0x880000000;
 ddr_mem_addr_hi = 0x100000000;
-ddr_mem_size_hi = 256*MB;
+ddr_mem_size_hi = 736*MB;
 
 msmc_mem_addr = 0x70000000;
 main_ocram_mem_addr = 0x03600000;
@@ -257,16 +257,16 @@ mcu3_0_ddr_local_heap_size  = 8*MB;
 mcu3_1_ddr_local_heap_addr  = mcu3_0_ddr_local_heap_addr + mcu3_0_ddr_local_heap_size;
 mcu3_1_ddr_local_heap_size  = 8*MB;
 
-c7x_2_ddr_local_heap_addr = mcu3_1_ddr_local_heap_addr + mcu3_1_ddr_local_heap_size;
+c7x_2_ddr_local_heap_addr = ddr_mem_addr_hi;
 c7x_2_ddr_local_heap_size = 16*MB;
 c7x_2_ddr_scratch_addr    = c7x_2_ddr_local_heap_addr + c7x_2_ddr_local_heap_size;
 c7x_2_ddr_scratch_size    = 64*MB;
 
 c7x_1_ddr_scratch_addr     = c7x_2_ddr_scratch_addr +c7x_2_ddr_scratch_size;
-c7x_1_ddr_scratch_size     = ddr_mem_size - (c7x_1_ddr_scratch_addr - ddr_mem_addr);
+c7x_1_ddr_scratch_size     = 400*MB;
 
-c7x_1_ddr_local_heap_addr  = ddr_mem_addr_hi;
-c7x_1_ddr_local_heap_size  = ddr_mem_size_hi;
+c7x_1_ddr_local_heap_addr  = c7x_1_ddr_scratch_addr +c7x_1_ddr_scratch_size;
+c7x_1_ddr_local_heap_size  = 256*MB;
 
 #
 # Create memory section based on addr and size defined above, including
@@ -421,12 +421,9 @@ vision_apps_core_heaps_lo.concat(mcu2_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu2_1_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu3_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu3_1_ddr_local_heap);
-vision_apps_core_heaps_lo.concat(c7x_2_ddr_local_heap);
-vision_apps_core_heaps_lo.concat(c7x_2_ddr_scratch);
-vision_apps_core_heaps_lo.concat(c7x_1_ddr_scratch);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
 
-c7x_1_ddr_local_heap_phy  = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, c7x_1_ddr_local_heap_size, "DDR for c7x_1 for local heap");
+c7x_1_ddr_local_heap_phy  = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, ((c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size)-ddr_mem_addr_hi), "DDR for c7x_1, c7x_2 for scratch memory and local heap");
 
 vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
 vision_apps_core_heaps_hi.concat(c7x_1_ddr_local_heap_phy);
