@@ -164,8 +164,6 @@ static void appUnRegisterOpenVXTargetKernels();
 void appRtosTestRegister();
 void appRtosTestUnRegister();
 
-extern void appUdmaSetup(void);
-
 #ifdef ENABLE_UART
 void appLogDeviceWrite(char *string, uint32_t max_size)
 {
@@ -466,9 +464,6 @@ int32_t appInit()
     #endif
 
     #ifdef ENABLE_UDMA
-    #if defined(CPU_c7x_1)
-    appUdmaSetup();
-    #endif
     status = appUdmaInit();
     APP_ASSERT_SUCCESS(status);
 
@@ -477,7 +472,6 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
     #endif
-
 
     status = appMemInit(&mem_init_prm);
     APP_ASSERT_SUCCESS(status);
