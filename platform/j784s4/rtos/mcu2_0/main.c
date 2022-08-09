@@ -62,6 +62,7 @@
 
 #include <app.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/ethfw/include/app_ethfw.h>
 #include <stdio.h>
 #include <string.h>
 #include <ti/osal/osal.h>
@@ -100,6 +101,10 @@ int main(void)
 {
     TaskP_Params tskParams;
     TaskP_Handle task;
+
+#ifdef ENABLE_ETHFW
+    appEthFwEarlyInit();
+#endif
 
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();

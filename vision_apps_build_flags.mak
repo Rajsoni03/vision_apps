@@ -45,7 +45,8 @@ endif
 
 BUILD_ENABLE_ETHFW?=yes
 
-ifeq (,$(filter $(SOC),j721s2 j784s4))
+# ETHFW is not supported in J721S2
+ifneq (,$(filter $(SOC),j721s2))
 BUILD_ENABLE_ETHFW=no
 endif
 

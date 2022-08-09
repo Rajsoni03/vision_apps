@@ -85,6 +85,7 @@
 #include <utils/sciserver/include/app_sciserver.h>
 #include <utils/sensors/include/app_sensors.h>
 #include <utils/pcie/include/app_pcie_queue.h>
+#include <utils/ethfw/include/app_ethfw.h>
 
 /* TIOVX header files */
 #include <TI/tivx.h>
@@ -542,6 +543,15 @@ int32_t appInit()
 
     }
     #endif
+    #endif
+
+    #ifdef ENABLE_ETHFW
+    status = appEthFwInit();
+    APP_ASSERT_SUCCESS(status);
+    status = appEthFwRemoteServerInit();
+    APP_ASSERT_SUCCESS(status);
+
+    appLogWaitMsecs(50); /* Temporary workaround for ETHFW-1629 */
     #endif
 
     #ifdef ENABLE_FVID2

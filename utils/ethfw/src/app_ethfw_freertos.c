@@ -109,6 +109,13 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
 /* Max length of shared mcast address list */
 #define ETHAPP_MAX_SHARED_MCAST_ADDR        (8U)
 
+/* Required size of the MAC address pool (specific to the TI EVM configuration):
+ *  1 x MAC address for Ethernet Firmware
+ *  2 x MAC address for mpu1_0 virtual switch and MAC-only ports (Linux, 1 for QNX)
+ *  2 x MAC address for mcu2_1 virtual switch and MAC-only ports (RTOS)
+ *  1 x MAC address for mcu2_1 virtual switch port (AUTOSAR) */
+#define ETHAPP_MAC_ADDR_POOL_SIZE           (6U)
+
 static EthAppObj gEthAppObj =
 {
     .enetType = ENET_CPSW_9G,
@@ -134,9 +141,9 @@ static Enet_MacPort gEthAppPorts[] =
 #endif
 #elif defined(SOC_J784S4)
     ENET_MAC_PORT_1, /* QSGMII main */
-    ENET_MAC_PORT_2, /* QSGMII sub */
     ENET_MAC_PORT_3, /* QSGMII sub */
     ENET_MAC_PORT_4, /* QSGMII sub */
+    ENET_MAC_PORT_5, /* QSGMII sub */
 #endif
 };
 
@@ -306,18 +313,25 @@ int32_t appEthFwInit()
     flags |= ETHFW_BOARD_QENET_ENABLE;
 #endif
 #elif defined(SOC_J784S4)
-    flags |= ETHFW_BOARD_QENET_ENABLE;
+    flags |= (ETHFW_BOARD_QENET_ENABLE | ETHFW_BOARD_SERDES_CONFIG);
 #endif
 
     /* Board related initialization */
-    EthFwBoard_init(flags);
+    status = EthFwBoard_init(flags);
+    if (status != ENET_SOK)
+    {
+        appLogPrintf("ETHFW: Board initialization failed\n");
+    }
 
     /* Open UDMA driver */
-    gEthAppObj.hUdmaDrv = appUdmaGetObj();
-    if (gEthAppObj.hUdmaDrv == NULL)
+    if (status == ENET_SOK)
     {
-        appLogPrintf("ETHFW: ERROR: failed to open UDMA driver\n");
-        status = -1;
+        gEthAppObj.hUdmaDrv = appUdmaGetObj();
+        if (gEthAppObj.hUdmaDrv == NULL)
+        {
+            appLogPrintf("ETHFW: ERROR: failed to open UDMA driver\n");
+            status = -1;
+        }
     }
 
     /* Initialize Ethernet Firmware */
@@ -407,6 +421,7 @@ static int32_t EthApp_initEthFw(void)
     Cpsw_Cfg *cpswCfg = &ethFwCfg.cpswCfg;
     EnetUdma_Cfg dmaCfg;
     EnetRm_MacAddressPool *pool = &cpswCfg->resCfg.macList;
+    uint32_t poolSize;
     int32_t status = ETHAPP_OK;
     int32_t i;
 
@@ -418,8 +433,8 @@ static int32_t EthApp_initEthFw(void)
     cpswCfg->dmaCfg = (void *)&dmaCfg;
 
     /* Populate MAC address pool */
-    pool->numMacAddress = EthFwBoard_getMacAddrPool(pool->macAddress,
-                                                    ENET_ARRAYSIZE(pool->macAddress));
+    poolSize = EnetUtils_min(ENET_ARRAYSIZE(pool->macAddress), ETHAPP_MAC_ADDR_POOL_SIZE);
+    pool->numMacAddress = EthFwBoard_getMacAddrPool(pool->macAddress, poolSize);
 
     /* Set hardware port configuration parameters */
     ethFwCfg.ports = &gEthAppPorts[0];
@@ -433,6 +448,9 @@ static int32_t EthApp_initEthFw(void)
     /* Set AUTOSAR virtual port configuration parameters */
     ethFwCfg.autosarVirtPortCfg  = &gEthApp_autosarVirtPortCfg[0];
     ethFwCfg.numAutosarVirtPorts = ARRAY_SIZE(gEthApp_autosarVirtPortCfg);
+
+    /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
+    cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
 
     /* Overwrite config params with those for hardware interVLAN */
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
@@ -508,7 +526,7 @@ static int32_t EthApp_initEthFw(void)
     return status;
 }
 
-/* NIMU callbacks (exact name required) */
+/* lwIP callbacks (exact name required) */
 
 bool EthFwCallbacks_isPortLinked(struct netif *netif,
                                  Enet_Handle hEnet)
