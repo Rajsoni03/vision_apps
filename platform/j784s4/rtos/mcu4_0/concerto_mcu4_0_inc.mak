@@ -35,7 +35,7 @@ endif
 STATIC_LIBS += app_utils_hwa
 STATIC_LIBS += app_utils_sciclient
 
-#ADDITIONAL_STATIC_LIBS += vhwa.aer5f
+ADDITIONAL_STATIC_LIBS += vhwa.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
 
 DEFS        += $(RTOS)

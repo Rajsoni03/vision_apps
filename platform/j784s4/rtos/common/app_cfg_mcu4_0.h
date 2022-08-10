@@ -67,7 +67,8 @@
 
 #define DDR_HEAP_MEM_SIZE               (DDR_MCU4_0_LOCAL_HEAP_SIZE)
 
-#undef ENABLE_UDMA
+#define ENABLE_FVID2
+#define ENABLE_VHWA_VPAC1
 #undef ENABLE_UDMA_COPY
 
 #endif /* APP_CFG_MCU4_0_H_ */
