@@ -166,7 +166,7 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 endif
 
 qnx_fs_install_nfs: qnx_fs_copy_spl_uboot qnx_fs_install
-	cp $(PSDK_QNX_PATH)/qnx/bsp/images/ifs-$(SOC)-evm-ti-spl-nfs.raw $(QNX_AUX_FS_PATH)/qnx-ifs-spl-nfs
+	cp $(PSDK_QNX_PATH)/qnx/bsp/images/ifs-$(SOC)-evm-ti-spl-nfs-with-cpsw2g.raw $(QNX_AUX_FS_PATH)/qnx-ifs-spl-nfs
 	sync
 
 qnx_fs_install_nfs_test_data:
