@@ -7,6 +7,10 @@
 SBL_CORE=mcu1_0
 BOARD=$(BUILD_PDK_BOARD)
 ATF_OPTEE_PATH=$(VISION_APPS_PATH)/out/sbl_combined_bootfiles/atf_optee_dir
+ATF_TARGET_BOARD=generic
+ifeq ($(SOC),j784s4)
+	ATF_TARGET_BOARD=j784s4
+endif
 SBL_REPO_PATH=$(PDK_PATH)/packages/ti/boot/sbl
 COMBINED_APPIMAGE_TOOL_PATH=$(SBL_REPO_PATH)/tools/combined_appimage
 
@@ -39,14 +43,14 @@ sbl_sd:
 atf_optee: sbl_sd
 ifeq ($(BUILD_QNX_A72), yes)
 	# For ATF, setting HANDLE_EA_EL3_FIRST=0 for QNX so that the all runtime exception to be routed to current exception level (or in EL1 if the current exception level is EL0)
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=generic SPD=opteed  HANDLE_EA_EL3_FIRST=0
+	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed  HANDLE_EA_EL3_FIRST=0
 endif
 ifeq ($(BUILD_LINUX_A72), yes)
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=generic SPD=opteed
+	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed
 endif
 	$(MAKE) -C $(VISION_APPS_PATH)/../ti-optee-os -s -j32 CROSS_COMPILE_core=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- NOWERROR=1 CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=2 CFG_ARM64_core=y ta-targets=ta_arm64 PLATFORM=k3 PLATFORM_FLAVOR=j7
 	mkdir -p $(ATF_OPTEE_PATH)
-	cp $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3/generic/release/bl31.bin $(ATF_OPTEE_PATH)/bl31.bin
+	cp $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3/$(ATF_TARGET_BOARD)/release/bl31.bin $(ATF_OPTEE_PATH)/bl31.bin
 	cp $(VISION_APPS_PATH)/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin $(ATF_OPTEE_PATH)/bl32.bin
 
 
