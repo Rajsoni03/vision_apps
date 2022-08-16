@@ -117,8 +117,13 @@ BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
 # PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm
 BUILD_PDK_BOARD=$(SOC)_evm
 
-# Flag to select silicon revision: 1_1 for ES 1.1, 1_0 for ES 1.0
-J7ES_SR?=1_1
+# Flag to select silicon revision: 1_1 for SR 1.1, 1_0 for SR 1.0
+HS_SR?=1_1
+ifeq ($(SOC),j721s2)
+# Note: There is only SR 1.0 for J721S2 HS
+HS_SR=1_0
+endif
+
 
 # when mcu2-1 build is enabled, mcu2-0 must also be built
 ifeq ($(BUILD_CPU_MCU2_1),yes)
