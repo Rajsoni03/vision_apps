@@ -335,13 +335,13 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    attrs.attrIndx = Mmu_AttrIndx_MAIR4;
-
     retVal = Mmu_map(MSMC_C7x_3_ADDR, MSMC_C7x_3_ADDR, MSMC_C7x_3_SIZE, &attrs, is_secure); /* Local MSMC   */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
+
+    attrs.attrIndx = Mmu_AttrIndx_MAIR4;
 
     retVal = Mmu_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs, is_secure);
     if(retVal == FALSE)
