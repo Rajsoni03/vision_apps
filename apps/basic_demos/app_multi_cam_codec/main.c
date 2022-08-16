@@ -2139,6 +2139,14 @@ static void construct_gst_strings(app_gst_wrapper_params_t* params, uint8_t srcT
             i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
             i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! fakesink \n");
         }
+        else if (sinkType == 3){
+            snprintf(params->m_AppSinkNameArr[ch], MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+                                                                                        params->out_format);
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=7 \n");
+            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
+        }
     }
 }
 
@@ -2149,6 +2157,19 @@ static void set_gst_pipe_params(AppObj *obj)
     app_gst_wrapper_params_t *gst_pipe_params = &obj->gst_pipe_params;
     uint8_t srcType     = 0;
     uint8_t sinkType    = 0;
+
+    /* DMABUF-IMPORT feature not currently supported by decoder on J721S2/J784S4.
+       This will necessarily cause data copy from decoder to tivx-allocated memory 
+       for respective devices. */
+    #if defined(SOC_J721E)
+    sinkType    = 0;
+    #endif
+    #if defined(SOC_J721S2)
+    sinkType    = 3;
+    #endif
+    #if defined(SOC_J784S4)
+    sinkType    = 3;
+    #endif
 
     gst_pipe_params->in_width        = enc_pool->width;
     gst_pipe_params->in_height       = enc_pool->height;
