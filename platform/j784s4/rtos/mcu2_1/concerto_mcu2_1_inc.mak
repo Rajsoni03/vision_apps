@@ -20,7 +20,6 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 
-LDIRS += $(PDK_PATH)/packages/ti/drv/csitx/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/vhwa/lib/$(SOC)/mcu2_1/$(TARGET_BUILD)/
 
 ifeq ($(RTOS),FREERTOS)
@@ -38,7 +37,6 @@ endif
 STATIC_LIBS += app_utils_hwa
 STATIC_LIBS += app_utils_sciclient
 
-ADDITIONAL_STATIC_LIBS += csitx.aer5f
 ADDITIONAL_STATIC_LIBS += vhwa.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
 
