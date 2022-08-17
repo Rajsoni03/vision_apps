@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.02.02</h2>
+<h2 align='center'>Version: 08.02.01</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -72,8 +72,6 @@
 <a href="#Device_Support">Device Support</a> </li>
 <li>
 <a href="#Validation">Validation Information</a> </li>
-<li>
-<a href="#Fixed_Issues">Fixed Issues</a> </li>
 <li>
 <a href="#Open_Defects">Open Defects</a> </li>
 <li>
@@ -129,7 +127,7 @@ Refer to following documentation for further details:<p>
 <p>
 <h2><a class="anchor" name="Whats_New"></a>What's New</h2>
 
-New features in this release are highlighted in <strong>bold</strong>
+New features in this release are highlighted in <strong>bold</strong> (Note: Deep learning demos utilizing TIDL have not been validated in this EEA release)
 
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
@@ -161,8 +159,6 @@ New features in this release are highlighted in <strong>bold</strong>
         <ul>
         <li>semantic segmentation, Parking spot detect and Vehicle detect algorithms</li>
         <li>1 channel, 3 algo mode</li>
-        <li>3 channel, 3 algo mode (combined network for parking spot and vehicle detect)</li>
-        <li>3 channel, 5 algo mode - combined network for parking spot and vehicle detect + Three task network for Semantic Segmentation, Motion Segmentation and Depth Estimation (AVP3 demo)</li>
         </ul>
     </li>
     <li>DKAZE-based Visual Localization application</li>
@@ -209,8 +205,8 @@ New features in this release are highlighted in <strong>bold</strong>
 <li>The J784S4 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
 what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.</li>
 
-<li>There is an existing workaround on the DM code to enable power for the DRU4-DRU7.  This was a change from the EA1 release which powered this on from the
-C7X-1.</li>
+<li>There is an existing workaround in the C7X-1 code to enable power for the DRU4-DRU7.  Therefore, if these DRU's need to be used, the C7X-1 should be
+enabled in the build.  This is already enabled in the default SDK build.</li>
 </ul>
 
 <p>
@@ -225,27 +221,8 @@ Refer Processor SDK RTOS release notes <a href="../psdk_rtos/docs/user_guide/rel
 <p>
 The tools used to validate this package are listed in top level user guide <a href="../psdk_rtos/docs/user_guide/sdk_components.html" target="_blank">[HTML]</a>
 
+<p>
 <hr>
-<p>
-<h2><a class="anchor" name="Fixed_Issues"></a>Fixed Issues</h2>
-<p>
-<table>
-<thead>
-<tr class="header">
-<th align="center">ID</th>
-<th align="left">Summary</th>
-</tr>
-</thead>
-<tbody>
-<tr class="even">
-<td align="center">ADASVISION-5573</td>
-<td align="left"><span>AVP2/AVP3 apps fail on J7AHP due to TIDL models</span></td>
-</tr>
-</tbody>
-</table>
-
-<hr>
-<p>
 <h2><a class="anchor" name="Open_Defects"></a>Open Defects</h2>
 <p>
 <table>
@@ -262,7 +239,11 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5575</td>
-<td align="left"><span>Graphics bar not rendering properly for all CPU's on J7AHP</span></td>
+<td align="left"><span>Graphics bar not rendering all CPU's on J7AHP</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5573</td>
+<td align="left"><span>AVP2/AVP3 apps fail on J7AHP due to TIDL models</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5572</td>
