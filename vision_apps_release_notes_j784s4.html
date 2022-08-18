@@ -135,8 +135,8 @@ New features in this release are highlighted in <strong>bold</strong>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
     <li> Free RTOS on C7x and R5F and Linux or QNX on A72</li>
-    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
-    <li>Integrates all major HW components like CSI2 camera, eDP display, UART, I2C, SD card</li>
+    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
+    <li>Integrates all major HW components like CSI2 camera, eDP display, UART, I2C, ethernet, SD card</li>
     </ul>
 </li>
 
@@ -211,6 +211,10 @@ what is used during boot.  Therefore, if additional peripherals need to be acces
 
 <li>There is an existing workaround on the DM code to enable power for the DRU4-DRU7.  This was a change from the EA1 release which powered this on from the
 C7X-1.</li>
+
+<li>There is a known instability with the QNX + SBL boot mode where the kernel will crash upon boot approximately 25% of the time.  In order to workaround
+this issue, you can set the value returned by the board_smp_num_cpu function in the location psdkqa/qnx/src/hardware/startup/boards/j784s4/board_smp.c from
+8 to 2 and this issue should no longer be seen</li>
 </ul>
 
 <p>
@@ -241,6 +245,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="center">ADASVISION-5573</td>
 <td align="left"><span>AVP2/AVP3 apps fail on J7AHP due to TIDL models</span></td>
 </tr>
+<tr class="even">
+<td align="center">ADASVISION-5572</td>
+<td align="left"><span>16bit TIDL networks hang on J7AHP</span></td>
+</tr>
 </tbody>
 </table>
 
@@ -263,10 +271,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center">ADASVISION-5575</td>
 <td align="left"><span>Graphics bar not rendering properly for all CPU's on J7AHP</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5572</td>
-<td align="left"><span>16bit TIDL networks hang on J7AHP</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5566</td>
