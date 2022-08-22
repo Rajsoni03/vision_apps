@@ -235,20 +235,20 @@
 #define DDR_C66X_2_SCRATCH_ADDR (0xE1000000u)
 #define DDR_C66X_2_SCRATCH_SIZE (0x03000000u)
 
-/* DDR for c7x_1 for Scratch Memory [ size 368.00 MB ] */
-#define DDR_C7X_1_SCRATCH_ADDR (0xE4000000u)
-#define DDR_C7X_1_SCRATCH_SIZE (0x17000000u)
-
 /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-#define INTERCORE_ETH_DESC_MEM_ADDR (0xFB000000u)
+#define INTERCORE_ETH_DESC_MEM_ADDR (0xE4000000u)
 #define INTERCORE_ETH_DESC_MEM_SIZE (0x00800000u)
 
 /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-#define INTERCORE_ETH_DATA_MEM_ADDR (0xFB800000u)
+#define INTERCORE_ETH_DATA_MEM_ADDR (0xE4800000u)
 #define INTERCORE_ETH_DATA_MEM_SIZE (0x01800000u)
 
+/* DDR for c7x_1 for Scratch Memory [ size 368.00 MB ] */
+#define DDR_C7X_1_SCRATCH_ADDR (0x100000000u)
+#define DDR_C7X_1_SCRATCH_SIZE (0x17000000u)
+
 /* DDR for c7x_1 for local heap [ size 256.00 MB ] */
-#define DDR_C7X_1_LOCAL_HEAP_ADDR (0x100000000u)
+#define DDR_C7X_1_LOCAL_HEAP_ADDR (0x117000000u)
 #define DDR_C7X_1_LOCAL_HEAP_SIZE (0x10000000u)
 
 #define DDR_64BIT_BASE_VADDR (0x100000000u)

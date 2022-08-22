@@ -66,10 +66,10 @@
 
 MEMORY
 {
-    /* R5F_TCMA_VECS [ size 256 B ] */
-    R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000100
-    /* R5F_TCMA [ size 31.75 KB ] */
-    R5F_TCMA                 (    X ) : ORIGIN = 0x00000100 , LENGTH = 0x00007F00
+    /* R5F_TCMA_VECS [ size 64 B ] */
+    R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000040
+    /* R5F_TCMA [ size 31.94 KB ] */
+    R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x00007FC0
     /* Main OCRAM for MCU2_1 [ size 256.00 KB ] */
     MAIN_OCRAM_MCU2_1        ( RWIX ) : ORIGIN = 0x03640000 , LENGTH = 0x00040000
     /* R5F_TCMB0 [ size 32.00 KB ] */
@@ -91,7 +91,7 @@ MEMORY
     /* DDR for MCU2_1 for local heap [ size 16.00 MB ] */
     DDR_MCU2_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xDA000000 , LENGTH = 0x01000000
     /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xFB000000 , LENGTH = 0x00800000
+    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xE4000000 , LENGTH = 0x00800000
     /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xFB800000 , LENGTH = 0x01800000
+    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xE4800000 , LENGTH = 0x01800000
 }
