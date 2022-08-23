@@ -347,13 +347,13 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
 
     retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_REGISTER_HANDLE, &doHpd, sizeof(doHpd), 0U);
 
-    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    #if defined(SOC_J721S2)
     if( (FVID2_SOK == retVal) && (obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP) )
     {
         retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_IS_DP_CONNECTED, &isDpConnected, sizeof(isDpConnected), 0U);
     }
-    #elif defined(SOC_J721E)
-    /* The DP initialization should occur on J721E regardless of if it is connected or not */
+    #elif defined(SOC_J721E) || defined(SOC_J784S4)
+    /* The DP initialization should occur on J721E/J784S4 regardless of if it is connected or not */
     isDpConnected = true;
     #endif
 

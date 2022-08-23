@@ -297,6 +297,10 @@ void appDssConfigureDP(void)
 
     b_status = Board_control(BOARD_CTRL_CMD_SET_IO_EXP_PIN_OUT, (void *)(&ioExpCfg));
 
+    #if defined (SOC_J721S2) || defined (SOC_J784S4)
+    appLogWaitMsecs(500u);
+    #endif
+
     if (b_status == BOARD_SOK)
     {
         appLogPrintf("DSS: Turning on DP_PWR pin for eDP adapters ... Done!!!\n");
