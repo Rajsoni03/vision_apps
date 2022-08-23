@@ -7,7 +7,15 @@ MCUSW_PATH=$(PSDK_PATH)/mcusw
 # file in tiovx, ex, bios, tidl, pdk, cgtools, ...
 include $(TIOVX_PATH)/psdkra_tools_path.mak
 include $(TIOVX_PATH)/build_flags.mak
-include safertos_package_path.mk
+
+# This is required to be set when pulling in the safertos_version
+BOARD=$(SOC)_evm
+
+include $(PDK_PATH)/packages/ti/build/safertos_version.mk
+
+export SAFERTOS_KERNEL_INSTALL_PATH_r5f = $(PSDK_PATH)/safertos_$(SOC)_r5f_$(SAFERTOS_VERSION_r5f)
+export SAFERTOS_KERNEL_INSTALL_PATH_c66 = $(PSDK_PATH)/safertos_$(SOC)_c66_$(SAFERTOS_VERSION_c66)
+export SAFERTOS_KERNEL_INSTALL_PATH_c7x = $(PSDK_PATH)/safertos_$(SOC)_c7x_$(SAFERTOS_VERSION_c7x)
 
 LINUX_FS_PATH ?= $(PSDK_PATH)/targetfs/
 LINUX_FS_BOOT_PATH ?= $(PSDK_PATH)/bootfs/
