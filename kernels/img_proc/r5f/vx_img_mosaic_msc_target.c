@@ -415,8 +415,8 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
     if(VX_SUCCESS == status)
     {
         vx_enum                 self_cpu;
-        app_perf_hwa_id_t       app_hwa_inst_id_0, app_hwa_inst_id_1;
-        uint32_t                inst_id_offset;
+        app_perf_hwa_id_t       app_hwa_inst_id_0 = 0U, app_hwa_inst_id_1 = 0U;
+        uint32_t                inst_id_offset = 0U;
 
         self_cpu = tivxGetSelfCpuId();
 

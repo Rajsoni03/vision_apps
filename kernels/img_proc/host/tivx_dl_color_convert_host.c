@@ -118,17 +118,20 @@ static vx_status VX_CALLBACK tivxAddKernelDLColorConvertValidate(vx_node node,
         tivxCheckStatus(&status, vxQueryImage(output_image, VX_IMAGE_FORMAT, &output_image_fmt, sizeof(output_image_fmt)));
     }
 
-    if (!((((vx_df_image)VX_DF_IMAGE_RGB == input_image_fmt) && ((vx_df_image)VX_DF_IMAGE_NV12 == output_image_fmt)) ||
-       ((((vx_df_image)VX_DF_IMAGE_NV12 == input_image_fmt) || ((vx_df_image)VX_DF_IMAGE_NV21 == input_image_fmt)) && ((vx_df_image)VX_DF_IMAGE_RGB == output_image_fmt)) ||
-       ((((vx_df_image)VX_DF_IMAGE_NV12 == input_image_fmt) || ((vx_df_image)VX_DF_IMAGE_NV21 == input_image_fmt)) && ((vx_df_image)VX_DF_IMAGE_IYUV == output_image_fmt)) ||
-       (((vx_df_image)VX_DF_IMAGE_IYUV == input_image_fmt) && ((vx_df_image)VX_DF_IMAGE_NV12 == output_image_fmt))))
+    if (VX_SUCCESS == status)
     {
-        status = VX_ERROR_INVALID_PARAMETERS;
-        VX_PRINT(VX_ZONE_ERROR, "Supported Input and Output combinations are, \n \
-                                 1. input=VX_DF_IMAGE_RGB, output=VX_DF_IMAGE_NV12 \n \
-                                 2. input=VX_DF_IMAGE_NV12 or VX_DF_IMAGE_NV21, output=VX_DF_IMAGE_RGB \n \
-                                 3. input=VX_DF_IMAGE_NV12 or VX_DF_IMAGE_NV21, output=VX_DF_IMAGE_IYUV \n \
-                                 4. input=VX_DF_IMAGE_IYUV and output=VX_DF_IMAGE_NV12 \n");
+        if (!((((vx_df_image)VX_DF_IMAGE_RGB == input_image_fmt) && ((vx_df_image)VX_DF_IMAGE_NV12 == output_image_fmt)) ||
+           ((((vx_df_image)VX_DF_IMAGE_NV12 == input_image_fmt) || ((vx_df_image)VX_DF_IMAGE_NV21 == input_image_fmt)) && ((vx_df_image)VX_DF_IMAGE_RGB == output_image_fmt)) ||
+           ((((vx_df_image)VX_DF_IMAGE_NV12 == input_image_fmt) || ((vx_df_image)VX_DF_IMAGE_NV21 == input_image_fmt)) && ((vx_df_image)VX_DF_IMAGE_IYUV == output_image_fmt)) ||
+           (((vx_df_image)VX_DF_IMAGE_IYUV == input_image_fmt) && ((vx_df_image)VX_DF_IMAGE_NV12 == output_image_fmt))))
+        {
+            status = VX_ERROR_INVALID_PARAMETERS;
+            VX_PRINT(VX_ZONE_ERROR, "Supported Input and Output combinations are, \n \
+                                     1. input=VX_DF_IMAGE_RGB, output=VX_DF_IMAGE_NV12 \n \
+                                     2. input=VX_DF_IMAGE_NV12 or VX_DF_IMAGE_NV21, output=VX_DF_IMAGE_RGB \n \
+                                     3. input=VX_DF_IMAGE_NV12 or VX_DF_IMAGE_NV21, output=VX_DF_IMAGE_IYUV \n \
+                                     4. input=VX_DF_IMAGE_IYUV and output=VX_DF_IMAGE_NV12 \n");
+        }
     }
 
     return status;
