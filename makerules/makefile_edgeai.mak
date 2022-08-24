@@ -16,7 +16,7 @@ export CROSS_COMPILER_PATH
 export CROSS_COMPILER_PREFIX
 export TARGET_FS
 
-edgeai: sdk
+edgeai:
 	@echo "Building EdgeAI Components"
 	$(MAKE) linux_fs_install
 	$(MAKE) edgeai_modules
