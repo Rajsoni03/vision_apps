@@ -1,3 +1,4 @@
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
 
 include $(PRELUDE)
@@ -15,7 +16,7 @@ SKIPBUILD=1
 endif
 
 ifeq ($(TARGET_CPU),A72)
-ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
 include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
 CSOURCES    += main_linux_arm.c
 endif
@@ -32,12 +33,15 @@ ifeq ($(TARGET_OS), LINUX)
 STATIC_LIBS += app_utils_gst_wrapper
 endif
 
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
 SHARED_LIBS += gstreamer-1.0
 SHARED_LIBS += gstapp-1.0
 SHARED_LIBS += gstbase-1.0
 SHARED_LIBS += gobject-2.0
 SHARED_LIBS += glib-2.0
+endif
 
 include $(FINALE)
 
+endif
 endif
