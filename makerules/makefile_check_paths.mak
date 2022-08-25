@@ -25,10 +25,8 @@ endif
 ifeq ($(SOC),j721e)
 	@if [ ! -d $(CGT6X_ROOT) ]; then echo 'ERROR: $(CGT6X_ROOT) not found !!!'; exit 1; fi
 	@if [ ! -d $(REMOTE_DEVICE_PATH) ]; then echo 'ERROR: $(REMOTE_DEVICE_PATH) not found !!!'; exit 1; fi
-	@if [ ! -d $(EDGEAI_MODULES_PATH) ]; then echo 'ERROR: $(EDGEAI_MODULES_PATH) not found !!!'; exit 1; fi
-	@if [ ! -d $(EDGEAI_PLUGINS_PATH) ]; then echo 'ERROR: $(EDGEAI_PLUGINS_PATH) not found !!!'; exit 1; fi
 endif
-ifeq ($(SOC),j721s2)
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
 	@if [ ! -d $(EDGEAI_MODULES_PATH) ]; then echo 'ERROR: $(EDGEAI_MODULES_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(EDGEAI_PLUGINS_PATH) ]; then echo 'ERROR: $(EDGEAI_PLUGINS_PATH) not found !!!'; exit 1; fi
 endif
@@ -37,6 +35,4 @@ ifeq ($(BUILD_QNX_A72),yes)
 endif
 
 	@echo "# SDK paths OK !!!"
-
-
 
