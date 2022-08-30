@@ -260,6 +260,8 @@ endif
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_linux_install_sd
 endif
+
+edgeai_linux_fs_install_sd: linux_fs_install
 ifneq ($(SOC),j784s4)
 	$(MAKE) EDGEAI_INSTALL_PATH=$(LINUX_SD_FS_ROOT_PATH) edgeai_install
 endif
@@ -272,6 +274,9 @@ linux_fs_install_sd_ip: ip_addr_check linux_fs_install
 	sshfs -o nonempty root@$(J7_IP_ADDRESS):/ /tmp/j7-evm
 	#(call CLEAN_COPY_FROM_STAGE,/tmp/j7-evm)
 	$(call CLEAN_COPY_FROM_STAGE_FAST,/tmp/j7-evm)
+	fusermount -u /tmp/j7-evm/
+
+edgeai_linux_fs_install_sd_ip: linux_fs_install_sd_ip
 ifneq ($(SOC),j784s4)
 	$(MAKE) EDGEAI_INSTALL_PATH=/tmp/j7-evm edgeai_install
 endif

@@ -17,10 +17,15 @@ export CROSS_COMPILER_PREFIX
 export TARGET_FS
 
 edgeai:
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
 	@echo "Building EdgeAI Components"
+	$(MAKE) edgeai_check_paths
 	$(MAKE) linux_fs_install
 	$(MAKE) edgeai_modules
 	$(MAKE) edgeai_plugins
+else ifeq ($(SOC),j784s4)
+	@echo "Building EdgeAI Components not Supported"
+endif
 
 edgeai_modules:
 	@echo "Building EdgeAI Modules"
