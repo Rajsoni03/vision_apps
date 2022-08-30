@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.00.04</h2>
+<h2 align='center'>Version: 08.04.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -184,6 +184,7 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
+    <li><strong>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display</strong></li>
     <li>C7x algorithm offload demo (with DMA acceleration)</li>
     </ul>
 </li>
@@ -213,8 +214,42 @@ New features in this release are highlighted in <strong>bold</strong>
 <p>
 <h2><a class="anchor" name="Compatibility"></a>Upgrade and Compatibility Information</h2>
 <p>
+
+<table frame="box" rules="all" cellspacing="0" width="100%" border="1" cellpadding="3">
+<tr bgcolor="lightgrey">
+<td align="center"> <b>File</b> </td>
+<td align="center"><b>Change description</b></td>
+<td align="center"><b>User application change required</b></td>
+<td align="center"><b>User application recompile required</b></td>
+</tr>
+
+<tr>
+<td align="center"> kernels_j7\include\TI\j7.h </td>
+<td align="center"> This file is deprecated and will be removed in PSDK 8.5 ... please remove its inclusion and just include TI/tivx.h.
+</td>
+<td align="center"> YES </td>
+<td align="center"> YES </td>
+</tr>
+
+<tr>
+<td align="center"> include\TI\tivx_soc_j721e.h </td>
+<td align="center"> Renaming of TIVX_TARGET_IPU1_0/TIVX_TARGET_IPU1_1 to TIVX_TARGET_MCU2_0/TIVX_TARGET_MCU2_1 </td>
+<td align="center"> NO </td>
+<td align="center"> YES </td>
+</tr>
+
+<tr>
+<td align="center"> kernels_j7\include\TI\j7_tvm.h </td>
+<td align="center"> Additional parameters included in tivxTVMJ7Params </td>
+<td align="center"> YES </td>
+<td align="center"> YES </td>
+</tr>
+
+</table>
+
 The J721S2 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
 what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.
+
 <p>
 <hr>
 <p>
@@ -240,64 +275,36 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-5232</td>
-<td align="left"><span>MSC error observed in many of the vision apps</span></td>
+<td align="center">ADASVISION-5608</td>
+<td align="left"><span>PC Emulation: DOF visualize is not registered for J721S2/J7AHP</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5125</td>
-<td align="left"><span>RTOS bootloader doc points to an out-of-date doc for details on the boot component</span></td>
+<td align="center">ADASVISION-5559</td>
+<td align="left"><span>"sdk_clean" make target from "vision_apps" fails</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5124</td>
-<td align="left"><span>RTOS bootloader diff table in SDK doc missing a key item</span></td>
+<td align="center">ADASVISION-5519</td>
+<td align="left"><span>AVP4 app is not releasing all resources</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5118</td>
-<td align="left"><span>SBL flow not working with QNX on J721S2</span></td>
+<td align="center">ADASVISION-5559</td>
+<td align="left"><span>"sdk_clean" make target from "vision_apps" fails</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5067</td>
-<td align="left"><span>C7X-2 requires a 10s delay during init</span></td>
+<td align="center">ADASVISION-5334</td>
+<td align="left"><span>Errors observed in parking spot and vehicle detections in AVP apps</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5064</td>
-<td align="left"><span>Instability seen on cold boot requiring a reboot</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10513">ADASVISION-4864</a></td>
-<td align="left"><span>Instability in heterogeneous camera</span></td>
+<td align="center">ADASVISION-5231</td>
+<td align="left"><span>EDP to HDMI adapter is not enabled in J721S2</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4874</td>
-<td align="left"><span>Color flashes on display with 8-camera use case with FreeRTOS</span></td>
+<td align="center">ADASVISION-5333</td>
+<td align="left"><span>TIDL Performance Degradation on SDK (J721S2)</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10711">ADASVISION-5039</a></td>
-<td align="left"><span>TIDL preemption test fails when TIDL logs are used</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5101</td>
-<td align="left"><span>YUV or RAW test pattern input fails</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5119</td>
-<td align="left"><span>Installed ATF and OPTEE are out-dated</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5120</td>
-<td align="left"><span>The alignment for the Cache Line size is too high, 256bytes</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5142</td>
-<td align="left"><span>Update Recommended MicroSD card size from 16Gb --> 32Gb for both data sets</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5321</td>
-<td align="left"><span>16bit inference in PC mode for app_tidl_seg is incorrect</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5372</td>
-<td align="left"><span>Incorrect calculation for Free Memory in percentage</span></td>
+<td align="center">ADASVISION-5063</td>
+<td align="left"><span>A72 cache is disabled due to coherency issue between A72 and R5</span></td>
 </tr>
 </tbody>
 </table>
@@ -314,6 +321,18 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10884">ADASVISION-5531</a></td>
+<td align="left"><span>[NF]: Incorrect condition check when skip is enabled</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
+<td align="left"><span>SDE disparity artifacts on EVM</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10883">ADASVISION-5566</a></td>
+<td align="left"><span>SDE crashes with 12-bit input</span></td>
+</tr>
 <tr class="even">
 <td align="center">ADASVISION-5399</td>
 <td align="left"><span>VPAC/DMPAC Func clock not enabled for j721s2</span></td>
@@ -323,24 +342,8 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5334</td>
-<td align="left"><span>Errors observed in parking spot and vehicle detections in AVP apps</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5231</td>
-<td align="left"><span>EDP to HDMI adapter is not enabled in J721S2</span></td>
-</tr>
-<tr class="even">
 <td align="center">ADASVISION-5065</td>
 <td align="left"><span>OCMC RAM Init fails on MCU2-0</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5333</td>
-<td align="left"><span>TIDL Performance Degradation on SDK (J721S2)</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5063</td>
-<td align="left"><span>A72 cache is disabled due to coherency issue between A72 and R5</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
@@ -355,24 +358,8 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>Frozen frame running OpenVX graphs back to back </span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10510">ADASVISION-4876</a></td>
-<td align="left"><span>Performance degradation observed on some vision apps demos</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10512">ADASVISION-4873</a></td>
-<td align="left"><span>[IMGPreProcNode]: BT601 limited range CSC coefficients causes clipping</span></td>
-</tr>
-<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10514">ADASVISION-4799</a></td>
 <td align="left"><span>Broadcast Mode Unreliable</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10517">ADASVISION-4412</a></td>
-<td align="left"><span>Performance measurement incorrect for display node</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10519">ADASVISION-4411</a></td>
-<td align="left"><span>Performance measurement incorrect for capture node</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10520">ADASVISION-4386</a></td>

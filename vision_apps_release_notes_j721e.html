@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.02.00</h2>
+<h2 align='center'>Version: 08.04.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -136,7 +136,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li> Free RTOS on C7x, C6x on R5F and Linux or QNX on A72</li>
+    <li> Free RTOS and <strong>Safe RTOS</strong> on C7x, C6x on R5F and Linux or QNX on A72</li>
     <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C6x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
     <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
     </ul>
@@ -191,6 +191,7 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
+    <li><strong>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display</strong></li>
     <li>C7x algorithm offload demo (with DMA acceleration)</li>
     </ul>
 </li>
@@ -230,7 +231,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <p>
 <h2><a class="anchor" name="Compatibility"></a>Upgrade and Compatibility Information</h2>
 <p>
-Not applicable. Early adopter release.
+No upgrade and compatibility changes since previous release.
 <p>
 <hr>
 <p>
@@ -256,48 +257,36 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10513">ADASVISION-4864</a></td>
-<td align="left"><span>Instability in heterogeneous camera</span></td>
+<td align="center">ADASVISION-5591</td>
+<td align="left"><span>Wrong comments for pinmux in PSDKR</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-4874</td>
-<td align="left"><span>Color flashes on display with 8-camera use case with FreeRTOS</span></td>
+<td align="center">ADASVISION-5559</td>
+<td align="left"><span>sdk_clean make target from vision_apps fails</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10711">ADASVISION-5039</a></td>
-<td align="left"><span>TIDL preemption test fails when TIDL logs are used</span></td>
+<td align="center">ADASVISION-5525</td>
+<td align="left"><span>canny edge detection kernel crashes calling application on node release</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5101</td>
-<td align="left"><span>YUV or RAW test pattern input fails</span></td>
+<td align="center">ADASVISION-5519</td>
+<td align="left"><span>AVP4 app is not releasing all resources</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5114</td>
-<td align="left"><span>Difference in contents of k3-j721e-rtos-memory-map.dtsi in PSDKRA and PSDKLA</span></td>
+<td align="center">ADASVISION-5509</td>
+<td align="left"><span>Segmentation Fault in tidl avp2 demo when en_out_img_write is enabled</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5119</td>
-<td align="left"><span>Installed ATF and OPTEE are out-dated</span></td>
+<td align="center">ADASVISION-5498</td>
+<td align="left"><span>vision_apps demo: The MAX payload size in the FD exchange demo needs to be increased</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5120</td>
-<td align="left"><span>The alignment for the Cache Line size is too high, 256bytes</span></td>
+<td align="center">ADASVISION-5495</td>
+<td align="left"><span>For dl_demo avp2, when enable en_out_img_write, no mosaic image</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5121</td>
-<td align="left"><span>k3-j721e-vision-apps.dtbo carveouts have conflict/overlap</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5142</td>
-<td align="left"><span>Update Recommended MicroSD card size from 16Gb --> 32Gb for both data sets</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5321</td>
-<td align="left"><span>16bit inference in PC mode for app_tidl_seg is incorrect</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5372</td>
-<td align="left"><span>Incorrect calculation for Free Memory in percentage</span></td>
+<td align="center">ADASVISION-5491</td>
+<td align="left"><span>Error during code generation using scripts in vision_apps/kernels/srv/scripts/</span></td>
 </tr>
 </tbody>
 </table>
@@ -314,6 +303,22 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10886">ADASVISION-5616</a></td>
+<td align="left"><span>J721E: QNX: SafeRTOS: eDP to HDMI adaptor Board function causes crash</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10884">ADASVISION-5531</a></td>
+<td align="left"><span>[NF]: Incorrect condition check when skip is enabled</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
+<td align="left"><span>SDE disparity artifacts on EVM</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10883">ADASVISION-5566</a></td>
+<td align="left"><span>SDE crashes with 12-bit input</span></td>
+</tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
 <td align="left"><span>AVP4 freezes in first second of running on QNX</span></td>
