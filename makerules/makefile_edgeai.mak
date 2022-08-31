@@ -43,12 +43,16 @@ edgeai_plugins:
 	DESTDIR=$(TARGET_FS) ninja -C build install
 
 edgeai_install:
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
 	@echo "Install EdgeAI Modules and Plugins to EDGEAI_INSTALL_PATH"
 	cd $(EDGEAI_MODULES_PATH); \
-	$(MAKE) install DESTDIR=$(EDGEAI_INSTALL_PATH) -C build
+	if [ -d "build" ]; then $(MAKE) install DESTDIR=$(EDGEAI_INSTALL_PATH) -C build; else echo edgeai-tiovx-modules has not been built yet, skipping install; fi;
 	cd $(EDGEAI_PLUGINS_PATH); \
-	DESTDIR=$(EDGEAI_INSTALL_PATH) ninja -C build install; \
+	if [ -d "build" ]; then DESTDIR=$(EDGEAI_INSTALL_PATH) ninja -C build install; else echo edgeai-gst-plugins has not been built yet, skipping install; fi; \
 	sync
+else ifeq ($(SOC),j784s4)
+	@echo "Building EdgeAI Components not Supported"
+endif
 
 edgeai_scrub:
 	@echo "EdgeAI Scrub"
