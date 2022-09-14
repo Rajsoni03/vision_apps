@@ -58,7 +58,7 @@ static uint32_t gTraceBufIndex = 0U;
 int32_t Ipc_Trace_printf(const char *format, ...)
 {
     char buffer[IPC_TRACE_MAX_LINE_LENGTH];
-    va_list args;
+    va_list args = {0};
     uint8_t i = 0;
 
     va_start(args, format);

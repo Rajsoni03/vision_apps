@@ -172,6 +172,22 @@ uint16_t Draw2D_getFontColor(uint16_t key)
     return color;
 }
 
+static int32_t Draw2D_initializeFontProperty(Draw2D_FontProperty *pProp)
+{
+    if(pProp==NULL)
+        return VX_FAILURE;
+
+    pProp->addr        = NULL;
+    pProp->width       = 0;
+    pProp->height      = 0;
+    pProp->bpp         = 0;
+    pProp->lineOffset  = 0;
+    pProp->num         = 0;
+    pProp->colorFormat = 0;
+
+    return 0;
+}
+
 int32_t Draw2D_drawString_rot(Draw2D_Handle pCtx,
                         uint32_t startX,
                         uint32_t startY,
@@ -189,6 +205,7 @@ int32_t Draw2D_drawString_rot(Draw2D_Handle pCtx,
     if(pObj==NULL || str==NULL)
         return VX_FAILURE;
 
+    Draw2D_initializeFontProperty(&font);
     Draw2D_getFontProperty(pPrm, &font);
 
     len = strlen(str);
@@ -375,6 +392,7 @@ int32_t Draw2D_clearString(Draw2D_Handle pCtx,
     if(pCtx==NULL)
         return VX_FAILURE;
 
+    Draw2D_initializeFontProperty(&font);
     Draw2D_getFontProperty(pPrm, &font);
 
     len = sizeof(tmpString)-1;
@@ -409,6 +427,22 @@ int32_t Draw2D_drawBmp(Draw2D_Handle pCtx,
                         0);
 }
 
+
+static int32_t Draw2D_initializeBmpProperty(Draw2D_BmpProperty *pProp)
+{
+    if(pProp==NULL)
+        return VX_FAILURE;
+
+    pProp->addr        = NULL;
+    pProp->width       = 0;
+    pProp->height      = 0;
+    pProp->bpp         = 0;
+    pProp->lineOffset  = 0;
+    pProp->colorFormat = 0;
+
+    return 0;
+}
+
 int32_t Draw2D_drawBmp_rot(Draw2D_Handle pCtx,
                         uint32_t startX,
                         uint32_t startY,
@@ -425,6 +459,7 @@ int32_t Draw2D_drawBmp_rot(Draw2D_Handle pCtx,
     if(pObj==NULL)
         return VX_FAILURE;
 
+    Draw2D_initializeBmpProperty(&bmp);
     Draw2D_getBmpProperty(pPrm, &bmp);
 
     width = bmp.width;
