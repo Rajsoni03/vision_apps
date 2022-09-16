@@ -118,7 +118,7 @@ ddr_mem_size  = 1*GB + 432*MB; # Last 64MB is used by Linux
 
 ddr_mem_addr_hi_phy = 0x880000000;
 ddr_mem_addr_hi = 0x100000000;
-ddr_mem_size_hi = 256*MB;
+ddr_mem_size_hi = 624*MB;
 
 msmc_mem_addr = 0x70000000;
 main_ocram_mem_addr = 0x03600000;
@@ -271,17 +271,17 @@ c66x_2_ddr_local_heap_size = 16*MB;
 c66x_2_ddr_scratch_addr    = c66x_2_ddr_local_heap_addr + c66x_2_ddr_local_heap_size;
 c66x_2_ddr_scratch_size    = 48*MB;
 
-c7x_1_ddr_scratch_addr     = c66x_2_ddr_scratch_addr + c66x_2_ddr_scratch_size;
-c7x_1_ddr_scratch_size     = ddr_mem_size - (c7x_1_ddr_scratch_addr - ddr_mem_addr);
+ddr_intercore_eth_desc_addr = c66x_2_ddr_scratch_addr + c66x_2_ddr_scratch_size;
+ddr_intercore_eth_desc_size = 8*MB;
 
-mcu2_1_ddr_intercore_eth_desc_addr = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
-mcu2_1_ddr_intercore_eth_desc_size = 8*MB;
+ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_desc_size;
+ddr_intercore_eth_data_size = 24*MB;
 
-mcu2_1_ddr_intercore_eth_data_addr = mcu2_1_ddr_intercore_eth_desc_addr + mcu2_1_ddr_intercore_eth_desc_size;
-mcu2_1_ddr_intercore_eth_data_size = 24*MB;
+c7x_1_ddr_scratch_addr     = ddr_mem_addr_hi;
+c7x_1_ddr_scratch_size     = 368*MB;
 
-c7x_1_ddr_local_heap_addr  = ddr_mem_addr_hi;
-c7x_1_ddr_local_heap_size  = ddr_mem_size_hi;
+c7x_1_ddr_local_heap_addr  = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
+c7x_1_ddr_local_heap_size  = 256*MB;
 
 #
 # Create memory section based on addr and size defined above, including
@@ -289,8 +289,8 @@ c7x_1_ddr_local_heap_size  = ddr_mem_size_hi;
 #
 
 # r5f local memory sections
-mcu_r5f_tcma_vecs  = MemSection("R5F_TCMA_VECS" , "X"   , 0x00000000, 0x00000100);
-mcu_r5f_tcma       = MemSection("R5F_TCMA" , "X"   , 0x00000100, (32*KB) - 0x00000100);
+mcu_r5f_tcma_vecs  = MemSection("R5F_TCMA_VECS" , "X"   , 0x00000000, (KB >> 4));
+mcu_r5f_tcma       = MemSection("R5F_TCMA" , "X"   , 0x00000040, (32*KB) - (KB >> 4));
 
 r5f_tcmb0      = MemSection("R5F_TCMB0", "RWIX", 0x41010000, 32*KB);
 
@@ -451,11 +451,10 @@ vision_apps_core_heaps_lo.concat(c66x_1_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(c66x_2_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(c66x_1_ddr_scratch);
 vision_apps_core_heaps_lo.concat(c66x_2_ddr_scratch);
-vision_apps_core_heaps_lo.concat(c7x_1_ddr_scratch);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
 
 # This falls in upper 2GB region in J721E
-c7x_1_ddr_local_heap_phy  = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, c7x_1_ddr_local_heap_size, "DDR for c7x_1 for local heap");
+c7x_1_ddr_local_heap_phy  = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, (c7x_1_ddr_scratch_size + c7x_1_ddr_local_heap_size), "DDR for c7x_1 for scratch & local heap");
 
 vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
 vision_apps_core_heaps_hi.concat(c7x_1_ddr_local_heap_phy);
@@ -463,10 +462,10 @@ vision_apps_core_heaps_hi.setDtsName("vision_apps_core_heaps_hi", "vision-apps-c
 vision_apps_core_heaps_hi.splitOrigin(True)
 
 # This region is for ethernet firmware, multi-core, multi-cast feature
-intercore_eth_desc_mem = MemSection("INTERCORE_ETH_DESC_MEM", "", mcu2_1_ddr_intercore_eth_desc_addr, mcu2_1_ddr_intercore_eth_desc_size, "Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent");
+intercore_eth_desc_mem = MemSection("INTERCORE_ETH_DESC_MEM", "", ddr_intercore_eth_desc_addr, ddr_intercore_eth_desc_size, "Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent");
 intercore_eth_desc_mem.setDtsName("vision_apps_main_r5fss0_core0_shared_memory_queue_region", "vision-apps-r5f-virtual-eth-queues");
 
-intercore_eth_data_mem = MemSection("INTERCORE_ETH_DATA_MEM", "", mcu2_1_ddr_intercore_eth_data_addr, mcu2_1_ddr_intercore_eth_data_size, "Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent");
+intercore_eth_data_mem = MemSection("INTERCORE_ETH_DATA_MEM", "", ddr_intercore_eth_data_addr, ddr_intercore_eth_data_size, "Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent");
 intercore_eth_data_mem.setDtsName("vision_apps_main_r5fss0_core0_shared_memory_bufpool_region", "vision-apps-r5f-virtual-eth-buffers");
 
 #
@@ -773,8 +772,8 @@ LinkerCmdFile(mcu2_1_mmap, "./mcu2_1/linker_mem_map.cmd").export();
 LinkerCmdFile(mcu3_0_mmap, "./mcu3_0/linker_mem_map.cmd").export();
 LinkerCmdFile(mcu3_1_mmap, "./mcu3_1/linker_mem_map.cmd").export();
 
-HtmlMmapTable(html_mmap, "./system_memory_map.html").export();
+HtmlMmapTable(html_mmap, "./system_memory_map_safertos.html").export();
 
-CHeaderFile(c_header_mmap, "./app_mem_map.h").export();
+CHeaderFile(c_header_mmap, 0x880000000, 0x100000000, "./app_mem_map.h").export();
 
 DtsFile(dts_mmap, "./k3-j721e-rtos-memory-map.dtsi").export();
