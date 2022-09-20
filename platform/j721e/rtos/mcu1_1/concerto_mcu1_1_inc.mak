@@ -39,4 +39,10 @@ ifeq ($(RTOS),SAFERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/safertos/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
 endif
 
+LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
+
+include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
+
 DEFS        += $(RTOS)

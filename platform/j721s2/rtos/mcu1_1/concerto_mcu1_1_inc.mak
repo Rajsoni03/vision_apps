@@ -14,8 +14,16 @@ endif
 
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
+IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos
+
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
 endif
+
+LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
+LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/mcu1_1/$(TARGET_BUILD)/
+
+include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
 
 DEFS        += $(RTOS)
