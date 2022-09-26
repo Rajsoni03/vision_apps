@@ -68,8 +68,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <errno.h>
+#include <sys/resource.h>
 
 #include <utils/mem/include/app_mem.h>
+#include <utils/mem/include/app_mem_limits.h>
 
 /* #define APP_MEM_DEBUG */
 
@@ -113,6 +116,14 @@ int mkstemp(char *template);
 
 static app_mem_obj_t g_app_mem_obj;
 
+/* Mutex for controlling access to Init/De-Init. */
+static pthread_mutex_t gMutex = PTHREAD_MUTEX_INITIALIZER;
+
+/* Counter for tracking the {init, de-init} calls. This is also used to
+ * guarantee a single init/de-init operation.
+ */
+static uint32_t gInitCount = 0U;
+
 void appMemPrintMemAllocInfo()
 {
     app_mem_obj_t *obj = &g_app_mem_obj;
@@ -120,6 +131,40 @@ void appMemPrintMemAllocInfo()
     printf("MEM: Alloc's: %ld alloc's of %ld bytes \n", obj->num_alloc, obj->total_alloc_bytes );
     printf("MEM: Free's : %ld free's  of %ld bytes \n", obj->num_free, obj->total_free_bytes );
     printf("MEM: Open's : %ld allocs  of %ld bytes \n", obj->cur_alloc, obj->cur_alloc_bytes );
+}
+
+/* Function to increase the number of open files at a process
+ * level. The default number of open files is 1024 and this causes
+ * memory allocation errors since the PC emulation mode uses shm_open()
+ * for memory allocations.
+ *
+ * The logic below allows setting the upper limit on the max number of
+ * open files.
+ */
+static int32_t increaseOpenFileLimits(int32_t  maxOpenFiles)
+{
+  struct rlimit limit;
+  
+  limit.rlim_cur = maxOpenFiles;
+  limit.rlim_max = maxOpenFiles;
+
+  if (setrlimit(RLIMIT_NOFILE, &limit) != 0)
+  {
+      printf("setrlimit() failed with errno=%d\n", errno);
+      return -1;
+  }
+
+  /* Get max number of files. */
+  if (getrlimit(RLIMIT_NOFILE, &limit) != 0)
+  {
+      printf("getrlimit() failed with errno=%d\n", errno);
+      return -1;
+  }
+
+  printf("The soft limit is %lu\n", limit.rlim_cur);
+  printf("The hard limit is %lu\n", limit.rlim_max);
+
+  return 0;
 }
 
 static void appMemFreeListItem(app_mem_list_t *mem_map_list)
@@ -257,9 +302,6 @@ static int32_t appMemAddTupleToList(uint64_t dmaBufFd, uint32_t size, uint64_t *
         m.offset    = 0;
         m.size      = size;
 
-        /* Enter critical section */
-        pthread_mutex_lock(&(obj->list_mutex));
-
         status = appMemPushToList(&(obj->plist), &m);
 
         if (status == 0)
@@ -273,9 +315,6 @@ static int32_t appMemAddTupleToList(uint64_t dmaBufFd, uint32_t size, uint64_t *
             appMemPrintMemAllocInfo();
 #endif
         }
-
-        /* Exit critical section */
-        pthread_mutex_unlock(&(obj->list_mutex));
 
         if (status!=0)
         {
@@ -323,56 +362,70 @@ static int32_t appMemAddTupleToList(uint64_t dmaBufFd, uint32_t size, uint64_t *
     return status;
 }
 
-int32_t appMemInit(app_mem_init_prm_t *prm)
+static int32_t appMemInitLocal(app_mem_init_prm_t *prm)
 {
     int32_t fd;
     int32_t status = 0;
 
-    /* Initialize our book-keeping structures */
-    app_mem_obj_t *obj = &g_app_mem_obj;
+    /* 'prm' is unused in this function. */
+    (void)prm;
 
-    printf("MEM: Init ... !!!\n");
+    status = increaseOpenFileLimits(APP_MEM_HEAP_MAX_NUM_MEM_BLKS_IN_USE);
 
-    obj->total_alloc_bytes = 0;
-    obj->total_free_bytes  = 0;
-    obj->cur_alloc_bytes   = 0;
-    obj->num_alloc         = 0;
-    obj->num_free          = 0;
-    obj->cur_alloc         = 0;
-    obj->next_free_id      = 0;
-    obj->plist             = NULL;
-    obj->dma_heap_fd       = -1;
-
-    /* Within the same syatem, the names used for creating the shared memory
-     * buffers has to be unique for avoiding memory allocation error. So, create
-     * a unique string per process based on a template string.
-     */
-    strcpy(obj->shm_name, "vashm_buff_XXXXXX");
-
-    fd = mkstemp(obj->shm_name);
-
-    if (fd < 0)
+    if (status < 0)
     {
-        printf("MEM: Init ... (mkstemp) failed!!!\n");
+        printf("MEM: Init ... (increaseOpenFileLimits) failed!!!\n");
         perror("MEM:");
-        status = -1;
     }
     else
     {
-        close(fd);
-        /* Delete the file created by mkstemp() call. */
-        unlink(obj->shm_name);
-    }
+        /* Initialize our book-keeping structures */
+        app_mem_obj_t *obj = &g_app_mem_obj;
 
-    /* Initialize the pthread mutex */
-    pthread_mutex_init(&obj->list_mutex, NULL);
+        printf("MEM: Init ... !!!\n");
+
+        obj->total_alloc_bytes = 0;
+        obj->total_free_bytes  = 0;
+        obj->cur_alloc_bytes   = 0;
+        obj->num_alloc         = 0;
+        obj->num_free          = 0;
+        obj->cur_alloc         = 0;
+        obj->next_free_id      = 0;
+        obj->plist             = NULL;
+        obj->dma_heap_fd       = -1;
+
+        /* Within the same syatem, the names used for creating the shared memory
+         * buffers has to be unique for avoiding memory allocation error. So, create
+         * a unique string per process based on a template string.
+         */
+        strcpy(obj->shm_name, "vashm_buff_XXXXXX");
+
+        fd = mkstemp(obj->shm_name);
+
+        if (fd < 0)
+        {
+            printf("MEM: Init ... (mkstemp) failed!!!\n");
+            perror("MEM:");
+            status = -1;
+        }
+        else
+        {
+            close(fd);
+
+            /* Delete the file created by mkstemp() call. */
+            unlink(obj->shm_name);
+        }
+
+        /* Initialize the pthread mutex */
+        pthread_mutex_init(&obj->list_mutex, NULL);
+    }
 
     printf("MEM: Init ... Done !!!\n");
 
-    return(status);
+    return status;
 }
 
-int32_t appMemDeInit(void)
+static int32_t appMemDeInitLocal(void)
 {
     int32_t status = 0;
 
@@ -394,6 +447,49 @@ int32_t appMemDeInit(void)
     return(status);
 }
 
+int32_t appMemInit(app_mem_init_prm_t *prm)
+{
+    int32_t status = 0;
+
+    pthread_mutex_lock(&gMutex);
+
+    if (gInitCount == 0U)
+    {
+        status = appMemInitLocal(prm);
+    }
+
+    gInitCount++;
+
+    pthread_mutex_unlock(&gMutex);
+
+    return status;
+}
+
+int32_t appMemDeInit()
+{
+    int32_t status = 0;
+
+    pthread_mutex_lock(&gMutex);
+
+    if (gInitCount != 0U)
+    {
+        gInitCount--;
+
+        if (gInitCount == 0U)
+        {
+            status = appMemDeInitLocal();
+        }
+    }
+    else
+    {
+        status = -1;
+    }
+
+    pthread_mutex_unlock(&gMutex);
+
+    return status;
+}
+
 uint64_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 {
     app_mem_obj_t  *obj = &g_app_mem_obj;
@@ -402,11 +498,12 @@ uint64_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 
     *dmaBufFdOffset = 0;
 
-    app_mem_list_t *mem_map_list = obj->plist;
-
     /* Enter critical section */
     pthread_mutex_lock(&obj->list_mutex);
-    while(mem_map_list != NULL)
+
+    app_mem_list_t *mem_map_list = obj->plist;
+
+    while (mem_map_list != NULL)
     {
         if ( (virt_addr >= mem_map_list->mem_data.virt_addr)
             && (virt_addr < (mem_map_list->mem_data.virt_addr+mem_map_list->mem_data.size))
@@ -430,6 +527,7 @@ uint64_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
     {
         printf("MEM: ERROR: Failed to export dmaBufFd for virtPtr %p !!!\n", virPtr);
     }
+
     printf("MEM: Exported dmaBufFd %d @ offset = %d bytes !!!\n", dmaBufFd, *dmaBufFdOffset);
 #endif
 
@@ -447,7 +545,8 @@ int32_t appMemTranslateDmaBufFd(uint64_t dmaBufFd, uint32_t size, uint64_t *virt
 
     /* Enter critical section */
     pthread_mutex_lock(&obj->list_mutex);
-    while(mem_map_list != NULL)
+
+    while (mem_map_list != NULL)
     {
         if (dmaBufFd == mem_map_list->mem_data.buf_fd)
         {
@@ -461,9 +560,6 @@ int32_t appMemTranslateDmaBufFd(uint64_t dmaBufFd, uint32_t size, uint64_t *virt
 
         mem_map_list = mem_map_list->next;
     }
-
-    /* Exit critical section */
-    pthread_mutex_unlock(&obj->list_mutex);
 
     if (*virtPtr == 0)
     {
@@ -479,6 +575,9 @@ int32_t appMemTranslateDmaBufFd(uint64_t dmaBufFd, uint32_t size, uint64_t *virt
         printf("MEM: ERROR: Failed to translate dmaBufFd [%ld]\n", dmaBufFd);
         status = -1;
     }
+
+    /* Exit critical section */
+    pthread_mutex_unlock(&obj->list_mutex);
 
 #ifdef APP_MEM_DEBUG
     printf("MEM: Translated dmaBufFd %ld to virtPtr %p and phyPtr %p!!!\n",
@@ -501,7 +600,16 @@ void *appMemAlloc(uint32_t block, uint32_t size, uint32_t align)
     uint64_t        phys_addr = 0;
     int32_t         status = 0;
 
-    if (size == 0)
+    /* Enter critical section */
+    pthread_mutex_lock(&(obj->list_mutex));
+
+    if (gInitCount == 0U)
+    {
+        status = -1;
+        printf("MEM: ERROR: Memory allocator has not been initialized.\n");
+    }
+
+    if ((status == 0) && (size == 0))
     {
         printf("MEM: ERROR: Alloc failed. Invalid size: %d bytes\n", size);
         status = -1;
@@ -510,7 +618,7 @@ void *appMemAlloc(uint32_t block, uint32_t size, uint32_t align)
     if (status == 0)
     {
         char    name[MAX_SHM_BUFF_NAME_LEN];
-        int32_t oflag = O_RDWR | O_CREAT;
+        int32_t oflag = O_RDWR | O_CREAT | O_EXCL;
         mode_t  mode = S_IRUSR | S_IWUSR;
 
         /* Need to prepend "/" to the name as per the convention.
@@ -524,6 +632,13 @@ void *appMemAlloc(uint32_t block, uint32_t size, uint32_t align)
         if (buf_fd < 0)
         {
             printf("MEM: ERROR: Alloc failed (shm_open)\n");
+
+            if (EEXIST == errno)
+            {
+                printf("MEM: ERROR: Shared memory handle name (%s) is already "
+                       "open. Perhaps appMemInit (or appInit) is not called "
+                       "first.\n", name);
+            }
 
 #ifdef APP_MEM_DEBUG
             appMemPrintMemAllocInfo();
@@ -556,6 +671,9 @@ void *appMemAlloc(uint32_t block, uint32_t size, uint32_t align)
         obj->next_free_id++;
     }
 
+    /* Exit critical section */
+    pthread_mutex_unlock(&obj->list_mutex);
+
     return ((void *)(uintptr_t)virtual_ptr);
 }
 
@@ -566,6 +684,7 @@ int32_t appMemFree(uint32_t block, void *virPtr, uint32_t size )
     int32_t         status = 0;
     uint8_t         b_found_addr = 0;
 
+    /* Enter critical section */
     pthread_mutex_lock(&(obj->list_mutex));
 
     while(mem_map_list != NULL)
@@ -597,6 +716,7 @@ int32_t appMemFree(uint32_t block, void *virPtr, uint32_t size )
         appMemRemoveFromList(&(obj->plist), mem_map_list);
     }
 
+    /* Exit critical section */
     pthread_mutex_unlock(&(obj->list_mutex));
 
     return(status);

@@ -66,70 +66,16 @@
 
 #if defined(TARGET_X86_64)
 #include <sys/resource.h>
-#include <errno.h>
-
-/* The value below has been set to a value based on what has been
- * observed in trial conformance test runs. It is around 1024 and the
- * following value should suffice for the current conformance test
- * execution and this value needs to be adjusted if memory allocation
- * failures are noticed in future due to test case updates that pushes
- * the limit of the max simultaneous memory allocations which directly
- * determines the maximum number of open files.
- */
-#define APP_INIT_MAX_NUM_OPEN_FILES     (2048U)
-
-/* Function to increase the number of open files at a process
- * level. The default number of open files is 1024 and this causes
- * memory allocation errors since the PC emulation mode uses shm_open()
- * for memory allocations.
- *
- * The logic below allows setting the upper limit on the max number of
- * open files.
- */
-static int32_t increaseOpenFileLimits(int32_t  maxOpenFiles)
-{
-  struct rlimit limit;
-  
-  limit.rlim_cur = maxOpenFiles;
-  limit.rlim_max = maxOpenFiles;
-
-  if (setrlimit(RLIMIT_NOFILE, &limit) != 0)
-  {
-      printf("setrlimit() failed with errno=%d\n", errno);
-      return -1;
-  }
-
-  /* Get max number of files. */
-  if (getrlimit(RLIMIT_NOFILE, &limit) != 0)
-  {
-      printf("getrlimit() failed with errno=%d\n", errno);
-      return -1;
-  }
-
-  printf("The soft limit is %lu\n", limit.rlim_cur);
-  printf("The hard limit is %lu\n", limit.rlim_max);
-
-  return 0;
-}
 
 int32_t appCommonInit()
 {
     int32_t status;
 
-    status = increaseOpenFileLimits(APP_INIT_MAX_NUM_OPEN_FILES);
+    status = appMemInit(NULL);
 
     if (status != 0)
     {
-        printf("APP: ERROR: increaseOpenFileLimits failed !!!\n");
-    }
-    else
-    {
-        status = appMemInit(NULL);
-
-        if (status != 0)
-        {
-            printf("APP: ERROR: Memory init failed !!!\n");
-        }
+        printf("APP: ERROR: Memory init failed !!!\n");
     }
 
     return status;

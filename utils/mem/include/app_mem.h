@@ -65,6 +65,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \defgroup group_vision_apps_utils_mem Memory allocation APIs
  *
@@ -353,6 +357,10 @@ void  appMemCacheWbInv(void *ptr, uint32_t size);
 void appMemPrintMemAllocInfo();
 
 /* @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

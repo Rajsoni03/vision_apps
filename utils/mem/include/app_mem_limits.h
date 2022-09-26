@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2022 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,99 +60,22 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <utils/mem/include/app_mem.h>
-#include <utils/app_init/include/app_init.h>
+#ifndef APP_MEM_LIMITS_H_
+#define APP_MEM_LIMITS_H_
 
-#define APP_ASSERT_SUCCESS(x)  { if((x)!=0) while(1); }
+/* \brief Constant for controlling the maximum number of buffers in use when in PC mode.
+ *
+ * Under linux, there is a default limit on maximum number of open files and this is
+ * typically set to 1024. The memory allocation scheme for PC builds uses shared memory
+ * APIs which involves opening files under /dev/shm. The default open file limit count
+ * limits the number of simultaneous successful memory allocation calls. This constant
+ * is defined to set this limit if the default value of 1024 is insufficient.
+ *
+ * The value below has been set to a value based on what has been observed in trial
+ * opneVX conformance test runs. 
+ *
+ */
+#define APP_MEM_HEAP_MAX_NUM_MEM_BLKS_IN_USE        (2048U)
 
-#define MAX_NUM     (64)
+#endif
 
-void appMemAllocTest()
-{
-    void *ptr[MAX_NUM];
-    int dmaBufFd[MAX_NUM];
-    uint64_t phyPtr = 0;
-    uint32_t size = 128*1024;
-    uint32_t loop = 16;
-    uint32_t i;
-    uint32_t offset;
-    uint64_t cur_time;
-
-    for(i=0; i<loop; i++)
-    {
-        ptr[i] = appMemAlloc(APP_MEM_HEAP_DDR, size, 1);
-        if(ptr[i])
-        {
-            printf("APP_MEM: %d: Allocated memory @ %p of size %d bytes \n", i, ptr[i], size);
-
-            phyPtr = appMemGetVirt2PhyBufPtr((uint64_t)ptr[i], APP_MEM_HEAP_DDR);
-            printf("APP_MEM: %d: Translated virtual addr = %p -> phyical addr = %lx \n", i, ptr[i], phyPtr);
-
-            dmaBufFd[i] = appMemGetDmaBufFd(ptr[i], &offset);
-            printf("APP_MEM: %d: Exported dmaBufId %d with offset %d\n", i, dmaBufFd[i], offset);
-        }
-        else
-        {
-            printf("APP_MEM: %d: ERROR: Unable to allocate memory size %d bytes \n", i, size);
-        }
-    }
-    for(i=0; i<loop; i++)
-    {
-        if(ptr[i])
-        {
-            uint32_t k;
-            uint8_t *ptr8 = (uint8_t*)ptr[i];
-
-            for(k=0; k<size; k++)
-            {
-                ptr8[k] = k;
-            }
-            for(k=0; k<size; k++)
-            {
-                ptr8[k] = k*k;
-            }
-        }
-    }
-    for(i=1; i<loop; i++)
-    {
-        if(ptr[i] && ptr[i-1])
-        {
-            uint32_t k;
-            uint8_t *dst8 = (uint8_t*)ptr[i];
-            uint8_t *src8 = (uint8_t*)ptr[i-1];
-
-            for(k=0; k<size; k++)
-            {
-                dst8[k] = src8[k]*dst8[k];
-            }
-        }
-    }
-
-    for(i=0; i<loop; i++)
-    {
-        if(ptr[i])
-        {
-            appMemFree(APP_MEM_HEAP_DDR, ptr[i], size);
-            printf("APP_MEM: %d: Free'ed memory @ %p of size %d bytes \n", i, ptr[i], size);
-        }
-    }
-
-}
-
-int main(void)
-{
-    int32_t status = 0;
-
-    status = appCommonInit();
-
-    if (status == 0)
-    {
-        appMemAllocTest();
-        status = appCommonDeInit();
-    }
-
-    return status;
-}

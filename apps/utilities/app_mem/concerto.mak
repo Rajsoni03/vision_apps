@@ -12,7 +12,8 @@ include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
 endif
 
 ifeq ($(TARGET_CPU), x86_64)
-CSOURCES    := main_mem_x86.c
+CPPSOURCES  := main_mem_x86.cpp
+CPPFLAGS    := --std=c++11
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 endif
 
