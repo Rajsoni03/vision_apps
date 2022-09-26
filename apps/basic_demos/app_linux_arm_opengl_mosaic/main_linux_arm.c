@@ -42,9 +42,7 @@
 #include <TI/tivx.h>
 #include <TI/tivx_sample.h>
 #include <tivx_sample_kernels_priv.h>
-#ifndef PC
 #include <utils/app_init/include/app_init.h>
-#endif
 #include <tivx_utils_file_rd_wr.h>
 #include <TI/tivx_task.h>
 
@@ -308,11 +306,7 @@ int main(int argc, char *argv[])
     snprintf(output_file_path, APP_MAX_FILE_PATH, "%s/output/%s", test_data_path, "mosaic_output_file.bin");
     snprintf(input1_file_path, APP_MAX_FILE_PATH, "%s/psdkra/app_opengl_mosaic/%s", test_data_path, "input1_file.bin");
 
-#ifndef PC
-    status = appCommonInit();
-#endif
-    tivxInit();
-    tivxHostInit();
+    appInit();
 
     context = vxCreateContext();
     if(status == VX_SUCCESS)
@@ -424,11 +418,7 @@ int main(int argc, char *argv[])
     tivxSampleUnLoadKernels(context);
     vxReleaseContext(&context);
 
-    tivxHostDeInit();
-    tivxDeInit();
-    #ifndef PC
-    appCommonDeInit();
-    #endif
+    appDeInit();
     return status;
 }
 

@@ -76,8 +76,6 @@
  *
  */
 
-#include <VX/vx.h>
-#include <TI/tivx.h>
 #include <tivx_utils_file_rd_wr.h>
 
 #include <stdio.h>
@@ -87,9 +85,7 @@
 #include <stdarg.h>
 
 #include "test_engine/test.h"
-#ifndef PC
 #include <utils/app_init/include/app_init.h>
-#endif
 
 #ifdef HAVE_VERSION_INC
 #include "openvx_cts_version.inc"
@@ -122,19 +118,11 @@ int CT_main(int argc, char* argv[], const char* version_str);
 int main(int argc, char* argv[])
 {
     int status;
-#ifndef PC
-    status = appCommonInit();
-#endif
-    tivxInit();
-    tivxHostInit();
+    appInit();
     TestModuleRegister();
     status = vision_apps_test_main(argc, argv);
     TestModuleUnRegister();
-    tivxHostDeInit();
-    tivxDeInit();
-#ifndef PC
-    appCommonDeInit();
-#endif
+    appDeInit();
     return status;
 }
 #endif

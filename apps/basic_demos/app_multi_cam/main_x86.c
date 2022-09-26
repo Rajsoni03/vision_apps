@@ -59,7 +59,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#include <TI/tivx.h>
+#include <utils/app_init/include/app_init.h>
 
 int app_multi_cam_main(int argc, char* argv[]);
 
@@ -67,9 +67,9 @@ int main(int argc, char* argv[])
 {
     int status;
 
-    tivxInit();
+    appInit();
     status = app_multi_cam_main(argc, argv);
-    tivxDeInit();
+    appDeInit();
 
     return status;
 }

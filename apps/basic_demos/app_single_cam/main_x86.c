@@ -61,6 +61,7 @@
  */
 
 #include "app_test.h"
+#include <utils/app_init/include/app_init.h>
 
 static AppObj g_AppObj;
 IssAeDynamicParams g_ae_dynPrms=
@@ -117,7 +118,7 @@ int main(int argc, char* argv[])
 }
 static void x86_app_init(AppObj *obj)
 {
-    tivxInit();
+    appInit();
 
     obj->context = vxCreateContext();
     APP_ASSERT_VALID_REF(obj->context);
@@ -137,7 +138,7 @@ static void x86_app_deinit(AppObj *obj)
     vxReleaseContext(&obj->context);
     APP_PRINTF("vxReleaseContext done\n");
 
-    tivxDeInit();
+    appDeInit();
     APP_PRINTF("tivxDeInit done\n");
 }
 

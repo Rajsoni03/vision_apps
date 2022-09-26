@@ -60,7 +60,7 @@
  *
  */
 
-#include <TI/tivx.h>
+#include <utils/app_init/include/app_init.h>
 
 int app_tidl_avp_main(int argc, char* argv[]);
 
@@ -68,9 +68,9 @@ int main(int argc, char* argv[])
 {
     int status;
 
-    tivxInit();
+    appInit();
     status = app_tidl_avp_main(argc, argv);
-    tivxDeInit();
+    appDeInit();
 
     return status;
 }

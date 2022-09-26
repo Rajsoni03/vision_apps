@@ -933,11 +933,7 @@ static void app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 
 static void app_init(AppObj *obj)
 {
-#ifndef PC
-    appCommonInit();
-#endif
-    tivxInit();
-    tivxHostInit();
+    appInit();
 
     obj->context = vxCreateContext();
     APP_ASSERT_VALID_REF(obj->context);
@@ -1245,11 +1241,7 @@ static void app_deinit(AppObj *obj)
 {
     tivxSrvUnLoadKernels(obj->context);
     vxReleaseContext(&obj->context);
-    tivxHostDeInit();
-    tivxDeInit();
-#ifndef PC
-    appCommonDeInit();
-#endif
+    appDeInit();
 }
 
 int main(int argc, char* argv[])

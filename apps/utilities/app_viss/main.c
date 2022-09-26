@@ -466,19 +466,11 @@ int main(int argc, char *argv[])
     load = atoi(argv[1]);
     time = atoi(argv[2]);
 
-    status = appCommonInit();
-
-    if(status==0)
-    {
-        tivxInit();
-        tivxHostInit();
-    }
+    appInit();
 
     TestGraProcessingDcc(load, time);
 
-    tivxHostDeInit();
-    tivxDeInit();
-    appCommonDeInit();
+    appDeInit();
 
     return status;
 }

@@ -893,13 +893,7 @@ static vx_status app_init(AppObj *obj)
     obj->stop_task = 0;
     obj->stop_task_done = 0;
 
-    status = appCommonInit();
-
-    if(status==0)
-    {
-        tivxInit();
-        tivxHostInit();
-    }
+    appInit();
 
     obj->context = vxCreateContext();
     APP_ASSERT_VALID_REF(obj->context);
@@ -2175,9 +2169,7 @@ static void app_deinit(AppObj *obj)
     appDeInitImageSensor(obj->sensor_name);
     APP_PRINTF("sensor deinit done\n");
 
-    tivxHostDeInit();
-    tivxDeInit();
-    appCommonDeInit();
+    appDeInit();
 }
 
 /* TODO: Use a common utils file */
