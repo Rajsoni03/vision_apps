@@ -114,7 +114,11 @@ uintptr_t appLogWrLock(app_log_wr_obj_t *obj);
 void      appLogWrUnLock(app_log_wr_obj_t *obj, uintptr_t key);
 
 int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm);
+#if defined(FREERTOS) || defined(SYSBIOS) || defined(SAFERTOS)
+void      appLogRdRun(void *arg0, void *arg1);
+#else
 void*     appLogRdRun(app_log_rd_obj_t *obj);
+#endif
 
 void     *appMemMap(void *phys_addr, uint32_t size);
 int32_t   appMemUnMap(void *virt_addr, uint32_t size);

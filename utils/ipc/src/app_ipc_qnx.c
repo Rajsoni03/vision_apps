@@ -293,7 +293,8 @@ static void appIpcRpmsgRxHandler(RPMessage_Handle rpmsg_handle,
     }
 }
 
-static void appIpcRpmsgRxTaskMain(void* arg)
+static void appIpcRpmsgRxTaskMain(void* arg0,
+                                  void* arg1)
 {
     app_ipc_obj_t *obj = &g_app_ipc_obj;
     uint32_t done = 0, src_cpu_id, reply_endpt;
@@ -363,7 +364,7 @@ static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
 
     obj->task_handle = (void*)TaskP_create(
-                            (void*)appIpcRpmsgRxTaskMain,
+                            &appIpcRpmsgRxTaskMain,
                             &qnx_task_prms);
 
     if(obj->task_handle==NULL)

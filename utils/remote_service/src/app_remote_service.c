@@ -409,7 +409,7 @@ static int32_t appRemoteServiceCreateRpmsgRxTask(app_remote_service_obj_t *obj)
     obj->task_name[APP_REMOTE_SERVICE_MAX_TASK_NAME-1] = 0;
 
     obj->task_handle = (void*)TaskP_create(
-                            (void*)appRemoteServiceRxTaskMain,
+                            &appRemoteServiceRxTaskMain,
                             &task_prms);
     if(obj->task_handle==NULL)
     {

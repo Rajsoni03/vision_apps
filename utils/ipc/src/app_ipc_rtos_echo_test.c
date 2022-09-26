@@ -340,7 +340,7 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
     //RPMessage_delete(&handle);
 }
 
-static void rpmsg_senderFxn(uintptr_t arg0, uintptr_t arg1)
+static void rpmsg_senderFxn(void* arg0, void* arg1)
 {
     RPMessage_Handle    handle;
     RPMessage_Params    params;
@@ -357,8 +357,8 @@ static void rpmsg_senderFxn(uintptr_t arg0, uintptr_t arg1)
 
     appUtilsTaskInit();
 
-    dstProc = (uint16_t)arg0;
-    appDstProcId = (uint32_t)arg1;
+    dstProc = (uint16_t)(*(uint16_t*)arg0);
+    appDstProcId = (uint32_t)(*(uint32_t*)arg1);
 
     buf1 = &g_sendBuf[RPMSG_DATA_SIZE * appDstProcId];
 
@@ -505,7 +505,7 @@ int32_t appIpcEchoTestStart(void)
         strncpy(g_rpmsg_responder_task_name, "IPC_TEST_RX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
         g_rpmsg_responder_task_name[APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
 
-        rx_task = TaskP_create(rpmsg_responderFxn, &params);
+        rx_task = TaskP_create(&rpmsg_responderFxn, &params);
         if(rx_task==NULL)
         {
             appLogPrintf("IPC: ERROR: Failed to create RX task !!!\n");
@@ -531,14 +531,14 @@ int32_t appIpcEchoTestStart(void)
                     params.priority = 3;
                     params.stack     = g_taskStackBuf[cpu_id];
                     params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
-                    params.arg0     = (void*)ipc_lld_cpu_id;
-                    params.arg1     = (void*)cpu_id;
+                    params.arg0     = (void*)&ipc_lld_cpu_id;
+                    params.arg1     = (void*)&cpu_id;
                     params.name     = (uint8_t*)&g_rpmsg_sender_task_name[cpu_id][0];
 
                     strncpy(g_rpmsg_sender_task_name[cpu_id], "IPC_TEST_TX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
                     g_rpmsg_sender_task_name[cpu_id][APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
 
-                    tx_task[cpu_id] = TaskP_create(rpmsg_senderFxn, &params);
+                    tx_task[cpu_id] = TaskP_create(&rpmsg_senderFxn, &params);
                     if(tx_task[cpu_id]==NULL)
                     {
                         appLogPrintf("IPC: ERROR: Failed to create TX task %d !!!\n", cpu_id);

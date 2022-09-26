@@ -375,7 +375,7 @@ static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
 
     obj->task_handle = (void*)TaskP_create(
-                            (void*)appIpcRpmsgRxTaskMain,
+                            &appIpcRpmsgRxTaskMain,
                             &rtos_task_prms);
     if(obj->task_handle==NULL)
     {
@@ -956,7 +956,7 @@ int32_t appIpcCreateTraceBufFlushTask(void)
     taskParams.stacksize = sizeof(gIpcTraceBufFlushBuf);
     taskParams.name      = "IPC tracebuf flush";
 
-    TaskP_create(traceBufFlush, &taskParams);
+    TaskP_create(&traceBufFlush, &taskParams);
 
     return status;
 }

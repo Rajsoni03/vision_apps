@@ -94,7 +94,7 @@ static void appMain(void* arg0, void* arg1)
     sciserverInitTaskParams.stack        = gSciserverInitTskStack;
     sciserverInitTaskParams.stacksize    = sizeof (gSciserverInitTskStack);
 
-    sciserverInitTask = TaskP_create(appSciserverInit, &sciserverInitTaskParams);
+    sciserverInitTask = TaskP_create(&appSciserverInit, &sciserverInitTaskParams);
     if(NULL == sciserverInitTask)
     {
         OS_stop();
@@ -148,7 +148,7 @@ int main(void)
     tskParams.stack        = gTskStackMain;
     tskParams.stacksize    = sizeof (gTskStackMain);
 
-    task = TaskP_create(appMain, &tskParams);
+    task = TaskP_create(&appMain, &tskParams);
     if(NULL == task)
     {
         OS_stop();

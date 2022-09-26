@@ -205,7 +205,7 @@ int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm)
     obj->task_name[APP_LOG_MAX_TASK_NAME-1] = 0;
 
     obj->task_handle = (void*)TaskP_create(
-                            (void*)appLogRdRun,
+                            &appLogRdRun,
                             &rtos_task_prms);
     if(obj->task_handle==NULL)
     {

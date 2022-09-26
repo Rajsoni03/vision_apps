@@ -351,7 +351,7 @@ int32_t appEthFwInit()
         taskParams.stacksize = sizeof(gEthAppLwipStackBuf);
         taskParams.name      = "lwIP main loop";
 
-        TaskP_create(EthApp_lwipMain, &taskParams);
+        TaskP_create(&EthApp_lwipMain, &taskParams);
     }
 
     if (status == ETHAPP_OK)

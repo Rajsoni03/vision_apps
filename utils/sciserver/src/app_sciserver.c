@@ -110,7 +110,7 @@ int32_t appSciserverSciclientDeInit()
     return retVal;
 }
 
-int32_t appSciserverInit()
+int32_t appSciserverInit(void* arg0, void* arg1)
 {
     int32_t retVal = CSL_PASS;
     Sciserver_TirtosCfgPrms_t serverParams;

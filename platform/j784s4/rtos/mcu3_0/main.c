@@ -109,7 +109,7 @@ int main(void)
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;
     tskParams.stacksize = sizeof (gTskStackMain);
-    task = TaskP_create(appMain, &tskParams);
+    task = TaskP_create(&appMain, &tskParams);
     if(NULL == task)
     {
         OS_stop();

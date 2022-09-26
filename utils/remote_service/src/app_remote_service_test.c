@@ -214,7 +214,7 @@ static int32_t appRemoteServiceTestLoadTestInit()
     }
 
     obj->task_handle = (void*)TaskP_create(
-                            (void*)appRemoteServiceLoadTestTaskMain,
+                            &appRemoteServiceLoadTestTaskMain,
                             &task_prms);
     if(obj->task_handle==NULL)
     {
