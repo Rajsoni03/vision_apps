@@ -357,8 +357,8 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
 
     appUtilsTaskInit();
 
-    dstProc = (uint16_t)(*(uint16_t*)arg0);
-    appDstProcId = (uint32_t)(*(uint32_t*)arg1);
+    dstProc = (uint16_t)((uintptr_t)arg0);
+    appDstProcId = (uint32_t)((uintptr_t)arg1);
 
     buf1 = &g_sendBuf[RPMSG_DATA_SIZE * appDstProcId];
 
@@ -531,8 +531,8 @@ int32_t appIpcEchoTestStart(void)
                     params.priority = 3;
                     params.stack     = g_taskStackBuf[cpu_id];
                     params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
-                    params.arg0     = (void*)&ipc_lld_cpu_id;
-                    params.arg1     = (void*)&cpu_id;
+                    params.arg0     = (void*)ipc_lld_cpu_id;
+                    params.arg1     = (void*)cpu_id;
                     params.name     = (uint8_t*)&g_rpmsg_sender_task_name[cpu_id][0];
 
                     strncpy(g_rpmsg_sender_task_name[cpu_id], "IPC_TEST_TX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
