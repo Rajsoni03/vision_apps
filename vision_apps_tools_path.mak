@@ -12,11 +12,13 @@ include $(TIOVX_PATH)/build_flags.mak
 BOARD=$(SOC)_evm
 
 ifeq ($(SOC),j721e)
+ifneq ($(wildcard $(PDK_PATH)),)
   include $(PDK_PATH)/packages/ti/build/safertos_version.mk
 
   export SAFERTOS_KERNEL_INSTALL_PATH_r5f = $(PSDK_PATH)/safertos_$(SOC)_r5f_$(SAFERTOS_VERSION_r5f)
   export SAFERTOS_KERNEL_INSTALL_PATH_c66 = $(PSDK_PATH)/safertos_$(SOC)_c66_$(SAFERTOS_VERSION_c66)
   export SAFERTOS_KERNEL_INSTALL_PATH_c7x = $(PSDK_PATH)/safertos_$(SOC)_c7x_$(SAFERTOS_VERSION_c7x)
+endif
 endif
 
 LINUX_FS_PATH ?= $(PSDK_PATH)/targetfs/
