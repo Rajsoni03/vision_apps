@@ -447,6 +447,12 @@ int32_t appInit()
 
     appUtilsPrintCpuHz();
 
+    #if defined(FREERTOS)
+    appLogPrintf("CPU is running FreeRTOS\n");
+    #elif defined(SAFERTOS)
+    appLogPrintf("CPU is running SafeRTOS\n");
+    #endif
+
     appLogPrintf("APP: Init ... !!!\n");
 
     #ifdef ENABLE_UART
