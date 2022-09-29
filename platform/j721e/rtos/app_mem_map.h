@@ -175,17 +175,9 @@
 #define APP_LOG_MEM_ADDR (0xB2000000u)
 #define APP_LOG_MEM_SIZE (0x00040000u)
 
-/* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.62 MB ] */
+/* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
 #define TIOVX_OBJ_DESC_MEM_ADDR (0xB2040000u)
-#define TIOVX_OBJ_DESC_MEM_SIZE (0x03FA0000u)
-
-/* Memory for IPC over PCIe using shared memory. MUST be non-cached or cache-coherent [ size 64.00 KB ] */
-#define PCIE_QUEUE_SHARED_MEM_ADDR (0xB5FE0000u)
-#define PCIE_QUEUE_SHARED_MEM_SIZE (0x00010000u)
-
-/* Reserved Memory for RAT mapping of remote PCIe IPC shared memory. MUST be non-cached or cache-coherent [ size 64.00 KB ] */
-#define PCIE_QUEUE_MIRROR_REMOTE_SHARED_MEM_ADDR (0xB5FF0000u)
-#define PCIE_QUEUE_MIRROR_REMOTE_SHARED_MEM_SIZE (0x00010000u)
+#define TIOVX_OBJ_DESC_MEM_SIZE (0x03FC0000u)
 
 /* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
 #define TIOVX_LOG_RT_MEM_ADDR (0xB6000000u)

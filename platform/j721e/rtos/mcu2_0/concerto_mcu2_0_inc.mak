@@ -76,8 +76,6 @@ ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 endif
 STATIC_LIBS += app_utils_hwa
 STATIC_LIBS += app_utils_dss
-STATIC_LIBS += app_utils_pcie_queue
-STATIC_LIBS += vx_target_kernels_sample_r5f
 STATIC_LIBS += app_utils_sciclient
 
 ifeq ($(BUILD_ENABLE_ETHFW),yes)

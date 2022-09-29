@@ -99,19 +99,6 @@ void tivxRegisterSampleTargetA72Kernels(void);
  */
 void tivxUnRegisterSampleTargetA72Kernels(void);
 
-/*!
- * \brief Function to register SAMPLE Kernels on the r5f Target
- * \ingroup group_tivx_ext
- */
-void tivxRegisterSampleTargetR5FKernels(void);
-
-/*!
- * \brief Function to un-register SAMPLE Kernels on the r5f Target
- * \ingroup group_tivx_ext
- */
-void tivxUnRegisterSampleTargetR5FKernels(void);
-
-
 #ifdef __cplusplus
 }
 #endif

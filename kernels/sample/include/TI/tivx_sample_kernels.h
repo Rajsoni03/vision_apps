@@ -107,45 +107,6 @@ extern "C" {
  */
 #define TIVX_KERNEL_OPENGL_MOSAIC_NAME      "com.ti.sample.opengl_mosaic"
 
-/*! \brief pcie_tx kernel name
- */
-#define TIVX_KERNEL_PCIE_TX_NAME            "com.ti.sample.pcie_tx"
-
-/*! \brief pcie_rx kernel name
- */
-#define TIVX_KERNEL_PCIE_RX_NAME            "com.ti.sample.pcie_rx"
-
-/*! \brief Maximum channels supported by an instance of PCIe TX kernel
- */
-#define TIVX_KERNEL_PCIE_TX_MAX_CHANNELS    (1U)
-
-/**
- * \brief PCIe TX Node parameters
- */ 
-typedef struct
-{
-    uint32_t pcie_queue_channel[TIVX_KERNEL_PCIE_TX_MAX_CHANNELS];
-    /**< Array of channel id for each channel */
-
-} tivx_pcie_tx_params_t;
-
-/*! \brief Minimum pipe-up buffers needed for an instance of PCIe RX kernel
- */
-#define TIVX_PCIE_RX_MIN_PIPEUP_BUFS        (3U)
-
-/*! \brief Maximum channels supported by an instance of PCIe RX kernel
- */
-#define TIVX_KERNEL_PCIE_RX_MAX_CHANNELS    (1U)
-
-/**
- * \brief PCIe RX Node parameters
- */ 
-typedef struct
-{
-    uint32_t pcie_queue_channel[TIVX_KERNEL_PCIE_RX_MAX_CHANNELS];
-    /**< Array of channel id for each channel */
-} tivx_pcie_rx_params_t;
-
 /*********************************
  * OpenGL Mosaic STRUCTURES
  *********************************/

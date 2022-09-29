@@ -71,17 +71,11 @@ static vx_status VX_CALLBACK unPublishKernels(vx_context context);
 static uint32_t gIsSampleKernelsLoad = 0u;
 
 vx_status tivxAddKernelOpenglMosaic(vx_context context);
-vx_status tivxAddKernelPcieTx(vx_context context);
-vx_status tivxAddKernelPcieRx(vx_context context);
 
 vx_status tivxRemoveKernelOpenglMosaic(vx_context context);
-vx_status tivxRemoveKernelPcieTx(vx_context context);
-vx_status tivxRemoveKernelPcieRx(vx_context context);
 
 static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelOpenglMosaic, &tivxRemoveKernelOpenglMosaic},
-    {&tivxAddKernelPcieTx, &tivxRemoveKernelPcieTx},
-    {&tivxAddKernelPcieRx, &tivxRemoveKernelPcieRx},
 };
 
 static vx_status VX_CALLBACK publishKernels(vx_context context)

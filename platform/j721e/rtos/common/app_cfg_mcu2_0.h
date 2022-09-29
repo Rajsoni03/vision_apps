@@ -129,6 +129,4 @@
 #error "CSI2TX and DSI cannot be active at the same time"
 #endif
 
-#undef ENABLE_PCIE_DEMO
-
 #endif /* APP_CFG_MCU2_0_H_ */

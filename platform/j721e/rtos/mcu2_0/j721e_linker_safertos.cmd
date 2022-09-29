@@ -88,8 +88,6 @@ SECTIONS
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
 
-    .pcie_queue_shmem (NOLOAD) : {} palign(8)  > PCIE_QUEUE_SHARED_MEM
-
    /* Data sections. */
     GROUP  palign( 0x10000 ), LOAD_START( lnkRamStartAddr ), LOAD_END( lnkRamEndAddr )
     {

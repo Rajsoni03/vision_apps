@@ -83,7 +83,6 @@
 #include <utils/sciclient/include/app_sciclient.h>
 #include <utils/sciserver/include/app_sciserver.h>
 #include <utils/sensors/include/app_sensors.h>
-#include <utils/pcie/include/app_pcie_queue.h>
 #include <utils/ethfw/include/app_ethfw.h>
 
 /* TIOVX header files */
@@ -531,18 +530,6 @@ int32_t appInit()
         appRtosTestRegister();
         appPerfStatsRemoteServiceInit();
     }
-    #ifdef ENABLE_PCIE_DEMO
-    {
-        app_pcie_queue_init_prms_t app_pcie_queue_init_prm;
-
-        appPcieQueueInitSetDefault(&app_pcie_queue_init_prm);
-        app_pcie_queue_init_prm.rat_mapped_base_address = PCIE_QUEUE_MIRROR_REMOTE_SHARED_MEM_ADDR;
-        app_pcie_queue_init_prm.rat_map_size = PCIE_QUEUE_MIRROR_REMOTE_SHARED_MEM_SIZE;
-        status = appPcieQueueInit(&app_pcie_queue_init_prm);
-        APP_ASSERT_SUCCESS(status);
-
-    }
-    #endif
     #endif
 
     #ifdef ENABLE_ETHFW

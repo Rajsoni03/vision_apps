@@ -85,9 +85,6 @@ SECTIONS
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
 
-    .pcie_queue_shmem (NOLOAD) : {} palign(8)  > PCIE_QUEUE_SHARED_MEM
-
-
     .irqStack   : {. = . + __IRQ_STACK_SIZE;} align(4)      > DDR_MCU2_0  (HIGH)
     RUN_START(__IRQ_STACK_START)
     RUN_END(__IRQ_STACK_END)

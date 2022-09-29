@@ -89,32 +89,6 @@ VX_API_ENTRY vx_node VX_API_CALL tivxOpenglMosaicNode(vx_graph graph,
                                       vx_user_data_object  configuration,
                                       vx_object_array      input,
                                       vx_image             output);
-
-/*! \brief [Graph] Creates a PCIE_TX Node.
- * \param [in] graph The reference to the graph.
- * \param [in] configuration
- * \param [in] input
- * \see <tt>TIVX_KERNEL_PCIE_TX_NAME</tt>
- * \return <tt>vx_node</tt>.
- * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt> vxGetStatus</tt>
- */
-VX_API_ENTRY vx_node VX_API_CALL tivxPcieTxNode(vx_graph graph,
-                                      vx_user_data_object  configuration,
-                                      vx_image             input);
-
-/*! \brief [Graph] Creates a PCIE_RX Node.
- * \param [in] graph The reference to the graph.
- * \param [in] configuration
- * \param [out] output
- * \see <tt>TIVX_KERNEL_PCIE_RX_NAME</tt>
- * \return <tt>vx_node</tt>.
- * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt> vxGetStatus</tt>
- */
-VX_API_ENTRY vx_node VX_API_CALL tivxPcieRxNode(vx_graph graph,
-                                      vx_user_data_object  configuration,
-                                      vx_object_array      output);
-
-
 /*@}*/
 
 #ifdef __cplusplus

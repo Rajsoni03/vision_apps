@@ -235,13 +235,9 @@ ipc_vring_mem_size      = 32*MB;
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
 app_log_mem_size        = 256*KB;
 tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
-tiovx_obj_desc_mem_size = 64*MB - 128*KB - app_log_mem_size;
-pcie_queue_shared_mem_addr = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
-pcie_queue_shared_mem_size = 64*KB;
-pcie_queue_mirror_remote_shared_mem_addr = pcie_queue_shared_mem_addr + pcie_queue_shared_mem_size;
-pcie_queue_mirror_remote_shared_mem_size = 64*KB;
+tiovx_obj_desc_mem_size = 64*MB - app_log_mem_size;
 
-tiovx_log_rt_mem_addr   = pcie_queue_mirror_remote_shared_mem_addr + pcie_queue_mirror_remote_shared_mem_size;
+tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
 tiovx_log_rt_mem_size   = 32*MB;
 
 # Shared memory for Buffers/ION allocator
@@ -416,8 +412,6 @@ c7x_1_ddr_total.setDtsName("vision_apps_c71_0_memory_region", "vision-apps-c71-m
 # Shared memory memory sections in DDR
 app_log_mem            = MemSection("APP_LOG_MEM"        , "", app_log_mem_addr       , app_log_mem_size       , "Memory for remote core logging");
 tiovx_obj_desc_mem     = MemSection("TIOVX_OBJ_DESC_MEM" , "", tiovx_obj_desc_mem_addr, tiovx_obj_desc_mem_size, "Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent");
-pcie_queue_shared_mem  = MemSection("PCIE_QUEUE_SHARED_MEM" , "", pcie_queue_shared_mem_addr, pcie_queue_shared_mem_size, "Memory for IPC over PCIe using shared memory. MUST be non-cached or cache-coherent");
-pcie_queue_mirror_remote_shared_mem  = MemSection("PCIE_QUEUE_MIRROR_REMOTE_SHARED_MEM" , "", pcie_queue_mirror_remote_shared_mem_addr, pcie_queue_mirror_remote_shared_mem_size, "Reserved Memory for RAT mapping of remote PCIe IPC shared memory. MUST be non-cached or cache-coherent");
 tiovx_log_rt_mem     = MemSection("TIOVX_LOG_RT_MEM" , "", tiovx_log_rt_mem_addr, tiovx_log_rt_mem_size, "Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent");
 
 ipc_vring_mem      = MemSection("IPC_VRING_MEM"     , "", ipc_vring_mem_addr     , ipc_vring_mem_size     , "Memory for IPC Vring's. MUST be non-cached or cache-coherent");
@@ -429,8 +423,6 @@ ipc_vring_mem.setOriginTag(False);
 vision_apps_ddr_total  = MemSection("DDR_VISION_APPS_DTS", "", 0                      , 0                      , "DDR for Vision Apps for all sections, used for reserving memory in DTS file");
 vision_apps_ddr_total.concat(app_log_mem);
 vision_apps_ddr_total.concat(tiovx_obj_desc_mem);
-vision_apps_ddr_total.concat(pcie_queue_shared_mem);
-vision_apps_ddr_total.concat(pcie_queue_mirror_remote_shared_mem);
 vision_apps_ddr_total.concat(tiovx_log_rt_mem);
 vision_apps_ddr_total.setDtsName("vision_apps_memory_region", "vision-apps-dma-memory");
 
@@ -516,8 +508,6 @@ mcu2_0_mmap.addMemSection( mcu2_0_ddr_resource_table  );
 mcu2_0_mmap.addMemSection( mcu2_0_ddr         );
 mcu2_0_mmap.addMemSection( app_log_mem        );
 mcu2_0_mmap.addMemSection( tiovx_obj_desc_mem );
-mcu2_0_mmap.addMemSection( pcie_queue_shared_mem );
-mcu2_0_mmap.addMemSection( pcie_queue_mirror_remote_shared_mem );
 mcu2_0_mmap.addMemSection( ipc_vring_mem      );
 mcu2_0_mmap.addMemSection( mcu2_0_ddr_local_heap  );
 mcu2_0_mmap.addMemSection( ddr_shared_mem     );
@@ -669,8 +659,6 @@ html_mmap.addMemSection( c7x_1_ddr_scratch );
 html_mmap.addMemSection( c7x_1_ddr         );
 html_mmap.addMemSection( app_log_mem        );
 html_mmap.addMemSection( tiovx_obj_desc_mem );
-html_mmap.addMemSection( pcie_queue_shared_mem );
-html_mmap.addMemSection( pcie_queue_mirror_remote_shared_mem );
 html_mmap.addMemSection( ipc_vring_mem      );
 html_mmap.addMemSection( ddr_shared_mem     );
 html_mmap.addMemSection( tiovx_log_rt_mem );
@@ -720,8 +708,6 @@ c_header_mmap.addMemSection( c7x_1_ddr_scratch);
 c_header_mmap.addMemSection( tiovx_log_rt_mem );
 c_header_mmap.addMemSection( app_log_mem        );
 c_header_mmap.addMemSection( tiovx_obj_desc_mem );
-c_header_mmap.addMemSection( pcie_queue_shared_mem );
-c_header_mmap.addMemSection( pcie_queue_mirror_remote_shared_mem );
 c_header_mmap.addMemSection( ipc_vring_mem      );
 c_header_mmap.addMemSection( ddr_shared_mem     );
 c_header_mmap.addMemSection( c7x_1_msmc         );

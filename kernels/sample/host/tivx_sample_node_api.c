@@ -79,34 +79,3 @@ VX_API_ENTRY vx_node VX_API_CALL tivxOpenglMosaicNode(vx_graph graph,
                                            dimof(prms));
     return node;
 }
-
-VX_API_ENTRY vx_node VX_API_CALL tivxPcieTxNode(vx_graph graph,
-                                      vx_user_data_object  configuration,
-                                      vx_image             input)
-{
-    vx_reference prms[] = {
-            (vx_reference)configuration,
-            (vx_reference)input
-    };
-    vx_node node = tivxCreateNodeByKernelName(graph,
-                                           TIVX_KERNEL_PCIE_TX_NAME,
-                                           prms,
-                                           dimof(prms));
-    return node;
-}
-
-VX_API_ENTRY vx_node VX_API_CALL tivxPcieRxNode(vx_graph graph,
-                                      vx_user_data_object  configuration,
-                                      vx_object_array      output)
-{
-    vx_reference prms[] = {
-            (vx_reference)configuration,
-            (vx_reference)output
-    };
-    vx_node node = tivxCreateNodeByKernelName(graph,
-                                           TIVX_KERNEL_PCIE_RX_NAME,
-                                           prms,
-                                           dimof(prms));
-    return node;
-}
-
