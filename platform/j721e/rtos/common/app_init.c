@@ -72,7 +72,6 @@
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/remote_service/include/app_remote_service.h>
-#include <utils/mmc_sd/include/app_mmc_sd.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
 #include <utils/misc/include/app_misc.h>
@@ -442,11 +441,6 @@ int32_t appInit()
     status = appMemInit(&mem_init_prm);
     APP_ASSERT_SUCCESS(status);
 
-    #ifdef ENABLE_MMC_SD
-    status = appFatFsInit();
-    APP_ASSERT_SUCCESS(status);
-    #endif
-
     #ifdef ENABLE_IPC
     status = appIpcInit(&ipc_init_prm);
     APP_ASSERT_SUCCESS(status);
@@ -707,9 +701,6 @@ void appDeInit()
     appRtosTestUnRegister();
     appRemoteServiceDeInit();
     appIpcDeInit();
-    #endif
-    #ifdef ENABLE_MMC_SD
-    appFatFsDeInit();
     #endif
     appMemDeInit();
     #ifdef ENABLE_PRINTF_REDIRECT

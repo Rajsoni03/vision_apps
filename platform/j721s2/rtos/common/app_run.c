@@ -67,7 +67,6 @@
 #include <string.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <utils/mmc_sd/include/app_mmc_sd.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
 #include <TI/tivx.h>

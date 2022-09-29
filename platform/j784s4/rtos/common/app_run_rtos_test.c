@@ -66,7 +66,6 @@
 #include <string.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <utils/mmc_sd/include/app_mmc_sd.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
 
