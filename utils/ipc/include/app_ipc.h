@@ -103,10 +103,8 @@
 #define APP_IPC_CPU_C6x_2   ( 8u)
 /** \brief CPU ID */
 #define APP_IPC_CPU_C7x_1   ( 9u)
-/** \brief CPU ID */
-#define APP_IPC_CPU_MPU1_1  (10u)
 /** \brief Max CPU ID */
-#define APP_IPC_CPU_MAX     (11u)
+#define APP_IPC_CPU_MAX     (10u)
 /** \brief Invalid CPU ID */
 #define APP_IPC_CPU_INVALID (0xFFu)
 #endif
@@ -130,10 +128,8 @@
 #define APP_IPC_CPU_C7x_1   ( 7u)
 /** \brief CPU ID */
 #define APP_IPC_CPU_C7x_2   ( 8u)
-/** \brief CPU ID */
-#define APP_IPC_CPU_MPU1_1  ( 9u)
 /** \brief Max CPU ID */
-#define APP_IPC_CPU_MAX     (10u)
+#define APP_IPC_CPU_MAX     ( 9u)
 /** \brief Invalid CPU ID */
 #define APP_IPC_CPU_INVALID (0xFFu)
 #endif
@@ -165,10 +161,8 @@
 #define APP_IPC_CPU_C7x_3   (11u)
 /** \brief CPU ID */
 #define APP_IPC_CPU_C7x_4   (12u)
-/** \brief CPU ID */
-#define APP_IPC_CPU_MPU1_1  (13u)
 /** \brief Max CPU ID */
-#define APP_IPC_CPU_MAX     (14u)
+#define APP_IPC_CPU_MAX     (13u)
 /** \brief Invalid CPU ID */
 #define APP_IPC_CPU_INVALID (0xFFu)
 #endif

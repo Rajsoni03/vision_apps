@@ -62,30 +62,6 @@
 
 #include "app_grpx_priv.h"
 
-uint32_t appGrpxIsValidCpu(uint16_t procId)
-{
-    uint32_t is_valid = 1;
-
-    if(procId == APP_IPC_CPU_MPU1_1)
-        is_valid = 0;
-
-    return is_valid;
-}
-
-uint32_t appGrpxGetNumCpu()
-{
-    uint32_t numCpu = 0, procId;
-
-    for (procId = 0; procId < APP_IPC_CPU_MAX; procId++)
-    {
-        if(appGrpxIsValidCpu(procId))
-        {
-            numCpu++;
-        }
-    }
-    return numCpu;
-}
-
 int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                     uint32_t x, uint32_t y,
                     uint32_t barHeight
@@ -120,11 +96,6 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
 
     for (procId = 0; procId < APP_IPC_CPU_MAX; procId++)
     {
-        if(!appGrpxIsValidCpu(procId))
-        {
-            /* a CPU whose load should not be shown or a CPU not present in this SoC */
-            continue;
-        }
         switch(procId)
         {
             case APP_IPC_CPU_MPU1_0:
@@ -402,7 +373,7 @@ int32_t appGrpxGetDimCpuLoad(uint16_t *width, uint16_t *height)
     if(status==0)
     {
         *height = APP_GRPX_LOAD_BAR_HEIGHT + prop.height*2 + prop2.height + APP_GRPX_LOAD_PAD_Y*2 + APP_GRPX_LOAD_PAD_Y/2;
-        *width  = (prop.width*APP_GRPX_LOAD_BAR_NUM_CHAR + prop.width/2)*appGrpxGetNumCpu();
+        *width  = (prop.width*APP_GRPX_LOAD_BAR_NUM_CHAR + prop.width/2)*APP_IPC_CPU_MAX;
     }
     return status;
 }

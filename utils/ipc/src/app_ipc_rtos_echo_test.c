@@ -81,8 +81,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     IPC_MCU3_1,
     IPC_C66X_1,
     IPC_C66X_2,
-    IPC_C7X_1,
-    IPC_MPU1_1
+    IPC_C7X_1
 };
 #endif
 
@@ -97,8 +96,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     IPC_MCU3_0,
     IPC_MCU3_1,
     IPC_C7X_1,
-    IPC_C7X_2,
-    IPC_MPU1_1
+    IPC_C7X_2
 };
 #endif
 
@@ -117,8 +115,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     IPC_C7X_1,
     IPC_C7X_2,
     IPC_C7X_3,
-    IPC_C7X_4,
-    IPC_MPU1_1
+    IPC_C7X_4
 };
 #endif
 

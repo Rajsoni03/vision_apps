@@ -74,8 +74,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     5,
     6,
     7,
-    8,
-    (uint32_t)(-1)
+    8
 };
 
 static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
@@ -89,8 +88,7 @@ static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
     "mcu3_1",
     "c6x_1",
     "c6x_2",
-    "c7x_1",
-    "mpu1_1"
+    "c7x_1"
 };
 #endif
 
@@ -105,8 +103,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     2,
     5,
     6,
-    7,
-    (uint32_t)(-1)
+    7
 };
 
 static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
@@ -119,8 +116,7 @@ static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
     "mcu3_0",
     "mcu3_1",
     "c7x_1",
-    "c7x_2",
-    "mpu1_1"
+    "c7x_2"
 };
 #endif
 
@@ -139,8 +135,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     8,
     9,
     10,
-    11,
-    (uint32_t)(-1)
+    11
 };
 
 static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
@@ -157,8 +152,7 @@ static char *g_app_cpu_id_name[APP_IPC_CPU_MAX] =
     "c7x_1",
     "c7x_2",
     "c7x_3",
-    "c7x_4",
-    "mpu1_1"
+    "c7x_4"
 };
 #endif
 

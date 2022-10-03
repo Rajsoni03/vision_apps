@@ -164,8 +164,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     IPC_MCU3_1,
     IPC_C66X_1,
     IPC_C66X_2,
-    IPC_C7X_1,
-    IPC_MPU1_1
+    IPC_C7X_1
 };
 
 static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
@@ -179,8 +178,7 @@ static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
     APP_IPC_CPU_MCU3_1,
     APP_IPC_CPU_C6x_1,
     APP_IPC_CPU_C6x_2,
-    APP_IPC_CPU_C7x_1,
-    APP_IPC_CPU_MPU1_1
+    APP_IPC_CPU_C7x_1
 };
 #endif
 
@@ -195,8 +193,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     IPC_MCU3_0,
     IPC_MCU3_1,
     IPC_C7X_1,
-    IPC_C7X_2,
-    IPC_MPU1_1
+    IPC_C7X_2
 };
 
 static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
@@ -209,8 +206,7 @@ static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
     APP_IPC_CPU_MCU3_0,
     APP_IPC_CPU_MCU3_1,
     APP_IPC_CPU_C7x_1,
-    APP_IPC_CPU_C7x_2,
-    APP_IPC_CPU_MPU1_1
+    APP_IPC_CPU_C7x_2
 };
 #endif
 
@@ -229,8 +225,7 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
     IPC_C7X_1,
     IPC_C7X_2,
     IPC_C7X_3,
-    IPC_C7X_4,
-    IPC_MPU1_1
+    IPC_C7X_4
 };
 
 static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
@@ -247,8 +242,7 @@ static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
     APP_IPC_CPU_C7x_1,
     APP_IPC_CPU_C7x_2,
     APP_IPC_CPU_C7x_3,
-    APP_IPC_CPU_C7x_4,
-    APP_IPC_CPU_MPU1_1
+    APP_IPC_CPU_C7x_4
 };
 #endif
 
