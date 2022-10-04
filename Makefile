@@ -40,6 +40,7 @@ DIRECTORIES += utils/app_init
 DIRECTORIES += utils/console_io
 DIRECTORIES += utils/hwa
 DIRECTORIES += utils/ipc
+DIRECTORIES += utils/iss
 DIRECTORIES += utils/mem
 DIRECTORIES += utils/misc
 DIRECTORIES += utils/perf_stats
@@ -57,6 +58,9 @@ DIRECTORIES += apps/basic_demos/app_fd_exchange
 DIRECTORIES += apps/basic_demos/app_rtos_fileio
 DIRECTORIES += apps/tests/app_vx_conformance
 DIRECTORIES += apps/utilities
+
+DIRECTORIES += kernels/fileio
+DIRECTORIES += kernels/img_proc
 
 else
 DIRECTORIES += utils

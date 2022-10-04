@@ -142,7 +142,6 @@ IMAGING_LIBS += ti_imaging_dcc
 endif
 
 VISION_APPS_UTILS_LIBS  =
-VISION_APPS_UTILS_LIBS += app_utils_draw2d
 VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_ipc
 VISION_APPS_UTILS_LIBS += app_utils_console_io
@@ -150,6 +149,7 @@ VISION_APPS_UTILS_LIBS += app_utils_remote_service
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 ifneq ($(TARGET_PLATFORM), AM62A)
 VISION_APPS_UTILS_LIBS += app_utils_grpx
+VISION_APPS_UTILS_LIBS += app_utils_draw2d
 endif
 VISION_APPS_UTILS_LIBS += app_utils_hwa
 VISION_APPS_UTILS_LIBS += app_utils_init
@@ -164,6 +164,7 @@ VISION_APPS_SRV_LIBS  += vx_srv_render_utils_tools
 VISION_APPS_SRV_LIBS  += app_utils_opengl
 
 VISION_APPS_KERNELS_LIBS  =
+
 VISION_APPS_KERNELS_LIBS += vx_kernels_img_proc
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_a72
 VISION_APPS_KERNELS_LIBS += vx_kernels_fileio
