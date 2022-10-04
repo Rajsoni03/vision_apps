@@ -69,13 +69,5 @@ ifeq ($(TARGET_CPU),x86_64)
 CFLAGS      += -DTARGET_X86_64
 endif
 
-ifeq ($(BUILD_VPAC3),yes)
-DEFS        += VPAC3
-endif
-
-ifeq ($(BUILD_VPAC3L),yes)
-DEFS        += VPAC3L
-endif
-
 include $(FINALE)
 endif

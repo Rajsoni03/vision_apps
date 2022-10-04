@@ -32,17 +32,7 @@ else ifeq ($(SOC),am62a)
     BUILD_DEFS += SOC_AM62A
 endif
 
-ifeq ($(BUILD_VPAC1),yes)
-    BUILD_DEFS += VPAC1
-endif
-
-ifeq ($(BUILD_VPAC3),yes)
-    BUILD_DEFS += VPAC3
-endif
-
-ifeq ($(BUILD_VPAC3L),yes)
-    BUILD_DEFS += VPAC3L
-endif
+BUILD_DEFS += $(VPAC_VERSION)
 
 DIRECTORIES :=
 ifeq ($(SOC),am62a)
