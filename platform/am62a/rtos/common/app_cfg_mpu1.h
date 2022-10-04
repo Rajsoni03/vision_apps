@@ -67,7 +67,6 @@
 
 #undef ENABLE_PRINTF_REDIRECT   /* not supported on MPU1 */
 
-#define ENABLE_MMC_SD
 #define ENABLE_UART
 #define ENABLE_BOARD
 #define ENABLE_TIOVX_HOST
