@@ -181,7 +181,7 @@ void appDeInit()
 
 void appIdleLoop(void)
 {
-    #if defined(C71) || defined(C66)
-   __asm(" IDLE"); 
+    #if defined(__C7100__) || defined(__C7120__) || defined(__C7504__) || defined(_TMS320C6X)
+   __asm(" IDLE");
    #endif
 }

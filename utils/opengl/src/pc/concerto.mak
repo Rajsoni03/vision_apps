@@ -10,8 +10,6 @@ CFLAGS      += -Wno-sign-compare
 
 CPPSOURCES  := app_gl_egl_utils_pc.cpp
 
-SKIPBUILD=0
-
 include $(FINALE)
 
 endif

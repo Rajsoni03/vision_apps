@@ -277,6 +277,22 @@ static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
 };
 #endif
 
+#if defined (SOC_AM62A)
+static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
+{
+    IPC_MPU1_0,
+    IPC_MCU1_0,
+    IPC_C7X_1
+};
+
+static uint32_t g_ipc_to_app_cpu_id[IPC_MAX_PROCS] =
+{
+    APP_IPC_CPU_MPU1_0,
+    APP_IPC_CPU_MCU1_0,
+    APP_IPC_CPU_C7x_1
+};
+#endif
+
 static void appIpcRpmsgRxHandler(RPMessage_Handle rpmsg_handle,
                         void *arg, void *data,
                         uint16_t len, uint32_t src_cpu_id,
@@ -813,7 +829,11 @@ void appIpcGetTiovxLogRtSharedMemInfo(void **shm_base, uint32_t *shm_size)
 }
 
 #define APP_IPC_HW_SPIN_LOCK_MAX        (256u)
+#if defined(SOC_AM62A)
+#define APP_IPC_HW_SPIN_LOCK_MMR_BASE   ((uint32_t)0x2A000000u)
+#else
 #define APP_IPC_HW_SPIN_LOCK_MMR_BASE   ((uint32_t)0x30E00000u)
+#endif
 #define APP_IPC_HW_SPIN_LOCK_OFFSET(x)  ((uint32_t)0x800u + (uint32_t)4u*(uint32_t)(x))
 
 int32_t appIpcHwLockAcquire(uint32_t hw_lock_id, uint32_t timeout)

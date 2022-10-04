@@ -17,7 +17,7 @@ export CROSS_COMPILER_PREFIX
 export TARGET_FS
 
 edgeai:
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2 am62a))
 	@echo "Building EdgeAI Components"
 	$(MAKE) edgeai_check_paths
 	$(MAKE) linux_fs_install
@@ -43,7 +43,7 @@ edgeai_plugins:
 	DESTDIR=$(TARGET_FS) ninja -C build install
 
 edgeai_install:
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2 am62a))
 	@echo "Install EdgeAI Modules and Plugins to EDGEAI_INSTALL_PATH"
 	cd $(EDGEAI_MODULES_PATH); \
 	if [ -d "build" ]; then $(MAKE) install DESTDIR=$(EDGEAI_INSTALL_PATH) -C build; else echo edgeai-tiovx-modules has not been built yet, skipping install; fi;

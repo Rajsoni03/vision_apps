@@ -67,7 +67,11 @@
 
 #define APP_IPC_HW_SPIN_LOCK_MAX        (256u)
 #define APP_IPC_HW_SPIN_LOCK_OFFSET(x)  ((uint32_t)0x800u + (uint32_t)4u*(uint32_t)(x))
+#if defined(SOC_AM62A)
+#define APP_IPC_HW_SPIN_LOCK_MMR_BASE   ((uint32_t)0x2A000000u)
+#else
 #define APP_IPC_HW_SPIN_LOCK_MMR_BASE   ((uint32_t)0x30E00000u)
+#endif
 #define APP_IPC_HW_SPIN_LOCK_MMR_SIZE   (APP_IPC_HW_SPIN_LOCK_OFFSET(APP_IPC_HW_SPIN_LOCK_MAX))
 
 int32_t appIpcHwLockInit()

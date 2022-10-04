@@ -68,7 +68,11 @@
 #include "tivx_kernels_target_utils.h"
 #include "tivx_img_hist_host.h"
 
+#if defined(SOC_AM62A)
+#define NUM_A72_TARGETS (1)
+#else
 #define NUM_A72_TARGETS (4)
+#endif
 
 static tivx_target_kernel vx_img_hist_target_kernel[NUM_A72_TARGETS];
 
@@ -170,9 +174,11 @@ void tivxAddTargetKernelImgHist(void)
     if ( self_cpu == TIVX_CPU_ID_A72_0 )
     {
         strncpy(target_name[0], TIVX_TARGET_A72_0, TIVX_TARGET_MAX_NAME);
+        #if !defined(SOC_AM62A)
         strncpy(target_name[1], TIVX_TARGET_A72_1, TIVX_TARGET_MAX_NAME);
         strncpy(target_name[2], TIVX_TARGET_A72_2, TIVX_TARGET_MAX_NAME);
         strncpy(target_name[3], TIVX_TARGET_A72_3, TIVX_TARGET_MAX_NAME);
+        #endif
     }
 
     for(i = 0; i < NUM_A72_TARGETS; i++)
@@ -228,6 +234,6 @@ vx_status VXLIB_histogram_i8u_o32u_cn(uint8_t src[],
         }
     }
 
-   
+
     return (status);
 }

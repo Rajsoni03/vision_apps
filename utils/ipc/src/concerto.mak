@@ -19,8 +19,6 @@ CSOURCES    += app_ipc_linux_hw_spinlock.c
 #
 CSOURCES    += app_ipc_linux_rpmsg_char.c
 
-DEFS+=SOC_J7
-
 endif
 
 ifeq ($(TARGET_OS), QNX)

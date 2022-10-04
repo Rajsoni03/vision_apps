@@ -28,13 +28,47 @@ else ifeq ($(SOC),j721s2)
     BUILD_DEFS += SOC_J721S2
 else ifeq ($(SOC),j784s4)
     BUILD_DEFS += SOC_J784S4
+else ifeq ($(SOC),am62a)
+    BUILD_DEFS += SOC_AM62A
+endif
+
+ifeq ($(BUILD_VPAC1),yes)
+    BUILD_DEFS += VPAC1
 endif
 
 ifeq ($(BUILD_VPAC3),yes)
     BUILD_DEFS += VPAC3
 endif
 
+ifeq ($(BUILD_VPAC3L),yes)
+    BUILD_DEFS += VPAC3L
+endif
+
 DIRECTORIES :=
+ifeq ($(SOC),am62a)
+DIRECTORIES += utils/app_init
+DIRECTORIES += utils/console_io
+DIRECTORIES += utils/hwa
+DIRECTORIES += utils/ipc
+DIRECTORIES += utils/mem
+DIRECTORIES += utils/misc
+DIRECTORIES += utils/perf_stats
+DIRECTORIES += utils/remote_service
+DIRECTORIES += utils/sciclient
+DIRECTORIES += utils/sciserver
+DIRECTORIES += utils/udma
+
+DIRECTORIES += modules
+
+DIRECTORIES += platform/$(SOC)
+
+DIRECTORIES += apps/basic_demos/app_c7x_kernel
+DIRECTORIES += apps/basic_demos/app_fd_exchange
+DIRECTORIES += apps/basic_demos/app_rtos_fileio
+DIRECTORIES += apps/tests/app_vx_conformance
+DIRECTORIES += apps/utilities
+
+else
 DIRECTORIES += utils
 DIRECTORIES += kernels
 DIRECTORIES += modules
@@ -49,6 +83,7 @@ else
 	DIRECTORIES += apps/tests
 	DIRECTORIES += apps/ptk_demos/app_common
 	DIRECTORIES += apps/ptk_demos/applibs
+endif
 endif
 
 TARGET_COMBOS :=
@@ -240,10 +275,32 @@ sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scr
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
+else ifeq ($(SOC),am62a)
+sdk: sdk_check_paths pdk imaging vxlib tiovx
+	$(MAKE) vision_apps
+	$(MAKE) tidl_rt
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot
 endif
 
+sdk_clean: sdk_check_paths pdk_clean imaging_clean vxlib_clean tiovx_clean vision_apps_clean sbl_bootimage_clean tidl_rt_clean
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_clean
+endif
+
+sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub tidl_rt_clean
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_clean
+endif
+endif
+
+ifeq ($(SOC),am62a)
+sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs
+	$(MAKE) -C $(PSDK_PATH)/psdk_rtos sphinx_docs
+else
 sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs ptk_docs tiadalg_docs
 	$(MAKE) -C $(PSDK_PATH)/psdk_rtos sphinx_docs
+endif
 
 #KW build: Split the build into two - components which need not be part of
 # SDK KW report as the report for these components are separately delivered

@@ -4,14 +4,6 @@
 # Edit this file to suit your specific build needs
 #
 
-#Check if PTK makefile is present and based on that skip build
-PTK_MAKEFILE_PATH=$(PTK_PATH)/Makefile
-ifneq ("$(wildcard $(PTK_MAKEFILE_PATH))","")
-	BUILD_PTK?=yes
-else
-	BUILD_PTK=no
-endif
-
 vxlib:
 ifeq ($(BUILD_EMULATION_MODE),yesDISABLE)
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
@@ -34,7 +26,7 @@ ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=C66 TARGET_BUILD=debug $(MAKE) -C $(VXLIB_PATH) cp_to_lib
 endif
 endif
-ifeq ($(SOC), $(filter $(SOC),j721s2 j784s4))
+ifeq ($(SOC), $(filter $(SOC),j721s2 j784s4 am62a))
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=$(C7X_TARGET) TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) vxlib
 	TARGET_PLATFORM=$(TARGET_SOC) TARGET_CPU=$(C7X_TARGET) TARGET_BUILD=release $(MAKE) -C $(VXLIB_PATH) cp_to_lib

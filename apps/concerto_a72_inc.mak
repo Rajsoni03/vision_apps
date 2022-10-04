@@ -125,10 +125,15 @@ TIOVX_LIBS += vx_utils
 TIOVX_LIBS += vx_kernels_hwa vx_kernels_tidl vx_kernels_tvm
 TIOVX_LIBS += vx_tutorial
 
-IMAGING_LIBS  = vx_kernels_imaging
+IMAGING_LIBS  =
+IMAGING_LIBS += app_utils_iss
+
+ifneq ($(TARGET_PLATFORM), AM62A)
+IMAGING_LIBS += vx_kernels_imaging
 IMAGING_LIBS += app_utils_itt_server
 IMAGING_LIBS += app_utils_network_api
-IMAGING_LIBS += app_utils_iss
+endif
+
 ifeq ($(TARGET_OS), LINUX)
 IMAGING_LIBS += ti_2a_wrapper
 IMAGING_LIBS += ti_imaging_aealg
@@ -143,7 +148,9 @@ VISION_APPS_UTILS_LIBS += app_utils_ipc
 VISION_APPS_UTILS_LIBS += app_utils_console_io
 VISION_APPS_UTILS_LIBS += app_utils_remote_service
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
+ifneq ($(TARGET_PLATFORM), AM62A)
 VISION_APPS_UTILS_LIBS += app_utils_grpx
+endif
 VISION_APPS_UTILS_LIBS += app_utils_hwa
 VISION_APPS_UTILS_LIBS += app_utils_init
 
@@ -166,12 +173,14 @@ VISION_APPS_MODULES_LIBS  =
 VISION_APPS_MODULES_LIBS += vx_app_modules
 
 TEST_LIBS =
-TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
-TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tidl_tests vx_tiovx_tvm_tests
+TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule vx_tiovx_tidl_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink
+ifneq ($(TARGET_PLATFORM), AM62A)
+TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tvm_tests
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
+endif
 
 STATIC_LIBS += $(TIOVX_LIBS)
 STATIC_LIBS += $(VISION_APPS_UTILS_LIBS)

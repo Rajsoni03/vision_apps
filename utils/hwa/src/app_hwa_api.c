@@ -64,8 +64,9 @@
 
 int32_t appVhwaConfigureFreq(uint32_t freq_config)
 {
-    int32_t status = -1;
+    int32_t status = 0;
 
+    #if !defined(SOC_AM62A)
     if (APP_HWA_CONFIGURE_FREQ_VPAC_720_DMPAC_480 == freq_config)
     {
         status = appRemoteServiceRun(APP_IPC_CPU_MCU2_1, APP_VHWA_SERVICE_NAME,
@@ -81,7 +82,9 @@ int32_t appVhwaConfigureFreq(uint32_t freq_config)
     else
     {
         appLogPrintf("Invalid frequency configuration provided\n");
+        status = -1;
     }
+    #endif
 
     return status;
 }

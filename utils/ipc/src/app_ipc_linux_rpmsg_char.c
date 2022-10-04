@@ -75,8 +75,17 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
 
     if (APP_IPC_CPU_MCU1_0 == cpu_id)
     {
+        #if defined(SOC_AM62A)
+        rpmsg_char_id = R5F_MAIN0_0;
+        #else
         rpmsg_char_id = R5F_MCU0_0;
+        #endif
     }
+    else if (APP_IPC_CPU_C7x_1 == cpu_id)
+    {
+        rpmsg_char_id = DSP_C71_0;
+    }
+    #if !defined(SOC_AM62A)
     else if (APP_IPC_CPU_MCU1_1 == cpu_id)
     {
         rpmsg_char_id = R5F_MCU0_1;
@@ -117,10 +126,6 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
         rpmsg_char_id = DSP_C66_1;
     }
     #endif
-    else if (APP_IPC_CPU_C7x_1 == cpu_id)
-    {
-        rpmsg_char_id = DSP_C71_0;
-    }
     #if defined (SOC_J721S2) || defined(SOC_J784S4)
     else if (APP_IPC_CPU_C7x_2 == cpu_id)
     {
@@ -137,7 +142,7 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
         rpmsg_char_id = DSP_C71_3;
     }
     #endif
-
+    #endif
     return rpmsg_char_id;
 }
 

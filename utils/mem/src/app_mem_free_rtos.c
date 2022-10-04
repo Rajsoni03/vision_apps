@@ -72,8 +72,10 @@
 #define ENABLE_CACHE_OPS
 
 #if 0
-#if defined(C71) || defined(C7120)
+#if defined(__C7100__) || defined(__C7120__)
 #undef ENABLE_CACHE_OPS /* since C7x is coherent */
+#elif defined(__C7504__)
+#define ENABLE_CACHE_OPS /* since C7504 is incoherent */
 #endif
 #endif
 
@@ -82,7 +84,7 @@
 /** \brief Minmum number of bytes that will be used for alignment, MUST >= max CPU cache line size */
 #define APP_MEM_ALIGN_MIN_BYTES     (128u)
 
-#if defined(C71) || defined(C7120)
+#if defined(__C7100__) || defined(__C7120__)
 
 /* Offset to be added to convert virtual address to physical address */
 #define VIRT_PHY_ADDR_OFFSET (DDR_64BIT_BASE_PADDR - DDR_64BIT_BASE_VADDR)
@@ -99,6 +101,16 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
   }
 
   return phyAddr;
+}
+#elif defined(__C7504__)
+/* For AM62A max DDR size assumed is 2GB which falls within the 32-bit range */
+/* This routine should be implemented if addition memory above 2GB is added */
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+
+  return (uint64_t)virtAddr;
 }
 #endif
 
@@ -458,14 +470,14 @@ int32_t appMemStats(uint32_t heap_id, app_mem_stats_t *stats)
     return status;
 }
 
-#if defined(C71) || defined(C7120)
+#if defined(__C7100__) || defined(__C7120__) || defined(__C7504__)
 #include <c6x_migration.h>
 #include <c7x.h>
 #endif
 
 void appMemFence()
 {
-    #if defined(C71) || defined(C7120)
+    #if defined(__C7100__) || defined(__C7120__) || defined(__C7504__)
     _mfence();
     _mfence();
     #endif
@@ -506,7 +518,7 @@ uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 {
     /* For rtos implementation, virtual and shared pointers are same
      */
-#if defined(C71) || defined(C7120)
+#if defined(__C7100__) || defined(__C7120__)
     uint64_t physPtr;
 
     physPtr = appUdmaVirtToPhyAddrConversion((void*)virtPtr, 0, NULL);

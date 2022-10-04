@@ -65,6 +65,8 @@
 
 #include <stdint.h>
 
+/* #define APP_IPC_DEBUG */
+
 /**
  * \defgroup group_vision_apps_utils_ipc Inter-processor communication (IPC) APIs
  *
@@ -163,6 +165,19 @@
 #define APP_IPC_CPU_C7x_4   (12u)
 /** \brief Max CPU ID */
 #define APP_IPC_CPU_MAX     (13u)
+/** \brief Invalid CPU ID */
+#define APP_IPC_CPU_INVALID (0xFFu)
+#endif
+
+#if defined (SOC_AM62A)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MPU1_0  ( 0u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_MCU1_0  ( 1u)
+/** \brief CPU ID */
+#define APP_IPC_CPU_C7x_1   ( 2u)
+/** \brief Max CPU ID */
+#define APP_IPC_CPU_MAX     ( 3u)
 /** \brief Invalid CPU ID */
 #define APP_IPC_CPU_INVALID (0xFFu)
 #endif

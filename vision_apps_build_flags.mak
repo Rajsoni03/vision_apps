@@ -41,12 +41,22 @@ BUILD_CPU_C7x_1?=yes
 BUILD_CPU_C7x_2?=yes
 BUILD_CPU_C7x_3?=yes
 BUILD_CPU_C7x_4?=yes
+else ifeq ($(SOC),am62a)
+BUILD_CPU_MPU1?=yes
+BUILD_CPU_MCU1_0?=yes
+BUILD_CPU_C7x_1?=yes
+endif
+
+ifneq ($(SOC), am62a)
+BUILD_PTK?=yes
+else
+BUILD_PTK?=no
 endif
 
 BUILD_ENABLE_ETHFW?=yes
 
 # ETHFW is not supported in J721S2
-ifneq (,$(filter $(SOC),j721s2))
+ifneq (,$(filter $(SOC),j721s2 am62a))
 BUILD_ENABLE_ETHFW=no
 endif
 
@@ -114,7 +124,7 @@ BUILD_APP_RTOS_LINUX?=$(BUILD_LINUX_A72)
 # Build RTOS + QNX binaries
 BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
 
-# PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm
+# PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm am62a_evm
 BUILD_PDK_BOARD=$(SOC)_evm
 
 # Flag to select silicon revision: 1_1 for SR 1.1, 1_0 for SR 1.0

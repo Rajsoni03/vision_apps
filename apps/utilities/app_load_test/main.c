@@ -73,6 +73,7 @@
 #include <utils/console_io/include/app_log.h>
 
 #define APP_TEST_DURATION   (30*1000)
+#define MCU1_FAMILY 3
 #define MCU2_FAMILY 4
 #define MCU3_FAMILY 6
 #define MCU4_FAMILY 7
@@ -116,18 +117,18 @@ int main(int argc, char *argv[])
     load = atoi(argv[2]);
     time = atoi(argv[3]);
 
+    #if defined(SOC_AM62A)
+    if (core == MCU1_FAMILY)
+    {
+        core_id[0] = APP_IPC_CPU_MCU1_0;
+        core_cnt = 1;
+    }
+    #else
     if (core == MCU2_FAMILY)
     {
         core_id[0] = APP_IPC_CPU_MCU2_0;
         core_id[1] = APP_IPC_CPU_MCU2_1;
     }
-    #if defined(SOC_J721E)
-    else if (core == C6X_FAMILY)
-    {
-        core_id[0] = APP_IPC_CPU_C6x_1;
-        core_id[1] = APP_IPC_CPU_C6x_2;
-    }
-    #endif
     else if (core == MCU3_FAMILY)
     {
         core_id[0] = APP_IPC_CPU_MCU3_0;
@@ -140,6 +141,14 @@ int main(int argc, char *argv[])
         core_id[1] = APP_IPC_CPU_MCU4_1;
     }
     #endif
+    #if defined(SOC_J721E)
+    else if (core == C6X_FAMILY)
+    {
+        core_id[0] = APP_IPC_CPU_C6x_1;
+        core_id[1] = APP_IPC_CPU_C6x_2;
+    }
+    #endif
+    #endif
     else if (core == C7X_FAMILY)
     {
         core_id[0] = APP_IPC_CPU_C7x_1;
@@ -147,7 +156,7 @@ int main(int argc, char *argv[])
         #if defined(SOC_J721S2)
         core_id[1] = APP_IPC_CPU_C7x_2;
         #endif
-        #if defined(SOC_J721E)
+        #if defined(SOC_J721E) || defined(SOC_AM62A)
         core_cnt = 1;
         #endif
         #if defined(SOC_J784S4)

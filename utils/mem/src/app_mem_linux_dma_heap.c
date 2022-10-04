@@ -80,7 +80,11 @@
 
 /*MACROS*/
 /* #define APP_MEM_DEBUG */
+#ifdef SOC_AM62A
+#define DMA_HEAP_NAME          "/dev/dma_heap/edgeai_shared-memories"
+#else
 #define DMA_HEAP_NAME          "/dev/dma_heap/vision_apps_shared-memories"
+#endif
 #define DMA_HEAP_ALLOC_FLAGS   (0u)
 
 /*STRUCTURES*/
@@ -504,9 +508,9 @@ void  appMemCacheInv(void *ptr, uint32_t size)
     int32_t status = 0;
     uint32_t offset = 0;
     uint32_t dmaBufFd = appMemGetDmaBufFd(ptr, &offset);
-    struct dma_buf_sync sync_flags;
+    struct dma_buf_sync sync_flags = {0};
 
-    sync_flags.flags = DMA_BUF_SYNC_RW;
+    sync_flags.flags = DMA_BUF_SYNC_START | DMA_BUF_SYNC_RW;
 
     if(dmaBufFd > 0)
     {
@@ -520,33 +524,12 @@ void  appMemCacheInv(void *ptr, uint32_t size)
     }
 }
 
-void  appMemCacheWbInv(void *ptr, uint32_t size)
-{
-    int32_t status = 0;
-    uint32_t offset = 0;
-    uint32_t dmaBufFd = appMemGetDmaBufFd(ptr, &offset);
-    struct dma_buf_sync sync_flags;
-
-    sync_flags.flags = DMA_BUF_SYNC_RW | DMA_BUF_SYNC_END;
-
-    if(dmaBufFd > 0)
-    {
-        status = ioctl(dmaBufFd, DMA_BUF_IOCTL_SYNC, &sync_flags);
-        if(status < 0)
-        {
-            printf("MEM: ERROR: DMA_BUF_IOCTL_SYNC failed for appMemCacheWbInv(%p, %d) !!!\n",
-                ptr, size
-                );
-        }
-    }
-}
-
 void  appMemCacheWb(void *ptr, uint32_t size)
 {
     int32_t status = 0;
     uint32_t offset = 0;
     uint32_t dmaBufFd = appMemGetDmaBufFd(ptr, &offset);
-    struct dma_buf_sync sync_flags;
+    struct dma_buf_sync sync_flags ={0};
 
     sync_flags.flags = DMA_BUF_SYNC_RW | DMA_BUF_SYNC_END;
 
@@ -560,6 +543,12 @@ void  appMemCacheWb(void *ptr, uint32_t size)
                 );
         }
     }
+}
+
+void  appMemCacheWbInv(void *ptr, uint32_t size)
+{
+    appMemCacheWb(ptr, size);
+    appMemCacheInv(ptr, size);
 }
 
 /* NOT SUPPORTED on Linux A72, needed for linking tivx mem platform layer */

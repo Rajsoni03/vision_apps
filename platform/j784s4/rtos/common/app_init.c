@@ -912,7 +912,7 @@ static void appUnRegisterOpenVXTargetKernels()
 
 void appIdleLoop(void)
 {
-    #if defined(C7120)
+    #if defined(__C7120__)
    __asm(" IDLE");
    #endif
 }

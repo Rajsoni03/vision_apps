@@ -6,20 +6,31 @@ TARGET      := vx_applib_tests
 TARGETTYPE  := library
 
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64))
-CSOURCES    := test_srv_calib_applib.c  test_srv_bowl_lut_gen_applib.c test_vpac_viss_aewb.c
+CSOURCES    := test_srv_calib_applib.c
+CSOURCES    += test_srv_bowl_lut_gen_applib.c
 CSOURCES    += test_srv_app.c
+
+ifneq ($(SOC), am62a)
+CSOURCES    += test_vpac_viss_aewb.c
+endif
+
 endif
 
 ifeq ($(TARGET_CPU), A72)
-
-CSOURCES    := test_srv_calib_applib.c  test_srv_bowl_lut_gen_applib.c test_vpac_viss_aewb.c
+CSOURCES    := test_srv_calib_applib.c
+CSOURCES    += test_srv_bowl_lut_gen_applib.c
 CSOURCES    += test_srv_app.c
+
+ifneq ($(SOC), am62a)
+CSOURCES    += test_vpac_viss_aewb.c
+endif
+
 CFLAGS      += -DEGL_NO_X11
 ifeq ($(TARGET_OS),LINUX)
 IDIRS       += $(LINUX_FS_PATH)/usr/include
 IDIRS       += $(LINUX_FS_PATH)/usr/include/drm
-
 endif
+
 ifeq ($(TARGET_OS),QNX)
 IDIRS += $(GCC_QNX_ARM_ROOT)/../usr/include
 LDIRS += $(GCC_QNX_ARM_ROOT)/../usr/lib
@@ -62,6 +73,9 @@ ifeq ($(BUILD_VPAC3),yes)
 DEFS        += VPAC3
 endif
 
-include $(FINALE)
+ifeq ($(BUILD_VPAC3L),yes)
+DEFS        += VPAC3L
 endif
 
+include $(FINALE)
+endif

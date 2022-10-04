@@ -85,7 +85,7 @@
 #define APP_PERF_DDR_STATS_CTR2         (0x03) /* A value of 0x03 configures counter 3 to return number of command activations */
 #define APP_PERF_DDR_STATS_CTR3         (0x1C) /* A value of 0x1C configures counter 4 to return number of queue full states   */
 
-#if defined(SOC_J721E)
+#if defined(SOC_J721E) || defined(SOC_AM62A)
 #define APP_PERF_NUM_DDR_INSTANCES      (1u)
 #elif defined (SOC_J721S2)
 #define APP_PERF_NUM_DDR_INSTANCES      (2u)
@@ -616,13 +616,22 @@ void appPerfStatsDdrStatsReadCounters(uint32_t *val0, uint32_t *val1, uint32_t *
     volatile uint32_t cur_cnt0 = 0, cur_cnt1 = 0, cur_cnt2 = 0, cur_cnt3 = 0;
     uint32_t diff_cnt0, diff_cnt1, diff_cnt2, diff_cnt3, ddr_inst;
 
+
+    #if defined(SOC_AM62A)
+    cnt_sel[0] = (volatile uint32_t *)0x0f300000;
+    cnt0[0]    = (volatile uint32_t *)0x0f300104;
+    cnt1[0]    = (volatile uint32_t *)0x0f300108;
+    cnt2[0]    = (volatile uint32_t *)0x0f30010C;
+    cnt3[0]    = (volatile uint32_t *)0x0f300110;
+    #else
     cnt_sel[0] = (volatile uint32_t *)0x02980100;
     cnt0[0]    = (volatile uint32_t *)0x02980104;
     cnt1[0]    = (volatile uint32_t *)0x02980108;
     cnt2[0]    = (volatile uint32_t *)0x0298010C;
     cnt3[0]    = (volatile uint32_t *)0x02980110;
+    #endif
 
-    #ifdef SOC_J721S2
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     cnt_sel[1] = (volatile uint32_t *)0x029A0100;
     cnt0[1]    = (volatile uint32_t *)0x029A0104;
     cnt1[1]    = (volatile uint32_t *)0x029A0108;

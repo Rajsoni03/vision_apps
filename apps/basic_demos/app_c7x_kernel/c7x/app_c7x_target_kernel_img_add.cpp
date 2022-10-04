@@ -93,9 +93,19 @@
 #include "VXLIB_add_i8u_i8u_o8u_cn.h"
 #include "stdio.h"
 
+#if defined(SOC_AM62A)
+#include <utils/udma/include/app_udma_utils.h>
+#else
 #include <utils/udma/include/app_udma.h>
+#endif
 
-//#define ENABLE_DMA_KERNEL_PRINT_STATS
+/* #define ENABLE_DMA_KERNEL_PRINT_STATS */
+
+#if defined(x86_64) || defined(SOC_AM62A)
+#undef USE_HW_DMA
+#else
+#define USE_HW_DMA
+#endif
 
 #define EXEC_PIPELINE_STAGE1(x) ((x) & 0x00000001)
 #define EXEC_PIPELINE_STAGE2(x) ((x) & 0x00000002)
@@ -158,8 +168,10 @@ static vx_status dma_create(DMAObj *dmaObj, vx_size transfer_type, vx_uint32 dma
 
     if(transfer_type == DATA_COPY_DMA)
     {
-#ifndef x86_64
+#if defined(USE_HW_DMA)
         dmaObj->udmaChHdl = appUdmaCopyNDGetHandle(dma_ch);
+#else
+        dmaObj->udmaChHdl = NULL;
 #endif
     }
     else
@@ -174,7 +186,7 @@ static vx_status dma_delete(DMAObj *dmaObj)
 {
     vx_status status = VX_SUCCESS;
 
-#ifndef x86_64
+#if defined(USE_HW_DMA)
     status = appUdmaCopyDelete(dmaObj->udmaChHdl);
 #endif
 
@@ -187,7 +199,7 @@ static vx_status dma_init(DMAObj *dmaObj)
 
     if(dmaObj->transfer_type == DATA_COPY_DMA)
     {
-#ifndef x86_64
+#if defined(USE_HW_DMA)
         appUdmaCopyNDInit(dmaObj->udmaChHdl, &dmaObj->tfrPrms);
 #endif
     }
@@ -207,7 +219,7 @@ static vx_status dma_deinit(DMAObj *dmaObj)
 
     if(dmaObj->transfer_type == DATA_COPY_DMA)
     {
-#ifndef x86_64
+#if defined(USE_HW_DMA)
         appUdmaCopyNDDeinit(dmaObj->udmaChHdl);
 #endif
     }
@@ -226,7 +238,7 @@ static vx_status dma_transfer_trigger(DMAObj *dmaObj)
 
     if(dmaObj->transfer_type == DATA_COPY_DMA)
     {
-#ifndef x86_64
+#if defined(USE_HW_DMA)
         appUdmaCopyNDTrigger(dmaObj->udmaChHdl);
 #endif
     }
@@ -274,7 +286,7 @@ static vx_status dma_transfer_wait(DMAObj *dmaObj)
 
     if(dmaObj->transfer_type == DATA_COPY_DMA)
     {
-#ifndef x86_64
+#if defined(USE_HW_DMA)
         appUdmaCopyNDWait(dmaObj->udmaChHdl);
 #endif
     }
@@ -801,14 +813,14 @@ vx_status VX_CALLBACK app_c7x_target_kernel_img_add_create(tivx_target_kernel_in
 
         if(status == VX_SUCCESS)
         {
-#ifdef x86_64
-            dma_create(&kernelParams->dmaObjSrc0, DATA_COPY_CPU, 0);
-            dma_create(&kernelParams->dmaObjSrc1, DATA_COPY_CPU, 1);
-            dma_create(&kernelParams->dmaObjDst,  DATA_COPY_CPU, 2);
-#else
+#if defined(USE_HW_DMA)
             dma_create(&kernelParams->dmaObjSrc0, DATA_COPY_DMA, 8);
             dma_create(&kernelParams->dmaObjSrc1, DATA_COPY_DMA, 9);
             dma_create(&kernelParams->dmaObjDst,  DATA_COPY_DMA, 10);
+#else
+            dma_create(&kernelParams->dmaObjSrc0, DATA_COPY_CPU, 0);
+            dma_create(&kernelParams->dmaObjSrc1, DATA_COPY_CPU, 1);
+            dma_create(&kernelParams->dmaObjDst,  DATA_COPY_CPU, 2);
 #endif
             tivxSetTargetKernelInstanceContext(kernel, kernelParams,  sizeof(tivxC7xKernelParams));
         }

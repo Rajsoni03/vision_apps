@@ -27,14 +27,6 @@ include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
 endif
 endif
 
-ifeq ($(TARGET_CPU),A72)
-ifeq ($(TARGET_OS),SYSBIOS)
-
-TARGETTYPE  := library
-
-endif
-endif
-
 include $(FINALE)
 
 endif

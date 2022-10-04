@@ -66,10 +66,17 @@
 #include <utils/console_io/include/app_log.h>
 
 #ifdef A72
+
+#if !defined (SOC_AM62A)
 static uint8_t  g_cmdPrm[CMD_PARAM_SIZE];
+#endif
 
 int32_t appEnumerateImageSensor(char *sensor_name_list[], uint8_t  * num_sensors_found)
 {
+#if defined (SOC_AM62A)
+    *num_sensors_found = 0;
+    return 0;
+#else
     int32_t status = -1;
     uint8_t  count = 0;
     uint8_t  numRegisteredSensors = 0;
@@ -107,6 +114,7 @@ int32_t appEnumerateImageSensor(char *sensor_name_list[], uint8_t  * num_sensors
     *num_sensors_found = numRegisteredSensors;
 
     return status;
+#endif
 }
 /*
 Sends the sensor name in cmd_param
@@ -115,6 +123,10 @@ Expects sensor properties at cmd_param[0] + ISS_SENSORS_MAX_NAME
 
 int32_t appQueryImageSensor(char* sensor_name, IssSensor_CreateParams* pSensorCreatePrms)
 {
+#if defined (SOC_AM62A)
+    memset(pSensorCreatePrms, 0, sizeof(IssSensor_CreateParams));
+    return 0;
+#else
     int32_t status = -1;
     memset(pSensorCreatePrms, 0, sizeof(IssSensor_CreateParams));
     memset(g_cmdPrm, 0, CMD_PARAM_SIZE);
@@ -141,10 +153,14 @@ int32_t appQueryImageSensor(char* sensor_name, IssSensor_CreateParams* pSensorCr
         appLogPrintf("ISS: ERROR: Querying sensor [%s] failed !!!\n", sensor_name);
     }
     return status;
+#endif
 }
 
 int32_t appInitImageSensor(char* sensor_name, uint32_t featuresEnabled, uint32_t channel_mask)
 {
+#if defined(SOC_AM62A)
+    return 0;
+#else
     int32_t status = -1;
     if((channel_mask >= (1<<ISS_SENSORS_MAX_CHANNEL)) || (channel_mask < 0x1))
     {
@@ -189,10 +205,14 @@ int32_t appInitImageSensor(char* sensor_name, uint32_t featuresEnabled, uint32_t
     appLogPrintf("ISS: Initializing sensor [%s] ... Done !!!\n", sensor_name);
 
     return status;
+#endif
 }
 
 int32_t appDetectImageSensor(uint8_t *sensor_id_list, uint8_t *num_sensors_found, uint32_t channel_mask)
 {
+#if defined (SOC_AM62A)
+    return 0;
+#else
     int32_t status = -1;
     uint8_t sensor_id;
     uint8_t numDetectedSensors = 0;
@@ -216,7 +236,7 @@ int32_t appDetectImageSensor(uint8_t *sensor_id_list, uint8_t *num_sensors_found
         while(channel_mask > 0)
         {
             if(channel_mask & 0x1)
-            {    
+            {
                 sensor_id = (uint8_t)(*cmd_ptr);
                 if(0xFF != sensor_id)
                 {
@@ -237,10 +257,14 @@ int32_t appDetectImageSensor(uint8_t *sensor_id_list, uint8_t *num_sensors_found
     }
 
     return status;
+#endif
 }
 
 int32_t appStartImageSensor(char* sensor_name, uint32_t channel_mask)
 {
+#if defined (SOC_AM62A)
+    return 0;
+#else
     int32_t status = -1;
 
     appLogPrintf("ISS: Starting sensor [%s] ... !!!\n", sensor_name);
@@ -268,10 +292,14 @@ int32_t appStartImageSensor(char* sensor_name, uint32_t channel_mask)
     }
 
     return status;
+#endif
 }
 
 int32_t appStopImageSensor(char* sensor_name, uint32_t channel_mask)
 {
+#if defined (SOC_AM62A)
+    return 0;
+#else
     int32_t status = -1;
 
     appLogPrintf("ISS: Stopping sensor [%s] ... !!!\n", sensor_name);
@@ -299,10 +327,14 @@ int32_t appStopImageSensor(char* sensor_name, uint32_t channel_mask)
     }
 
     return status;
+#endif
 }
 
 int32_t appDeInitImageSensor(char* sensor_name)
 {
+#if defined (SOC_AM62A)
+    return 0;
+#else
     int32_t status = -1;
 
     appLogPrintf("ISS: De-initializing sensor [%s] ... !!!\n", sensor_name);
@@ -329,6 +361,7 @@ int32_t appDeInitImageSensor(char* sensor_name)
     }
 
     return status;
+#endif
 }
 
 #endif /*(A72)*/
@@ -336,6 +369,9 @@ int32_t appDeInitImageSensor(char* sensor_name)
 #if defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS))
 int32_t appIssInit()
 {
+#if defined (SOC_AM62A)
+    return 0;
+#else
     int32_t status;
     int32_t itt_status;
     int32_t viss_status;
@@ -365,10 +401,14 @@ int32_t appIssInit()
     }
 
     return status;
+#endif
 }
 
 int32_t appIssDeInit()
 {
+#if defined (SOC_AM62A)
+    return 0;
+#else
     int32_t status;
     int32_t itt_status;
     status = IssSensor_DeInit();
@@ -385,6 +425,7 @@ int32_t appIssDeInit()
 
     appLogPrintf("APP ISS: Deinit ... Done !!!\n");
     return (status);
+#endif
 }
 
 #endif /*defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS))*/

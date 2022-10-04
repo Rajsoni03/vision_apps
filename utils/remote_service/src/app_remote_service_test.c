@@ -128,8 +128,13 @@ void appRemoteServiceLoadTestTaskLoad(uint32_t ld)
     volatile int i = 0, j =0, a = 1, count;
     uint32_t cpu_id = appIpcGetSelfCpuId();
 
+    #if defined(SOC_AM62A)
+    if (ld > 50 && (cpu_id == APP_IPC_CPU_MCU1_0))
+        ld += 5;
+    #else
     if (ld > 50 && (cpu_id == APP_IPC_CPU_MCU1_0 || cpu_id == APP_IPC_CPU_MCU2_0))
         ld += 5;
+    #endif
 
     #if defined(SOC_J721E)
     if (ld > 95 && (cpu_id == APP_IPC_CPU_C6x_1 || cpu_id == APP_IPC_CPU_C6x_2))
@@ -281,9 +286,10 @@ int32_t appRemoteServiceTestHandler(char *service_name, uint32_t cmd, void *prm,
         if(prm!=NULL && prm_size == sizeof(uint32_t))
         {
             uintptr_t addr = (uintptr_t)(*(volatile uint32_t*)prm);
-            uint32_t value = *(volatile uint32_t*)addr;
 
             appMemCacheInv((void*)addr, 256);
+
+            uint32_t value = *(volatile uint32_t*)addr;
 
             #ifdef APP_REMOTE_SERVICE_TEST_DEBUG
             appLogPrintf("REMOTE_SERVICE_TEST: 0x%08x = %d\n",
@@ -439,8 +445,6 @@ int32_t appRemoteServiceTestRunCmd1(uint32_t cpu_id)
 
         before = i*10;
 
-        appMemCacheInv((void*)virt_ptr, 256);
-
         *(volatile uint32_t*)virt_ptr = before;
 
         appMemCacheWbInv((void*)virt_ptr, 256);
@@ -452,6 +456,10 @@ int32_t appRemoteServiceTestRunCmd1(uint32_t cpu_id)
         status = appRemoteServiceRun(cpu_id, APP_REMOTE_SERVICE_TEST_NAME, APP_REMOTE_SERVICE_TEST_CMD_1, &value, sizeof(uint32_t), 0);
 
         appMemCacheInv((void*)virt_ptr, 256);
+
+        #ifdef A72
+        asm("    DSB SY");
+        #endif
 
         after = *(volatile uint32_t*)virt_ptr;
 

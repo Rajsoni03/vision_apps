@@ -30,7 +30,7 @@ endif
 ifeq ($(TARGET_CPU),C66)
 IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c66}/source_code_and_projects/SafeRTOS/config
 endif
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120 C7504))
 IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/config
 endif
 endif
@@ -38,6 +38,11 @@ endif
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C71 C7120))
 IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/c7x
 IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/c7x
+endif
+
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU),C7504))
+IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/c75x
+IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/c75x
 endif
 
 ifeq ($(TARGET_CPU),C66)

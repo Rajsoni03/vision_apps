@@ -551,11 +551,19 @@ void appPerfStatsHwaUpdateLoad(app_perf_hwa_id_t id, uint32_t active_time_in_use
 void appPerfStatsDdrStatsReadCounters(uint32_t *val0, uint32_t *val1, uint32_t *val2, uint32_t *val3, bool raw)
 {
     static uint32_t is_first_time = 1;
+    #if defined(SOC_AM62A)
+    static volatile uint32_t *cnt_sel = (volatile uint32_t *)0x00F30100;
+    static volatile uint32_t *cnt0    = (volatile uint32_t *)0x00F30104;
+    static volatile uint32_t *cnt1    = (volatile uint32_t *)0x00F30108;
+    static volatile uint32_t *cnt2    = (volatile uint32_t *)0x00F3010C;
+    static volatile uint32_t *cnt3    = (volatile uint32_t *)0x00F30110;
+    #else
     static volatile uint32_t *cnt_sel = (volatile uint32_t *)0x02980100;
     static volatile uint32_t *cnt0    = (volatile uint32_t *)0x02980104;
     static volatile uint32_t *cnt1    = (volatile uint32_t *)0x02980108;
     static volatile uint32_t *cnt2    = (volatile uint32_t *)0x0298010C;
     static volatile uint32_t *cnt3    = (volatile uint32_t *)0x02980110;
+    #endif
     static volatile uint32_t last_cnt0 = 0, last_cnt1 = 0, last_cnt2 = 0, last_cnt3 = 0;
     volatile uint32_t cur_cnt0, cur_cnt1, cur_cnt2, cur_cnt3;
     uint32_t diff_cnt0, diff_cnt1, diff_cnt2, diff_cnt3;

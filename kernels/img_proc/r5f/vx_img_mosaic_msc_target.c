@@ -196,6 +196,14 @@ void tivxAddTargetKernelImgMosaicMsc(void)
 
     self_cpu = tivxGetSelfCpuId();
 
+    #if defined(SOC_AM62A)
+    if ((vx_enum)TIVX_CPU_ID_MCU1_0 == self_cpu )
+    {
+        /* Both scalars are used, but the target used it always MSC0 */
+        strncpy(target_name[0], TIVX_TARGET_VPAC_MSC1, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[1], TIVX_TARGET_VPAC_MSC2, TIVX_TARGET_MAX_NAME);
+    }
+    #else
     if ((vx_enum)TIVX_CPU_ID_MCU2_0 == self_cpu )
     {
         /* Both scalars are used, but the target used it always MSC0 */
@@ -215,6 +223,7 @@ void tivxAddTargetKernelImgMosaicMsc(void)
         VX_PRINT(VX_ZONE_ERROR, "Invalid CPU ID\n");
         status = (vx_status)VX_FAILURE;
     }
+    #endif
 
     if ((vx_status)VX_SUCCESS == status)
     {
@@ -420,6 +429,14 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
 
         self_cpu = tivxGetSelfCpuId();
 
+        #if defined(SOC_AM62A)
+        if ((vx_enum)TIVX_CPU_ID_MCU1_0 == self_cpu)
+        {
+            app_hwa_inst_id_0   = APP_PERF_HWA_VPAC1_MSC0;
+            app_hwa_inst_id_1   = APP_PERF_HWA_VPAC1_MSC1;
+            inst_id_offset      = 0U;
+        }
+        #else
         if ((vx_enum)TIVX_CPU_ID_MCU2_0 == self_cpu)
         {
             app_hwa_inst_id_0   = APP_PERF_HWA_VPAC1_MSC0;
@@ -433,6 +450,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
             app_hwa_inst_id_1   = APP_PERF_HWA_VPAC2_MSC1;
             inst_id_offset = 2U;
         }
+        #endif
         #endif
 
         if (msc_obj->max_msc_instances == 2)

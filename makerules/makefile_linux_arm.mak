@@ -52,10 +52,17 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/imx219
+ifeq ($(SOC),am62a)
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ov2312
+endif
+
 	cp $(IMAGING_PATH)/sensor_drv/src/imx390/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
 	cp $(IMAGING_PATH)/sensor_drv/src/ar0820/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
 	cp $(IMAGING_PATH)/sensor_drv/src/ar0233/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
 	cp $(IMAGING_PATH)/sensor_drv/src/imx219/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/imx219
+ifeq ($(SOC),am62a)
+	cp $(IMAGING_PATH)/sensor_drv/src/ov2312/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/ov2312
+endif
 
 	# Copy header files (variables used in this section are defined in makefile_ipk.mak)
 	@# copy all the .h files under folders in IPK_INCLUDE_FOLDERS
@@ -153,13 +160,15 @@ ifeq ($(BUILD_CPU_C7x_1),yes)
 	#Build TIDL test case and copy binaries
 	#$(MAKE) -C $(TIDL_PATH)/../ run
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/tidl_test
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2 am62a))
 	cp -P $(TIDL_PATH)/tfl_delegate/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(TIDL_PATH)/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+ifneq ($(SOC), am62a)
 	cp -P $(TIDL_PATH)/onnxrt_EP/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp $(TIDL_PATH)/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out  $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 endif
+	cp $(TIDL_PATH)/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out  $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 	cp -r $(TIDL_PATH)/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
+endif
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	# copy remote firmware files for c7x_2
@@ -268,6 +277,7 @@ linux_fs_install_sd_ip: ip_addr_check linux_fs_install
 	sshfs -o nonempty root@$(J7_IP_ADDRESS):/ /tmp/j7-evm
 	#(call CLEAN_COPY_FROM_STAGE,/tmp/j7-evm)
 	$(call CLEAN_COPY_FROM_STAGE_FAST,/tmp/j7-evm)
+	$(MAKE) EDGEAI_INSTALL_PATH=/tmp/j7-evm edgeai_install
 	fusermount -u /tmp/j7-evm/
 
 linux_fs_install_sd_test_data:

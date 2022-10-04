@@ -871,7 +871,7 @@ static void appUnRegisterOpenVXTargetKernels()
 
 void appIdleLoop(void)
 {
-    #if defined(C71) || defined(C66)
+    #if defined(__C7100__) || defined(C66)
    __asm(" IDLE");
    #endif
 }

@@ -10,8 +10,6 @@ CSOURCES    += app_grpx_cpu_load.c
 CSOURCES    += app_grpx_hwa_load.c
 CSOURCES    += app_grpx_ddr_load.c
 
-SKIPBUILD=0
-
 include $(FINALE)
 
 endif
@@ -26,8 +24,6 @@ TARGET      := app_utils_grpx
 TARGETTYPE  := library
 
 CSOURCES    := app_grpx_null.c
-
-SKIPBUILD=0
 
 include $(FINALE)
 

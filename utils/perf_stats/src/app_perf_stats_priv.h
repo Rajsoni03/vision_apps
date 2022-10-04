@@ -68,7 +68,11 @@
 
 #define APP_PERF_STATS_SERVICE_NAME  "com.ti.perf_stats"
 
+#if defined(SOC_AM62A)
+#define APP_PERF_STATS_GET_DDR_STATS_CORE       (APP_IPC_CPU_MCU1_0)
+#else
 #define APP_PERF_STATS_GET_DDR_STATS_CORE       (APP_IPC_CPU_MCU2_1)
+#endif
 
 #define APP_PERF_STATS_CMD_RESET_LOAD_CALC      (0x0001)
 #define APP_PERF_STATS_CMD_GET_CPU_LOAD         (0x0002)

@@ -44,8 +44,6 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					imaging/ti_2a_wrapper/include \
 					imaging/sensor_drv/include \
 					ivision \
-					perception/include \
-					tiadalg \
 					$(tidl_dir)/ti_dl/inc \
 					tiovx/conformance_tests/test_engine \
 					tiovx/include \
@@ -59,6 +57,11 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					vision_apps/kernels \
 					vision_apps/modules \
 					vision_apps/utils
+
+ifneq ($(SOC),am62a)
+IPK_INCLUDE_FOLDERS += perception/include \
+					tiadalg
+endif
 
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
 LINUX_APP_PROFILE=debug

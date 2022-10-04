@@ -134,7 +134,7 @@ static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
     {&tivxAddTargetKernelDisparityMerge, &tivxRemoveTargetKernelDisparityMerge},
     {&tivxAddTargetKernelMedianFilter, &tivxRemoveTargetKernelMedianFilter},
     {&tivxAddTargetKernelHoleFilling, &tivxRemoveTargetKernelHoleFilling},
-#if ! (defined(C71) || defined(C7120))
+#if ! (defined(__C7100__) || defined(__C7120__))
     {&tivxAddTargetKernelSdeDisparityVisualize, &tivxRemoveTargetKernelSdeDisparityVisualize},
     {&tivxAddTargetKernelSdeHistogramVisualize, &tivxRemoveTargetKernelSdeHistogramVisualize},
 #endif

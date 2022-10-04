@@ -67,39 +67,61 @@
 #include <utils/sciclient/include/app_sciclient_wrapper_api.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <ti/drv/csirx/csirx.h>
-#include <ti/drv/csitx/csitx.h>
-#include <ti/drv/vhwa/include/vhwa_m2mDof.h>
+
 #include <ti/drv/vhwa/include/vhwa_m2mLdc.h>
 #include <ti/drv/vhwa/include/vhwa_m2mMsc.h>
-#include <ti/drv/vhwa/include/vhwa_m2mNf.h>
-#include <ti/drv/vhwa/include/vhwa_m2mSde.h>
 #include <ti/drv/vhwa/include/vhwa_m2mViss.h>
 #include <TI/j7_viss_srvr_remote.h>
 
+#if !defined(SOC_AM62A)
+#include <ti/drv/vhwa/include/vhwa_m2mNf.h>
+#include <ti/drv/vhwa/include/vhwa_m2mSde.h>
+#include <ti/drv/vhwa/include/vhwa_m2mDof.h>
+#include <ti/drv/csirx/csirx.h>
+#include <ti/drv/csitx/csitx.h>
+#endif
+
 #define APP_DEBUG_VHWA
 
+#if defined(VPAC3L)
+#undef ENABLE_DOF
+#undef ENABLE_SDE
+#undef ENABLE_NF
+#else
 #define ENABLE_DOF
 #define ENABLE_SDE
-#define ENABLE_MSC
 #define ENABLE_NF
+#endif
+
+#define ENABLE_MSC
 #define ENABLE_VISS
 #define ENABLE_LDC
 
 /* below define's set max limits for line width in order to
  * reserved space in SL2 for VHWA modules during init
  */
+#if defined (VPAC3L)
+#define APP_UTILS_VHWA_MAX_IN_IMG_WIDTH        (2690U)
+#else
 #define APP_UTILS_VHWA_MAX_IN_IMG_WIDTH        (1920U)
+#endif
 #define APP_UTILS_VHWA_IN_IMG_CCSF             (FVID2_CCSF_BITS12_UNPACKED16)
 #define APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH   (6)
+#if defined (VPAC3L)
+#define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (2450U)
+#else
 #define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (1920U)
+#endif
 #define APP_UTILS_VHWA_OUT_IMG_CCSF            (FVID2_CCSF_BITS12_UNPACKED16)
 #define APP_UTILS_VHWA_MAX_OUT_IMG_BUFF_DEPTH  (2)
 
-#if defined(SOC_J721S2) || defined(SOC_J784S4)
+#if defined(VPAC3)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (128)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (64)
-#elif defined(SOC_J721E)
+#elif defined(VPAC3L)
+#define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (64)
+#define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (64)
+#elif defined(VPAC1)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_WIDTH     (192)
 #define APP_UTILS_VHWA_LDC_MAX_BLOCK_HEIGHT    (80)
 #endif
@@ -108,11 +130,8 @@ static void appVhwaVpacMscInit(Vhwa_M2mMscSl2AllocPrms *sl2Prms)
 {
     uint32_t cnt;
 
-    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    #if defined(VPAC3) || defined(VPAC3L)
     uint32_t idx;
-    #endif
-
-    #if defined(SOC_J721S2) || defined(SOC_J784S4)
     for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INST; cnt++)
     {
         for(idx = 0; idx < VHWA_M2M_MSC_MAX_IN_CHANNEL; idx++)
@@ -122,7 +141,7 @@ static void appVhwaVpacMscInit(Vhwa_M2mMscSl2AllocPrms *sl2Prms)
             sl2Prms->inBuffDepth[cnt][idx]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
         }
     }
-    #elif defined(SOC_J721E)
+    #elif defined(VPAC1)
     for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INPUT_BUFF; cnt++)
     {
         sl2Prms->maxInWidth[cnt]    = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
@@ -158,9 +177,24 @@ int32_t appFvid2Init(void)
     return (retVal);
 }
 
+int32_t appFvid2DeInit(void)
+{
+    int32_t retVal = FVID2_SOK;
+
+    retVal = Fvid2_deInit(NULL);
+    if(retVal!=FVID2_SOK)
+    {
+        appLogPrintf("FVID2: ERROR: Fvid2_deInit failed !!!\n");
+    }
+    return (retVal);
+}
+
+#if !defined(SOC_AM62A)
+
 int32_t appCsi2RxInit(void)
 {
     int32_t status = FVID2_SOK;
+
     Csirx_InitParams initPrmsCsirx;
 
     appLogPrintf("CSI2RX: Init ... !!!\n");
@@ -186,6 +220,7 @@ int32_t appCsi2RxInit(void)
 int32_t appCsi2TxInit(void)
 {
     int32_t status = FVID2_SOK;
+
     uint32_t regVal = 0U, unlocked = 0U;
     Csitx_InitParams initPrmsCsitx;
 
@@ -240,22 +275,9 @@ int32_t appCsi2TxInit(void)
     return (status);
 }
 
-int32_t appFvid2DeInit(void)
-{
-    int32_t retVal = FVID2_SOK;
-
-    retVal = Fvid2_deInit(NULL);
-    if(retVal!=FVID2_SOK)
-    {
-        appLogPrintf("FVID2: ERROR: Fvid2_deInit failed !!!\n");
-    }
-    return (retVal);
-}
-
 int32_t appCsi2RxDeInit(void)
 {
     int32_t retVal = FVID2_SOK;
-
     retVal = Csirx_deInit();
     if(retVal!=FVID2_SOK)
     {
@@ -267,7 +289,6 @@ int32_t appCsi2RxDeInit(void)
 int32_t appCsi2TxDeInit(void)
 {
     int32_t retVal = FVID2_SOK;
-
     retVal = Csitx_deInit();
     if(retVal!=FVID2_SOK)
     {
@@ -290,11 +311,11 @@ int32_t appVhwaDmpacInit()
     #endif
 
 
-#ifdef ENABLE_DOF
+#if defined(ENABLE_DOF)
     Vhwa_M2mDofSl2AllocPrms sl2AllocPrms;
     Vhwa_M2mDofInitParams   initPrms;
 
-    #ifdef APP_DEBUG_VHWA
+    #if defined(APP_DEBUG_VHWA)
     appLogPrintf("VHWA: DOF Init ... !!!\n");
     #endif
 
@@ -321,21 +342,21 @@ int32_t appVhwaDmpacInit()
         }
         else
         {
-            #ifdef APP_DEBUG_VHWA
+            #if defined(APP_DEBUG_VHWA)
             appLogPrintf("VHWA: DOF Init ... Done !!!\n");
             #endif
         }
     }
 #endif
 
-#ifdef ENABLE_SDE
+#if defined(ENABLE_SDE)
     /* SDE */
     if (0 == status)
     {
         Vhwa_M2mSdeSl2AllocPrms sl2AllocPrms;
         Vhwa_M2mSdeInitParams   initPrms;
 
-        #ifdef APP_DEBUG_VHWA
+        #if defined(APP_DEBUG_VHWA)
         appLogPrintf("VHWA: SDE Init ... !!!\n");
         #endif
 
@@ -362,7 +383,7 @@ int32_t appVhwaDmpacInit()
             }
             else
             {
-                #ifdef APP_DEBUG_VHWA
+                #if defined(APP_DEBUG_VHWA)
                 appLogPrintf("VHWA: SDE Init ... Done !!!\n");
                 #endif
             }
@@ -374,6 +395,20 @@ int32_t appVhwaDmpacInit()
     return (status);
 
 }
+
+int32_t appVhwaDmpacDeInit()
+{
+#if defined(ENABLE_DOF)
+    Vhwa_m2mDofDeInit();
+#endif
+#if defined(ENABLE_SDE)
+    Vhwa_m2mSdeDeInit();
+#endif
+
+    return (0);
+}
+
+#endif /* !defined(SOC_AM62A) */
 
 int32_t appVhwaVpacInit(uint32_t vpacInst)
 {
@@ -399,14 +434,14 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
     }
     #endif
 
-#ifdef ENABLE_LDC
+#if defined(ENABLE_LDC)
     /* LDC */
     if (0 == status)
     {
         Vhwa_M2mLdcSl2AllocPrms sl2AllocPrms;
         Vhwa_M2mLdcInitParams   initPrms;
 
-        #ifdef APP_DEBUG_VHWA
+        #if defined(APP_DEBUG_VHWA)
         appLogPrintf("VHWA: LDC Init ... !!!\n");
         #endif
 
@@ -414,7 +449,11 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
         Vhwa_m2mLdcInitParamsInit(&initPrms);
 
         /* Set UDMA driver handle */
+        #if defined(SOC_AM62A)
+        initPrms.udmaDrvHndl = NULL;
+        #else
         initPrms.udmaDrvHndl = appUdmaGetObj();
+        #endif
 
         status = Vhwa_m2mLdcInit(&initPrms);
         if (0 != status)
@@ -435,7 +474,7 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
             }
             else
             {
-                #ifdef APP_DEBUG_VHWA
+                #if defined(APP_DEBUG_VHWA)
                 appLogPrintf("VHWA: LDC Init ... Done !!!\n");
                 #endif
             }
@@ -443,20 +482,24 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
     }
 #endif
 
-#ifdef ENABLE_MSC
+#if defined(ENABLE_MSC)
     /* MSC */
     if (0 == status)
     {
         Vhwa_M2mMscInitParams initPrms;
         Vhwa_M2mMscSl2AllocPrms sl2Prms;
 
-        #ifdef APP_DEBUG_VHWA
+        #if defined(APP_DEBUG_VHWA)
         appLogPrintf("VHWA: MSC Init ... !!!\n");
         #endif
 
         Vhwa_m2mMscInitParamsInit(&initPrms);
 
+        #if defined(SOC_AM62A)
+        initPrms.drvHandle = NULL;
+        #else
         initPrms.drvHandle = appUdmaGetObj();
+        #endif
 
         status = Vhwa_m2mMscInit(&initPrms);
 
@@ -471,7 +514,7 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
             }
             else
             {
-                #ifdef APP_DEBUG_VHWA
+                #if defined(APP_DEBUG_VHWA)
                 appLogPrintf("VHWA: MSC Init ... Done !!!\n");
                 #endif
             }
@@ -483,14 +526,14 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
     }
 #endif
 
-#ifdef ENABLE_NF
+#if defined(ENABLE_NF)
     /* NF */
     if (0 == status)
     {
         Vhwa_M2mNfSl2AllocPrms  sl2AllocPrms;
         Vhwa_M2mNfInitPrms      initPrms;
 
-        #ifdef APP_DEBUG_VHWA
+        #if defined(APP_DEBUG_VHWA)
         appLogPrintf("VHWA: NF Init ... !!!\n");
         #endif
 
@@ -521,7 +564,7 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
             }
             else
             {
-                #ifdef APP_DEBUG_VHWA
+                #if defined(APP_DEBUG_VHWA)
                 appLogPrintf("VHWA: NF Init ... Done !!!\n");
                 #endif
             }
@@ -529,14 +572,14 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
     }
 #endif
 
-#ifdef ENABLE_VISS
+#if defined(ENABLE_VISS)
     /* VISS */
     if (0 == status)
     {
         Vhwa_M2mVissSl2Params   sl2AllocPrms;
         Vhwa_M2mVissInitParams  initPrms;
 
-        #ifdef APP_DEBUG_VHWA
+        #if defined(APP_DEBUG_VHWA)
         appLogPrintf("VHWA: VISS Init ... !!!\n");
         #endif
 
@@ -544,7 +587,11 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
         Vhwa_m2mVissInitParamsInit(&initPrms);
 
         /* Set UDMA driver handle */
+        #if defined(VPAC3L)
+        initPrms.udmaDrvHndl = NULL;
+        #else
         initPrms.udmaDrvHndl = appUdmaGetObj();
+        #endif
 
         /* Set configThroughUDMA to true to support multi handle */
         initPrms.configThroughUdmaFlag = true;
@@ -574,7 +621,7 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
             }
             else
             {
-                #ifdef APP_DEBUG_VHWA
+                #if defined(APP_DEBUG_VHWA)
                 appLogPrintf("VHWA: VISS Init ... Done !!!\n");
                 #endif
             }
@@ -586,30 +633,18 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
     return (status);
 }
 
-int32_t appVhwaDmpacDeInit()
-{
-#ifdef ENABLE_DOF
-    Vhwa_m2mDofDeInit();
-#endif
-#ifdef ENABLE_SDE
-    Vhwa_m2mSdeDeInit();
-#endif
-
-    return (0);
-}
-
 int32_t appVhwaVpacDeInit()
 {
-#ifdef ENABLE_LDC
+#if defined(ENABLE_LDC)
     Vhwa_m2mLdcDeInit();
 #endif
-#ifdef ENABLE_MSC
+#if defined(ENABLE_MSC)
     Vhwa_m2mMscDeInit();
 #endif
-#ifdef ENABLE_NF
+#if defined(ENABLE_NF)
     Vhwa_m2mNfDeInit();
 #endif
-#ifdef ENABLE_VISS
+#if defined(ENABLE_VISS)
     Vhwa_m2mVissDeInit();
 #endif
 
@@ -628,14 +663,10 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
 
         switch(cmd)
         {
+            #if defined(ENABLE_SDE)
             case APP_DMPAC_SDE_SL2_FREE:
                 /* free SDE SL2 memory */
                 status = Vhwa_m2mSdeFreeSl2();
-                break;
-
-            case APP_DMPAC_DOF_SL2_FREE:
-                /* free DOF SL2 memory */
-                status = Vhwa_m2mDofFreeSl2();
                 break;
 
             case APP_DMPAC_SDE_SL2_REALLOC:
@@ -650,6 +681,13 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 }
 
                 break;
+            #endif
+
+            #if defined(ENABLE_DOF)
+            case APP_DMPAC_DOF_SL2_FREE:
+                /* free DOF SL2 memory */
+                status = Vhwa_m2mDofFreeSl2();
+                break;
 
             case APP_DMPAC_DOF_SL2_REALLOC:
                 /* realloc DOF SL2 for 2MP */
@@ -662,8 +700,9 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                     appLogPrintf(" VHWA Remote Service: ERROR: Invalid DOF SL2 parameters passed !!!\n");
                 }
                 break;
+            #endif
 
-#ifndef SOC_J784S4
+#if defined(SOC_J721E) || defined(SOC_J721S2)
             case APP_VPAC_720_DMPAC_480:
                 SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 480000000);
                 #if defined(SOC_J721S2)

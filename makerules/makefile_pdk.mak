@@ -67,18 +67,32 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 endif
 
 pdk_emu:
+ifeq ($(SOC), am62a)
+ifeq ($(BUILD_EMULATION_MODE),yes)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient dmautils SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient dmautils SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
+endif
+else
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient udma dmautils SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl osal_nonos sciclient udma dmautils SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
+endif
 endif
 
 pdk_clean:
 	$(MAKE) pdk_build PDK_BUILD_TARGET_LIST_ALL="pdk_libs_clean pdk_app_libs_clean"
 
 pdk_emu_clean:
+ifeq ($(SOC), am62a)
+ifeq ($(BUILD_EMULATION_MODE),yes)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean dmautils_clean SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean dmautils_clean SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
+endif
+else
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean udma_clean dmautils_clean SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=release
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build csl_clean osal_nonos_clean sciclient_clean udma_clean dmautils_clean SOC=$(SOC) BOARD=$(SOC)_hostemu CORE=c7x-hostemu -s BUILD_PROFILE=debug
+endif
 endif
 
 pdk_scrub:
