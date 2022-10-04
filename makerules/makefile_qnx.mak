@@ -49,6 +49,7 @@ qnx_fs_install:
 ifeq ($(BUILD_CPU_MPU1),yes)
 	# copy application binaries and scripts
 	mkdir -p $(QNX_FS_PATH)/vision_apps
+	mkdir -p $(QNX_FS_PATH)/tilib
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(QNX_APP_PROFILE)/*.out $(QNX_FS_PATH)/vision_apps
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(QNX_FS_PATH)/tilib
 	# app_linux_fs_files are not very OS specific. Only input file paths change
