@@ -451,7 +451,7 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
            printf("IPC: ERROR: Unable to map spin lock memory !!!\n");
            status = -1;
     }
-    if(prm->num_cpus>=APP_IPC_CPU_MAX)
+    if(prm->num_cpus>APP_IPC_CPU_MAX)
     {
         printf("IPC: ERROR: Invalid number of CPUs !!!\n");
         status = -1;
