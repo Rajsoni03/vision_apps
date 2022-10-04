@@ -226,6 +226,30 @@ void appGrpxGetHwaLoad(app_grpx_obj_t *obj)
             }
         }
     }
+    #if defined(SOC_J784S4)
+    status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU4_0, &hwa_load);
+    if(status==0)
+    {
+        for(hwa_id=(app_perf_hwa_id_t)0; hwa_id<APP_PERF_HWA_MAX; hwa_id++)
+        {
+            if(hwa_id!=APP_PERF_HWA_GPU) /* This HWA is not controlled by mcu4-0 */
+            {
+                uint32_t load;
+                app_perf_stats_hwa_load_t *hwaLoad;
+
+                hwaLoad = &hwa_load.hwa_stats[hwa_id];
+
+                if(hwaLoad->active_time > 0 && hwaLoad->pixels_processed > 0 && hwaLoad->total_time > 0)
+                {
+                    load = (hwaLoad->active_time*10000)/hwaLoad->total_time;
+
+                    obj->hwa_load[hwa_id] = (load+50)/100; /* round off and convert to 0..100 range */
+                    obj->hwa_perf[hwa_id] = (uint16_t)(hwaLoad->pixels_processed/hwaLoad->total_time);
+                }
+            }
+        }
+    }
+    #endif
     status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MPU1_0, &hwa_load);
     if(status==0)
     {

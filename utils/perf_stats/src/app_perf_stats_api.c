@@ -257,6 +257,27 @@ static void appPerfStatsHwaStatsExport(FILE *fp)
             }
         }
     }
+    #if defined(SOC_J784S4)
+    status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU4_0, &hwa_load);
+    if(status==0)
+    {
+        for(hwa_id=(app_perf_hwa_id_t)0; hwa_id<APP_PERF_HWA_MAX; hwa_id++)
+        {
+            hwaLoad = &hwa_load.hwa_stats[hwa_id];
+
+            if(hwaLoad->active_time > 0 && hwaLoad->pixels_processed > 0 && hwaLoad->total_time > 0)
+            {
+                load = (hwaLoad->active_time*10000)/hwaLoad->total_time;
+                APP_PERF_EXPORT_WRITELN(fp, "%6s    | %3"PRIu64".%2"PRIu64" %% ( %"PRIu64" MP/s )",
+                        appPerfStatsGetHwaName(hwa_id),
+                        load/100,
+                        load%100,
+                        (hwaLoad->pixels_processed/hwaLoad->total_time)
+                    );
+            }
+        }
+    }
+    #endif
     #endif
     status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MPU1_0, &hwa_load);
     if(status==0)
@@ -889,6 +910,13 @@ int32_t appPerfStatsHwaLoadPrintAll()
     {
         appPerfStatsHwaLoadPrint(&hwa_load);
     }
+    #if defined(SOC_J784S4)
+    status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU4_0, &hwa_load);
+    if(status==0)
+    {
+        appPerfStatsHwaLoadPrint(&hwa_load);
+    }
+    #endif
     #endif
     status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MPU1_0, &hwa_load);
     if(status==0)
@@ -917,6 +945,12 @@ int32_t appPerfStatsHwaLoadResetAll()
         APP_PERF_STATS_CMD_RESET_HWA_LOAD_CALC,
         NULL, 0,
         0);
+    #if defined(SOC_J784S4)
+    status = appRemoteServiceRun(APP_IPC_CPU_MCU4_0, APP_PERF_STATS_SERVICE_NAME,
+        APP_PERF_STATS_CMD_RESET_HWA_LOAD_CALC,
+        NULL, 0,
+        0);
+    #endif
     #endif
     status = appRemoteServiceRun(APP_IPC_CPU_MPU1_0, APP_PERF_STATS_SERVICE_NAME,
         APP_PERF_STATS_CMD_RESET_HWA_LOAD_CALC,
