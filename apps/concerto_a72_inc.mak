@@ -91,7 +91,6 @@ ifeq ($(LINK_SHARED_OBJ)$(TARGETTYPE),yesexe)
 $(info $(TARGET) links against libtivision_apps.so)
 
 SHARED_LIBS += tivision_apps
-$(_MODULE)_LOPT += -rpath=/usr/lib
 
 IMAGING_LIBS =
 VISION_APPS_SRV_LIBS  =

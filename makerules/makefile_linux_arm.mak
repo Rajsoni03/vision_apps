@@ -22,18 +22,20 @@ UENV_NAME?=uEnv_$(SOC)_vision_apps.txt
 LINUX_FS_STAGE_PATH?=/tmp/tivision_apps_targetfs_stage
 
 linux_fs_stage:
+ifeq ($(YOCTO_STAGE),)
 	@rm -rf $(LINUX_FS_STAGE_PATH)
-	@mkdir -p $(LINUX_FS_STAGE_PATH)
-	@mkdir -p $(LINUX_FS_STAGE_PATH)/usr/lib
-	@mkdir -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)
+endif
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/usr/lib
 
 ifeq ($(BUILD_CPU_MPU1),yes)
 	# copy application binaries and scripts
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/vision_apps
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/vision_apps
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out $(LINUX_FS_STAGE_PATH)/opt/vision_apps || true
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/vx_app_arm_remote_log.out $(LINUX_FS_STAGE_PATH)/opt || true
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so $(LINUX_FS_STAGE_PATH)/usr/lib
+ifeq ($(YOCTO_STAGE),)
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps
 	chmod +x $(LINUX_FS_STAGE_PATH)/opt/vision_apps/*.sh
 
@@ -46,14 +48,15 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 		mkdir -p $(PTK_DEMO_CFG_DIR)/$$var; \
 		cp -R $(PTK_DEMO_DIR)/$$var/config $(PTK_DEMO_CFG_DIR)/$$var; \
 	done
+endif
 
 	# copy imaging sensor dcc binaries
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/imx219
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0820
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/imaging/ar0233
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/imaging/imx219
 ifeq ($(SOC),am62a)
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/imaging/ov2312
+	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/imaging/ov2312
 endif
 
 	cp $(IMAGING_PATH)/sensor_drv/src/imx390/dcc_bins/*.bin $(LINUX_FS_STAGE_PATH)/opt/imaging/imx390
@@ -68,15 +71,18 @@ endif
 	@# copy all the .h files under folders in IPK_INCLUDE_FOLDERS
 	@# https://stackoverflow.com/questions/10176849/how-can-i-copy-only-header-files-in-an-entire-nested-directory-to-another-direct
 	for folder in $(IPK_INCLUDE_FOLDERS); do \
-		mkdir -p $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$$folder; \
+		install -m 775 -d $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$$folder; \
 		(cd $(PSDK_PATH)/$$folder && find . -name '*.h' -print | tar --create --files-from -) | (cd $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$$folder && tar xfp -); \
 	done
-	ln -sr $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$(tidl_dir) $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tidl_j7
 
+ifeq ($(YOCTO_STAGE),)
+	ln -sr $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$(tidl_dir) $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tidl_j7
 	$(MAKE) EDGEAI_INSTALL_PATH=$(LINUX_FS_STAGE_PATH) edgeai_install
+endif
 
 endif
 
+ifeq ($(YOCTO_STAGE),)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	# copy remote firmware files for mcu1_0
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu1_0.out)
@@ -192,7 +198,7 @@ ifeq ($(BUILD_CPU_C7x_4),yes)
 	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_3-fw
 endif
 	sync
-
+endif
 
 # MODIFY_FS macro for making PSDK RTOS modifications to the PSDK Linux to file system
 # $1 : rootfs path
@@ -242,6 +248,32 @@ define CLEAN_COPY_FROM_STAGE_FAST =
 	sync
 endef
 
+###### USED FOR YOCTO BUILD #########
+
+YOCTO_VARS = PROFILE=release \
+	BUILD_EMULATION_MODE=no \
+	TARGET_CPU=A72 \
+	TARGET_OS=LINUX \
+	TIDL_PATH=$(PSDK_PATH)/tidl_j7/ti_dl
+
+yocto_build:
+	$(COPYDIR) $(PSDK_PATH)/psdk_include/* $(PSDK_PATH)/.
+	$(YOCTO_VARS) $(MAKE) imaging
+	$(YOCTO_VARS) $(MAKE) tiovx
+	$(YOCTO_VARS) $(MAKE) ptk
+	$(YOCTO_VARS) $(MAKE) tivision_apps
+	$(YOCTO_VARS) $(MAKE) vx_app_conformance vx_app_arm_remote_log vx_app_arm_ipc
+
+yocto_clean: imaging_scrub tiovx_scrub ptk_scrub scrub
+	$(CLEANDIR) $(PSDK_PATH)/tidl_j7
+	$(CLEANDIR) $(VXLIB_PATH)
+	$(CLEANDIR) $(IVISION_PATH)
+	$(CLEANDIR) $(TIADALG_PATH)
+
+yocto_install:
+	$(YOCTO_VARS) YOCTO_STAGE=1 $(MAKE) linux_fs_stage
+
+######################################
 
 linux_host_libs_includes:
 	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX $(MAKE) imaging
@@ -298,3 +330,6 @@ linux_fs_install_from_custom_stage:
 	# Set LINUX_FS_PATH=destination dir
 	# Set LINUX_FS_STAGE_PATH=source dir
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_FS_PATH))
+
+update_fw: linux_fs_stage
+	cp $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/* $(PSDK_PATH)/psdk_fw/$(SOC)/$(FIRMWARE_SUBFOLDER)/.
