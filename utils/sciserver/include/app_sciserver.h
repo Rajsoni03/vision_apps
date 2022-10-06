@@ -78,7 +78,7 @@
 /** \brief Sciserver init
  *
  */
-int32_t appSciserverInit(void* arg0, void* arg1);
+void appSciserverInit(void* arg0, void* arg1);
 
 /** \brief Sciclient init for MCU1_0
  *
