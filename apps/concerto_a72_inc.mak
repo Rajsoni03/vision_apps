@@ -177,8 +177,8 @@ TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule vx_tiovx_tidl_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink
-ifneq ($(TARGET_PLATFORM), AM62A)
 TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tvm_tests
+ifneq ($(TARGET_PLATFORM), AM62A)
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
 endif

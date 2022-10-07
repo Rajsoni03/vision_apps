@@ -423,6 +423,11 @@ int32_t appInit()
     #endif
     appRegisterOpenVXTargetKernels();
 
+    #ifdef ENABLE_VHWA_VPAC
+    status = appVissRemoteServiceInit();
+    APP_ASSERT_SUCCESS(status);
+    #endif
+
     #ifdef ENABLE_UDMA_COPY
     status = appUdmaCopyInit();
     APP_ASSERT_SUCCESS(status);
@@ -483,6 +488,10 @@ void appDeInit()
 
     #ifdef ENABLE_I2C
     appI2cDeInit();
+    #endif
+
+    #if defined(ENABLE_VHWA_VPAC)
+    appVissRemoteServiceDeInit();
     #endif
 
     /* De-init GTC timer */
