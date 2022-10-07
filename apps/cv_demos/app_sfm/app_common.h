@@ -94,8 +94,6 @@
 #define APP_ASSERT(x)               assert((x))
 #define APP_ASSERT_VALID_REF(ref)   (APP_ASSERT(vxGetStatus((vx_reference)(ref))==VX_SUCCESS));
 
-#define DISPLAY_WIDTH  (1920)
-#define DISPLAY_HEIGHT (1080)
 #define NUM_CH    (1)
 
 #define APP_MAX_BUFQ_DEPTH (4)

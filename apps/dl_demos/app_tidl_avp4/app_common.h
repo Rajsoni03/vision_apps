@@ -82,8 +82,6 @@
 
 #define MAX_IMG_WIDTH  (2048)
 #define MAX_IMG_HEIGHT (2048)
-#define DISPLAY_WIDTH  (1920)
-#define DISPLAY_HEIGHT (1080)
 
 #define APP_MAX_BUFQ_DEPTH (4)
 
