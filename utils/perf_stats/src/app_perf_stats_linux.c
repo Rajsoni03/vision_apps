@@ -185,10 +185,10 @@ void appPerfStatsCpuLoadCalc()
 
     appPerfStatsLock(obj);
 
-    obj->cpuLoad.total_time   += total_time;
-    obj->cpuLoad.busy_time    += (total_time - (diff_cnt[3]+diff_cnt[4]));
-    obj->cpuLoad.irq_time     += diff_cnt[5];
-    obj->cpuLoad.softirq_time += diff_cnt[6];
+    obj->cpuLoad.total_time   = total_time;
+    obj->cpuLoad.busy_time    = (total_time - (diff_cnt[3]+diff_cnt[4]));
+    obj->cpuLoad.irq_time     = diff_cnt[5];
+    obj->cpuLoad.softirq_time = diff_cnt[6];
 
     appPerfStatsUnLock(obj);
 
@@ -378,9 +378,9 @@ void appPerfStatsHwaUpdateLoad(app_perf_hwa_id_t id, uint32_t active_time_in_use
 
         if(cur_time > hwaLoad->last_timestamp)
         {
-            hwaLoad->total_time += (cur_time - hwaLoad->last_timestamp);
-            hwaLoad->active_time += active_time_in_usecs;
-            hwaLoad->pixels_processed += pixels_processed;
+            hwaLoad->total_time = (cur_time - hwaLoad->last_timestamp);
+            hwaLoad->active_time = active_time_in_usecs;
+            hwaLoad->pixels_processed = pixels_processed;
         }
         hwaLoad->last_timestamp = cur_time;
 
