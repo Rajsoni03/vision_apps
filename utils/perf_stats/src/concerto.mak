@@ -26,7 +26,7 @@ CSOURCES    := app_perf_stats_freertos.c
 endif
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
-CSOURCES    := app_perf_stats_linux.c
+CSOURCES    := app_perf_stats_hlos.c
 endif
 
 CSOURCES += app_perf_stats_api.c
