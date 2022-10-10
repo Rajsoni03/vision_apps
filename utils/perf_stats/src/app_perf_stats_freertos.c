@@ -639,6 +639,20 @@ void appPerfStatsDdrStatsReadCounters(uint32_t *val0, uint32_t *val1, uint32_t *
     cnt3[1]    = (volatile uint32_t *)0x029A0110;
     #endif
 
+    #if defined(SOC_J784S4)
+    cnt_sel[2] = (volatile uint32_t *)0x029C0100;
+    cnt0[2]    = (volatile uint32_t *)0x029C0104;
+    cnt1[2]    = (volatile uint32_t *)0x029C0108;
+    cnt2[2]    = (volatile uint32_t *)0x029C010C;
+    cnt3[2]    = (volatile uint32_t *)0x029C0110;
+
+    cnt_sel[3] = (volatile uint32_t *)0x029E0100;
+    cnt0[3]    = (volatile uint32_t *)0x029E0104;
+    cnt1[3]    = (volatile uint32_t *)0x029E0108;
+    cnt2[3]    = (volatile uint32_t *)0x029E010C;
+    cnt3[3]    = (volatile uint32_t *)0x029E0110;
+    #endif
+
     if(is_first_time)
     {
         is_first_time = 0;
