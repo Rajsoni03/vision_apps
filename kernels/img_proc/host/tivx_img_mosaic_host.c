@@ -275,6 +275,10 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs)
             /* add supported target's */
             tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC1);
             tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC_MSC2);
+            #if defined(SOC_J784S4)
+            tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC2_MSC1);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_VPAC2_MSC2);
+            #endif
         }
         if (status == VX_SUCCESS)
         {
