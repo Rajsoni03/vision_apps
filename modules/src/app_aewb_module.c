@@ -313,8 +313,8 @@ vx_status app_create_graph_aewb(vx_graph graph, AEWBObj *aewbObj, vx_object_arra
         return status;
     }
 
-    vxSetNodeTarget(aewbObj->node, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
     vxSetReferenceName((vx_reference)aewbObj->node, "aewb_node");
+    vxSetNodeTarget(aewbObj->node, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
 
     vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e};
     vxReplicateNode(graph, aewbObj->node, replicate, 6);

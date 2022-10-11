@@ -199,8 +199,8 @@ vx_status app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj
 
     if(status == VX_SUCCESS)
     {
-        vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
         vxSetReferenceName((vx_reference)imgMosaicObj->node, "mosaic_node");
+        vxSetNodeTarget(imgMosaicObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
     }
     else
     {

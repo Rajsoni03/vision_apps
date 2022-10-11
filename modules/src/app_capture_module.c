@@ -528,8 +528,8 @@ vx_status app_create_graph_capture(vx_graph graph, CaptureObj *captureObj)
 
     if(status == VX_SUCCESS)
     {
-        vxSetNodeTarget(captureObj->node, VX_TARGET_STRING, TIVX_TARGET_CAPTURE1);
         vxSetReferenceName((vx_reference)captureObj->node, "capture_node");
+        vxSetNodeTarget(captureObj->node, VX_TARGET_STRING, TIVX_TARGET_CAPTURE1);
 
         if(captureObj->en_out_capture_write == 1)
         {
@@ -557,8 +557,8 @@ vx_status app_create_graph_capture_write_output(vx_graph graph, CaptureObj *capt
         status = vxGetStatus((vx_reference)captureObj->write_node);
         if(status == VX_SUCCESS)
         {
-            vxSetNodeTarget(captureObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
             vxSetReferenceName((vx_reference)captureObj->write_node, "capture_write_node");
+            vxSetNodeTarget(captureObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
 
             vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};
             vxReplicateNode(graph, captureObj->write_node, replicate, 3);
@@ -577,8 +577,8 @@ vx_status app_create_graph_capture_write_output(vx_graph graph, CaptureObj *capt
         status = vxGetStatus((vx_reference)captureObj->write_node);
         if(status == VX_SUCCESS)
         {
-            vxSetNodeTarget(captureObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
             vxSetReferenceName((vx_reference)captureObj->write_node, "capture_write_node");
+            vxSetNodeTarget(captureObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
 
             vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};
             vxReplicateNode(graph, captureObj->write_node, replicate, 3);

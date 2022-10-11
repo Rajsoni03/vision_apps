@@ -127,8 +127,8 @@ vx_status app_create_graph_display(vx_graph graph, DisplayObj *displayObj, vx_im
 
         if(status == VX_SUCCESS)
         {
-            vxSetNodeTarget(displayObj->disp_node, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
             vxSetReferenceName((vx_reference)displayObj->disp_node, "DisplayNode");
+            vxSetNodeTarget(displayObj->disp_node, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
         }
         else
         {

@@ -372,8 +372,8 @@ vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_arra
     status = vxGetStatus((vx_reference)vissObj->node);
     if(status == VX_SUCCESS)
     {
-        vxSetNodeTarget(vissObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_VISS1);
         vxSetReferenceName((vx_reference)vissObj->node, "viss_node");
+        vxSetNodeTarget(vissObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_VISS1);
 
         vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
         vxReplicateNode(graph, vissObj->node, replicate, 13);
@@ -402,8 +402,8 @@ vx_status app_create_graph_viss_write_output(vx_graph graph, VISSObj *vissObj)
     status = vxGetStatus((vx_reference)vissObj->img_write_node);
     if(status == VX_SUCCESS)
     {
-        vxSetNodeTarget(vissObj->img_write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
         vxSetReferenceName((vx_reference)vissObj->img_write_node, "viss_img_write_node");
+        vxSetNodeTarget(vissObj->img_write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
 
         vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};
         vxReplicateNode(graph, vissObj->img_write_node, replicate, 3);
@@ -423,8 +423,8 @@ vx_status app_create_graph_viss_write_output(vx_graph graph, VISSObj *vissObj)
         status = vxGetStatus((vx_reference)vissObj->h3a_write_node);
         if(status == VX_SUCCESS)
         {
-            vxSetNodeTarget(vissObj->h3a_write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
             vxSetReferenceName((vx_reference)vissObj->h3a_write_node, "viss_h3a_write_node");
+            vxSetNodeTarget(vissObj->h3a_write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
 
             vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};
             vxReplicateNode(graph, vissObj->h3a_write_node, replicate, 3);
