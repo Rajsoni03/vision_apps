@@ -826,7 +826,7 @@ static void appRegisterOpenVXTargetKernels()
         #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxRegisterImgProcTargetR5FKernels();
         #endif
-        #if defined(ENABLE_VHWA_VPAC0)
+        #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxRegisterImagingTargetAewbKernels();
         #endif
     appLogPrintf("APP: OpenVX Target kernel init ... Done !!!\n");
