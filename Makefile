@@ -218,83 +218,43 @@ vision_apps_scrub: sdk_check_paths
 
 vision_apps_docs: sdk_check_paths doxy_docs
 
-ifeq ($(SOC),j721e)
-sdk: sdk_check_paths pdk ethfw remote_device imaging ptk vxlib tiovx tiadalg qnx
-	$(MAKE) vision_apps
-	$(MAKE) tidl_rt
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot
-endif
-
-sdk_clean: sdk_check_paths pdk_clean ethfw_clean remote_device_clean imaging_clean ptk_clean vxlib_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean tidl_rt_clean
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
-
-sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scrub ptk_scrub vxlib_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
+# Set Variables for SOC specific rule dependencies used in make rules below
+ifeq ($(SOC), $(filter $(SOC), j721e j784s4))
+SOC_VARIABLE_RULES=ethfw remote_device ptk tiadalg qnx
+SOC_VARIABLE_CLEAN=ethfw_clean remote_device_clean ptk_clean tiadalg_clean qnx_clean
+SOC_VARIABLE_SCRUB=ethfw_scrub remote_device_scrub ptk_scrub tiadalg_scrub qnx_scrub
+SOC_VARIABLE_DOCS=ptk_docs tiadalg_docs
 else ifeq ($(SOC),j721s2)
-sdk: sdk_check_paths pdk imaging ptk vxlib tiovx tiadalg qnx
-	$(MAKE) vision_apps
-	$(MAKE) tidl_rt
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot
-endif
-
-sdk_clean: sdk_check_paths pdk_clean imaging_clean ptk_clean vxlib_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
-
-sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub ptk_scrub vxlib_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
-else ifeq ($(SOC),j784s4)
-sdk: sdk_check_paths pdk ethfw remote_device imaging ptk vxlib tiovx tiadalg qnx
-	$(MAKE) vision_apps
-	$(MAKE) tidl_rt
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot
-endif
-
-sdk_clean: sdk_check_paths pdk_clean ethfw_clean remote_device_clean imaging_clean ptk_clean vxlib_clean tiovx_clean tidl_clean tiadalg_clean vision_apps_clean qnx_clean sbl_bootimage_clean tidl_rt_clean
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
-
-sdk_scrub: sdk_check_paths pdk_scrub ethfw_scrub remote_device_scrub imaging_scrub ptk_scrub vxlib_scrub tiovx_scrub tidl_scrub tiadalg_scrub vision_apps_scrub qnx_scrub sbl_bootimage_scrub tidl_rt_scrub
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
+SOC_VARIABLE_RULES=ptk tiadalg qnx
+SOC_VARIABLE_CLEAN=ptk_clean tiadalg_clean qnx_clean
+SOC_VARIABLE_SCRUB=ptk_scrub tiadalg_scrub qnx_scrub
+SOC_VARIABLE_DOCS=ptk_docs tiadalg_docs
 else ifeq ($(SOC),am62a)
-sdk: sdk_check_paths pdk imaging vxlib tiovx
+SOC_VARIABLE_RULES=
+SOC_VARIABLE_CLEAN=
+SOC_VARIABLE_SCRUB=
+SOC_VARIABLE_DOCS=
+endif
+
+sdk: sdk_check_paths pdk imaging vxlib tiovx $(SOC_VARIABLE_RULES)
 	$(MAKE) vision_apps
 	$(MAKE) tidl_rt
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot
 endif
 
-sdk_clean: sdk_check_paths pdk_clean imaging_clean vxlib_clean tiovx_clean vision_apps_clean sbl_bootimage_clean tidl_rt_clean
+sdk_clean: sdk_check_paths pdk_clean imaging_clean vxlib_clean tiovx_clean vision_apps_clean sbl_bootimage_clean tidl_rt_clean $(SOC_VARIABLE_CLEAN)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
 
-sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub tidl_rt_clean
+sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub tidl_rt_scrub $(SOC_VARIABLE_SCRUB)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
-endif
 
-ifeq ($(SOC),am62a)
-sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs
+sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs $(SOC_VARIABLE_DOCS)
 	$(MAKE) -C $(PSDK_PATH)/psdk_rtos sphinx_docs
-else
-sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs ptk_docs tiadalg_docs
-	$(MAKE) -C $(PSDK_PATH)/psdk_rtos sphinx_docs
-endif
 
 #KW build: Split the build into two - components which need not be part of
 # SDK KW report as the report for these components are separately delivered
