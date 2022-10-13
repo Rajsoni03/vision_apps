@@ -472,12 +472,12 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
         printf("IPC: ERROR: Invalid number of CPUs !!!\n");
         status = -1;
     }
-    if( (obj->prm.tiovx_obj_desc_mem==NULL) || (obj->prm.tiovx_obj_desc_mem_size==0) )
+    if( (obj->prm.tiovx_obj_desc_mem==MAP_FAILED) || (obj->prm.tiovx_obj_desc_mem_size==0) )
     {
         printf("IPC: ERROR: Invalid tiovx obj desc memory address or size !!!\n");
         status = -1;
     }
-    if( (obj->prm.tiovx_log_rt_mem==NULL) || (obj->prm.tiovx_log_rt_mem_size==0) )
+    if( (obj->prm.tiovx_log_rt_mem==MAP_FAILED) || (obj->prm.tiovx_log_rt_mem_size==0) )
     {
         printf("IPC: ERROR: Invalid tiovx rt memory address or size !!!\n");
         status = -1;
