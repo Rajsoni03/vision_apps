@@ -264,10 +264,7 @@ void appDssConfigureBoard(app_dss_default_prm_t *prm)
 
     /* ADASVISION-4188 - There seem to be an I2C conflict when ETHFW is enabled, so this is disabled when ETHFW is enabled */
     /* If customers are not usign ETHFW then below can be enabled to support eDP to HDMI mode */
-
-    /* ADASVISION-5616: Issue is observed when using SafeRTOS+QNX with this call */
-
-#if !defined(ENABLE_ETHFW) && !(defined(SAFERTOS))
+#if !defined(ENABLE_ETHFW)
     if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
     {
         appDssConfigureDP();
