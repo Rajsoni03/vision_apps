@@ -177,37 +177,48 @@ optee_size = 24*MB;
 #
 # DDR memory allocation for various shared memories
 #
-
+carveout_size = 0
 # Keeping 16MB additional for VRING start, so that IPC Shared memory starts
 # exactly at 0xAA000000 offset. This gap of 16MB is not currently used and
 # can be used for Linux..
 ipc_vring_mem_addr      = ddr_mem_addr_2;
 ipc_vring_mem_size      = 3*MB;
+carveout_size += ipc_vring_mem_size
 
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
 app_log_mem_size        = 256*KB;
+carveout_size += app_log_mem_size
 
 tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
 tiovx_obj_desc_mem_size = 16*MB - app_log_mem_size;
+carveout_size += tiovx_obj_desc_mem_size
 
 tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
 tiovx_log_rt_mem_size   = 16*MB;
+carveout_size += tiovx_log_rt_mem_size
 
 # Shared memory for Buffers/ION allocator
 ddr_shared_mem_addr     = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
 ddr_shared_mem_size     = 192*MB;
+carveout_size += ddr_shared_mem_size
 
 mcu_r5f_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
 mcu_r5f_ddr_local_heap_size  = 16*MB;
+carveout_size += mcu_r5f_ddr_local_heap_size
 
 dm_r5f_ddr_local_heap_addr  = mcu_r5f_ddr_local_heap_addr + mcu_r5f_ddr_local_heap_size;
 dm_r5f_ddr_local_heap_size  = 16*MB;
+carveout_size += dm_r5f_ddr_local_heap_size
 
 c7x_1_ddr_local_heap_addr  = dm_r5f_ddr_local_heap_addr + dm_r5f_ddr_local_heap_size;
 c7x_1_ddr_local_heap_size  = 32*MB;
+carveout_size += c7x_1_ddr_local_heap_size
 
 c7x_1_ddr_scratch_addr     = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
 c7x_1_ddr_scratch_size     = 32*MB;
+carveout_size += c7x_1_ddr_scratch_size
+
+assert carveout_size <= ddr_mem_size_2
 
 #
 # Create memory section based on addr and size defined above, including
@@ -436,4 +447,4 @@ HtmlMmapTable(html_mmap, "./system_memory_map.html").export();
 
 CHeaderFile(c_header_mmap, 0,0, "./app_mem_map.h").export();
 
-DtsFile(dts_mmap, "./am62a-rtos-memory-map.dtsi").export();
+DtsFile(dts_mmap, "./k3-am62a7-sk.dts").export();

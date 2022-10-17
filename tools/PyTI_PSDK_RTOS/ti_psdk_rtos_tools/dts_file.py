@@ -114,7 +114,7 @@ class DtsFile :
                  "  * IMPORTANT NOTE: Follow below instructions to apply the updated memory map to linux dtsi file, \n" \
                  "  * \n" \
                  "  * 1. Copy the memory sections, from the generated dts file, to the file shown below under reserved_memory: reserved-memory { ... } \n" \
-                 "  *     ${LINUX_KERNEL_PATH}/arch/arm64/boot/dts/ti/k3-j721e-rtos-memory-map.dtsi\n" \
+                 "  *     ${LINUX_KERNEL_PATH}/arch/arm64/boot/dts/ti/" + self.name[2:] + "\n" \
                  "  * \n" \
                  "  * 2. Rebuild the dtb, dtbo from PSDK Linux install directory \n" \
                  "  *      make linux-dtbs \n" \
