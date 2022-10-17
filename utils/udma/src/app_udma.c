@@ -194,11 +194,7 @@ int32_t appUdmaDeInit(void)
 
 void *appUdmaGetObj(void)
 {
-    #if defined(SOC_AM62A)
-    return NULL;
-    #else
     return (void *)&gAppUdmaDrvObj;
-    #endif
 }
 
 #if !defined(SOC_AM62A)
