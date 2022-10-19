@@ -30,54 +30,70 @@
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TI_GST_WRAPPER_PRIV_H_
-#define _TI_GST_WRAPPER_PRIV_H_
 
-
-/* Standard headers. */
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <sys/stat.h>
-
-/* Third-party headers. */
-#include <gst/gst.h>
-#include <gst/app/gstappsink.h>
-#include <gst/app/gstappsrc.h>
-
-#include <utils/gst_wrapper/include/gst_wrapper.h>
 #include <utils/codec_wrapper/include/codec_wrapper.h>
-#include "gsttiovximagemeta.h"
+#include <utils/gst_wrapper/src/gst_wrapper_priv.h>
 
 
-typedef struct 
+#define GST_TIMEOUT  400*GST_MSECOND
+
+
+int32_t appCodecInit(app_codec_wrapper_params_t* params)
 {
-    app_codec_wrapper_params_t params;
-    int32_t     isAppSrc;
-    int32_t     isAppSink;
+    return appGstInit(params);
+}
 
+int32_t appCodecSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
+{
+    return appGstSrcInit(data_ptr);
+}
 
-    GstElement *m_pipeline;
+int32_t appCodecSinkInit(void* (*data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
+{
+    return appGstSinkInit(data_ptr);
+}
 
-    GstElement *m_srcElemArr[CODEC_MAX_NUM_CHANNELS];
-    GstElement *m_sinkElemArr[CODEC_MAX_NUM_CHANNELS];
+int32_t appCodecStart()
+{
+    return appGstStart();
+}
 
-    GstBuffer*  buff[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS];
-    GstMemory*  mem[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
-    GstMapInfo  map_info[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
+int32_t appCodecEnqAppSrc(uint8_t idx)
+{
+    return appGstEnqAppSrc(idx);
+}
 
-    GstBuffer*  pulled_buff[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS];
-    void*       (*pulled_data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
+int32_t appCodecDeqAppSrc(uint8_t idx)
+{
+    return appGstDeqAppSrc(idx);
+}
 
-    int32_t push_count;
-    int32_t pull_count;
+int32_t appCodecEnqEosAppSrc()
+{
+    return appGstEnqEosAppSrc();
+}
 
-} app_gst_wrapper_obj_t;
+int32_t appCodecDeqAppSink(uint8_t idx)
+{
+    return appGstDeqAppSink(idx);
+}
 
-extern app_gst_wrapper_obj_t g_app_gst_wrapper_obj;
+int32_t appCodecEnqAppSink(uint8_t idx)
+{
+    return appGstEnqAppSink(idx);
+}
 
+int32_t appCodecStop()
+{
+    return appGstStop();
+}
 
-#endif /* _TI_GST_WRAPPER_PRIV_H_ */
+void appCodecDeInit()
+{
+    appGstDeInit();
+}
 
+void appCodecPrintStats()
+{
+    appGstPrintStats();
+}

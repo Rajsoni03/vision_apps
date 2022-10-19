@@ -33,46 +33,9 @@
 #ifndef _TI_GST_WRAPPER_H_
 #define _TI_GST_WRAPPER_H_
 
-/**
- * \defgroup group_vision_apps_utils_gst_wrapper GStreamer utility APIs
- *
- * \brief This section contains APIs to use Gstreamer Pipelines within demos
- *
- * \ingroup group_vision_apps_utils
- *
- * @{
- */
 
+#include <utils/codec_wrapper/include/codec_wrapper.h>
 
-#define MAX_LEN_CMD_STR   4096u
-#define MAX_LEN_ELEM_NAME   32u
-#define MAX_NUM_PLANES       4u
-#define MAX_NUM_CHANNELS     8u
-#define MAX_BUFFER_DEPTH    16u
-
-/**
- * \brief Init parameters
- */
-typedef struct 
-{
-    char        m_AppSrcNameArr[MAX_NUM_CHANNELS][MAX_LEN_ELEM_NAME];/* Name of the AppSrc element */
-    int32_t     in_width;/* Width of the buffers input to the GstPipeline */
-    int32_t     in_height;/* Height of the buffers input to the GstPipeline */
-    char        in_format[8];/* Format of the buffers input to the GstPipeline (eg:"NV12")*/
-    uint8_t     in_num_planes;/* Number of planes of the buffers input to the GstPipeline */
-    uint8_t     in_num_channels;/* Number of channels input to the GstPipeline */
-    uint8_t     in_buffer_depth;/* The input buffer pool size for the GstPipeline */
-
-    char        m_AppSinkNameArr[MAX_NUM_CHANNELS][MAX_LEN_ELEM_NAME];/* Name of the AppSink element */
-    int32_t     out_width;/* Width of the buffers output from the GstPipeline */
-    int32_t     out_height;/* Height of the buffers output from the GstPipeline */
-    char        out_format[8];/* Format of the buffers output from the GstPipeline (eg:"NV12")*/
-    uint8_t     out_num_planes;/* Number of planes of the buffers output from the GstPipeline */
-    uint8_t     out_num_channels;/* Number of channels output from the GstPipeline */
-    uint8_t     out_buffer_depth;/* The output buffer pool size for the GstPipeline */
-
-    char        m_cmdString[MAX_LEN_CMD_STR];/* The command string that describes the GstPipeline, in a format accepted by gst_parse_launch() */
-} app_gst_wrapper_params_t;
 
 /**
  * \brief 
@@ -82,7 +45,7 @@ typedef struct
  * 
  * \param [in]      prm         Init parameters
  */
-int32_t appGstInit(app_gst_wrapper_params_t *prm);
+int32_t appGstInit(app_codec_wrapper_params_t *prm);
 
 /**
  * \brief 
@@ -93,7 +56,7 @@ int32_t appGstInit(app_gst_wrapper_params_t *prm);
  * 
  * \param [in]      data_ptr        memory that the GstBuffers will map to
  */
-int32_t appGstSrcInit(void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES]);
+int32_t appGstSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES]);
 
 /**
  * \brief 
@@ -104,7 +67,7 @@ int32_t appGstSrcInit(void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM
  * 
  * \param [in]      data_ptr        pointers to hold the pulled buffers
  */
-int32_t appGstSinkInit(void* (*data_ptr)[MAX_NUM_CHANNELS][MAX_NUM_PLANES]);
+int32_t appGstSinkInit(void* (*data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES]);
 
 /**
  * \brief 

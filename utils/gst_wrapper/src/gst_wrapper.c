@@ -38,8 +38,7 @@
 app_gst_wrapper_obj_t g_app_gst_wrapper_obj;
 
 
-static GstElement *findElementByName(GstElement* pipeline,
-                                     const char* name)
+static GstElement *findElementByName(GstElement* pipeline, const char* name)
 {
     GstElement *elem;
 
@@ -53,7 +52,7 @@ static GstElement *findElementByName(GstElement* pipeline,
     return elem;
 }
 
-static int32_t exportgsttiovxbuffer(GstBuffer* buf, void* data_ptr[MAX_NUM_PLANES])
+static int32_t exportgsttiovxbuffer(GstBuffer* buf, void* data_ptr[CODEC_MAX_NUM_PLANES])
 {
     vx_status status = VX_SUCCESS;
     void* p_status = NULL;
@@ -61,7 +60,7 @@ static int32_t exportgsttiovxbuffer(GstBuffer* buf, void* data_ptr[MAX_NUM_PLANE
     vx_reference img1;
     vx_enum img1_type = VX_TYPE_INVALID;
     uint32_t img1_num_planes = 0;
-    uint32_t sizes[MAX_NUM_PLANES] = { 0 };
+    uint32_t sizes[CODEC_MAX_NUM_PLANES] = { 0 };
 
     tiovxmeta = (GstTIOVXImageMeta *) gst_buffer_iterate_meta(buf, &p_status);
     if (!tiovxmeta)
@@ -94,7 +93,7 @@ static int32_t exportgsttiovxbuffer(GstBuffer* buf, void* data_ptr[MAX_NUM_PLANE
                 (vx_reference) img1,
                 data_ptr,
                 sizes,
-                MAX_NUM_PLANES,
+                CODEC_MAX_NUM_PLANES,
                 &img1_num_planes);
     if (VX_SUCCESS != status) {
         printf("gst_wrapper: ERROR: Could not export handles from vx_image!\n");
@@ -106,7 +105,7 @@ static int32_t exportgsttiovxbuffer(GstBuffer* buf, void* data_ptr[MAX_NUM_PLANE
     return status;
 }
 
-int32_t appGstInit(app_gst_wrapper_params_t* params)
+int32_t appGstInit(app_codec_wrapper_params_t* params)
 {
     int32_t status = 0;
     app_gst_wrapper_obj_t* p_gst_pipe_obj = &g_app_gst_wrapper_obj;
@@ -146,7 +145,7 @@ int32_t appGstInit(app_gst_wrapper_params_t* params)
     return status;
 }
 
-int32_t appGstSrcInit(void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES])
+int32_t appGstSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
 {
     int32_t status = 0;
     GstCaps* caps = NULL;
@@ -218,7 +217,7 @@ int32_t appGstSrcInit(void* data_ptr[MAX_BUFFER_DEPTH][MAX_NUM_CHANNELS][MAX_NUM
     return status;
 }
 
-int32_t appGstSinkInit(void* (*data_ptr)[MAX_NUM_CHANNELS][MAX_NUM_PLANES])
+int32_t appGstSinkInit(void* (*data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
 {
     int32_t status = 0;
     app_gst_wrapper_obj_t* p_gst_pipe_obj = &g_app_gst_wrapper_obj;

@@ -65,7 +65,7 @@
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
 #include <utils/hwa/include/app_hwa_api.h>
-#include <utils/gst_wrapper/include/gst_wrapper.h>
+#include <utils/codec_wrapper/include/codec_wrapper.h>
 #include <VX/vx_khr_pipelining.h>
 
 #include "app_common.h"
@@ -81,7 +81,7 @@
 #include "multi_cam_codec_img_mosaic_module.h"
 
 #define APP_BUFFER_Q_DEPTH   (4)
-#define GST_ENC_BUFQ_DEPTH   (2)
+#define CODEC_ENC_BUFQ_DEPTH   (2)
 #define COPY_BUFFER_Q_DEPTH   (1)
 
 #define CAPTURE_PIPELINE_DEPTH   (5)
@@ -91,9 +91,9 @@ typedef struct {
 
     vx_object_array arr[APP_MODULES_MAX_BUFQ_DEPTH];
 
-    void           *data_ptr[APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
-    vx_map_id       map_id[APP_MODULES_MAX_BUFQ_DEPTH][MAX_NUM_CHANNELS][MAX_NUM_PLANES];
-    vx_uint32       plane_sizes[MAX_NUM_PLANES];
+    void           *data_ptr[APP_MODULES_MAX_BUFQ_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
+    vx_map_id       map_id[APP_MODULES_MAX_BUFQ_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
+    vx_uint32       plane_sizes[CODEC_MAX_NUM_PLANES];
 
     vx_int32        bufq_depth;
     vx_int32        num_channels;
@@ -118,7 +118,7 @@ typedef struct {
     TIOVXImgMosaicModuleObj  imgMosaicObj;
     DisplayObj    displayObj;
 
-    app_gst_wrapper_params_t gst_pipe_params;
+    app_codec_wrapper_params_t codec_pipe_params;
 
     AppGraphParamRefPool enc_pool;
     AppGraphParamRefPool dec_pool;
@@ -136,7 +136,7 @@ typedef struct {
 
     vx_uint32 is_interactive;
 
-    vx_uint32  num_gst_bufs;
+    vx_uint32  num_codec_bufs;
     vx_uint32 num_ch;
 
     vx_uint32 num_frames_to_run;
@@ -190,12 +190,12 @@ static void app_update_param_set(AppObj *obj);
 static void app_pipeline_params_defaults(AppObj *obj);
 static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
-static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels);
-static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels);
+static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels);
+static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels);
 static vx_status capture_encode(AppObj* obj, vx_int32 frame_id);
 static vx_status decode_display(AppObj* obj, vx_int32 frame_id);
 static vx_status delete_array_image_buffers(vx_object_array arr);
-static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 sizes[MAX_NUM_PLANES]);
+static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_uint32 sizes[CODEC_MAX_NUM_PLANES]);
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -303,7 +303,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                     appPerfPointPrintFPS(&obj->total_perf);
                     appPerfPointReset(&obj->total_perf);
                     printf("\n");
-                    appGstPrintStats();
+                    appCodecPrintStats();
                     printf("\n");
 
                     vx_reference refs[1];
@@ -1080,8 +1080,8 @@ static void app_delete_graph(AppObj *obj)
 
     if ( obj->encode || obj->decode ) 
     {
-        appGstDeInit();
-        APP_PRINTF("Gst Pipeline delete done!\n");
+        appCodecDeInit();
+        APP_PRINTF("Codec Pipeline delete done!\n");
     }
 }
 
@@ -1300,8 +1300,8 @@ static vx_status app_create_graph(AppObj *obj)
     {
         if(status == VX_SUCCESS)
         {
-            status = appGstInit(&obj->gst_pipe_params);
-            APP_PRINTF("Gst Pipeline done!\n");
+            status = appCodecInit(&obj->codec_pipe_params);
+            APP_PRINTF("Codec Pipeline done!\n");
         }
     }
 
@@ -1332,7 +1332,7 @@ static vx_status app_verify_graph(AppObj *obj)
     {
       status = tivxExportGraphToDot(obj->display_graph,".", "vx_app_multi_cam_display");
     }
-    #endif
+    #endif /* 1 */
 
     if (((obj->captureObj.enable_error_detection) || (obj->test_mode)) && (status == VX_SUCCESS))
     {
@@ -1351,8 +1351,8 @@ static vx_status app_verify_graph(AppObj *obj)
 
         if(VX_SUCCESS == status)
         {
-            status = appGstSrcInit(obj->enc_pool.data_ptr);
-            APP_PRINTF("appGstSrcInit Done!\n");
+            status = appCodecSrcInit(obj->enc_pool.data_ptr);
+            APP_PRINTF("appCodecSrcInit Done!\n");
         }
         
         for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++)
@@ -1375,8 +1375,8 @@ static vx_status app_verify_graph(AppObj *obj)
         }
         if(VX_SUCCESS == status)
         {
-            status = appGstSinkInit(obj->dec_pool.data_ptr);
-            APP_PRINTF("appGstSinkInit Done!\n");
+            status = appCodecSinkInit(obj->dec_pool.data_ptr);
+            APP_PRINTF("appCodecSinkInit Done!\n");
         }
     }
 
@@ -1436,7 +1436,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
         {
             if (status == VX_SUCCESS && obj->encode==1)
             {
-                status = appGstDeqAppSrc(obj->ldc_enq_id);
+                status = appCodecDeqAppSrc(obj->ldc_enq_id);
             }
             if(status==VX_SUCCESS)
             {
@@ -1450,7 +1450,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
         }
         if(status==VX_SUCCESS && obj->encode==1)
         {
-            status = appGstEnqAppSrc(obj->appsrc_push_id);
+            status = appCodecEnqAppSrc(obj->appsrc_push_id);
         }
         obj->appsrc_push_id++;
         obj->appsrc_push_id     = (obj->appsrc_push_id  >= enc_pool->bufq_depth)? 0 : obj->appsrc_push_id;
@@ -1497,7 +1497,7 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
 
     if (status == VX_SUCCESS && obj->decode==1)
     {
-        pull_status = appGstDeqAppSink(obj->appsink_pull_id);
+        pull_status = appCodecDeqAppSink(obj->appsink_pull_id);
         if (pull_status == 1)
         {
             obj->EOS=1;
@@ -1576,12 +1576,12 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
     obj->mosaic_enq_id++;
     obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= dec_pool->bufq_depth)? 0 : obj->mosaic_enq_id;
     obj->appsink_pull_id++;
-    obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_gst_bufs)? 0 : obj->appsink_pull_id;
+    obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_codec_bufs)? 0 : obj->appsink_pull_id;
 
 exit:
     if (obj->decode==1)
     {
-        appGstEnqAppSink(obj->appsink_pull_id);
+        appCodecEnqAppSink(obj->appsink_pull_id);
     }
 
     return status;
@@ -1591,8 +1591,8 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
 {
     vx_status status = VX_SUCCESS;
     vx_size num_ch, img_size;
-    void* data_ptr[MAX_NUM_PLANES];
-    vx_uint32 sizes[MAX_NUM_PLANES], num_planes;
+    void* data_ptr[CODEC_MAX_NUM_PLANES];
+    vx_uint32 sizes[CODEC_MAX_NUM_PLANES], num_planes;
 
     status = vxQueryObjectArray(arr, VX_OBJECT_ARRAY_NUMITEMS, &num_ch, sizeof(num_ch));
     for (vx_uint32 ch = 0; status==VX_SUCCESS && ch<num_ch; ch++)
@@ -1609,7 +1609,7 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
                 (vx_reference)image,
                 data_ptr,
                 sizes,
-                MAX_NUM_PLANES,
+                CODEC_MAX_NUM_PLANES,
                 &num_planes);
         }
         if (status == VX_SUCCESS)
@@ -1639,11 +1639,11 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
 }
 
 
-static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_uint32 sizes[MAX_NUM_PLANES])
+static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_uint32 sizes[CODEC_MAX_NUM_PLANES])
 {
     vx_status status = VX_SUCCESS;
     vx_size num_ch, num_planes;
-    void* empty_data_ptr[MAX_NUM_PLANES] = {NULL};
+    void* empty_data_ptr[CODEC_MAX_NUM_PLANES] = {NULL};
 
     status = vxQueryObjectArray(arr, VX_OBJECT_ARRAY_NUMITEMS, &num_ch, sizeof(num_ch));
     for (vx_uint32 ch = 0; status==VX_SUCCESS && ch<num_ch; ch++)
@@ -1720,8 +1720,8 @@ static vx_status app_run_graph(AppObj *obj)
     {
         if ( obj->encode || obj->decode ) 
         {
-            status = appGstStart();
-            APP_PRINTF("appGstStart Done!\n");
+            status = appCodecStart();
+            APP_PRINTF("appCodecStart Done!\n");
         }
     }
 
@@ -1754,10 +1754,10 @@ static vx_status app_run_graph(AppObj *obj)
           break;
     }
 
-    for(uint8_t x=0; x<GST_ENC_BUFQ_DEPTH; x++){
+    for(uint8_t x=0; x<CODEC_ENC_BUFQ_DEPTH; x++){
         if ( obj->encode==1 ) 
         {
-            appGstDeqAppSrc(obj->ldc_enq_id);
+            appCodecDeqAppSrc(obj->ldc_enq_id);
         }
         if ( obj->encode==1 || obj->decode==0 ) 
         {
@@ -1768,8 +1768,8 @@ static vx_status app_run_graph(AppObj *obj)
     }
     if ( obj->encode==1 ) 
     {
-        APP_PRINTF("Pushing EoS to GstPipeline.\n");
-        status = appGstEnqEosAppSrc();
+        APP_PRINTF("Pushing EoS to Codec Pipeline.\n");
+        status = appCodecEnqEosAppSrc();
     }
 
     if ( obj->decode==1 )
@@ -1789,15 +1789,15 @@ static vx_status app_run_graph(AppObj *obj)
             obj->mosaic_enq_id++;
             obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= obj->dec_pool.bufq_depth)? 0 : obj->mosaic_enq_id;
             obj->appsink_pull_id++;
-            obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_gst_bufs)? 0 : obj->appsink_pull_id;
+            obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_codec_bufs)? 0 : obj->appsink_pull_id;
         
-            appGstEnqAppSink(obj->appsink_pull_id);
+            appCodecEnqAppSink(obj->appsink_pull_id);
         }
     }
     if ( obj->encode==1 || obj->decode==1 ) 
     {
-        appGstStop();
-        APP_PRINTF("appGstStop Done!\n");
+        appCodecStop();
+        APP_PRINTF("appCodecStop Done!\n");
     }
 
     if (status == VX_SUCCESS && (obj->encode==1 || obj->decode==0 ))
@@ -1820,7 +1820,7 @@ static vx_status app_run_graph(AppObj *obj)
     return status;
 }
 
-static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels)
+static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels)
 {
     vx_status status;
     vx_int32 ch;
@@ -1874,7 +1874,7 @@ static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[MAX_NU
     return(status);
 }
 
-static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[MAX_NUM_CHANNELS][MAX_NUM_PLANES], vx_int32 num_channels)
+static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels)
 {
     vx_status status;
     vx_int32 ch;
@@ -1961,9 +1961,9 @@ static void app_default_param_set(AppObj *obj)
     obj->decode     = 1;
     obj->downscale  = 0;
 
-    obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + GST_ENC_BUFQ_DEPTH;
+    obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + CODEC_ENC_BUFQ_DEPTH;
     obj->dec_pool.bufq_depth    = APP_BUFFER_Q_DEPTH;    
-    obj->num_gst_bufs           = obj->dec_pool.bufq_depth + 1;
+    obj->num_codec_bufs           = obj->dec_pool.bufq_depth + 1;
 }
 
 static void app_querry_param_set(AppObj *obj)
@@ -2094,58 +2094,59 @@ static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint
     imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
 }
 
-static void construct_gst_strings(app_gst_wrapper_params_t* params, uint8_t srcType, uint8_t sinkType)
+#if defined(LINUX)
+static void construct_gst_strings(app_codec_wrapper_params_t* params, uint8_t srcType, uint8_t sinkType)
 {
     int32_t i = 0;
 
     for (uint8_t ch = 0; ch < params->in_num_channels; ch++)
     {
         if (srcType == 0){
-            snprintf(params->m_AppSrcNameArr[ch] , MAX_LEN_ELEM_NAME, "myAppSrc%d" , ch);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"appsrc format=GST_FORMAT_TIME is-live=true do-timestamp=true block=false name=%s ! queue \n",params->m_AppSrcNameArr[ch]);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
+            snprintf(params->m_AppSrcNameArr[ch] , CODEC_MAX_LEN_ELEM_NAME, "myAppSrc%d" , ch);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"appsrc format=GST_FORMAT_TIME is-live=true do-timestamp=true block=false name=%s ! queue \n",params->m_AppSrcNameArr[ch]);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
                                                                                             params->in_width, params->in_height, params->in_format);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
         }
         else if (srcType == 1){
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"filesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.mp4 \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! qtdemux \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"filesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.mp4 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! qtdemux \n");
         }
         else if (srcType == 2){
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"videotestsrc is-live=true do-timestamp=true num-buffers=%d \n",1800);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"videotestsrc is-live=true do-timestamp=true num-buffers=%d \n",1800);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
                                                                                             params->in_width, params->in_height, params->in_format);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
         }
 
-        i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! h264parse \n");
+        i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! h264parse \n");
 
         if (sinkType == 0){
-            snprintf(params->m_AppSinkNameArr[ch], MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+            snprintf(params->m_AppSinkNameArr[ch], CODEC_MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
                                                                                         params->out_format);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
         }
         else if (sinkType == 1){
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! mp4mux \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! filesink location=output_video_%d.mp4 \n", ch);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! mp4mux \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! filesink location=output_video_%d.mp4 \n", ch);
         }
         else if (sinkType == 2){
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
                                                                                         params->out_format);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! fakesink \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! fakesink \n");
         }
         else if (sinkType == 3){
-            snprintf(params->m_AppSinkNameArr[ch], MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+            snprintf(params->m_AppSinkNameArr[ch], CODEC_MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264dec \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
                                                                                         params->out_format);
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=7 \n");
-            i += snprintf(&params->m_cmdString[i], MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=7 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
         }
     }
 }
@@ -2154,7 +2155,7 @@ static void set_gst_pipe_params(AppObj *obj)
 {
     AppGraphParamRefPool *enc_pool = &obj->enc_pool;
     AppGraphParamRefPool *dec_pool = &obj->dec_pool;
-    app_gst_wrapper_params_t *gst_pipe_params = &obj->gst_pipe_params;
+    app_codec_wrapper_params_t *codec_pipe_params = &obj->codec_pipe_params;
     uint8_t srcType     = 0;
     uint8_t sinkType    = 0;
 
@@ -2163,32 +2164,32 @@ static void set_gst_pipe_params(AppObj *obj)
        for respective devices. */
     #if defined(SOC_J721E)
     sinkType    = 0;
-    #endif
+    #endif /* SOC_J721E */
     #if defined(SOC_J721S2)
     sinkType    = 3;
-    #endif
+    #endif /* SOC_J721S2 */
     #if defined(SOC_J784S4)
     sinkType    = 3;
-    #endif
+    #endif /* SOC_J784S4 */
 
-    gst_pipe_params->in_width        = enc_pool->width;
-    gst_pipe_params->in_height       = enc_pool->height;
-    snprintf(gst_pipe_params->in_format,8,"NV12");
-    gst_pipe_params->in_num_planes   = enc_pool->num_planes;
-    gst_pipe_params->in_num_channels = enc_pool->num_channels;
-    gst_pipe_params->in_buffer_depth = enc_pool->bufq_depth;
+    codec_pipe_params->in_width        = enc_pool->width;
+    codec_pipe_params->in_height       = enc_pool->height;
+    snprintf(codec_pipe_params->in_format,8,"NV12");
+    codec_pipe_params->in_num_planes   = enc_pool->num_planes;
+    codec_pipe_params->in_num_channels = enc_pool->num_channels;
+    codec_pipe_params->in_buffer_depth = enc_pool->bufq_depth;
 
-    gst_pipe_params->out_width        = dec_pool->width;
-    gst_pipe_params->out_height       = dec_pool->height;
-    snprintf(gst_pipe_params->out_format,8,"NV12");
-    gst_pipe_params->out_num_planes   = dec_pool->num_planes;
-    gst_pipe_params->out_num_channels = dec_pool->num_channels;
-    gst_pipe_params->out_buffer_depth = dec_pool->bufq_depth;
+    codec_pipe_params->out_width        = dec_pool->width;
+    codec_pipe_params->out_height       = dec_pool->height;
+    snprintf(codec_pipe_params->out_format,8,"NV12");
+    codec_pipe_params->out_num_planes   = dec_pool->num_planes;
+    codec_pipe_params->out_num_channels = dec_pool->num_channels;
+    codec_pipe_params->out_buffer_depth = dec_pool->bufq_depth;
 
     if (obj->encode==0) srcType = 1;
     if (obj->decode==0) sinkType = 1;
 
-    construct_gst_strings(gst_pipe_params,srcType,sinkType);
+    construct_gst_strings(codec_pipe_params,srcType,sinkType);
 }
 
 static void app_update_param_set(AppObj *obj)
@@ -2226,3 +2227,4 @@ static void app_update_param_set(AppObj *obj)
     set_gst_pipe_params(obj);
 
 }
+#endif /* LINUX */
