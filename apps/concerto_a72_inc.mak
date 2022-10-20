@@ -124,6 +124,7 @@ TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_utils
 TIOVX_LIBS += vx_kernels_hwa vx_kernels_tidl vx_kernels_tvm
 TIOVX_LIBS += vx_tutorial
+TIOVX_LIBS += vx_hwa_target_kernels
 
 IMAGING_LIBS  =
 IMAGING_LIBS += app_utils_iss
