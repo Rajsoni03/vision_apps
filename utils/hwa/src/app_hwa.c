@@ -101,14 +101,15 @@
  * reserved space in SL2 for VHWA modules during init
  */
 #if defined (VPAC3L)
-#define APP_UTILS_VHWA_MAX_IN_IMG_WIDTH        (2690U)
+#define APP_UTILS_VHWA_MAX_IN_IMG_WIDTH        (2592U)
 #else
 #define APP_UTILS_VHWA_MAX_IN_IMG_WIDTH        (1920U)
 #endif
 #define APP_UTILS_VHWA_IN_IMG_CCSF             (FVID2_CCSF_BITS12_UNPACKED16)
 #define APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH   (6)
+
 #if defined (VPAC3L)
-#define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (2450U)
+#define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (2592U)
 #else
 #define APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH       (1920U)
 #endif
@@ -606,6 +607,24 @@ int32_t appVhwaVpacInit(uint32_t vpacInst)
             int32_t cnt;
 
             Vhwa_m2mVissSl2ParamsInit(&sl2AllocPrms);
+
+            for (cnt = 0U; cnt < VHWA_M2M_VISS_MAX_INPUTS; cnt ++)
+            {
+                sl2AllocPrms.maxInWidth[cnt] = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
+            }
+
+            for (cnt = 0U; cnt < VHWA_M2M_VISS_MAX_OUTPUTS; cnt ++)
+            {
+                if (VHWA_M2M_VISS_OUT_H3A_IDX == cnt)
+                {
+                    /* This is the default size for H3A output */
+                    sl2AllocPrms.maxOutWidth[cnt] = 1024U;
+                }
+                else
+                {
+                    sl2AllocPrms.maxOutWidth[cnt] = APP_UTILS_VHWA_MAX_OUT_IMG_WIDTH;
+                }
+            }
 
             sl2AllocPrms.inDepth = 3U; /* Minimum 3 */
 
