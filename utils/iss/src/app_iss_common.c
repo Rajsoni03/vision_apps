@@ -68,6 +68,10 @@
 #include <utils/iss/include/app_iss.h>
 #include <utils/console_io/include/app_log.h>
 
+#ifdef VPAC3L
+#include <dcc_viss_ov2312.h>
+#endif
+
 #include <dcc_viss_imx390.h>
 #include <dcc_viss_imx390_wdr.h>
 
@@ -80,6 +84,10 @@
 #include <dcc_viss_ub9xx_raw_test_pattern.h>
 
 #define _ENABLE_2A_
+
+#ifdef VPAC3L
+static uint8_t  dcc_viss_ov2312[DCC_VISS_OV2312_DCC_CFG_NUM_ELEM] = DCC_VISS_OV2312DCC_CFG;
+#endif
 
 static uint8_t  dcc_viss_imx390[DCC_VISS_IMX390_DCC_CFG_NUM_ELEM] = DCC_VISS_IMX390DCC_CFG;
 static uint8_t  dcc_viss_imx390_wdr[DCC_VISS_IMX390_WDR_DCC_CFG_NUM_ELEM] = DCC_VISS_IMX390_WDRDCC_CFG;
@@ -148,6 +156,11 @@ int32_t appIssGetDCCSizeVISS(char * sensor_name, uint32_t wdr_mode)
     {
         case 0:
             /*Linear mode*/
+            #ifdef VPAC3L
+            if(0 == strcmp(sensor_name, SENSOR_OV2312_UB953_LI))
+                size = DCC_VISS_OV2312_DCC_CFG_NUM_ELEM;
+            else
+            #endif
             if(0 == strcmp(sensor_name, SENSOR_SONY_IMX390_UB953_D3))
                 size = DCC_VISS_IMX390_DCC_CFG_NUM_ELEM;
             else if (0 == strcmp(sensor_name, SENSOR_ONSEMI_AR0233_UB953_MARS))
@@ -183,6 +196,11 @@ int32_t appIssGetDCCBuffVISS(char * sensor_name, uint32_t wdr_mode,  uint8_t * d
     {
         case 0:
             /*Linear mode*/
+            #ifdef VPAC3L
+            if(0 == strcmp(sensor_name, SENSOR_OV2312_UB953_LI))
+                memcpy(dcc_buf, dcc_viss_ov2312, num_bytes);
+            else
+            #endif
             if(0 == strcmp(sensor_name, SENSOR_SONY_IMX390_UB953_D3))
                 memcpy(dcc_buf, dcc_viss_imx390, num_bytes);
             else if (0 == strcmp(sensor_name, SENSOR_ONSEMI_AR0233_UB953_MARS))
