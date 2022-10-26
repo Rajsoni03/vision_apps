@@ -74,14 +74,8 @@ MEMORY
     DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xA8000000 , LENGTH = 0x00100000
     /* DDR for C7x_2 for Linux resource table [ size 1024 B ] */
     DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA8100000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for boot section [ size 1024 B ] */
-    DDR_C7x_2_BOOT           ( RWIX ) : ORIGIN = 0xA8200000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for vecs section [ size 16.00 KB ] */
-    DDR_C7x_2_VECS           ( RWIX ) : ORIGIN = 0xA8400000 , LENGTH = 0x00004000
-    /* DDR for C7x_2 for secure vecs section [ size 16.00 KB ] */
-    DDR_C7x_2_SECURE_VECS    ( RWIX ) : ORIGIN = 0xA8600000 , LENGTH = 0x00004000
-    /* DDR for C7x_2 for code/data [ size 25.98 MB ] */
-    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xA8604000 , LENGTH = 0x019FC000
+    /* DDR for C7x_2 for code/data [ size 30.00 MB ] */
+    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xA8200000 , LENGTH = 0x01E00000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
     IPC_VRING_MEM                     : ORIGIN = 0xB0000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */

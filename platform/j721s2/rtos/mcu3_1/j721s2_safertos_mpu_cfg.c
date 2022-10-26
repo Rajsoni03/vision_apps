@@ -31,10 +31,6 @@
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* ========================================================================== */
-/*                             Include Files                                  */
-/* ========================================================================== */
-/* Generic headers */
 #include <stdlib.h>
 #include <stdint.h>
 #include <ti/csl/arch/r5/csl_arm_r5.h>
@@ -110,7 +106,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 2 configuration: 512 KB OCMC RAM */
+        /* Region 2 configuration: 1024 KB OCMC RAM */
         /* ulRegionNumber */
         .ulRegionNumber         = 3U,
         /* Starting address */
@@ -124,8 +120,8 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
             .ulmemAttr          = 0U,
         },
-        /* Size is 512KB */
-        .ulRegionSize           = (512U * 1024U),
+        /* Size is 1024KB */
+        .ulRegionSize           = (1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
@@ -144,8 +140,8 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
             .ulmemAttr          = 0U,
         },
-        /* Size is 8MB */
-        .ulRegionSize           = (8U * 1024U * 1024U),
+        /* Size is 4MB */
+        .ulRegionSize           = (4U * 1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
@@ -242,7 +238,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         /* ulRegionNumber */
         .ulRegionNumber         = 9U,
         /* Starting address */
-        .ulRegionBeginAddress   = DDR_MCU1_0_IPC_ADDR,
+        .ulRegionBeginAddress   = DDR_MCU3_1_IPC_ADDR,
         /* Access permission */
         {
             .ulexeNeverControl  = 1U,

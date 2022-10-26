@@ -85,31 +85,6 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
-#if 0
-    {
-        /*
-         * NOTE Since Safertos supports on 9 configurable MPU regions we are skipping this.
-         */
-        /* Region 0 configuration: second half of 2 GB */
-        /* ulRegionNumber */
-        .ulRegionNumber         = 2U,
-        /* Starting address */
-        .ulRegionBeginAddress   = portmpuLARGEST_REGION_SIZE_ACTUAL,
-        /* Access permission */
-        {
-            .ulexeNeverControl  = 1U,
-            .ulaccessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-            .ulshareable        = 0U,
-            .ulcacheable        = 0U,
-            .ulcachePolicy      = 0U,
-            .ulmemAttr          = 0U,
-        },
-        /* TODO region size is 4GB, but 2GB is largest supported */
-        .ulRegionSize           = portmpuLARGEST_REGION_SIZE_ACTUAL,
-        /* ulSubRegionDisable */
-        .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
-    },
-#endif
     {
         /* Region 3 configuration: ATCM memory */
         /* ulRegionNumber */

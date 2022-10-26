@@ -66,22 +66,18 @@
 
 MEMORY
 {
-    /* L2 for C7x_2 [ size 448.00 KB ] */
-    L2RAM_C7x_2              ( RWIX ) : ORIGIN = 0x65800000 , LENGTH = 0x00070000
-    /* L1 for C7x_2 [ size 16.00 KB ] */
-    L1RAM_C7x_2              ( RWIX ) : ORIGIN = 0x65E00000 , LENGTH = 0x00004000
-    /* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xA8000000 , LENGTH = 0x00100000
-    /* DDR for C7x_2 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA8100000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for boot section [ size 1024 B ] */
-    DDR_C7x_2_BOOT           ( RWIX ) : ORIGIN = 0xA8200000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for vecs section [ size 16.00 KB ] */
-    DDR_C7x_2_VECS           ( RWIX ) : ORIGIN = 0xA8400000 , LENGTH = 0x00004000
-    /* DDR for C7x_2 for secure vecs section [ size 16.00 KB ] */
-    DDR_C7x_2_SECURE_VECS    ( RWIX ) : ORIGIN = 0xA8600000 , LENGTH = 0x00004000
-    /* DDR for C7x_2 for code/data [ size 25.98 MB ] */
-    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xA8604000 , LENGTH = 0x019FC000
+    /* L2 for C7x_1 [ size 448.00 KB ] */
+    L2RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64800000 , LENGTH = 0x00070000
+    /* L1 for C7x_1 [ size 16.00 KB ] */
+    L1RAM_C7x_1              ( RWIX ) : ORIGIN = 0x64E00000 , LENGTH = 0x00004000
+    /* MSMC for C7x_1 [ size  3.78 MB ] */
+    MSMC_C7x_1               ( RWIX ) : ORIGIN = 0x70020000 , LENGTH = 0x003C8000
+    /* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
+    DDR_C7x_1_IPC            ( RWIX ) : ORIGIN = 0xAA000000 , LENGTH = 0x00100000
+    /* DDR for C7x_1 for Linux resource table [ size 1024 B ] */
+    DDR_C7x_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xAA100000 , LENGTH = 0x00000400
+    /* DDR for C7x_1 for code/data [ size 78.00 MB ] */
+    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xAA200000 , LENGTH = 0x04E00000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
     IPC_VRING_MEM                     : ORIGIN = 0xB0000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
@@ -90,8 +86,8 @@ MEMORY
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB2040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
-    /* DDR for c7x_2 for local heap [ size 16.00 MB ] */
-    DDR_C7X_2_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x127000000 , LENGTH = 0x01000000
-    /* DDR for c7x_2 for Scratch Memory [ size 64.00 MB ] */
-    DDR_C7X_2_SCRATCH        ( RWIX ) : ORIGIN = 0x128000000 , LENGTH = 0x04000000
+    /* DDR for c7x_1 for Scratch Memory [ size 368.00 MB ] */
+    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x17000000
+    /* DDR for c7x_1 for local heap [ size 256.00 MB ] */
+    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0x117000000 , LENGTH = 0x10000000
 }

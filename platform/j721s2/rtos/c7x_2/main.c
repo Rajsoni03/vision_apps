@@ -78,6 +78,11 @@
 #include <ti/kernel/freertos/portable/TI_CGT/c7x/Cache.h>
 #include <ti/kernel/freertos/portable/TI_CGT/c7x/Hwi.h>
 #include <ti/kernel/freertos/portable/TI_CGT/c7x/Mmu.h>
+#elif (defined (SAFERTOS))
+#include "SafeRTOS_API.h"
+#include "SafeRTOSConfig.h"
+#include "Mmu.h"
+#include "Cache.h"
 #else
 #include <ti/sysbios/family/c7x/Cache.h>
 #include <ti/sysbios/family/c7x/Hwi.h>

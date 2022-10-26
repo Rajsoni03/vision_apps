@@ -72,7 +72,7 @@ SECTIONS
     boot:
     {
       boot.*<boot.oe71>(.text)
-    } load > DDR_C7x_1 ALIGN(0x200000)
+    } load > DDR_C7x_2 ALIGN(0x200000)
     /* Code sections. */
     GROUP LOAD_START( lnkStartFlashAddress ),
           LOAD_END( lnkEndFlashAddress )
@@ -87,7 +87,7 @@ SECTIONS
         .KERNEL_FUNCTION LOAD_START( lnkKernelFuncStartAddr ),
                          LOAD_END( lnkKernelFuncEndAddr )
                                 : {} palign( 0x10000 )
-    } > DDR_C7x_1
+    } > DDR_C7x_2
 
     /* Data sections. */
     GROUP  palign( 0x10000 ), LOAD_START( lnkRamStartAddr ), LOAD_END( lnkRamEndAddr )
@@ -104,26 +104,25 @@ SECTIONS
         .KERNEL_DATA LOAD_START( lnkKernelDataStartAddr ),
                      LOAD_END( lnkKernelDataEndAddr )
                                 : {} palign( 0x800 )
-    } > DDR_C7x_1
+    } > DDR_C7x_2
     
-    /* .bss:taskStackSection:tiovx (NOLOAD) : {} > L2RAM_C7x_1 */
-    .bss:taskStackSection       > DDR_C7x_1
-    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP
-    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_1_SCRATCH
+    /* .bss:taskStackSection:tiovx (NOLOAD) : {} > L2RAM_C7x_2 */
+    .bss:taskStackSection       > DDR_C7x_2
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C7X_2_LOCAL_HEAP
+    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_2_SCRATCH
 
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
 
-    .bss:l1mem              (NOLOAD)(NOINIT) : {} > L1RAM_C7x_1
-    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_1
-    .bss:l3mem              (NOLOAD)(NOINIT) : {} > MSMC_C7x_1
+    .bss:l1mem              (NOLOAD)(NOINIT) : {} > L1RAM_C7x_2
+    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_2
 
-    ipc_data_buffer:       > DDR_C7x_1
-    .tracebuf                : {} align(1024)   > DDR_C7x_1
-    .resource_table > DDR_C7x_1_RESOURCE_TABLE
+    ipc_data_buffer:       > DDR_C7x_2
+    .tracebuf                : {} align(1024)   > DDR_C7x_2
+    .resource_table > DDR_C7x_2_RESOURCE_TABLE
 
-    GROUP:              >  DDR_C7x_1
+    GROUP:              >  DDR_C7x_2
     {
         .data.Mmu_tableArray          : type=NOINIT
         .data.Mmu_tableArraySlot      : type=NOINIT

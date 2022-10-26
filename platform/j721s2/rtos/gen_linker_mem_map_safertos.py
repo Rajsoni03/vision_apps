@@ -202,24 +202,12 @@ mcu3_1_ddr_size = 16*MB - (mcu3_1_ddr_addr-mcu3_1_ddr_ipc_addr);
 
 c7x_2_ddr_ipc_addr = mcu3_1_ddr_addr + mcu3_1_ddr_size;
 c7x_2_ddr_resource_table_addr = c7x_2_ddr_ipc_addr + linux_ddr_ipc_size;
-c7x_2_ddr_boot_addr = c7x_2_ddr_resource_table_addr + 1*MB;
-c7x_2_ddr_boot_size = 1*KB;
-c7x_2_ddr_vecs_addr = c7x_2_ddr_resource_table_addr + 3*MB;
-c7x_2_ddr_vecs_size = 16*KB;
-c7x_2_ddr_secure_vecs_addr = c7x_2_ddr_resource_table_addr + 5*MB;
-c7x_2_ddr_secure_vecs_size = 16*KB;
-c7x_2_ddr_addr = c7x_2_ddr_secure_vecs_addr + c7x_2_ddr_secure_vecs_size;
+c7x_2_ddr_addr = c7x_2_ddr_resource_table_addr + 1*MB;
 c7x_2_ddr_size = 32*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
 
 c7x_1_ddr_ipc_addr =c7x_2_ddr_addr + c7x_2_ddr_size;
 c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
-c7x_1_ddr_boot_addr = c7x_1_ddr_resource_table_addr + 1*MB;
-c7x_1_ddr_boot_size = 1*KB;
-c7x_1_ddr_vecs_addr = c7x_1_ddr_resource_table_addr + 3*MB;
-c7x_1_ddr_vecs_size = 16*KB;
-c7x_1_ddr_secure_vecs_addr = c7x_1_ddr_resource_table_addr + 5*MB;
-c7x_1_ddr_secure_vecs_size = 16*KB;
-c7x_1_ddr_addr = c7x_1_ddr_secure_vecs_addr + c7x_1_ddr_secure_vecs_size;
+c7x_1_ddr_addr = c7x_1_ddr_resource_table_addr + 1*MB;
 c7x_1_ddr_size = 80*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
 
 #
@@ -363,34 +351,22 @@ mcu3_1_ddr_total.setDtsName("vision_apps_main_r5fss1_core1_memory_region", "visi
 c7x_2_ddr_ipc             = MemSection("DDR_C7x_2_IPC", "RWIX", c7x_2_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for C7x_2 for Linux IPC");
 c7x_2_ddr_ipc.setDtsName("vision_apps_c71_1_dma_memory_region", "vision-apps-c71_1-dma-memory");
 c7x_2_ddr_resource_table  = MemSection("DDR_C7x_2_RESOURCE_TABLE", "RWIX", c7x_2_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_2 for Linux resource table");
-c7x_2_ddr_boot            = MemSection("DDR_C7x_2_BOOT", "RWIX", c7x_2_ddr_boot_addr, c7x_2_ddr_boot_size, "DDR for C7x_2 for boot section");
-c7x_2_ddr_vecs            = MemSection("DDR_C7x_2_VECS", "RWIX", c7x_2_ddr_vecs_addr, c7x_2_ddr_vecs_size, "DDR for C7x_2 for vecs section");
-c7x_2_ddr_secure_vecs     = MemSection("DDR_C7x_2_SECURE_VECS", "RWIX", c7x_2_ddr_secure_vecs_addr, c7x_2_ddr_secure_vecs_size, "DDR for C7x_2 for secure vecs section");
 c7x_2_ddr                 = MemSection("DDR_C7x_2", "RWIX", c7x_2_ddr_addr, c7x_2_ddr_size, "DDR for C7x_2 for code/data");
 c7x_2_ddr_local_heap      = MemSection("DDR_C7X_2_LOCAL_HEAP", "RWIX", c7x_2_ddr_local_heap_addr, c7x_2_ddr_local_heap_size, "DDR for c7x_2 for local heap");
 c7x_2_ddr_scratch         = MemSection("DDR_C7X_2_SCRATCH", "RWIX", c7x_2_ddr_scratch_addr, c7x_2_ddr_scratch_size, "DDR for c7x_2 for Scratch Memory");
 c7x_2_ddr_total           = MemSection("DDR_C7x_2_DTS", "", 0, 0, "DDR for C7x_2 for all sections, used for reserving memory in DTS file");
 c7x_2_ddr_total.concat(c7x_2_ddr_resource_table);
-c7x_2_ddr_total.concat(c7x_2_ddr_boot);
-c7x_2_ddr_total.concat(c7x_2_ddr_vecs);
-c7x_2_ddr_total.concat(c7x_2_ddr_secure_vecs);
 c7x_2_ddr_total.concat(c7x_2_ddr);
 c7x_2_ddr_total.setDtsName("vision_apps_c71_1_memory_region", "vision-apps-c71_1-memory");
 
 c7x_1_ddr_ipc             = MemSection("DDR_C7x_1_IPC", "RWIX", c7x_1_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for C7x_1 for Linux IPC");
 c7x_1_ddr_ipc.setDtsName("vision_apps_c71_0_dma_memory_region", "vision-apps-c71-dma-memory");
 c7x_1_ddr_resource_table  = MemSection("DDR_C7x_1_RESOURCE_TABLE", "RWIX", c7x_1_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_1 for Linux resource table");
-c7x_1_ddr_boot            = MemSection("DDR_C7x_1_BOOT", "RWIX", c7x_1_ddr_boot_addr, c7x_1_ddr_boot_size, "DDR for C7x_1 for boot section");
-c7x_1_ddr_vecs            = MemSection("DDR_C7x_1_VECS", "RWIX", c7x_1_ddr_vecs_addr, c7x_1_ddr_vecs_size, "DDR for C7x_1 for vecs section");
-c7x_1_ddr_secure_vecs     = MemSection("DDR_C7x_1_SECURE_VECS", "RWIX", c7x_1_ddr_secure_vecs_addr, c7x_1_ddr_secure_vecs_size, "DDR for C7x_1 for secure vecs section");
 c7x_1_ddr                 = MemSection("DDR_C7x_1", "RWIX", c7x_1_ddr_addr, c7x_1_ddr_size, "DDR for C7x_1 for code/data");
 c7x_1_ddr_local_heap      = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_addr, c7x_1_ddr_local_heap_size, "DDR for c7x_1 for local heap");
 c7x_1_ddr_scratch         = MemSection("DDR_C7X_1_SCRATCH", "RWIX", c7x_1_ddr_scratch_addr, c7x_1_ddr_scratch_size, "DDR for c7x_1 for Scratch Memory");
 c7x_1_ddr_total           = MemSection("DDR_C7x_1_DTS", "", 0, 0, "DDR for C7x_1 for all sections, used for reserving memory in DTS file");
 c7x_1_ddr_total.concat(c7x_1_ddr_resource_table);
-c7x_1_ddr_total.concat(c7x_1_ddr_boot);
-c7x_1_ddr_total.concat(c7x_1_ddr_vecs);
-c7x_1_ddr_total.concat(c7x_1_ddr_secure_vecs);
 c7x_1_ddr_total.concat(c7x_1_ddr);
 c7x_1_ddr_total.setDtsName("vision_apps_c71_0_memory_region", "vision-apps-c71_0-memory");
 
@@ -529,9 +505,6 @@ c7x_1_mmap.addMemSection( c7x_1_l1           );
 c7x_1_mmap.addMemSection( c7x_1_msmc         );
 c7x_1_mmap.addMemSection( c7x_1_ddr_ipc      );
 c7x_1_mmap.addMemSection( c7x_1_ddr_resource_table      );
-c7x_1_mmap.addMemSection( c7x_1_ddr_boot     );
-c7x_1_mmap.addMemSection( c7x_1_ddr_vecs     );
-c7x_1_mmap.addMemSection( c7x_1_ddr_secure_vecs     );
 c7x_1_mmap.addMemSection( c7x_1_ddr          );
 c7x_1_mmap.addMemSection( app_log_mem        );
 c7x_1_mmap.addMemSection( tiovx_obj_desc_mem );
@@ -546,9 +519,6 @@ c7x_2_mmap.addMemSection( c7x_2_l2           );
 c7x_2_mmap.addMemSection( c7x_2_l1           );
 c7x_2_mmap.addMemSection( c7x_2_ddr_ipc      );
 c7x_2_mmap.addMemSection( c7x_2_ddr_resource_table      );
-c7x_2_mmap.addMemSection( c7x_2_ddr_boot     );
-c7x_2_mmap.addMemSection( c7x_2_ddr_vecs     );
-c7x_2_mmap.addMemSection( c7x_2_ddr_secure_vecs     );
 c7x_2_mmap.addMemSection( c7x_2_ddr          );
 c7x_2_mmap.addMemSection( app_log_mem        );
 c7x_2_mmap.addMemSection( tiovx_obj_desc_mem );
@@ -592,17 +562,11 @@ html_mmap.addMemSection( mcu3_1_ddr         );
 html_mmap.addMemSection( mcu3_1_ddr_local_heap );
 html_mmap.addMemSection( c7x_1_ddr_ipc     );
 html_mmap.addMemSection( c7x_1_ddr_resource_table     );
-html_mmap.addMemSection( c7x_1_ddr_boot    );
-html_mmap.addMemSection( c7x_1_ddr_vecs    );
-html_mmap.addMemSection( c7x_1_ddr_secure_vecs    );
 html_mmap.addMemSection( c7x_1_ddr_local_heap         );
 html_mmap.addMemSection( c7x_1_ddr_scratch );
 html_mmap.addMemSection( c7x_1_ddr         );
 html_mmap.addMemSection( c7x_2_ddr_ipc     );
 html_mmap.addMemSection( c7x_2_ddr_resource_table     );
-html_mmap.addMemSection( c7x_2_ddr_boot    );
-html_mmap.addMemSection( c7x_2_ddr_vecs    );
-html_mmap.addMemSection( c7x_2_ddr_secure_vecs    );
 html_mmap.addMemSection( c7x_2_ddr_local_heap         );
 html_mmap.addMemSection( c7x_2_ddr_scratch );
 html_mmap.addMemSection( c7x_2_ddr         );
@@ -685,8 +649,8 @@ dts_mmap.checkOverlap();
 #
 # Generate linker command files containing "MEMORY" definitions
 #
-LinkerCmdFile(c7x_1_mmap , "./c7x_1/linker_mem_map.cmd" ).export();
-LinkerCmdFile(c7x_2_mmap , "./c7x_2/linker_mem_map.cmd" ).export();
+LinkerCmdFile(c7x_1_mmap , "./c7x_1/linker_mem_map_safertos.cmd" ).export();
+LinkerCmdFile(c7x_2_mmap , "./c7x_2/linker_mem_map_safertos.cmd" ).export();
 LinkerCmdFile(mcu1_0_mmap, "./mcu1_0/linker_mem_map.cmd").export();
 LinkerCmdFile(mcu1_1_mmap, "./mcu1_1/linker_mem_map.cmd").export();
 LinkerCmdFile(mcu2_0_mmap, "./mcu2_0/linker_mem_map.cmd").export();
@@ -694,7 +658,7 @@ LinkerCmdFile(mcu2_1_mmap, "./mcu2_1/linker_mem_map.cmd").export();
 LinkerCmdFile(mcu3_0_mmap, "./mcu3_0/linker_mem_map.cmd").export();
 LinkerCmdFile(mcu3_1_mmap, "./mcu3_1/linker_mem_map.cmd").export();
 
-HtmlMmapTable(html_mmap, "./system_memory_map.html").export();
+HtmlMmapTable(html_mmap, "./system_memory_map_safertos.html").export();
 
 CHeaderFile(c_header_mmap, 0x880000000, 0x100000000, "./app_mem_map.h").export();
 

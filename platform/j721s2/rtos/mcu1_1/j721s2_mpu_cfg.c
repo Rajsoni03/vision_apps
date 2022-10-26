@@ -161,7 +161,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 10 configuration: Ring buffer */
+        /* Region 8 configuration: Ring buffer */
         .regionId         = 8U,
         .enable           = 1U,
         .baseAddr         = DDR_MCU1_1_IPC_ADDR,

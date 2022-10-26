@@ -104,13 +104,13 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
             .ulmemAttr          = 0U,
         },
-        /* ulRegionSize 32KB */
-        .ulRegionSize           = (32U * 1024U),
+        /* ulRegionSize 64KB */
+        .ulRegionSize           = (64U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 2 configuration: 512 KB OCMC RAM */
+        /* Region 2 configuration: 1024 KB OCMC RAM */
         /* ulRegionNumber */
         .ulRegionNumber         = 3U,
         /* Starting address */
@@ -124,8 +124,8 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
             .ulmemAttr          = 0U,
         },
-        /* Size is 512KB */
-        .ulRegionSize           = (512U * 1024U),
+        /* Size is 1024KB */
+        .ulRegionSize           = (1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
@@ -144,8 +144,8 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
             .ulmemAttr          = 0U,
         },
-        /* Size is 8MB */
-        .ulRegionSize           = (8U * 1024U * 1024U),
+        /* Size is 4MB */
+        .ulRegionSize           = (4U * 1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
@@ -193,7 +193,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulmemAttr          = 0U,
         },
         /* size is 32KB */
-        .ulRegionSize           = (32U * 1024U),
+        .ulRegionSize           = (64U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
