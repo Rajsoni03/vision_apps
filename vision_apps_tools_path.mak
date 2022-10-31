@@ -45,9 +45,9 @@ export PSDK_QNX_PATH ?= $(PSDK_PATH)/psdkqa
 ifeq ($(SOC),j721e)
   export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-j7-evm-08_04_00_11
 else ifeq ($(SOC),j721s2)
-  export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-j721s2-evm-08_04_00_13
+  export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-j721s2-evm-08_04_03_03
 else ifeq ($(SOC),j784s4)
-  export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-j784s4-evm-08_02_02_06
+  export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-j784s4-evm-08_04_03_03
 else ifeq ($(SOC),am62a)
   export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-am62axx-evm-08.04.00.20
 endif
