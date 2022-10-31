@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.04.03</h2>
+<h2 align='center'>Version: 08.04.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -137,8 +137,8 @@ New features in this release are highlighted in <strong>bold</strong>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
     <li> Free RTOS on C7x and R5F and Linux or QNX on A72</li>
-    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
-    <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
+    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
+    <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, SD card</li>
     </ul>
 </li>
 
@@ -184,6 +184,14 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
+    <li><strong>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display</strong></li>
+    <li>C7x algorithm offload demo (with DMA acceleration)</li>
+    </ul>
+</li>
+
+<li>CV Demos
+    <ul>
+    <li>Structure from motion</li>
     </ul>
 </li>
 
@@ -207,17 +215,40 @@ New features in this release are highlighted in <strong>bold</strong>
 <h2><a class="anchor" name="Compatibility"></a>Upgrade and Compatibility Information</h2>
 <p>
 
-<ul>
-<li>The J784S4 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
-what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.</li>
+<table frame="box" rules="all" cellspacing="0" width="100%" border="1" cellpadding="3">
+<tr bgcolor="lightgrey">
+<td align="center"> <b>File</b> </td>
+<td align="center"><b>Change description</b></td>
+<td align="center"><b>User application change required</b></td>
+<td align="center"><b>User application recompile required</b></td>
+</tr>
 
-<li>There is an existing workaround on the DM code to enable power for the DRU4-DRU7.  This was a change from the EA1 release which powered this on from the
-C7X-1.</li>
+<tr>
+<td align="center"> kernels_j7\include\TI\j7.h </td>
+<td align="center"> This file is deprecated and will be removed in PSDK 8.5 ... please remove its inclusion and just include TI/tivx.h.
+</td>
+<td align="center"> YES </td>
+<td align="center"> YES </td>
+</tr>
 
-<li>There is a known instability with the QNX + SBL boot mode where the kernel will crash upon boot approximately 25% of the time.  In order to workaround
-this issue, you can set the value returned by the board_smp_num_cpu function in the location psdkqa/qnx/src/hardware/startup/boards/j784s4/board_smp.c from
-8 to 2 and this issue should no longer be seen</li>
-</ul>
+<tr>
+<td align="center"> include\TI\tivx_soc_j721e.h </td>
+<td align="center"> Renaming of TIVX_TARGET_IPU1_0/TIVX_TARGET_IPU1_1 to TIVX_TARGET_MCU2_0/TIVX_TARGET_MCU2_1 </td>
+<td align="center"> NO </td>
+<td align="center"> YES </td>
+</tr>
+
+<tr>
+<td align="center"> kernels_j7\include\TI\j7_tvm.h </td>
+<td align="center"> Additional parameters included in tivxTVMJ7Params </td>
+<td align="center"> YES </td>
+<td align="center"> YES </td>
+</tr>
+
+</table>
+
+The J721S2 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
+what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.
 
 <p>
 <hr>
@@ -243,31 +274,43 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="center">ADASVISION-5608</td>
+<td align="left"><span>PC Emulation: DOF visualize is not registered for J721S2/J7AHP</span></td>
+</tr>
 <tr class="even">
-<td align="center">ADASVISION-5375</td>
-<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
+<td align="center">ADASVISION-5559</td>
+<td align="left"><span>"sdk_clean" make target from "vision_apps" fails</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5686</td>
-<td align="left"><span>vision_apps appIPCInit incorrectly checks errors from mmap_device_memory</span></td>
+<td align="center">ADASVISION-5519</td>
+<td align="left"><span>AVP4 app is not releasing all resources</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5672</td>
-<td align="left"><span>Multiple definition of display size makes it difficult to change output resolution</span></td>
+<td align="center">ADASVISION-5559</td>
+<td align="left"><span>"sdk_clean" make target from "vision_apps" fails</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5668</td>
-<td align="left"><span>Number of CPU error boundary check incorrect</span></td>
+<td align="center">ADASVISION-5334</td>
+<td align="left"><span>Errors observed in parking spot and vehicle detections in AVP apps</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5660</td>
-<td align="left"><span>Code error in appPerfStatsCpuLoadCalc</span></td>
+<td align="center">ADASVISION-5231</td>
+<td align="left"><span>EDP to HDMI adapter is not enabled in J721S2</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5333</td>
+<td align="left"><span>TIDL Performance Degradation on SDK (J721S2)</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5063</td>
+<td align="left"><span>A72 cache is disabled due to coherency issue between A72 and R5</span></td>
 </tr>
 </tbody>
 </table>
 
-<hr>
 <p>
+<hr>
 <h2><a class="anchor" name="Open_Defects"></a>Open Defects</h2>
 <p>
 <table>
@@ -278,33 +321,25 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="even">
-<td align="center">ADASVISION-5673</td>
-<td align="left"><span>Permission issue can occur when running the vision apps script incorrectly</span></td>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10884">ADASVISION-5531</a></td>
+<td align="left"><span>[NF]: Incorrect condition check when skip is enabled</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5661</td>
-<td align="left"><span>Incorrect fps reported with mcu1_0 included</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5609</td>
-<td align="left"><span>Incorrect documentation for the single camera PC emulation mode</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5576</td>
-<td align="left"><span>MCU1-0 IPC sync failing for J7AHP</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5575</td>
-<td align="left"><span>Graphics bar not rendering properly for all CPU's on J7AHP</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5555</td>
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
 <td align="left"><span>SDE disparity artifacts on EVM</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10883">ADASVISION-5566</a></td>
+<td align="left"><span>SDE crashes with 12-bit input</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5399</td>
-<td align="left"><span>VPAC/DMPAC Func clock not enabled for j721s2/j784s4</span></td>
+<td align="left"><span>VPAC/DMPAC Func clock not enabled for j721s2</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5375</td>
+<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5065</td>
@@ -313,6 +348,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
 <td align="left"><span>AVP4 freezes in first second of running on QNX</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
+<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
@@ -325,6 +364,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10520">ADASVISION-4386</a></td>
 <td align="left"><span>QNX SBL debug binaries not working on R5F</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10522">ADASVISION-4198</a></td>
+<td align="left"><span>Partial failure observed for IPC test when MCU1_0 is enabled due to secure mode boot</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10525">ADASVISION-4039</a></td>
@@ -354,6 +397,12 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tbody>
 </table>
 </table>
+<h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
+
+None for 8.4 release.
+<p>
+<hr>
+<p>
 <h2><a class="anchor" name="Support"></a>Technical Support</h2>
 For technical support and additional assistance, contact local TI Field Application Engineer <p>
 <hr>

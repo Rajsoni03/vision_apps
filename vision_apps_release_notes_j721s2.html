@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.04.00</h2>
+<h2 align='center'>Version: 08.04.03</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -136,7 +136,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li> Free RTOS on C7x and R5F and Linux or QNX on A72</li>
+    <li> Free RTOS and <strong>Safe RTOS</strong> C7x and R5F and Linux or QNX on A72</li>
     <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
     <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, SD card</li>
     </ul>
@@ -225,22 +225,8 @@ New features in this release are highlighted in <strong>bold</strong>
 
 <tr>
 <td align="center"> kernels_j7\include\TI\j7.h </td>
-<td align="center"> This file is deprecated and will be removed in PSDK 8.5 ... please remove its inclusion and just include TI/tivx.h.
+<td align="center"> This file is deprecated and removed in this SDK.
 </td>
-<td align="center"> YES </td>
-<td align="center"> YES </td>
-</tr>
-
-<tr>
-<td align="center"> include\TI\tivx_soc_j721e.h </td>
-<td align="center"> Renaming of TIVX_TARGET_IPU1_0/TIVX_TARGET_IPU1_1 to TIVX_TARGET_MCU2_0/TIVX_TARGET_MCU2_1 </td>
-<td align="center"> NO </td>
-<td align="center"> YES </td>
-</tr>
-
-<tr>
-<td align="center"> kernels_j7\include\TI\j7_tvm.h </td>
-<td align="center"> Additional parameters included in tivxTVMJ7Params </td>
 <td align="center"> YES </td>
 <td align="center"> YES </td>
 </tr>
@@ -274,37 +260,25 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="center">ADASVISION-5608</td>
-<td align="left"><span>PC Emulation: DOF visualize is not registered for J721S2/J7AHP</span></td>
-</tr>
 <tr class="even">
-<td align="center">ADASVISION-5559</td>
-<td align="left"><span>"sdk_clean" make target from "vision_apps" fails</span></td>
+<td align="center">ADASVISION-5375</td>
+<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5519</td>
-<td align="left"><span>AVP4 app is not releasing all resources</span></td>
+<td align="center">ADASVISION-5686</td>
+<td align="left"><span>vision_apps appIPCInit incorrectly checks errors from mmap_device_memory</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5559</td>
-<td align="left"><span>"sdk_clean" make target from "vision_apps" fails</span></td>
+<td align="center">ADASVISION-5672</td>
+<td align="left"><span>Multiple definition of display size makes it difficult to change output resolution</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5334</td>
-<td align="left"><span>Errors observed in parking spot and vehicle detections in AVP apps</span></td>
+<td align="center">ADASVISION-5668</td>
+<td align="left"><span>Number of CPU error boundary check incorrect</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5231</td>
-<td align="left"><span>EDP to HDMI adapter is not enabled in J721S2</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5333</td>
-<td align="left"><span>TIDL Performance Degradation on SDK (J721S2)</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5063</td>
-<td align="left"><span>A72 cache is disabled due to coherency issue between A72 and R5</span></td>
+<td align="center">ADASVISION-5660</td>
+<td align="left"><span>Code error in appPerfStatsCpuLoadCalc</span></td>
 </tr>
 </tbody>
 </table>
@@ -321,6 +295,14 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="even">
+<td align="center">ADASVISION-5673</td>
+<td align="left"><span>Permission issue can occur when running the vision apps script incorrectly</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5661</td>
+<td align="left"><span>Incorrect fps reported with mcu1_0 included</span></td>
+</tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10884">ADASVISION-5531</a></td>
 <td align="left"><span>[NF]: Incorrect condition check when skip is enabled</span></td>
@@ -329,17 +311,9 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
 <td align="left"><span>SDE disparity artifacts on EVM</span></td>
 </tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10883">ADASVISION-5566</a></td>
-<td align="left"><span>SDE crashes with 12-bit input</span></td>
-</tr>
 <tr class="even">
 <td align="center">ADASVISION-5399</td>
 <td align="left"><span>VPAC/DMPAC Func clock not enabled for j721s2</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5375</td>
-<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-5065</td>
@@ -399,7 +373,7 @@ The tools used to validate this package are listed in top level user guide <a hr
 </table>
 <h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
 
-None for 8.4 release.
+None for 8.4.3 release.
 <p>
 <hr>
 <p>
