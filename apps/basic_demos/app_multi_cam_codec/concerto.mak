@@ -1,4 +1,4 @@
-ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
 
 include $(PRELUDE)
@@ -16,7 +16,7 @@ SKIPBUILD=1
 endif
 
 ifeq ($(TARGET_CPU),A72)
-ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
 CSOURCES    += main_linux_arm.c
 endif
@@ -29,18 +29,35 @@ IDIRS += $(VISION_APPS_MODULES_IDIRS)
 STATIC_LIBS += $(IMAGING_LIBS)
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(VISION_APPS_MODULES_LIBS)
+
 STATIC_LIBS += app_utils_codec_wrapper
 
 ifeq ($(TARGET_OS), LINUX)
 STATIC_LIBS += app_utils_gst_wrapper
-endif
 
-ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
 SHARED_LIBS += gstreamer-1.0
 SHARED_LIBS += gstapp-1.0
 SHARED_LIBS += gstbase-1.0
 SHARED_LIBS += gobject-2.0
 SHARED_LIBS += glib-2.0
+endif
+
+ifeq ($(TARGET_OS), QNX)
+STATIC_LIBS += app_utils_omax_wrapper
+
+LDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/core/nto/aarch64/$(BUILD_PROFILE_QNX_SO)/
+LDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/utility/nto/aarch64/$(BUILD_PROFILE_QNX_SO)/
+
+ifeq ($(TARGET_BUILD), release)
+SHARED_LIBS += omxcore_j7$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += omxil_j7_utility$(BUILD_PROFILE_QNX_SUFFIX)
+endif
+ifeq ($(TARGET_BUILD), debug)
+CFLAGS      += -DDEBUG_MODE
+SHARED_LIBS += slog2
+STATIC_LIBS += omxcore_j7$(BUILD_PROFILE_QNX_SUFFIX)S
+STATIC_LIBS += omxil_j7_utility$(BUILD_PROFILE_QNX_SUFFIX)S
+endif
 endif
 
 include $(FINALE)

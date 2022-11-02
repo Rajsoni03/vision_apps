@@ -31,61 +31,64 @@
  */
 
 #include <utils/codec_wrapper/include/codec_wrapper.h>
+#include <utils/openmax_wrapper/src/omax_wrapper_priv.h>
 
 int32_t appCodecInit(app_codec_wrapper_params_t* params)
 {
-    return -1;
+    return appOMXInit(params);
 }
 
 int32_t appCodecSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
 {
-    return -1;
+    return appOMXEncInit(data_ptr);
 }
 
 int32_t appCodecSinkInit(void* (*data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
 {
-    return -1;
+    return appOMXDecInit(data_ptr);
 }
 
 int32_t appCodecStart()
 {
-    return -1;
+    return appOMXStart();
 }
 
 int32_t appCodecEnqAppSrc(uint8_t idx)
 {
-    return -1;
+    return appOMXEnqAppEnc(idx);
 }
 
 int32_t appCodecDeqAppSrc(uint8_t idx)
 {
-    return -1;
+    return appOMXDeqAppEnc(idx);
 }
 
 int32_t appCodecEnqEosAppSrc()
 {
-    return -1;
+    return appOMXEnqEosAppEnc();
 }
 
 int32_t appCodecDeqAppSink(uint8_t idx)
 {
-    return -1;
+    return appOMXDeqAppDec(idx);
 }
 
 int32_t appCodecEnqAppSink(uint8_t idx)
 {
-    return -1;
+    return appOMXEnqAppDec(idx);
 }
 
 int32_t appCodecStop()
 {
-    return -1;
+    return appOMXStop();
 }
 
 void appCodecDeInit()
 {
+    appOMXDeInit();
 }
 
 void appCodecPrintStats()
 {
+    appOMXPrintStats();
 }

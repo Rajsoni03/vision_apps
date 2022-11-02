@@ -61,32 +61,33 @@
  */
 typedef struct 
 {
-    #if defined(LINUX)
     char        m_AppSrcNameArr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_LEN_ELEM_NAME];/* Name of the AppSrc element */
-    int32_t     in_width;/* Width of the buffers input to the GstPipeline */
-    int32_t     in_height;/* Height of the buffers input to the GstPipeline */
-    char        in_format[8];/* Format of the buffers input to the GstPipeline (eg:"NV12") */
-    uint8_t     in_num_planes;/* Number of planes of the buffers input to the GstPipeline */
-    uint8_t     in_num_channels;/* Number of channels input to the GstPipeline */
-    uint8_t     in_buffer_depth;/* The input buffer pool size for the GstPipeline */
+    int32_t     in_width;/* Width of the buffers input to the CodecPipeline */
+    int32_t     in_height;/* Height of the buffers input to the CodecPipeline */
+    char        in_format[8];/* Format of the buffers input to the CodecPipeline (eg:"NV12") */
+    uint8_t     in_num_planes;/* Number of planes of the buffers input to the CodecPipeline */
+    uint8_t     in_num_channels;/* Number of channels input to the CodecPipeline */
+    uint8_t     in_buffer_depth;/* The input buffer pool size for the CodecPipeline */
 
     char        m_AppSinkNameArr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_LEN_ELEM_NAME];/* Name of the AppSink element */
-    int32_t     out_width;/* Width of the buffers output from the GstPipeline */
-    int32_t     out_height;/* Height of the buffers output from the GstPipeline */
-    char        out_format[8];/* Format of the buffers output from the GstPipeline (eg:"NV12") */
-    uint8_t     out_num_planes;/* Number of planes of the buffers output from the GstPipeline */
-    uint8_t     out_num_channels;/* Number of channels output from the GstPipeline */
-    uint8_t     out_buffer_depth;/* The output buffer pool size for the GstPipeline */
+    int32_t     out_width;/* Width of the buffers output from the CodecPipeline */
+    int32_t     out_height;/* Height of the buffers output from the CodecPipeline */
+    char        out_format[8];/* Format of the buffers output from the CodecPipeline (eg:"NV12") */
+    uint8_t     out_num_planes;/* Number of planes of the buffers output from the CodecPipeline */
+    uint8_t     out_num_channels;/* Number of channels output from the CodecPipeline */
+    uint8_t     out_buffer_depth;/* The output buffer pool size for the CodecPipeline */
 
-    char        m_cmdString[CODEC_MAX_LEN_CMD_STR];/* The command string that describes the GstPipeline, in a format accepted by gst_parse_launch() */
-    #endif /* LINUX */
+    char        m_cmdString[CODEC_MAX_LEN_CMD_STR];/* The command string that describes the CodecPipeline, in a format accepted by gst_parse_launch() */
+
+    int32_t appEncode;
+    int32_t appDecode;
 } app_codec_wrapper_params_t;
 
 /**
  * \brief 
  * 
  * Launches the CODECPipeline described by user defined parameters.
- * Initializes the gst_wrapper and calls gst_parse_launch() on the command string.
+ * Initializes the codec_wrapper and calls gst_parse_launch() on the command string.
  * 
  * \param [in]      prm         Init parameters
  */
@@ -180,7 +181,7 @@ int32_t appCodecStop();
 /**
  * \brief 
  * 
- * Unmaps all buffers that were mapped and destroys all GStreamer objects.
+ * Unmaps all buffers that were mapped and destroys all GStreamer or OpenMAX objects.
  */
 void    appCodecDeInit();
 
