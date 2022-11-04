@@ -506,7 +506,7 @@ int32_t appIpcEchoTestStart(void)
         params.stack     = g_taskStackBuf[cpu_id];
         params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
         params.arg0 = 0;
-        params.name = (uint8_t*)&g_rpmsg_responder_task_name[0];
+        params.name = (const char*)&g_rpmsg_responder_task_name[0];
 
         strncpy(g_rpmsg_responder_task_name, "IPC_TEST_RX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
         g_rpmsg_responder_task_name[APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
@@ -539,7 +539,7 @@ int32_t appIpcEchoTestStart(void)
                     params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
                     params.arg0     = (void*)ipc_lld_cpu_id;
                     params.arg1     = (void*)cpu_id;
-                    params.name     = (uint8_t*)&g_rpmsg_sender_task_name[cpu_id][0];
+                    params.name     = (const char*)&g_rpmsg_sender_task_name[cpu_id][0];
 
                     strncpy(g_rpmsg_sender_task_name[cpu_id], "IPC_TEST_TX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
                     g_rpmsg_sender_task_name[cpu_id][APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;

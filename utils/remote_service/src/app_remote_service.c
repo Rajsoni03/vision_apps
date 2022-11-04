@@ -403,7 +403,7 @@ static int32_t appRemoteServiceCreateRpmsgRxTask(app_remote_service_obj_t *obj)
     task_prms.priority = obj->task_pri;
     task_prms.arg0 = NULL;
     task_prms.arg1 = NULL;
-    task_prms.name = (uint8_t*)&obj->task_name[0];
+    task_prms.name = (const char*)&obj->task_name[0];
 
     strncpy(obj->task_name, "REMOTE_SRV", APP_REMOTE_SERVICE_MAX_TASK_NAME);
     obj->task_name[APP_REMOTE_SERVICE_MAX_TASK_NAME-1] = 0;

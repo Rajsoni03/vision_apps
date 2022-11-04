@@ -379,7 +379,7 @@ static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
     rtos_task_prms.priority = obj->task_pri;
     rtos_task_prms.arg0 = NULL;
     rtos_task_prms.arg1 = NULL;
-    rtos_task_prms.name = (uint8_t*)&obj->task_name[0];
+    rtos_task_prms.name = (const char*)&obj->task_name[0];
 
     strncpy(obj->task_name, "IPC_RX", APP_IPC_MAX_TASK_NAME);
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
@@ -968,7 +968,7 @@ int32_t appIpcCreateTraceBufFlushTask(void)
     taskParams.priority  = 0;
     taskParams.stack     = &gIpcTraceBufFlushBuf[0];
     taskParams.stacksize = sizeof(gIpcTraceBufFlushBuf);
-    taskParams.name      = "IPC tracebuf flush";
+    taskParams.name      = (const char*)"IPC tracebuf flush";
 
     TaskP_create(&traceBufFlush, &taskParams);
 

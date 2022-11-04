@@ -198,7 +198,7 @@ static int32_t appRemoteServiceTestLoadTestInit()
     task_prms.priority = APP_REMOTE_SERVICE_LOAD_TEST_TASK_PRI;
     task_prms.arg0 = NULL;
     task_prms.arg1 = NULL;
-    task_prms.name = (uint8_t*)&obj->task_name[0];
+    task_prms.name = (const char*)&obj->task_name[0];
 
     strncpy(obj->task_name, "LOAD_TEST", APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME);
     obj->task_name[APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME-1] = 0;

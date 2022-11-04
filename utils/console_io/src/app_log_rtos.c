@@ -206,7 +206,7 @@ int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm)
     rtos_task_prms.priority = prm->log_rd_task_pri;
     rtos_task_prms.arg0 = (void*)(obj);
     rtos_task_prms.arg1 = NULL;
-    rtos_task_prms.name = (uint8_t*)&obj->task_name[0];
+    rtos_task_prms.name = (const char*)&obj->task_name[0];
 
     strncpy(obj->task_name, "LOG_RD", APP_LOG_MAX_TASK_NAME);
     obj->task_name[APP_LOG_MAX_TASK_NAME-1] = 0;
