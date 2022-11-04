@@ -77,11 +77,11 @@ MEMORY
     /* DDR for C66x_2 for code/data [ size 14.00 MB ] */
     DDR_C66x_2               ( RWIX ) : ORIGIN = 0xA9200400 , LENGTH = 0x00DFFC00
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xB0000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xAA000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xB2000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xAC000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB2040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAC040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
     /* DDR for c66x_2 for local heap [ size 16.00 MB ] */

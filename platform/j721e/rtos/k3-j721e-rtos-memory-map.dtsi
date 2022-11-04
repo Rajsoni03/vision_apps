@@ -95,24 +95,24 @@
 		reg = <0x00 0xa9100000 0x00 0x00f00000>;
 		no-map;
 	};
-	vision_apps_c71_0_dma_memory_region: vision-apps-c71-dma-memory@aa000000 {
-		compatible = "shared-dma-pool";
-		reg = <0x00 0xaa000000 0x00 0x00100000>;
-		no-map;
-	};
-	vision_apps_c71_0_memory_region: vision-apps-c71-memory@aa100000 {
-		compatible = "shared-dma-pool";
-		reg = <0x00 0xaa100000 0x00 0x04f00000>;
-		no-map;
-	};
 	vision_apps_rtos_ipc_memory_region: vision-apps-rtos-ipc-memory-region {
-		reg = <0x00 0xb0000000 0x00 0x02000000>;
+		reg = <0x00 0xaa000000 0x00 0x02000000>;
 		alignment = <0x1000>;
 		no-map;
 	};
-	vision_apps_memory_region: vision-apps-dma-memory@b2000000 {
+	vision_apps_memory_region: vision-apps-dma-memory@ac000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xb2000000 0x00 0x06000000>;
+		reg = <0x00 0xac000000 0x00 0x06000000>;
+		no-map;
+	};
+	vision_apps_c71_0_dma_memory_region: vision-apps-c71-dma-memory@b2000000 {
+		compatible = "shared-dma-pool";
+		reg = <0x00 0xb2000000 0x00 0x00100000>;
+		no-map;
+	};
+	vision_apps_c71_0_memory_region: vision-apps-c71-memory@b2100000 {
+		compatible = "shared-dma-pool";
+		reg = <0x00 0xb2100000 0x00 0x05f00000>;
 		no-map;
 	};
 	vision_apps_shared_region: vision_apps_shared-memories {
