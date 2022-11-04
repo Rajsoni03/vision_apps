@@ -200,36 +200,12 @@ mcu3_1_ddr_resource_table_addr = mcu3_1_ddr_ipc_addr + linux_ddr_ipc_size;
 mcu3_1_ddr_addr = mcu3_1_ddr_resource_table_addr + linux_ddr_resource_table_size;
 mcu3_1_ddr_size = 16*MB - (mcu3_1_ddr_addr-mcu3_1_ddr_ipc_addr);
 
-c7x_2_ddr_ipc_addr = mcu3_1_ddr_addr + mcu3_1_ddr_size;
-c7x_2_ddr_resource_table_addr = c7x_2_ddr_ipc_addr + linux_ddr_ipc_size;
-c7x_2_ddr_boot_addr = c7x_2_ddr_resource_table_addr + 1*MB;
-c7x_2_ddr_boot_size = 1*KB;
-c7x_2_ddr_vecs_addr = c7x_2_ddr_resource_table_addr + 3*MB;
-c7x_2_ddr_vecs_size = 16*KB;
-c7x_2_ddr_secure_vecs_addr = c7x_2_ddr_resource_table_addr + 5*MB;
-c7x_2_ddr_secure_vecs_size = 16*KB;
-c7x_2_ddr_addr = c7x_2_ddr_secure_vecs_addr + c7x_2_ddr_secure_vecs_size;
-c7x_2_ddr_size = 32*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
-
-c7x_1_ddr_ipc_addr =c7x_2_ddr_addr + c7x_2_ddr_size;
-c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
-c7x_1_ddr_boot_addr = c7x_1_ddr_resource_table_addr + 1*MB;
-c7x_1_ddr_boot_size = 1*KB;
-c7x_1_ddr_vecs_addr = c7x_1_ddr_resource_table_addr + 3*MB;
-c7x_1_ddr_vecs_size = 16*KB;
-c7x_1_ddr_secure_vecs_addr = c7x_1_ddr_resource_table_addr + 5*MB;
-c7x_1_ddr_secure_vecs_size = 16*KB;
-c7x_1_ddr_addr = c7x_1_ddr_secure_vecs_addr + c7x_1_ddr_secure_vecs_size;
-c7x_1_ddr_size = 80*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
-
 #
 # DDR memory allocation for various shared memories
 #
 
-# Keeping 16MB additional for VRING start, so that IPC Shared memory starts
-# exactly at 0xAA000000 offset. This gap of 16MB is not currently used and
-# can be used for Linux..
-ipc_vring_mem_addr      = c7x_1_ddr_addr  + c7x_1_ddr_size + 16*MB;
+# Hardcoding this value, as this cannot be different from IPC echo test value
+ipc_vring_mem_addr      = 0xA8000000;
 ipc_vring_mem_size      = 32*MB;
 
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
@@ -240,8 +216,30 @@ tiovx_obj_desc_mem_size = 64*MB - app_log_mem_size;
 tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
 tiovx_log_rt_mem_size   = 32*MB;
 
-# Shared memory for Buffers/ION allocator
-ddr_shared_mem_addr     = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
+c7x_1_ddr_ipc_addr =tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
+c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
+c7x_1_ddr_boot_addr = c7x_1_ddr_resource_table_addr + 1*MB;
+c7x_1_ddr_boot_size = 1*KB;
+c7x_1_ddr_vecs_addr = c7x_1_ddr_resource_table_addr + 3*MB;
+c7x_1_ddr_vecs_size = 16*KB;
+c7x_1_ddr_secure_vecs_addr = c7x_1_ddr_resource_table_addr + 5*MB;
+c7x_1_ddr_secure_vecs_size = 16*KB;
+c7x_1_ddr_addr = c7x_1_ddr_secure_vecs_addr + c7x_1_ddr_secure_vecs_size;
+c7x_1_ddr_size = 96*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
+
+c7x_2_ddr_ipc_addr = c7x_1_ddr_addr  + c7x_1_ddr_size;
+c7x_2_ddr_resource_table_addr = c7x_2_ddr_ipc_addr + linux_ddr_ipc_size;
+c7x_2_ddr_boot_addr = c7x_2_ddr_resource_table_addr + 1*MB;
+c7x_2_ddr_boot_size = 1*KB;
+c7x_2_ddr_vecs_addr = c7x_2_ddr_resource_table_addr + 3*MB;
+c7x_2_ddr_vecs_size = 16*KB;
+c7x_2_ddr_secure_vecs_addr = c7x_2_ddr_resource_table_addr + 5*MB;
+c7x_2_ddr_secure_vecs_size = 16*KB;
+c7x_2_ddr_addr = c7x_2_ddr_secure_vecs_addr + c7x_2_ddr_secure_vecs_size;
+c7x_2_ddr_size = 32*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
+
+# Shared memory for DMA Buf FD carveout
+ddr_shared_mem_addr     = c7x_2_ddr_addr + c7x_2_ddr_size;
 ddr_shared_mem_size     = 512*MB;
 
 mcu1_0_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;

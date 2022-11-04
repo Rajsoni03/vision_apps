@@ -143,37 +143,37 @@
 #define DDR_MCU3_1_DTS_ADDR (0xA7100000u)
 #define DDR_MCU3_1_DTS_SIZE (0x00F00000u)
 
-/* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_2_IPC_ADDR (0xA8000000u)
-#define DDR_C7x_2_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_2 for all sections, used for reserving memory in DTS file [ size 31.00 MB ] */
-#define DDR_C7x_2_DTS_ADDR (0xA8100000u)
-#define DDR_C7x_2_DTS_SIZE (0x01F00000u)
-
-/* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_1_IPC_ADDR (0xAA000000u)
-#define DDR_C7x_1_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 79.00 MB ] */
-#define DDR_C7x_1_DTS_ADDR (0xAA100000u)
-#define DDR_C7x_1_DTS_SIZE (0x04F00000u)
-
 /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-#define IPC_VRING_MEM_ADDR (0xB0000000u)
+#define IPC_VRING_MEM_ADDR (0xA8000000u)
 #define IPC_VRING_MEM_SIZE (0x02000000u)
 
 /* Memory for remote core logging [ size 256.00 KB ] */
-#define APP_LOG_MEM_ADDR (0xB2000000u)
+#define APP_LOG_MEM_ADDR (0xAA000000u)
 #define APP_LOG_MEM_SIZE (0x00040000u)
 
 /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-#define TIOVX_OBJ_DESC_MEM_ADDR (0xB2040000u)
+#define TIOVX_OBJ_DESC_MEM_ADDR (0xAA040000u)
 #define TIOVX_OBJ_DESC_MEM_SIZE (0x03FC0000u)
 
 /* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-#define TIOVX_LOG_RT_MEM_ADDR (0xB6000000u)
+#define TIOVX_LOG_RT_MEM_ADDR (0xAE000000u)
 #define TIOVX_LOG_RT_MEM_SIZE (0x02000000u)
+
+/* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
+#define DDR_C7x_1_IPC_ADDR (0xB0000000u)
+#define DDR_C7x_1_IPC_SIZE (0x00100000u)
+
+/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 95.00 MB ] */
+#define DDR_C7x_1_DTS_ADDR (0xB0100000u)
+#define DDR_C7x_1_DTS_SIZE (0x05F00000u)
+
+/* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
+#define DDR_C7x_2_IPC_ADDR (0xB6000000u)
+#define DDR_C7x_2_IPC_SIZE (0x00100000u)
+
+/* DDR for C7x_2 for all sections, used for reserving memory in DTS file [ size 31.00 MB ] */
+#define DDR_C7x_2_DTS_ADDR (0xB6100000u)
+#define DDR_C7x_2_DTS_SIZE (0x01F00000u)
 
 /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
 #define DDR_SHARED_MEM_ADDR (0xB8000000u)

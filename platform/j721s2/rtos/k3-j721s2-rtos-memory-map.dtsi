@@ -4,7 +4,7 @@
   * IMPORTANT NOTE: Follow below instructions to apply the updated memory map to linux dtsi file, 
   * 
   * 1. Copy the memory sections, from the generated dts file, to the file shown below under reserved_memory: reserved-memory { ... } 
-  *     ${LINUX_KERNEL_PATH}/arch/arm64/boot/dts/ti/k3-j721e-rtos-memory-map.dtsi
+  *     ${LINUX_KERNEL_PATH}/arch/arm64/boot/dts/ti/k3-j721s2-rtos-memory-map.dtsi
   * 
   * 2. Rebuild the dtb, dtbo from PSDK Linux install directory 
   *      make linux-dtbs 
@@ -75,34 +75,34 @@
 		reg = <0x00 0xa7100000 0x00 0x00f00000>;
 		no-map;
 	};
-	vision_apps_c71_1_dma_memory_region: vision-apps-c71_1-dma-memory@a8000000 {
+	vision_apps_rtos_ipc_memory_region: vision-apps-rtos-ipc-memory-region@a8000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xa8000000 0x00 0x00100000>;
+		reg = <0x00 0xa8000000 0x00 0x02000000>;
 		no-map;
 	};
-	vision_apps_c71_1_memory_region: vision-apps-c71_1-memory@a8100000 {
+	vision_apps_memory_region: vision-apps-dma-memory@aa000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xa8100000 0x00 0x01f00000>;
+		reg = <0x00 0xaa000000 0x00 0x06000000>;
 		no-map;
 	};
-	vision_apps_c71_0_dma_memory_region: vision-apps-c71-dma-memory@aa000000 {
+	vision_apps_c71_0_dma_memory_region: vision-apps-c71-dma-memory@b0000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xaa000000 0x00 0x00100000>;
+		reg = <0x00 0xb0000000 0x00 0x00100000>;
 		no-map;
 	};
-	vision_apps_c71_0_memory_region: vision-apps-c71_0-memory@aa100000 {
+	vision_apps_c71_0_memory_region: vision-apps-c71_0-memory@b0100000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xaa100000 0x00 0x04f00000>;
+		reg = <0x00 0xb0100000 0x00 0x05f00000>;
 		no-map;
 	};
-	vision_apps_rtos_ipc_memory_region: vision-apps-rtos-ipc-memory-region@b0000000 {
+	vision_apps_c71_1_dma_memory_region: vision-apps-c71_1-dma-memory@b6000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xb0000000 0x00 0x02000000>;
+		reg = <0x00 0xb6000000 0x00 0x00100000>;
 		no-map;
 	};
-	vision_apps_memory_region: vision-apps-dma-memory@b2000000 {
+	vision_apps_c71_1_memory_region: vision-apps-c71_1-memory@b6100000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xb2000000 0x00 0x06000000>;
+		reg = <0x00 0xb6100000 0x00 0x01f00000>;
 		no-map;
 	};
 	vision_apps_shared_region: vision_apps_shared-memories {
