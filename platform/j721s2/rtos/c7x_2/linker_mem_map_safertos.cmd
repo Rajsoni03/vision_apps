@@ -70,18 +70,18 @@ MEMORY
     L2RAM_C7x_2              ( RWIX ) : ORIGIN = 0x65800000 , LENGTH = 0x00070000
     /* L1 for C7x_2 [ size 16.00 KB ] */
     L1RAM_C7x_2              ( RWIX ) : ORIGIN = 0x65E00000 , LENGTH = 0x00004000
-    /* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xA8000000 , LENGTH = 0x00100000
-    /* DDR for C7x_2 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA8100000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for code/data [ size 30.00 MB ] */
-    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xA8200000 , LENGTH = 0x01E00000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xB0000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xA8000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xB2000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xAA000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xB2040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAA040000 , LENGTH = 0x03FC0000
+    /* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
+    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xB6000000 , LENGTH = 0x00100000
+    /* DDR for C7x_2 for Linux resource table [ size 1024 B ] */
+    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB6100000 , LENGTH = 0x00000400
+    /* DDR for C7x_2 for code/data [ size 30.00 MB ] */
+    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xB6200000 , LENGTH = 0x01E00000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xB8000000 , LENGTH = 0x20000000
     /* DDR for c7x_2 for local heap [ size 16.00 MB ] */
