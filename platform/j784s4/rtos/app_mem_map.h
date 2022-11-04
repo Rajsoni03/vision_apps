@@ -183,57 +183,57 @@
 #define DDR_MCU4_1_IPC_ADDR (0xAA000000u)
 #define DDR_MCU4_1_IPC_SIZE (0x00100000u)
 
-/* DDR for MCU4_1 for all sections, used for reserving memory in DTS file [ size 15.00 MB ] */
+/* DDR for MCU4_1 for all sections, used for reserving memory in DTS file [ size 31.00 MB ] */
 #define DDR_MCU4_1_DTS_ADDR (0xAA100000u)
-#define DDR_MCU4_1_DTS_SIZE (0x00F00000u)
-
-/* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_1_IPC_ADDR (0xAB000000u)
-#define DDR_C7x_1_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_1_DTS_ADDR (0xAB100000u)
-#define DDR_C7x_1_DTS_SIZE (0x03300000u)
-
-/* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_2_IPC_ADDR (0xAE400000u)
-#define DDR_C7x_2_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_2 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_2_DTS_ADDR (0xAE500000u)
-#define DDR_C7x_2_DTS_SIZE (0x03300000u)
-
-/* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_3_IPC_ADDR (0xB1800000u)
-#define DDR_C7x_3_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_3 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_3_DTS_ADDR (0xB1900000u)
-#define DDR_C7x_3_DTS_SIZE (0x03300000u)
-
-/* DDR for C7x_4 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_4_IPC_ADDR (0xB4C00000u)
-#define DDR_C7x_4_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_4 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_4_DTS_ADDR (0xB4D00000u)
-#define DDR_C7x_4_DTS_SIZE (0x03300000u)
+#define DDR_MCU4_1_DTS_SIZE (0x01F00000u)
 
 /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 48.00 MB ] */
-#define IPC_VRING_MEM_ADDR (0xB8000000u)
+#define IPC_VRING_MEM_ADDR (0xAC000000u)
 #define IPC_VRING_MEM_SIZE (0x03000000u)
 
 /* Memory for remote core logging [ size 256.00 KB ] */
-#define APP_LOG_MEM_ADDR (0xBB000000u)
+#define APP_LOG_MEM_ADDR (0xAF000000u)
 #define APP_LOG_MEM_SIZE (0x00040000u)
 
 /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-#define TIOVX_OBJ_DESC_MEM_ADDR (0xBB040000u)
+#define TIOVX_OBJ_DESC_MEM_ADDR (0xAF040000u)
 #define TIOVX_OBJ_DESC_MEM_SIZE (0x03FC0000u)
 
-/* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-#define TIOVX_LOG_RT_MEM_ADDR (0xBF000000u)
-#define TIOVX_LOG_RT_MEM_SIZE (0x02000000u)
+/* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
+#define TIOVX_LOG_RT_MEM_ADDR (0xB3000000u)
+#define TIOVX_LOG_RT_MEM_SIZE (0x01000000u)
+
+/* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
+#define DDR_C7x_1_IPC_ADDR (0xB4000000u)
+#define DDR_C7x_1_IPC_SIZE (0x00100000u)
+
+/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
+#define DDR_C7x_1_DTS_ADDR (0xB4100000u)
+#define DDR_C7x_1_DTS_SIZE (0x03300000u)
+
+/* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
+#define DDR_C7x_2_IPC_ADDR (0xB7400000u)
+#define DDR_C7x_2_IPC_SIZE (0x00100000u)
+
+/* DDR for C7x_2 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
+#define DDR_C7x_2_DTS_ADDR (0xB7500000u)
+#define DDR_C7x_2_DTS_SIZE (0x03300000u)
+
+/* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
+#define DDR_C7x_3_IPC_ADDR (0xBA800000u)
+#define DDR_C7x_3_IPC_SIZE (0x00100000u)
+
+/* DDR for C7x_3 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
+#define DDR_C7x_3_DTS_ADDR (0xBA900000u)
+#define DDR_C7x_3_DTS_SIZE (0x03300000u)
+
+/* DDR for C7x_4 for Linux IPC [ size 1024.00 KB ] */
+#define DDR_C7x_4_IPC_ADDR (0xBDC00000u)
+#define DDR_C7x_4_IPC_SIZE (0x00100000u)
+
+/* DDR for C7x_4 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
+#define DDR_C7x_4_DTS_ADDR (0xBDD00000u)
+#define DDR_C7x_4_DTS_SIZE (0x03300000u)
 
 /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
 #define DDR_SHARED_MEM_ADDR (0xC1000000u)

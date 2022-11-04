@@ -72,24 +72,24 @@ MEMORY
     L1RAM_C7x_3              ( RWIX ) : ORIGIN = 0x66E00000 , LENGTH = 0x00004000
     /* MSMC for C7x_3 [ size  3.00 MB ] */
     MSMC_C7x_3               ( RWIX ) : ORIGIN = 0x6A000000 , LENGTH = 0x00300000
-    /* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_3_IPC            ( RWIX ) : ORIGIN = 0xB1800000 , LENGTH = 0x00100000
-    /* DDR for C7x_3 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_3_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB1900000 , LENGTH = 0x00000400
-    /* DDR for C7x_3 for boot section [ size 1024 B ] */
-    DDR_C7x_3_BOOT           ( RWIX ) : ORIGIN = 0xB1A00000 , LENGTH = 0x00000400
-    /* DDR for C7x_3 for vecs section [ size 16.00 KB ] */
-    DDR_C7x_3_VECS           ( RWIX ) : ORIGIN = 0xB1C00000 , LENGTH = 0x00004000
-    /* DDR for C7x_3 for secure vecs section [ size 16.00 KB ] */
-    DDR_C7x_3_SECURE_VECS    ( RWIX ) : ORIGIN = 0xB1E00000 , LENGTH = 0x00004000
-    /* DDR for C7x_3 for code/data [ size 45.98 MB ] */
-    DDR_C7x_3                ( RWIX ) : ORIGIN = 0xB1E04000 , LENGTH = 0x02DFC000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 48.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xB8000000 , LENGTH = 0x03000000
+    IPC_VRING_MEM                     : ORIGIN = 0xAC000000 , LENGTH = 0x03000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xBB000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xAF000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xBB040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
+    /* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
+    DDR_C7x_3_IPC            ( RWIX ) : ORIGIN = 0xBA800000 , LENGTH = 0x00100000
+    /* DDR for C7x_3 for Linux resource table [ size 1024 B ] */
+    DDR_C7x_3_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xBA900000 , LENGTH = 0x00000400
+    /* DDR for C7x_3 for boot section [ size 1024 B ] */
+    DDR_C7x_3_BOOT           ( RWIX ) : ORIGIN = 0xBAA00000 , LENGTH = 0x00000400
+    /* DDR for C7x_3 for vecs section [ size 16.00 KB ] */
+    DDR_C7x_3_VECS           ( RWIX ) : ORIGIN = 0xBAC00000 , LENGTH = 0x00004000
+    /* DDR for C7x_3 for secure vecs section [ size 16.00 KB ] */
+    DDR_C7x_3_SECURE_VECS    ( RWIX ) : ORIGIN = 0xBAE00000 , LENGTH = 0x00004000
+    /* DDR for C7x_3 for code/data [ size 45.98 MB ] */
+    DDR_C7x_3                ( RWIX ) : ORIGIN = 0xBAE04000 , LENGTH = 0x02DFC000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
     /* DDR for c7x_3 for local heap [ size 128.00 MB ] */

@@ -234,9 +234,21 @@ mcu4_0_ddr_size = 32*MB - (mcu4_0_ddr_addr-mcu4_0_ddr_ipc_addr);
 mcu4_1_ddr_ipc_addr = mcu4_0_ddr_addr + mcu4_0_ddr_size;
 mcu4_1_ddr_resource_table_addr = mcu4_1_ddr_ipc_addr + linux_ddr_ipc_size;
 mcu4_1_ddr_addr = mcu4_1_ddr_resource_table_addr + linux_ddr_resource_table_size;
-mcu4_1_ddr_size = 16*MB - (mcu4_1_ddr_addr-mcu4_1_ddr_ipc_addr);
+mcu4_1_ddr_size = 32*MB - (mcu4_1_ddr_addr-mcu4_1_ddr_ipc_addr);
 
-c7x_1_ddr_ipc_addr = mcu4_1_ddr_addr + mcu4_1_ddr_size;
+# Hardcoding this value, as this cannot be different from IPC echo test value
+ipc_vring_mem_addr      = 0xAC000000;
+ipc_vring_mem_size      = 48*MB;
+
+app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
+app_log_mem_size        = 256*KB;
+tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
+tiovx_obj_desc_mem_size = 64*MB - app_log_mem_size;
+
+tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
+tiovx_log_rt_mem_size   = 16*MB;
+
+c7x_1_ddr_ipc_addr = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
 c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_1_ddr_boot_addr = c7x_1_ddr_resource_table_addr + 1*MB;
 c7x_1_ddr_boot_size = 1*KB;
@@ -284,19 +296,8 @@ c7x_4_ddr_size = 52*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
 # DDR memory allocation for various shared memories
 #
 
-ipc_vring_mem_addr      = c7x_4_ddr_addr  + c7x_4_ddr_size;
-ipc_vring_mem_size      = 48*MB;
-
-app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
-app_log_mem_size        = 256*KB;
-tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
-tiovx_obj_desc_mem_size = 64*MB - app_log_mem_size;
-
-tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
-tiovx_log_rt_mem_size   = 32*MB;
-
-# Shared memory for Buffers/ION allocator
-ddr_shared_mem_addr     = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
+# Shared memory for DMA Buf FD carveout
+ddr_shared_mem_addr     = c7x_4_ddr_addr + c7x_4_ddr_size;
 ddr_shared_mem_size     = 512*MB;
 
 mcu1_0_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
