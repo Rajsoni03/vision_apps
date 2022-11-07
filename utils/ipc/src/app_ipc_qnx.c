@@ -368,7 +368,7 @@ static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
     qnx_task_prms.priority = obj->task_pri;
     qnx_task_prms.arg0 = NULL;
     qnx_task_prms.arg1 = NULL;
-    qnx_task_prms.name = (uint8_t*)&obj->task_name[0];
+    qnx_task_prms.name = (const char*)&obj->task_name[0];
 
     strncpy(obj->task_name, "IPC_RX", APP_IPC_MAX_TASK_NAME);
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
