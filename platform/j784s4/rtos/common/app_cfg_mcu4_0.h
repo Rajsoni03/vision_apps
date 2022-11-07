@@ -69,6 +69,5 @@
 
 #define ENABLE_FVID2
 #define ENABLE_VHWA_VPAC1
-#undef ENABLE_UDMA_COPY
 
 #endif /* APP_CFG_MCU4_0_H_ */
