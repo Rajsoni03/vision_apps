@@ -25,10 +25,10 @@ define INSTALL_TEST_DATA =
 	cp -r $(TIOVX_PATH)/conformance_tests/test_data/harriscorners $(1)/$(2)/test_data/
 	rm -rf $(1)/$(2)/test_data/tivx/tidl_models
 	rm -rf $(1)/$(2)/test_data/psdkra/tidl_models
-	cp -r $(TIOVX_PATH)/conformance_tests/test_data/tivx $(1)/$(2)/test_data/
-	cp -r $(TIOVX_PATH)/conformance_tests/test_data/psdkra $(1)/$(2)/test_data/
-	rm -f $(1)/$(2)/test_data/tivx/tidl_models
-	rm -f $(1)/$(2)/test_data/psdkra/tidl_models
+	cp -rL $(TIOVX_PATH)/conformance_tests/test_data/tivx $(1)/$(2)/test_data/
+	cp -rL $(TIOVX_PATH)/conformance_tests/test_data/psdkra $(1)/$(2)/test_data/
+	rm -rf $(1)/$(2)/test_data/tivx/tidl_models
+	rm -rf $(1)/$(2)/test_data/psdkra/tidl_models
 	cp -r $(TIOVX_PATH)/conformance_tests/test_data/tidl_models/$(SOC)/tivx/tidl_models $(1)/$(2)/test_data/tivx/tidl_models
 	cp -r $(TIOVX_PATH)/conformance_tests/test_data/tidl_models/$(SOC)/psdkra/tidl_models $(1)/$(2)/test_data/psdkra/tidl_models
 	sync
