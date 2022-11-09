@@ -153,7 +153,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .regionId         = 7U,
         .enable           = 1U,
         .baseAddr         = IPC_VRING_MEM_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_128MB,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_64MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
@@ -163,14 +163,13 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 8 configuration: TIOVX Log RT Mem */
-        /* Note: with the increased IPC VRING memory, the previous
-         * entry does not cover the entire non-cached region.
-         * Separating this out in order to mark the size correctly */
+        /* Region 8 configuration: Remaining noncache memory
+         * This needs to be aligned, so starting it at
+         * 0xB0000000 */
         .regionId         = 8U,
         .enable           = 1U,
-        .baseAddr         = TIOVX_LOG_RT_MEM_ADDR,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_32MB,
+        .baseAddr         = 0xB0000000,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_64MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,

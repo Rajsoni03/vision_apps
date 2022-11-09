@@ -66,7 +66,7 @@ static const uint32_t gMemAttr[CSL_ARM_R5_MEM_ATTR_MAX][3U] =
 xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((weak)) gMPUConfigParms[CSL_ARM_R5F_MPU_REGIONS_MAX] =
 {
     {
-        /* Region 0 configuration: complete 32 bit address space = 4Gbits add one more 2gb */
+        /* Region 1 configuration: complete 32 bit address space = 4Gbits add one more 2gb */
         /* ulRegionNumber */
         .ulRegionNumber         = 1U,
         /* Starting address */
@@ -86,7 +86,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 3 configuration: ATCM memory */
+        /* Region 2 configuration: ATCM memory */
         /* ulRegionNumber */
         .ulRegionNumber         = 2U,
         /* Starting address */
@@ -106,7 +106,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 2 configuration: 512 KB OCMC RAM */
+        /* Region 3 configuration: 512 KB OCMC RAM */
         /* ulRegionNumber */
         .ulRegionNumber         = 3U,
         /* Starting address */
@@ -126,29 +126,9 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 3 configuration: 2 MB MCMS3 RAM */
-        /* ulRegionNumber */
-        .ulRegionNumber         = 4U,
-        /* Starting address */
-        .ulRegionBeginAddress   = 0x70000000,
-        /* Access permission */
-        {
-            .ulexeNeverControl  = 0U,
-            .ulaccessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-            .ulshareable        = 0U,
-            .ulcacheable        = 1U,
-            .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
-            .ulmemAttr          = 0U,
-        },
-        /* Size is 8MB */
-        .ulRegionSize           = (8U * 1024U * 1024U),
-        /* ulSubRegionDisable */
-        .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
-    },
-    {
         /* Region 4 configuration: 2 GB DDR RAM */
         /* ulRegionNumber */
-        .ulRegionNumber         = 5U,
+        .ulRegionNumber         = 4U,
         /* Starting address */
         .ulRegionBeginAddress   = 0x80000000,
         /* Access permission */
@@ -176,7 +156,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
            Application can chose to overwrite this MPU configuration if needed.
            The same is true for the region corresponding to ATCM. */
         /* ulRegionNumber */
-        .ulRegionNumber         = 6U,
+        .ulRegionNumber         = 5U,
         /* Starting address */
         .ulRegionBeginAddress   = 0x41010000,
         /* Access permission */
@@ -194,29 +174,9 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 6 configuration: 128 MB FSS DAT */
+        /* Region 6 configuration: Ring buffer */
         /* ulRegionNumber */
-        .ulRegionNumber         = 7U,
-        /* Starting address */
-        .ulRegionBeginAddress   = 0x50000000,
-        /* Access permission */
-        {
-            .ulexeNeverControl  = 0U,
-            .ulaccessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
-            .ulshareable        = 0U,
-            .ulcacheable        = 1U,
-            .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WB_WA,
-            .ulmemAttr          = 0U,
-        },
-        /* size is 128MB */
-        .ulRegionSize           = (128U * 1024U *1024U),
-        /* ulSubRegionDisable */
-        .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
-    },
-    {
-        /* Region 7 configuration: Ring buffer */
-        /* ulRegionNumber */
-        .ulRegionNumber         = 8U,
+        .ulRegionNumber         = 6U,
         /* Starting address */
         .ulRegionBeginAddress   = IPC_VRING_MEM_ADDR,
         /* Access permission */
@@ -229,12 +189,52 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulmemAttr          = 0U,
         },
         /* ulRegionSize */
-        .ulRegionSize           = (128U * 1024U * 1024U),
+        .ulRegionSize           = (32U * 1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 8 configuration: Ring buffer */
+        /* Region 7 configuration: Log mem + Carveout */
+        /* ulRegionNumber */
+        .ulRegionNumber         = 7U,
+        /* Starting address */
+        .ulRegionBeginAddress   = APP_LOG_MEM_ADDR,
+        /* Access permission */
+        {
+            .ulexeNeverControl  = 1U,
+            .ulaccessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+            .ulshareable        = 0U,
+            .ulcacheable        = 0U,
+            .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
+            .ulmemAttr          = 0U,
+        },
+        /* ulRegionSize */
+        .ulRegionSize           = (64U * 1024U * 1024U),
+        /* ulSubRegionDisable */
+        .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
+    },
+    {
+        /* Region 8 configuration: RT Log memory */
+        /* ulRegionNumber */
+        .ulRegionNumber         = 8U,
+        /* Starting address */
+        .ulRegionBeginAddress   = TIOVX_LOG_RT_MEM_ADDR,
+        /* Access permission */
+        {
+            .ulexeNeverControl  = 1U,
+            .ulaccessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+            .ulshareable        = 0U,
+            .ulcacheable        = 0U,
+            .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
+            .ulmemAttr          = 0U,
+        },
+        /* ulRegionSize */
+        .ulRegionSize           = (32U * 1024U * 1024U),
+        /* ulSubRegionDisable */
+        .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
+    },
+    {
+        /* Region 9 configuration: Ring buffer */
         /* ulRegionNumber */
         .ulRegionNumber         = 9U,
         /* Starting address */
