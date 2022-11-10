@@ -66,7 +66,6 @@
 #include <TI/tivx_img_proc.h>
 #include <TI/tivx_target_kernel.h>
 #include <tivx_alg_ivision_if.h>
-#include "tivx_platform.h"
 #include <tivx_sfm_host.h>
 #include "tiadalg_interface.h"
 #include <utils/udma/include/app_udma.h>
