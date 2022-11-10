@@ -15,11 +15,22 @@ ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
 ifneq ($(wildcard $(PDK_PATH)),)
   include $(PDK_PATH)/packages/ti/build/safertos_version.mk
 
-  export SAFERTOS_KERNEL_INSTALL_PATH_r5f = $(PSDK_PATH)/safertos_$(SOC)_r5f_$(SAFERTOS_VERSION_r5f)
-  export SAFERTOS_KERNEL_INSTALL_PATH_c7x = $(PSDK_PATH)/safertos_$(SOC)_c7x_$(SAFERTOS_VERSION_c7x)
-
+  ifeq ($(SAFERTOS_$(SOC)_r5f_INSTALL_PATH),)
+    export SAFERTOS_KERNEL_INSTALL_PATH_r5f = $(PSDK_PATH)/safertos_$(SOC)_r5f_$(SAFERTOS_VERSION_r5f)
+  else
+    export SAFERTOS_KERNEL_INSTALL_PATH_r5f = $(SAFERTOS_$(SOC)_r5f_INSTALL_PATH)
+  endif
+  ifeq ($(SAFERTOS_$(SOC)_c7x_INSTALL_PATH),)
+    export SAFERTOS_KERNEL_INSTALL_PATH_c7x = $(PSDK_PATH)/safertos_$(SOC)_c7x_$(SAFERTOS_VERSION_c7x)
+  else
+    export SAFERTOS_KERNEL_INSTALL_PATH_c7x = $(SAFERTOS_$(SOC)_c7x_INSTALL_PATH)
+  endif
   ifeq ($(SOC),j721e)
-  export SAFERTOS_KERNEL_INSTALL_PATH_c66 = $(PSDK_PATH)/safertos_$(SOC)_c66_$(SAFERTOS_VERSION_c66)
+    ifeq ($(SAFERTOS_$(SOC)_c66_INSTALL_PATH),)
+      export SAFERTOS_KERNEL_INSTALL_PATH_c66 = $(PSDK_PATH)/safertos_$(SOC)_c66_$(SAFERTOS_VERSION_c66)
+    else
+      export SAFERTOS_KERNEL_INSTALL_PATH_c66 = $(SAFERTOS_$(SOC)_c66_INSTALL_PATH)
+    endif
   endif
 endif
 endif
