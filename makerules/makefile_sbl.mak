@@ -291,14 +291,14 @@ sbl_vision_apps_bootimage_hs:sbl_vision_apps_bootimage_hs_1 sbl_vision_apps_boot
 
 sbl_qnx_bootimage:
 ifeq ($(BUILD_QNX_A72), yes)
-ifeq ("$(wildcard $(QNX_FS_PATH)/qnx-ifs)","")
+ifeq ("$(wildcard $(QNX_BOOT_PATH)/qnx-ifs)","")
 	$(error qnx-ifs is still not built!)
 endif
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs
 	curr_dir=$(PWD)
 	cd $(ATF_OPTEE_PATH) && \
 	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/atf_optee.lds -o $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/atf_optee.elf && \
-	cd $(QNX_FS_PATH) && \
+	cd $(QNX_BOOT_PATH) && \
 	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/ifs_qnx.lds -o $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/ifs_qnx.elf && \
 	cd $(curr_dir)
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/atf_optee.elf $(VISION_APPS_PATH)/out/sbl_bootfiles/rprcs/atf_optee.rprc

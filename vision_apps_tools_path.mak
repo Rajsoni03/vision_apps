@@ -79,8 +79,10 @@ export QNX_TARGET ?= $(QNX_BASE)/target/qnx7
 export GCC_QNX_ROOT ?= $(QNX_HOST)/usr/bin
 export GCC_QNX_ARM_ROOT ?= $(QNX_HOST)/usr/bin
 export GCC_QNX_ARM ?= $(QNX_HOST)/usr/bin
-QNX_FS_PATH ?= $(PSDK_QNX_PATH)/bootfs/
+QNX_BOOT_PATH ?= $(PSDK_QNX_PATH)/bootfs/
+QNX_FS_PATH ?= $(PSDK_QNX_PATH)/qnxfs/
 QNX_SD_FS_ROOT_PATH ?= /media/$(USER)/rootfs
+QNX_SD_FS_QNX_PATH ?= /media/$(USER)/qnxfs
 QNX_SD_FS_BOOT_PATH ?= /media/$(USER)/boot
 
 ifeq ($(BUILD_OS),Linux)

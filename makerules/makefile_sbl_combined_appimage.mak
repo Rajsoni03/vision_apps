@@ -124,7 +124,7 @@ endif
 OUT_DIR=$(VISION_APPS_PATH)/out/sbl_combined_bootfiles/
 ATF_IMG=mpu1_0,$(ATF_OPTEE_PATH)/bl31.bin,0x70000000,0x70000000
 OPTEE_IMG=load_only,$(ATF_OPTEE_PATH)/bl32.bin,0x9e800000,0x9e800000
-KERNEL_IMG=load_only,$(QNX_FS_PATH)/qnx-ifs,0x80080000,0x80080000
+KERNEL_IMG=load_only,$(QNX_BOOT_PATH)/qnx-ifs,0x80080000,0x80080000
 DTB_IMG=
 SPL_IMG=
   IMG1=mcu1_0,$(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f

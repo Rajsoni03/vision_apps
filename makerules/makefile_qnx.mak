@@ -140,18 +140,21 @@ endif
 # MODIFY_QNX_SD_FS macro for making PSDK RTOS modifications to the QNX to file system
 define MODIFY_QNX_SD_FS =
 	# copy all staged files
-	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
+	cp -rfv $(QNX_BOOT_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
+	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_QNX_PATH)/
 	# copy vision apps binaries
-	mkdir -p $(QNX_SD_FS_BOOT_PATH)/vision_apps
-	cp -r $(QNX_FS_PATH)/vision_apps $(QNX_SD_FS_BOOT_PATH)/
+	mkdir -p $(QNX_SD_FS_QNX_PATH)/vision_apps
+	cp -r $(QNX_FS_PATH)/vision_apps $(QNX_SD_FS_QNX_PATH)/
 	sync
 endef
 
 qnx_fs_create_sd: qnx_fs_create
 	sudo chmod 777 -R $(QNX_SD_FS_ROOT_PATH)
 	rm -rf $(QNX_SD_FS_BOOT_PATH)/*
+	rm -rf $(QNX_SD_FS_QNX_PATH)/*
 	rm -rf $(QNX_SD_FS_ROOT_PATH)/*
-	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
+	cp -rfv $(QNX_BOOT_PATH)/* $(QNX_SD_FS_BOOT_PATH)/
+	cp -rfv $(QNX_FS_PATH)/* $(QNX_SD_FS_QNX_PATH)/
 
 qnx_fs_install_firmware:
 	# copy remote core firmware's
@@ -191,7 +194,7 @@ qnx_fs_install_ospi: qnx_fs_install sbl_bootimage_install_ospi
 	$(call MODIFY_QNX_SD_FS)
 
 qnx_fs_install_sd_test_data:
-	$(call INSTALL_TEST_DATA,$(QNX_SD_FS_BOOT_PATH),vision_apps)
+	$(call INSTALL_TEST_DATA,$(QNX_SD_FS_QNX_PATH),vision_apps)
 
 qnx_fs_install_sd_sbl_combined: qnx_fs_install sbl_combined_bootimage_install_sd
 	$(call MODIFY_QNX_SD_FS)
