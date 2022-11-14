@@ -61,6 +61,24 @@
  */
 
 #include "itt_priv.h"
+
+#ifdef ENABLE_EDGEAI
+#include <linux/i2c-dev.h>
+#include <fcntl.h>		/* open() */
+#include <sys/ioctl.h>	/* ioctl() */
+
+/* information should be dynamic */
+
+#define I2C_BUS 9
+#define SLAVE_REG 0x4a
+
+int file_g = -1;
+
+int i2c16BitRegRead(uint16_t regAddr, uint8_t *regData);
+int i2c16BitRegWrite(uint16_t regAddr, uint8_t regData);
+
+#endif /* ENABLE_EDGEAI */
+
 static uint8_t cmd_param_sensor_ctrl[CMD_PARAM_SIZE];
 
 void itt_ctrl_cmdHandlerIssReadSensorReg(char *cmd, uint32_t prmSize)
@@ -97,6 +115,14 @@ void itt_ctrl_cmdHandlerIssReadSensorReg(char *cmd, uint32_t prmSize)
         *ptr32 = sensorRegRdWr[1]; /*Register Address*/
         cmd_ptr += sizeof(uint32_t);
 
+        #ifdef ENABLE_EDGEAI
+        status = i2c16BitRegRead((uint16_t)sensorRegRdWr[1], (uint8_t*)&sensorRegRdWr[2]);
+
+        if(status != 0)
+        {
+            printf("Error : appRemoteServiceRun returned %d \n", status);
+        }
+        #else
         status = appRemoteServiceRun(
             APP_IPC_CPU_MCU2_0 ,
             IMAGE_SENSOR_REMOTE_SERVICE_NAME,
@@ -109,9 +135,11 @@ void itt_ctrl_cmdHandlerIssReadSensorReg(char *cmd, uint32_t prmSize)
         {
             printf("Error : appRemoteServiceRun returned %d \n", status);
         }
-        /* send response */
+        
         ptr32 = (uint32_t *)cmd_ptr;
         sensorRegRdWr[2] = *ptr32; /*Remote host should write register Value here */
+        #endif
+        /* send response */
         ITT_PRINTF("Read 0x%x from register 0x%x \n", sensorRegRdWr[2], sensorRegRdWr[1]);
         IttCtrl_writeParams((uint8_t *)&sensorRegRdWr[2], sizeof(sensorRegRdWr[2]), 0);
     }
@@ -162,6 +190,10 @@ void itt_ctrl_cmdHandlerIssWriteSensorReg(char *cmd, uint32_t prmSize)
         *ptr32 = sensorRegRdWr[2]; /*Register Value*/
         cmd_ptr += sizeof(uint32_t);
 
+        #ifdef ENABLE_EDGEAI
+        cmd_ptr -= sizeof(uint32_t);
+        status = i2c16BitRegWrite((uint16_t)sensorRegRdWr[1], *cmd_ptr);
+        #else
         status = appRemoteServiceRun(
             APP_IPC_CPU_MCU2_0 ,
             IMAGE_SENSOR_REMOTE_SERVICE_NAME,
@@ -169,11 +201,13 @@ void itt_ctrl_cmdHandlerIssWriteSensorReg(char *cmd, uint32_t prmSize)
             (void*)cmd_param_sensor_ctrl,
             CMD_PARAM_SIZE,
             0);
+        #endif
 
         if(status != 0)
         {
             printf("Error : appRemoteServiceRun returned %d \n", status);
         }
+        
         /* send response */
         ptr32 = (uint32_t *)cmd_ptr;
         sensorRegRdWr[2] = *ptr32; /*Remote host should write register Value here */
@@ -188,3 +222,70 @@ void itt_ctrl_cmdHandlerIssWriteSensorReg(char *cmd, uint32_t prmSize)
     /* send response */
     IttCtrl_writeParams(NULL, 0, 0);
 }
+
+#ifdef ENABLE_EDGEAI
+int i2cInit()
+{
+	int file;
+	int adapter_nr = I2C_BUS;
+	char filename[20];
+
+	snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
+	file = open(filename, O_RDWR);
+	if(file < 0) {
+		printf("Error: failed to open i2c bus at %s\n", filename);
+        return -1;
+	}
+    file_g = file;
+
+	if(ioctl(file, I2C_SLAVE, SLAVE_REG) < 0) {
+		printf("Error: could not assign address 0x%d\n", SLAVE_REG);
+        return -1;
+	}
+
+    return 0;
+}
+
+int i2c16BitRegRead(uint16_t regAddr, uint8_t *regData)
+{
+	uint8_t tx[2];
+	tx[0] = (uint8_t)((regAddr & 0xFF00) >> 8);
+	tx[1] = (uint8_t)(regAddr & 0x00FF);
+
+	/* i2c write without actually writing */
+	if(write(file_g, &tx[0], 2) != 2) {
+		printf("Error in writing\n");
+		return -1;
+	}
+
+	/* read the addresss */
+	if(read(file_g, tx, 2) != 2) {
+		printf("Error: could not read file at address 0x%.2x%.2x\n", tx[0], tx[1]);
+		return -1;
+	}
+
+	*regData = tx[0];
+	// ITT_PRINTF("read: 0x%.2x\n\n", tx[0]);
+	ITT_PRINTF("Read 0x%x from register 0x%x\n", tx[0], *regAddr);
+
+	return 0;
+}
+
+int i2c16BitRegWrite(uint16_t regAddr, uint8_t regData)
+{
+	uint8_t tx[3];
+	tx[0] = (uint8_t)((regAddr & 0xFF00) >> 8);
+	tx[1] = (uint8_t)(regAddr & 0x00FF);
+	tx[2] = regData;
+
+	if(write(file_g, &tx[0], 3) != 3) {
+		printf("Error in writing\n");
+		return -1;
+	}
+
+	regData = tx[0];
+	ITT_PRINTF("Read 0x%x from register 0x%x\n", tx[0], *regAddr);
+
+	return 0;
+}
+#endif /* ENABLE_EDGEAI */

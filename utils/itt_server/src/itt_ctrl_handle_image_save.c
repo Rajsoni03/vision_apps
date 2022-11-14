@@ -111,8 +111,8 @@ void itt_ctrl_cmdHandlerIssFileSave(char *cmd, uint32_t prmSize)
     test_data_path = app_get_test_file_path();
     if(NULL == test_data_path)
     {
-        printf("Test data path is NULL. Returning without sending image \n");
-        return;
+        printf("Test data path is NULL. Defaulting to current folder \n");
+        test_data_path = failsafe_test_data_path;
     }
     if (stat(test_data_path, &s))
     {

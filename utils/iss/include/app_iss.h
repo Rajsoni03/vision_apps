@@ -107,6 +107,10 @@ int32_t get_dcc_dir_size(char* dcc_folder_path);
 int32_t get_dcc_dir_data(char* dcc_folder_path, uint8_t * dcc_buf);
 
 #if defined(LINUX)
+uint8_t is_viss_plugin(uint32_t plugin_id);
+uint8_t is_aewb_plugin(uint32_t plugin_id);
+uint8_t is_ldc_plugin(uint32_t plugin_id);
+
 int32_t appDccUpdateNode(uint8_t * dcc_buf, int32_t num_bytes, vx_node node, uint32_t replicate_nodex_idx, vx_context context);
 int32_t appDccUpdatefromFS(char* sensor_name, uint8_t wdr_mode, 
                         vx_node node_viss, uint32_t viss_node_index,

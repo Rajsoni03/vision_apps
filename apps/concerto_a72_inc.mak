@@ -147,6 +147,7 @@ IMAGING_LIBS += ti_2a_wrapper
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
 IMAGING_LIBS += ti_imaging_dcc
+IMAGING_LIBS += ti_imaging_ittsrvr
 endif
 
 VISION_APPS_UTILS_LIBS += app_utils_mem

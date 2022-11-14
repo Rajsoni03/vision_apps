@@ -138,5 +138,47 @@ typedef struct
     /**< DCC Buffer Size */
 } AlgItt_IssAewbDccControlParams;
 
+#ifdef ENABLE_EDGEAI
+
+/* Initialize I2C bus for camera register read/write */
+int i2cInit();
+
+/**
+ *******************************************************************************
+ *   \brief Structure containing necessary objects for EdgeAI live tuning
+ *******************************************************************************
+*/
+typedef struct
+{
+    vx_context *context;
+    vx_node *node;
+    tivx_raw_image *raw_image_handle;
+    vx_image *yuv_image_handle;
+
+} module_obj_t;
+
+/**
+ *******************************************************************************
+ *   \brief Structure for EdgeAI ITT Server
+ *******************************************************************************
+*/
+typedef struct itt_server_obj {
+
+    /*! VISS module object */
+    module_obj_t obj_viss;
+
+    /*! LDC module object */
+    module_obj_t obj_ldc; 
+
+} ITTServerEdgeAIObj;
+
+typedef enum {
+    VISS = 0,
+    AEWB,
+    LDC,
+} EDGEAI_NODES;
+
+#endif /* ENABLE_EDGEAI */
+
 
 #endif /* ITT_SERVER_LINUX_PRIV_H_ */

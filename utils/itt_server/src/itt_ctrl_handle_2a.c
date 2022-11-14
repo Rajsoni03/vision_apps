@@ -62,6 +62,12 @@
 #include "itt_priv.h"
 static uint8_t cmd_param_aewb[CMD_PARAM_SIZE];
 
+#ifdef ENABLE_EDGEAI
+#define APP_IPC_CPU APP_IPC_CPU_MPU1_0
+#else
+#define APP_IPC_CPU APP_IPC_CPU_MPU1_0
+#endif
+
 void itt_ctrl_cmdHandlerIssRead2AParams(char *cmd, uint32_t prmSize)
 {
     int32_t status;
@@ -87,13 +93,14 @@ void itt_ctrl_cmdHandlerIssRead2AParams(char *cmd, uint32_t prmSize)
         *cmd_ptr = 0; /*channel ID*/
 
         status = appRemoteServiceRun(
-            APP_IPC_CPU_MCU2_0 ,
+            APP_IPC_CPU ,
             AEWB_SERVER_REMOTE_SERVICE_NAME,
             AEWB_CMD_GET_2A_PARAMS,
             (void*)cmd_param_aewb,
             CMD_PARAM_SIZE,
             0
         );
+
         if(status != 0)
         {
             printf("Error : appRemoteServiceRun returned %d \n", status);
@@ -144,13 +151,14 @@ void itt_ctrl_cmdHandlerIssWrite2AParams(char *cmd, uint32_t prmSize)
         memcpy(cmd_ptr, &aewb2ACtrlPrms, sizeof(AlgItt_IssAewb2AControlParams));
 
         status = appRemoteServiceRun(
-            APP_IPC_CPU_MCU2_0 ,
+            APP_IPC_CPU ,
             AEWB_SERVER_REMOTE_SERVICE_NAME,
             AEWB_CMD_SET_2A_PARAMS,
             (void*)cmd_param_aewb,
             CMD_PARAM_SIZE,
             0
         );
+        
         if(status != 0)
         {
             printf("Error : appRemoteServiceRun returned %d \n", status);

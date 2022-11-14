@@ -499,7 +499,7 @@ Checks if the plugin is relevant to VISS. Returns
     0, if False
     1, if True
 */
-static uint8_t is_viss_plugin(uint32_t plugin_id)
+uint8_t is_viss_plugin(uint32_t plugin_id)
 {
     switch (plugin_id)
     {
@@ -535,7 +535,7 @@ Checks if the plugin is relevant to AEWB. Returns
     0, if False
     1, if True
 */
-static uint8_t is_aewb_plugin(uint32_t plugin_id)
+uint8_t is_aewb_plugin(uint32_t plugin_id)
 {
     switch (plugin_id)
     {
@@ -554,7 +554,7 @@ Checks if the plugin is relevant to LDC. Returns
     0, if False
     1, if True
 */
-static uint8_t is_ldc_plugin(uint32_t plugin_id)
+uint8_t is_ldc_plugin(uint32_t plugin_id)
 {
     switch (plugin_id)
     {
