@@ -161,7 +161,7 @@ int32_t appLogGlobalTimeInit()
     /* Configure GTC Timer - running at 200MHz as per config and default mux mode */
     /* 200 MHz depends on 'MCU_PLL1' and is selected through 'GTCCLK_SEL' mux */
     /* Enable GTC */
-    HW_WR_REG32(*(volatile uint32_t*)GTC_BASE_ADDR + 0x0U, 0x1);
+    HW_WR_REG32((volatile uint32_t*)GTC_BASE_ADDR + 0x0U, 0x1);
     #endif
 
     #if defined (SOC_AM62A)
