@@ -31,11 +31,11 @@
  */
 
 /*
- * loadJSFile ("/ti/j7presi/workarea/vision_apps/tools/scripts/run_ccs.js")
+ * loadJSFile ("/ti/j7/workarea/vision_apps/tools/scripts/run_ccs.js")
 */
 
 /* Edit this to match your environment */
-psdk_rtos_workarea = "/ti/j7presi/workarea"
+psdk_rtos_workarea = "/ti/j7/workarea"
 load_mpu1=1
 load_mcu2_0=0
 load_mcu2_1=1

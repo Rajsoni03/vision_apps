@@ -6,7 +6,7 @@
 #
 # Steps to use,
 #
-# - Make sure input data is stored at path /ti/j7presi/workarea/tiovx/conformance_tests/test_data/psdkra/
+# - Make sure input data is stored at path /ti/j7/workarea/tiovx/conformance_tests/test_data/psdkra/
 #   - some demo config files hard code this path
 # - edit APP_CONFIG_BASE_PATH to point to vision_apps folder
 # - edit LD_LIBRARY_PATH to point to glew shared object folder
@@ -14,10 +14,10 @@
 # - output is stored in vision_apps/test_out
 #
 
-export TEST_DATA=/ti/j7presi/workarea/tiovx/conformance_tests/test_data/psdkra/
-export APP_CONFIG_BASE_PATH=/ti/j7presi/workarea/vision_apps
-export TIAP_DATABASE_PATH=/ti/j7presi/test_data/database
-export LD_LIBRARY_PATH=/ti/j7presi/workarea/glew-2.0.0/lib/:/usr/lib64:/usr/lib
+export TEST_DATA=/ti/j7/workarea/tiovx/conformance_tests/test_data/psdkra/
+export APP_CONFIG_BASE_PATH=/ti/j7/workarea/vision_apps
+export TIAP_DATABASE_PATH=/ti/j7/test_data/database
+export LD_LIBRARY_PATH=/ti/j7/workarea/glew-2.0.0/lib/:/usr/lib64:/usr/lib
 
 make_test_output_folder() {
     mkdir -p $output_folder
