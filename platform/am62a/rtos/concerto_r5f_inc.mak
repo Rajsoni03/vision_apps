@@ -48,7 +48,7 @@ TIOVX_LIBS += vx_kernels_hwa_tests vx_kernels_hwa
 TIOVX_LIBS += vx_target_kernels_vpac_viss vx_target_kernels_vpac_msc vx_target_kernels_vpac_ldc
 TIOVX_LIBS += vx_target_kernels_j7_arm
 
-IMAGING_LIBS += ti_imaging_dcc
+IMAGING_LIBS = ti_imaging_dcc
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS)
 SYS_STATIC_LIBS += $(IMAGING_LIBS)
