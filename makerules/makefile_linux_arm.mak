@@ -42,7 +42,7 @@ ifeq ($(YOCTO_STAGE),)
 	# copy ptk cfg files
 	$(eval PTK_DEMO_DIR = $(VISION_APPS_PATH)/apps/ptk_demos)
 	$(eval PTK_DEMO_CFG_DIR = $(LINUX_FS_STAGE_PATH)/opt/vision_apps/ptk_app_cfg)
-	$(eval PTK_APP_LIST = app_surround_radar_ogmap app_dof_sfm_fisheye app_lidar_ogmap app_valet_parking app_sde app_sde_obstacle_detection app_sde_ldc)
+	$(eval PTK_APP_LIST = app_surround_radar_ogmap app_dof_sfm_fisheye app_lidar_ogmap app_valet_parking app_sde app_sde_obstacle_detection)
 	mkdir -p $(PTK_DEMO_CFG_DIR)
 	for var in $(PTK_APP_LIST); do \
 		mkdir -p $(PTK_DEMO_CFG_DIR)/$$var; \
