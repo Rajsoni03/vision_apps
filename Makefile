@@ -251,7 +251,10 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
 
-sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub tidl_rt_scrub $(SOC_VARIABLE_SCRUB)
+sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub $(SOC_VARIABLE_SCRUB)
+ifeq ($(SOC),am62a)
+	tidl_rt_scrub
+endif
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
