@@ -264,7 +264,9 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
     {
         status = rpmsg_char_init(NULL);
     }
-    if(status==0)
+
+    /* status is a negative value for failures, and may be a positive value if rpmsg_char_init has previously been called */
+    if(status>=0)
     {
         for(i=0; i<APP_IPC_CPU_MAX; i++)
         {
@@ -295,7 +297,7 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
             }
         }
     }
-    if(status==0)
+    if(status>=0)
     {
         status = appIpcCreateRpmsgRxTask(obj);
     }
