@@ -239,7 +239,9 @@ endif
 
 sdk: sdk_check_paths pdk imaging vxlib tiovx $(SOC_VARIABLE_RULES)
 	$(MAKE) vision_apps
+ifeq ($(SOC),am62a)
 	$(MAKE) tidl_rt
+endif
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot
 endif
