@@ -35,6 +35,11 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/vx_app_arm_remote_log.out $(LINUX_FS_STAGE_PATH)/opt || true
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp -P $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so $(LINUX_FS_STAGE_PATH)/usr/lib
+ifeq ($(SOC),am62a)
+	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init_am62a.sh $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
+else
+	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init.sh $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
+endif
 ifeq ($(YOCTO_STAGE),)
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps
 	chmod +x $(LINUX_FS_STAGE_PATH)/opt/vision_apps/*.sh
@@ -265,7 +270,9 @@ yocto_build:
 	$(YOCTO_VARS) $(MAKE) tiovx
 	$(YOCTO_VARS) $(MAKE) ptk
 	$(YOCTO_VARS) $(MAKE) tivision_apps
-	$(YOCTO_VARS) $(MAKE) vx_app_conformance vx_app_arm_remote_log vx_app_arm_ipc
+	$(YOCTO_VARS) $(MAKE) vx_app_conformance vx_app_arm_remote_log vx_app_arm_ipc \
+		vx_app_arm_mem vx_app_arm_fd_exchange_consumer vx_app_arm_fd_exchange_producer \
+		vx_app_c7x_kernel vx_app_heap_stats vx_app_load_test vx_app_viss
 
 yocto_clean: imaging_scrub tiovx_scrub ptk_scrub scrub
 	$(CLEANDIR) $(PSDK_PATH)/tidl_j7
