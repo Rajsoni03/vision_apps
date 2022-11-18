@@ -98,8 +98,6 @@ static void memcpyC66(uint8_t *restrict pOut, uint8_t *restrict pIn, int32_t siz
         }
     }
 }
-#elif defined (__C7100__) || defined (__C7120__)
-#define memcpyC66 memcpy
 #else
 static void memcpyC66(uint8_t *pOut, uint8_t *pIn, int32_t size)
 {

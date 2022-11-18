@@ -78,7 +78,6 @@ static tivx_target_kernel vx_DrawBoxDetections_kernel = NULL;
 static vx_int32 clip_offset(vx_int32 input, vx_int32 max);
 static void drawBox(vx_uint8 *y_data, vx_uint8 *cbcr_data, vx_int32 width, vx_int32 height, vx_int32 xmin, vx_int32 ymin, vx_int32 xmax, vx_int32 ymax, vx_int32 label, vx_uint8 color_map[][3], vx_int32 max_classes);
 
-#if defined(SOC_J721E) || defined(SOC_J721S2)
 #ifndef x86_64
 #if CPU_COPY    /* Not enabled - change to 1 for doing CPU copy */
 static void memcpyC66(uint8_t *restrict pOut, uint8_t *restrict pIn, int32_t size)
@@ -110,9 +109,6 @@ static void memcpyC66(uint8_t *pOut, uint8_t *pIn, int32_t size)
     prms_1d.length      = (uint32_t) size;
     appUdmaCopy1D(NULL, &prms_1d);
 }
-#endif
-#else
-#define memcpyC66 memcpy
 #endif
 #else
 #define memcpyC66 memcpy

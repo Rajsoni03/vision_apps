@@ -351,7 +351,7 @@ static vx_status VX_CALLBACK tivxKernelODPostProcProcess
         /*center_x and center_y is optical center of original image resolution widthxheight*/
         #if defined(SOC_J721S2) || defined(SOC_J784S4)
         /* ADASVISION-5496: Using the natural C algorithm for tiadalg_fisheye_transformation
-         *                  for J721S2 as the recompiled version is not functional */
+         *                  for J721S2/J784S4 as the recompiled version is not functional */
         status = tiadalg_fisheye_transformation_cn
                  (
                     prms->fe_points_ptr,
