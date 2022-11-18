@@ -267,7 +267,7 @@ YOCTO_VARS = PROFILE=release \
 yocto_build:
 	$(COPYDIR) $(PSDK_PATH)/psdk_include/* $(PSDK_PATH)/.
 	$(YOCTO_VARS) $(MAKE) imaging
-	$(YOCTO_VARS) $(MAKE) tiovx
+	$(YOCTO_VARS) BUILD_CSITX=no $(MAKE) tiovx
 	$(YOCTO_VARS) $(MAKE) ptk
 	$(YOCTO_VARS) $(MAKE) tivision_apps
 	$(YOCTO_VARS) $(MAKE) vx_app_conformance vx_app_arm_remote_log vx_app_arm_ipc \
