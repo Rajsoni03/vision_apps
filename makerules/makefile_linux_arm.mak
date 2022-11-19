@@ -40,8 +40,9 @@ ifeq ($(SOC),am62a)
 else
 	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init.sh $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 endif
+	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_all/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 ifeq ($(YOCTO_STAGE),)
-	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps
+	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_evm/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 	chmod +x $(LINUX_FS_STAGE_PATH)/opt/vision_apps/*.sh
 
 	# copy ptk cfg files
