@@ -72,6 +72,11 @@
 
 #if defined(__C7100__) || defined(__C7120__)
 #include <c7x.h>
+#include <ti/csl/csl_clec.h>
+#include <ti/csl/arch/c7x/cslr_C7X_CPU.h>
+
+#define DRU_LOCAL_EVENT_START_J784S4   (664U)
+
 #endif
 
 /* ========================================================================== */
@@ -169,11 +174,22 @@ typedef struct
     /**< Flag to indicate init is done for the structure */
     uint64_t                wait_word;
     /**< Flag to indicate wait word for C7x wait event from CLEC */
+    volatile uint64_t     *swTriggerPointer;
+    /**< Pointer for non-ring based DRU UDMA processing */
 } app_udma_ch_obj_t;
 
 /* ========================================================================== */
 /*                          Function Declarations                             */
 /* ========================================================================== */
+
+#if defined(SOC_J784S4) && defined(__C7120__)
+extern uint32_t CSL_clecGetC7xRtmapCpuId(void);
+static int32_t appUdmaGetClecConfigEvent(CSL_CLEC_EVTRegs *pRegs,
+                            uint32_t evtNum,
+                            CSL_ClecEventConfig *evtCfg);
+static void appUdmaGetUtcInfo(uint32_t *pUtcId, uint32_t *pDru_local_event_start);
+static int32_t appUdmaGetEventNum(uint32_t druChannelId);
+#endif
 
 static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj);
 static int32_t appUdmaCopy2DLocal(
@@ -419,8 +435,8 @@ app_udma_ch_handle_t appUdmaCopyCreate(const app_udma_create_prms_t *prms)
 int32_t appUdmaCopyDelete(app_udma_ch_handle_t ch_handle)
 {
     int32_t             retVal = UDMA_SOK, tempRetVal, i;
-    uint64_t            pDesc;
     app_udma_ch_obj_t  *ch_obj = (app_udma_ch_obj_t *)ch_handle;
+    uint64_t            pDesc;
 
     if(NULL == ch_obj)
     {
@@ -435,13 +451,16 @@ int32_t appUdmaCopyDelete(app_udma_ch_handle_t ch_handle)
             retVal += Udma_chDisable(ch_obj->drv_ch_handle, UDMA_DEFAULT_CH_DISABLE_TIMEOUT);
 
             /* Flush any pending request from the free queue */
-            while(1)
+            if (1U == ch_obj->create_prms.use_ring)
             {
-                tempRetVal = Udma_ringFlushRaw(
-                                 Udma_chGetFqRingHandle(ch_obj->drv_ch_handle), &pDesc);
-                if(UDMA_ETIMEOUT == tempRetVal)
+                while(1)
                 {
-                    break;
+                    tempRetVal = Udma_ringFlushRaw(
+                                     Udma_chGetFqRingHandle(ch_obj->drv_ch_handle), &pDesc);
+                    if(UDMA_ETIMEOUT == tempRetVal)
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -631,12 +650,19 @@ int32_t appUdmaCopyNDInit(
         /* Set the user provided transfer params */
         appUdmaTrpdSetND(ch_obj, prms_nd);
 
-        /* Submit request */
-        retVal = Udma_ringQueueRaw(
-                 Udma_chGetFqRingHandle(ch_obj->drv_ch_handle), ch_obj->trpd_mem_phy);
-        if(UDMA_SOK != retVal)
+        if (0U == ch_obj->create_prms.use_ring)
         {
-            appLogPrintf("UDMA : ERROR: Channel queue failed!!\n");
+            Udma_chDruSubmitTr(ch_obj->drv_ch_handle, (CSL_UdmapTR *)((uint8_t *)ch_obj->trpd_mem + sizeof(CSL_UdmapTR15)));
+        }
+        else
+        {
+            /* Submit request */
+            retVal = Udma_ringQueueRaw(
+                     Udma_chGetFqRingHandle(ch_obj->drv_ch_handle), ch_obj->trpd_mem_phy);
+            if(UDMA_SOK != retVal)
+            {
+                appLogPrintf("UDMA : ERROR: Channel queue failed!!\n");
+            }
         }
     }
 
@@ -646,14 +672,20 @@ int32_t appUdmaCopyNDInit(
 int32_t appUdmaCopyNDTrigger(
     app_udma_ch_handle_t ch_handle)
 {
-    int32_t             retVal;
+    int32_t             retVal = UDMA_SOK;
     app_udma_ch_obj_t  *ch_obj = (app_udma_ch_obj_t *)ch_handle;
 
-    /* Set channel trigger - otherwise transfer won't happen */
-    retVal = Udma_chSetSwTrigger(ch_obj->drv_ch_handle, CSL_UDMAP_TR_FLAGS_TRIGGER_GLOBAL0);
-    if(UDMA_SOK != retVal)
+    if (0U == ch_obj->create_prms.use_ring)
     {
-        appLogPrintf("UDMA : ERROR: SW trigger failed!!\n");
+        CSL_druChSetGlobalTrigger0Raw(ch_obj->swTriggerPointer);
+    }
+    else
+    {
+        retVal = Udma_chSetSwTrigger(ch_obj->drv_ch_handle, CSL_UDMAP_TR_FLAGS_TRIGGER_GLOBAL0);
+        if(UDMA_SOK != retVal)
+        {
+            appLogPrintf("UDMA : ERROR: SW trigger failed!!\n");
+        }
     }
 
     return (retVal);
@@ -751,33 +783,36 @@ int32_t appUdmaCopyNDDeinit(
 {
     int32_t     retVal = UDMA_SOK;
     app_udma_ch_obj_t  *ch_obj = (app_udma_ch_obj_t *)ch_handle;
-    uint64_t    pDesc = 0;
     uint32_t   *pTrResp, trRespStatus;
     uint8_t    *trpd_mem;
+    uint64_t    pDesc = 0;
 
-    while (1U)
+    if (1U == ch_obj->create_prms.use_ring)
     {
-        /* Wait till response is received in completion queue */
-        retVal =
-            Udma_ringDequeueRaw(Udma_chGetCqRingHandle(ch_obj->drv_ch_handle), &pDesc);
+        while (1U)
+        {
+            /* Wait till response is received in completion queue */
+            retVal =
+                Udma_ringDequeueRaw(Udma_chGetCqRingHandle(ch_obj->drv_ch_handle), &pDesc);
+            if(UDMA_SOK == retVal)
+            {
+                break;
+            }
+            TaskP_yield();
+        }
+
         if(UDMA_SOK == retVal)
         {
-            break;
-        }
-        TaskP_yield();
-    }
-
-    if(UDMA_SOK == retVal)
-    {
-        /*
-            * Sanity check
-            */
-        /* Check returned descriptor pointer */
-        if(pDesc != ch_obj->trpd_mem_phy)
-        {
-            appLogPrintf("UDMA : ERROR: TR descriptor pointer returned doesn't "
-                    "match the submitted address!!\n");
-            retVal = UDMA_EFAIL;
+            /*
+             * Sanity check
+             */
+            /* Check returned descriptor pointer */
+            if(pDesc != ch_obj->trpd_mem_phy)
+            {
+                appLogPrintf("UDMA : ERROR: TR descriptor pointer returned doesn't "
+                        "match the submitted address!!\n");
+                retVal = UDMA_EFAIL;
+            }
         }
     }
 
@@ -800,6 +835,94 @@ int32_t appUdmaCopyNDDeinit(
     return (retVal);
 }
 
+#if defined(SOC_J784S4) && defined(__C7120__)
+
+static int32_t appUdmaGetClecConfigEvent(CSL_CLEC_EVTRegs *pRegs,
+                            uint32_t evtNum,
+                            CSL_ClecEventConfig *evtCfg)
+{
+    int32_t     retVal = CSL_PASS;
+    uint32_t    regVal;
+
+    if((NULL == pRegs) ||
+        (evtNum >= CSL_CLEC_MAX_EVT_IN))
+    {
+        retVal = CSL_EFAIL;
+    }
+    else
+    {
+        /* Perform read/modify/write so that the default interrupt mode (bit 24)
+         * is in power on reset value and should not be changed by CSL
+         */
+        regVal = CSL_REG32_RD(&pRegs->CFG[evtNum].MRR);
+        evtCfg->secureClaimEnable = CSL_REG32_FEXT(&regVal, CLEC_EVT_CFG_MRR_S         );
+        evtCfg->evtSendEnable     = CSL_REG32_FEXT(&regVal, CLEC_EVT_CFG_MRR_ESE       );
+        evtCfg->rtMap             = CSL_REG32_FEXT(&regVal, CLEC_EVT_CFG_MRR_RTMAP     );
+        evtCfg->extEvtNum         = CSL_REG32_FEXT(&regVal, CLEC_EVT_CFG_MRR_EXT_EVTNUM);
+        evtCfg->c7xEvtNum         = CSL_REG32_FEXT(&regVal, CLEC_EVT_CFG_MRR_C7X_EVTNUM);
+    }
+
+    return (retVal);
+}
+
+static void appUdmaGetUtcInfo(uint32_t *pUtcId, uint32_t *pDru_local_event_start)
+{
+  uint32_t utcId  = 0;
+  uint32_t dru_local_event_start = DRU_LOCAL_EVENT_START_J784S4;
+  uint64_t dnum;
+  uint8_t corePacNum;
+  /* Get the bits from bit 7 to bit 15, which represents the core pac number */
+  dnum = __DNUM;    // This register is used to identify the current core
+  corePacNum = CSL_REG64_FEXT(&dnum, C7X_CPU_DNUM_COREPACNUM);
+  switch (corePacNum)
+  {
+    case CSL_C7X_CPU_COREPACK_NUM_C7X1:
+      utcId = UDMA_UTC_ID_C7X_MSMC_DRU4;
+      dru_local_event_start = DRU_LOCAL_EVENT_START_J784S4 + (96*0);
+      break;
+    case CSL_C7X_CPU_COREPACK_NUM_C7X2:
+      utcId = UDMA_UTC_ID_C7X_MSMC_DRU5;
+      dru_local_event_start = DRU_LOCAL_EVENT_START_J784S4 + (96*1) ;
+      break;
+    case CSL_C7X_CPU_COREPACK_NUM_C7X3:
+      utcId = UDMA_UTC_ID_C7X_MSMC_DRU6;
+      dru_local_event_start = DRU_LOCAL_EVENT_START_J784S4 + (96*2);
+      break;
+    case CSL_C7X_CPU_COREPACK_NUM_C7X4:
+      utcId = UDMA_UTC_ID_C7X_MSMC_DRU7;
+      dru_local_event_start = DRU_LOCAL_EVENT_START_J784S4 + (96*3);
+      break;
+  }
+  if(pUtcId) *pUtcId = utcId ;
+  if(pDru_local_event_start) *pDru_local_event_start = dru_local_event_start ;
+  return ;
+}
+
+static int32_t appUdmaGetEventNum(uint32_t druChannelId)
+{
+    int32_t eventId;
+
+    uint32_t dru_local_event_start;
+    CSL_ClecEventConfig   cfgClec;
+    int32_t thisCore = CSL_clecGetC7xRtmapCpuId();
+
+    CSL_CLEC_EVTRegs     *clecBaseAddr = (CSL_CLEC_EVTRegs*)CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
+
+    appUdmaGetUtcInfo( NULL, &dru_local_event_start) ;
+    appUdmaGetClecConfigEvent(clecBaseAddr, dru_local_event_start + druChannelId, &cfgClec);
+    if((cfgClec.rtMap !=  thisCore) && (cfgClec.rtMap != CSL_CLEC_RTMAP_CPU_ALL)){
+        appLogPrintf("This core (%d) is different than CLEC RTMAP CPU (%d) programming for channel %d\n",
+            thisCore, cfgClec.rtMap, druChannelId);
+        return UDMA_EFAIL;
+    }
+    else{
+        eventId = cfgClec.c7xEvtNum;
+    }
+
+    return eventId;
+}
+#endif
+
 static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
 {
     int32_t             retVal = UDMA_SOK;
@@ -815,21 +938,37 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
         chType = UDMA_CH_TYPE_UTC;
         UdmaChPrms_init(&chPrms, chType);
         chPrms.utcId = UDMA_UTC_ID_MSMC_DRU0;
+
+        #if defined(SOC_J784S4) && defined(__C7120__)
+        appUdmaGetUtcInfo( &chPrms.utcId, NULL) ;
+        #endif
     }
     else
     {
         chType = UDMA_CH_TYPE_TR_BLK_COPY;
         UdmaChPrms_init(&chPrms, chType);
     }
-    chPrms.fqRingPrms.ringMem   = ch_obj->fq_ring_mem;
-    chPrms.cqRingPrms.ringMem   = ch_obj->cq_ring_mem;
-    chPrms.tdCqRingPrms.ringMem = ch_obj->tdcq_ring_mem;
-    chPrms.fqRingPrms.ringMemSize   = APP_UDMA_RING_MEM_SIZE;
-    chPrms.cqRingPrms.ringMemSize   = APP_UDMA_RING_MEM_SIZE;
-    chPrms.tdCqRingPrms.ringMemSize = APP_UDMA_RING_MEM_SIZE;
-    chPrms.fqRingPrms.elemCnt   = APP_UDMA_RING_ENTRIES;
-    chPrms.cqRingPrms.elemCnt   = APP_UDMA_RING_ENTRIES;
-    chPrms.tdCqRingPrms.elemCnt = APP_UDMA_RING_ENTRIES;
+    if (0U == ch_obj->create_prms.use_ring)
+    {
+        chPrms.fqRingPrms.ringMem      = NULL;
+        chPrms.cqRingPrms.ringMem     = NULL;
+        chPrms.tdCqRingPrms.ringMem = NULL;
+        chPrms.fqRingPrms.elemCnt     = 0U;
+        chPrms.cqRingPrms.elemCnt     = 0U;
+        chPrms.tdCqRingPrms.elemCnt  = 0U; 
+    }
+    else
+    {
+        chPrms.fqRingPrms.ringMem   = ch_obj->fq_ring_mem;
+        chPrms.cqRingPrms.ringMem   = ch_obj->cq_ring_mem;
+        chPrms.tdCqRingPrms.ringMem = ch_obj->tdcq_ring_mem;
+        chPrms.fqRingPrms.ringMemSize   = APP_UDMA_RING_MEM_SIZE;
+        chPrms.cqRingPrms.ringMemSize   = APP_UDMA_RING_MEM_SIZE;
+        chPrms.tdCqRingPrms.ringMemSize = APP_UDMA_RING_MEM_SIZE;
+        chPrms.fqRingPrms.elemCnt   = APP_UDMA_RING_ENTRIES;
+        chPrms.cqRingPrms.elemCnt   = APP_UDMA_RING_ENTRIES;
+        chPrms.tdCqRingPrms.elemCnt = APP_UDMA_RING_ENTRIES;
+    }
 
     /* Open channel for block copy */
     retVal = Udma_chOpen(ch_obj->drv_handle, &ch_obj->drv_ch_obj, chType, &chPrms);
@@ -847,6 +986,11 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
         if(UDMA_SOK == retVal)
         {
             UdmaChUtcPrms_init(&utcPrms);
+            if (0U == ch_obj->create_prms.use_ring)
+            {
+                utcPrms.druOwner = CSL_DRU_OWNER_DIRECT_TR;
+                utcPrms.druQueueId = 0;
+            }
             retVal = Udma_chConfigUtc(ch_obj->drv_ch_handle, &utcPrms);
             if(UDMA_SOK != retVal)
             {
@@ -976,9 +1120,15 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
 
         druChannelId = Udma_chGetNum(ch_obj->drv_ch_handle);
 
-        /* Modifying the wait-word on a per core basis - as different cores are allocated
-         * a different range of channels but the C7x eventID associated for all cores starts
-         * from 32 (Assuming the first 32 event bits are being used by the RTOS kernel) */
+        #if defined(SOC_J784S4) && defined(__C7120__)
+        int32_t eventId;
+
+        ch_obj->swTriggerPointer = Udma_druGetTriggerRegAddr(ch_obj->drv_ch_handle);
+
+        eventId = appUdmaGetEventNum(druChannelId);
+
+        ch_obj->wait_word = ((uint64_t)1U << eventId);
+        #else
         #if defined (SOC_J721S2)
         if (UDMA_CORE_ID_C7X_2==Udma_getCoreId())
         {
@@ -989,6 +1139,7 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
         {
             ch_obj->wait_word =  ((uint64_t)1U << (32 + druChannelId) );
         }
+        #endif
     }
 
     return (retVal);
@@ -1168,7 +1319,14 @@ static void appUdmaTrpdInit(app_udma_ch_obj_t *ch_obj, uint32_t copy_mode)
 
     pTrpd = (CSL_UdmapCppi5TRPD *)ch_obj->trpd_mem;
     pTr = (CSL_UdmapTR15 *)((uint8_t *)ch_obj->trpd_mem + sizeof(CSL_UdmapTR15));
-    cqRingNum = Udma_chGetCqRingNum(ch_obj->drv_ch_handle);
+    if (0 == ch_obj->create_prms.use_ring)
+    {
+        cqRingNum = 0;
+    }
+    else
+    {
+        cqRingNum = Udma_chGetCqRingNum(ch_obj->drv_ch_handle);
+    }
 
     /* Make TRPD */
     UdmaUtils_makeTrpd(pTrpd, UDMA_TR_TYPE_15, 1U, cqRingNum);

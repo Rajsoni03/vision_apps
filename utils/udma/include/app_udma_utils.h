@@ -114,6 +114,8 @@ typedef struct
     /**< Enable interrupt based DMA completion waiting */
     uint32_t    use_dru;
     /**< TRUE - Use DRU channel. FALSE - Use DMA blockcopy channel */
+    uint32_t    use_ring;
+    /**< TRUE - Use Ring based UDMA. FALSE - Use without ring */
     uint32_t    use_nd_copy;
     /**< TRUE - Use channel for ND copy. FALSE - Use channel for normal blockcopy */
 } app_udma_create_prms_t;
@@ -487,6 +489,11 @@ static inline void appUdmaCreatePrms_Init(app_udma_create_prms_t *prms)
         prms->enable_intr = 1;
 #endif
         prms->use_dru     = 0;
+#if defined(SOC_J784S4) && defined(__C7120__)
+        prms->use_ring    = 0;
+#else
+        prms->use_ring    = 1;
+#endif
         prms->use_nd_copy = 0; /* Transfer to completion */
     }
 }
