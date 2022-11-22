@@ -814,21 +814,21 @@ int32_t appUdmaCopyNDDeinit(
                 retVal = UDMA_EFAIL;
             }
         }
-    }
 
-    if(UDMA_SOK == retVal)
-    {
-        /* Invalidate cache */
-        trpd_mem  = ch_obj->trpd_mem;
-        appUdmaCacheInv(trpd_mem, APP_UDMA_TRPD_SIZE_ALIGN);
-
-        /* check TR response status */
-        pTrResp = (uint32_t *) (trpd_mem + (sizeof(CSL_UdmapTR15) * 2U));
-        trRespStatus = CSL_FEXT(*pTrResp, UDMAP_TR_RESPONSE_STATUS_TYPE);
-        if(trRespStatus != CSL_UDMAP_TR_RESPONSE_STATUS_COMPLETE)
+        if(UDMA_SOK == retVal)
         {
-            /* appLogPrintf("UDMA : ERROR: TR Response not completed!!\n"); */
-            retVal = UDMA_EFAIL;
+            /* Invalidate cache */
+            trpd_mem  = ch_obj->trpd_mem;
+            appUdmaCacheInv(trpd_mem, APP_UDMA_TRPD_SIZE_ALIGN);
+
+            /* check TR response status */
+            pTrResp = (uint32_t *) (trpd_mem + (sizeof(CSL_UdmapTR15) * 2U));
+            trRespStatus = CSL_FEXT(*pTrResp, UDMAP_TR_RESPONSE_STATUS_TYPE);
+            if(trRespStatus != CSL_UDMAP_TR_RESPONSE_STATUS_COMPLETE)
+            {
+                appLogPrintf("UDMA : ERROR: TR Response not completed!!\n");
+                retVal = UDMA_EFAIL;
+            }
         }
     }
 
@@ -940,7 +940,8 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
         chPrms.utcId = UDMA_UTC_ID_MSMC_DRU0;
 
         #if defined(SOC_J784S4) && defined(__C7120__)
-        appUdmaGetUtcInfo( &chPrms.utcId, NULL) ;
+        appUdmaGetUtcInfo( &chPrms.utcId, NULL);
+        ch_obj->create_prms.use_ring = 0U;
         #endif
     }
     else
@@ -948,6 +949,7 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
         chType = UDMA_CH_TYPE_TR_BLK_COPY;
         UdmaChPrms_init(&chPrms, chType);
     }
+
     if (0U == ch_obj->create_prms.use_ring)
     {
         chPrms.fqRingPrms.ringMem      = NULL;

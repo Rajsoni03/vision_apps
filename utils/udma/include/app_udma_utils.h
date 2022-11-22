@@ -489,11 +489,7 @@ static inline void appUdmaCreatePrms_Init(app_udma_create_prms_t *prms)
         prms->enable_intr = 1;
 #endif
         prms->use_dru     = 0;
-#if defined(SOC_J784S4) && defined(__C7120__)
-        prms->use_ring    = 0;
-#else
         prms->use_ring    = 1;
-#endif
         prms->use_nd_copy = 0; /* Transfer to completion */
     }
 }
