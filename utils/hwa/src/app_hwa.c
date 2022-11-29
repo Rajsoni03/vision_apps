@@ -130,9 +130,8 @@
 static void appVhwaVpacMscInit(Vhwa_M2mMscSl2AllocPrms *sl2Prms)
 {
     uint32_t cnt;
-
-    #if defined(VPAC3) || defined(VPAC3L)
     uint32_t idx;
+
     for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INST; cnt++)
     {
         for(idx = 0; idx < VHWA_M2M_MSC_MAX_IN_CHANNEL; idx++)
@@ -142,14 +141,6 @@ static void appVhwaVpacMscInit(Vhwa_M2mMscSl2AllocPrms *sl2Prms)
             sl2Prms->inBuffDepth[cnt][idx]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
         }
     }
-    #elif defined(VPAC1)
-    for(cnt = 0; cnt < VHWA_M2M_MSC_MAX_INPUT_BUFF; cnt++)
-    {
-        sl2Prms->maxInWidth[cnt]    = APP_UTILS_VHWA_MAX_IN_IMG_WIDTH;
-        sl2Prms->inCcsf[cnt]        = APP_UTILS_VHWA_IN_IMG_CCSF;
-        sl2Prms->inBuffDepth[cnt]   = APP_UTILS_VHWA_MAX_IN_IMG_BUFF_DEPTH;
-    }
-    #endif
 
     for(cnt = 0; cnt < MSC_MAX_OUTPUT; cnt++)
     {
