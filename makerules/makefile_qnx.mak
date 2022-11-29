@@ -53,7 +53,14 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(QNX_APP_PROFILE)/*.out $(QNX_FS_PATH)/vision_apps
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/QNX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(QNX_FS_PATH)/tilib
 	# app_linux_fs_files are not very OS specific. Only input file paths change
-	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/* $(QNX_FS_PATH)/vision_apps
+	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_all/* $(QNX_FS_PATH)/vision_apps
+	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_evm/* $(QNX_FS_PATH)/vision_apps
+	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/*.txt $(QNX_FS_PATH)/vision_apps
+ifeq ($(SOC),am62a)
+	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init_am62a.sh $(QNX_FS_PATH)/vision_apps/.
+else
+	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init.sh $(QNX_FS_PATH)/vision_apps/.
+endif
 	# Rename file paths in app cfg files
 	sed -i 's/\/opt\//\/ti_fs\//g' $(QNX_FS_PATH)/vision_apps/*.cfg
 	sed -i 's/\/opt\//\/ti_fs\//g' $(QNX_FS_PATH)/vision_apps/app_srv_avp_cfg/*.cfg
