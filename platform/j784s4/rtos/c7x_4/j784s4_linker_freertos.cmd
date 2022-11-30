@@ -94,6 +94,9 @@ SECTIONS
     .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C7X_4_LOCAL_HEAP
     .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_4_SCRATCH
 
+    .bss:ddr_non_cache_mem      (NOLOAD) : {} > DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE
+    .bss:ddr_scratch_non_cache_mem    (NOLOAD) : {} > DDR_C7X_4_SCRATCH_NON_CACHEABLE
+
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM

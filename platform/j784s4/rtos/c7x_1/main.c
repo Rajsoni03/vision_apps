@@ -250,6 +250,28 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    /*-------------------------------------------------------*/
+    /* Cachable region memory attributes                     */
+    /*-------------------------------------------------------*/
+
     attrs.attrIndx = Mmu_AttrIndx_MAIR7;
 
     retVal = Mmu_map(0x80000000U, 0x80000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
@@ -300,12 +322,6 @@ void appMmuMap(Bool is_secure)
     }
 
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;

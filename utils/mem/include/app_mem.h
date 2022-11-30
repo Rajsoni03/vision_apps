@@ -104,11 +104,14 @@ extern "C" {
 /** \brief Heap located in DDR and is used as scratch */
 #define APP_MEM_HEAP_DDR_SCRATCH (4u)
 
-/** \brief Heap located in DDR and in non-cache memory */
+/** \brief Heap located in DDR and in non-cache memory of persistent property */
 #define APP_MEM_HEAP_DDR_NON_CACHE  (5u)
 
+/** \brief Heap located in DDR and in non-cache memory of scratch property */
+#define APP_MEM_HEAP_DDR_NON_CACHE_SCRATCH  (6u)
+
 /** \brief Max heaps in system */
-#define APP_MEM_HEAP_MAX        (6u)
+#define APP_MEM_HEAP_MAX        (7u)
 
 /* @} */
 

@@ -88,11 +88,21 @@
 
 /* For J7ES/J721E/TDA4VM the upper 2GB DDR starts from 0x0008_8000_0000 */
 /* This address is mapped to a virtual address of 0x0001_0000_0000 */
+
+/* Cacheable memories*/
 #define DDR_C7X_4_LOCAL_HEAP_VADDR (DDR_C7X_4_LOCAL_HEAP_ADDR)
 #define DDR_C7X_4_LOCAL_HEAP_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_LOCAL_HEAP_ADDR - DDR_64BIT_BASE_VADDR))
 
 #define DDR_C7X_4_SCRATCH_VADDR    (DDR_C7X_4_SCRATCH_ADDR)
 #define DDR_C7X_4_SCRATCH_PADDR    (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_SCRATCH_ADDR - DDR_64BIT_BASE_VADDR))
+
+/* Non-cacheable memories*/
+#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_VADDR (DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR)
+#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR - DDR_64BIT_BASE_VADDR))
+
+#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_VADDR    (DDR_C7X_4_SCRATCH_NON_CACHEABLE_ADDR)
+#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_PADDR    (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_SCRATCH_NON_CACHEABLE_ADDR - DDR_64BIT_BASE_VADDR))
+
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -274,6 +284,28 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_VADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_4_SCRATCH_NON_CACHEABLE_VADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_PADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    /*-------------------------------------------------------*/
+    /* Cachable region memory attributes                     */
+    /*-------------------------------------------------------*/
+
     attrs.attrIndx = Mmu_AttrIndx_MAIR7;
 
     retVal = Mmu_map(0x80000000U, 0x80000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
@@ -324,12 +356,6 @@ void appMmuMap(Bool is_secure)
     }
 
     retVal = Mmu_map(DDR_C7X_4_SCRATCH_VADDR, DDR_C7X_4_SCRATCH_PADDR, DDR_C7X_4_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;

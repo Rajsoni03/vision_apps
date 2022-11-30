@@ -158,6 +158,14 @@ __attribute__ ((aligned(4096)))
         ;
 #endif
 
+#ifdef DDR_SCRATCH_NON_CACHE_SIZE
+uint8_t g_ddr_scratch_non_cache_mem[DDR_SCRATCH_NON_CACHE_SIZE]
+__attribute__ ((section(".bss:ddr_scratch_non_cache_mem")))
+__attribute__ ((aligned(4096)))
+        ;
+#endif
+
+
 static void appRegisterOpenVXTargetKernels();
 static void appUnRegisterOpenVXTargetKernels();
 void appRtosTestRegister();
@@ -243,7 +251,15 @@ int32_t appInit()
     heap_prm->base = g_ddr_non_cache_mem;
     strncpy(heap_prm->name, "DDR_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX);
     heap_prm->size = DDR_HEAP_NON_CACHE_MEM_SIZE;
-    heap_prm->flags = 0;
+    heap_prm->flags = APP_MEM_HEAP_FLAGS_TYPE_LINEAR_ALLOCATE;
+    #endif
+
+    #ifdef DDR_SCRATCH_NON_CACHE_SIZE
+    heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR_NON_CACHE_SCRATCH];
+    heap_prm->base = g_ddr_scratch_non_cache_mem;
+    strncpy(heap_prm->name, "DDR_SCRATCH_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX);
+    heap_prm->size = DDR_SCRATCH_NON_CACHE_SIZE;
+    heap_prm->flags = APP_MEM_HEAP_FLAGS_TYPE_LINEAR_ALLOCATE;
     #endif
 
     #ifdef ENABLE_IPC
