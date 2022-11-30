@@ -65,6 +65,90 @@
 
 AppObj gAppObj;
 
+vx_status load_vximage_from_bin_16(vx_image image, char *filename)
+{
+    uint32_t stride;
+    uint32_t img_width, img_height;
+    vx_df_image img_df;
+    vx_status status = VX_SUCCESS;
+    uint16_t *data_ptr = NULL;
+    void *dst_data_ptr = NULL;
+    vx_map_id map_id;
+
+    /** - Check if image object is valid
+     *
+     * \code
+     */
+    if (status == (vx_status)VX_SUCCESS)
+    {
+        status = vxGetStatus((vx_reference)image);
+    }
+
+    if(status == (vx_status)VX_SUCCESS)
+    {
+        FILE * pf;
+        uint32_t bpp = 2;
+
+        img_height = 0;
+        img_width = 0;
+
+        vxQueryImage(image, (vx_enum)VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+        vxQueryImage(image, (vx_enum)VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+        vxQueryImage(image, (vx_enum)VX_IMAGE_FORMAT, &img_df, sizeof(vx_df_image));
+
+        stride = img_width*bpp;
+
+        // read 16-bit input file
+        pf = (FILE *)fopen(filename, "rb");
+
+        data_ptr = (uint16_t *) malloc(img_width*img_height*sizeof(uint16_t));
+        fread(data_ptr, sizeof(uint16_t), img_width*img_height, pf);
+        fclose(pf);
+
+        if(status == (vx_status)VX_SUCCESS)
+        {
+            vx_imagepatch_addressing_t image_addr;
+            vx_rectangle_t rect;
+            
+            uint32_t y, x;
+
+            rect.start_x = 0;
+            rect.start_y = 0;
+            rect.end_x = img_width;
+            rect.end_y = img_height;
+
+            //data_ptr = (void*)((uint8_t*)data_ptr);            
+
+            vxMapImagePatch(image,
+                &rect,
+                0,
+                &map_id,
+                &image_addr,
+                &dst_data_ptr,
+                (vx_enum)VX_WRITE_ONLY,
+                (vx_enum)VX_MEMORY_TYPE_HOST,
+                (vx_enum)VX_NOGAP_X
+            );
+
+            dst_data_ptr = (uint16_t*) dst_data_ptr;
+            for (y = 0; y < img_height; y++)
+            {
+                for (x = 0; x < img_width; x++)
+                {
+                    ((uint16_t*)dst_data_ptr)[x] = (data_ptr[x] >> 4);
+                }
+
+                data_ptr = (uint16_t*)((uint8_t*)data_ptr + stride);
+                dst_data_ptr = (uint16_t*)((uint8_t*)dst_data_ptr + image_addr.stride_y);
+            }
+
+            vxUnmapImagePatch(image, map_id);
+        }
+    }
+
+    return status;
+}
+
 int app_stereo_main(int argc, char* argv[])
 {
     AppObj *obj = &gAppObj;
@@ -197,6 +281,7 @@ static vx_status add_graph_parameter_by_node_index(vx_graph graph, vx_node node,
 static vx_status app_create_graph(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
+    vx_df_image df;
 
     uint32_t pipeline_depth, buf_id, list_depth = 2;
     if (obj->test_mode == 1)
@@ -215,18 +300,28 @@ static vx_status app_create_graph(AppObj *obj)
     obj->graph_sde = vxCreateGraph(obj->context);
     status = vxGetStatus((vx_reference)obj->graph_sde);
 
+    // Set image object type depending on input bit depth.
+    if (obj->bit_depth == 8)
+    {
+        df = VX_DF_IMAGE_U8;
+    } else
+    {
+        df = VX_DF_IMAGE_U16;
+    }
+
     if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2)  && (obj->display_option == 1) && (status == VX_SUCCESS))
     {
         vx_image sample_input_img_left;
         vx_image sample_input_img_right;
 
-        sample_input_img_left  = vxCreateImage(obj->context, obj->width, obj->height, VX_DF_IMAGE_U8);
+        sample_input_img_left  = vxCreateImage(obj->context, obj->width, obj->height, df);
         status = vxGetStatus((vx_reference)sample_input_img_left);
         if(status == VX_SUCCESS)
         {
-            sample_input_img_right = vxCreateImage(obj->context, obj->width, obj->height, VX_DF_IMAGE_U8);
+            sample_input_img_right = vxCreateImage(obj->context, obj->width, obj->height, df);
             status = vxGetStatus((vx_reference)sample_input_img_right);
         }
+
         for(buf_id=0; buf_id<obj->num_buf; buf_id++)
         {
             if(status == VX_SUCCESS)
@@ -267,12 +362,12 @@ static vx_status app_create_graph(AppObj *obj)
         {
             if(status == VX_SUCCESS)
             {
-                obj->input_img_left[buf_id] = vxCreateImage(obj->context, obj->width, obj->height, VX_DF_IMAGE_U8);
+                obj->input_img_left[buf_id] = vxCreateImage(obj->context, obj->width, obj->height, df);
                 status = vxGetStatus((vx_reference)obj->input_img_left[buf_id]);
             }
             if(status == VX_SUCCESS)
             {
-                obj->input_img_right[buf_id] = vxCreateImage(obj->context, obj->width, obj->height, VX_DF_IMAGE_U8);
+                obj->input_img_right[buf_id] = vxCreateImage(obj->context, obj->width, obj->height, df);
                 status = vxGetStatus((vx_reference)obj->input_img_right[buf_id]);
             }
         }
@@ -854,6 +949,15 @@ static vx_status app_run_graph(AppObj *obj)
 
     uint32_t curFileNum;
     uint32_t iterations;
+    char     fileExt[10];
+
+    if (obj->bit_depth == 8)
+    {
+        strncpy(fileExt, ".bmp", sizeof(fileExt));
+    } else 
+    {
+        strncpy(fileExt, ".bin", sizeof(fileExt));
+    }
 
     if(obj->pipeline_option==1)
     {
@@ -880,13 +984,15 @@ static vx_status app_run_graph(AppObj *obj)
 
             appPerfPointBegin(&obj->total_perf);
 
-            snprintf(obj->left_input_file_name, APP_MAX_FILE_PATH, "%s/%010d.bmp",
+            snprintf(obj->left_input_file_name, APP_MAX_FILE_PATH, "%s/%010d%s",
                 obj->left_input_file_path,
-                curFileNum
+                curFileNum,
+                fileExt
                 );
-            snprintf(obj->right_input_file_name, APP_MAX_FILE_PATH, "%s/%010d.bmp",
+            snprintf(obj->right_input_file_name, APP_MAX_FILE_PATH, "%s/%010d%s",
                 obj->right_input_file_path,
-                curFileNum
+                curFileNum,
+                fileExt
                 );
 
             if(obj->pipeline_option==1 && (status == VX_SUCCESS))
@@ -938,13 +1044,28 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
         {
             printf(" %d of %d: Loading [%s] ...\n", curFileNum, obj->end_fileno, obj->left_input_file_name);
         }
-        tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[obj->enqueueCnt], obj->left_input_file_name, vx_true_e);
+
+        if (obj->bit_depth == 8)
+        {
+            tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[obj->enqueueCnt], obj->left_input_file_name, vx_true_e);
+        } else 
+        {
+            load_vximage_from_bin_16(obj->input_img_left[obj->enqueueCnt], obj->left_input_file_name);
+        }
 
         if(0 == obj->is_interactive)
         {
             printf(" %d of %d: Loading [%s] ...\n", curFileNum, obj->end_fileno, obj->right_input_file_name);
         }
-        tivx_utils_load_vximage_from_bmpfile(obj->input_img_right[obj->enqueueCnt], obj->right_input_file_name, vx_true_e);
+
+        if (obj->bit_depth == 8)
+        {
+            tivx_utils_load_vximage_from_bmpfile(obj->input_img_right[obj->enqueueCnt], obj->right_input_file_name, vx_true_e);
+        } else
+        {
+            load_vximage_from_bin_16(obj->input_img_right[obj->enqueueCnt], obj->right_input_file_name);
+        }
+        
         appPerfPointEnd(&obj->fileio_perf);
 
         /* Enqueue input - start execution */
@@ -996,7 +1117,14 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
             }
             if(status == VX_SUCCESS)
             {
-                status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[left_img_obj_array_idx], obj->left_input_file_name, vx_true_e);
+                if (obj->bit_depth == 8)
+                {
+                    status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[left_img_obj_array_idx], obj->left_input_file_name, vx_true_e);
+                } else
+                {
+                    status = load_vximage_from_bin_16(obj->input_img_left[left_img_obj_array_idx], obj->left_input_file_name);
+                }
+                
             }
         }
 
@@ -1012,7 +1140,14 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
             }
             if(status == VX_SUCCESS)
             {
-                status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_right[right_img_obj_array_idx], obj->right_input_file_name, vx_true_e);
+                if (obj->bit_depth == 8)
+                {
+                    status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_right[right_img_obj_array_idx], obj->right_input_file_name, vx_true_e);
+                } else
+                {
+                    status = load_vximage_from_bin_16(obj->input_img_right[right_img_obj_array_idx], obj->right_input_file_name);
+                }
+                
             }
         }
 
@@ -1100,7 +1235,14 @@ static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 cu
     }
     if(status == VX_SUCCESS)
     {
-        status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[0], obj->left_input_file_name, vx_true_e);
+        if (obj->bit_depth == 8)
+        {
+            status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[0], obj->left_input_file_name, vx_true_e);
+        } else
+        {
+            status = load_vximage_from_bin_16(obj->input_img_left[0], obj->left_input_file_name);
+        }
+        
     }
     if(0 == obj->is_interactive)
     {
@@ -1108,7 +1250,14 @@ static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 cu
     }
     if(status == VX_SUCCESS)
     {
-        status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_right[0], obj->right_input_file_name, vx_true_e);
+        if (obj->bit_depth == 8)
+        {
+            status = tivx_utils_load_vximage_from_bmpfile(obj->input_img_right[0], obj->right_input_file_name, vx_true_e);
+        } else
+        {
+            status = load_vximage_from_bin_16(obj->input_img_right[0], obj->right_input_file_name);
+        }
+        
     }
     appPerfPointEnd(&obj->fileio_perf);
 
@@ -1299,6 +1448,7 @@ static void app_set_cfg_default(AppObj *obj)
     obj->pipeline_option = 0;
     obj->num_iterations  = 10;
     obj->is_interactive  = 0;
+    obj->bit_depth       = 8;
     obj->test_mode       = 0;
     obj->vis_confidence  = 1;
 
@@ -1641,6 +1791,15 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                     obj->is_interactive = atoi(token);
                 }
             }
+            else
+            if(strcmp(token, "bit_depth")==0)
+            {
+                token = strtok(NULL, s);
+                if (NULL != token)
+                {
+                    obj->bit_depth = atoi(token);
+                }
+            }            
         }
     }
 

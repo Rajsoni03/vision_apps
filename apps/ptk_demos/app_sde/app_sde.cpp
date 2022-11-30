@@ -1209,13 +1209,13 @@ static void SDEAPP_evtHdlrThread(SDEAPP_Context *appCntxt)
                 {
                     SDEAPP_createDisplayImage(appCntxt);
                     SDEAPP_createDisparityCCImage(appCntxt);
-                }
 
 #if !defined(PC)
-                status = vxScheduleGraph(appCntxt->vxDispGraph);
-                PTK_assert(VX_SUCCESS == status);
-                status = vxWaitGraph(appCntxt->vxDispGraph);
+                    status = vxScheduleGraph(appCntxt->vxDispGraph);
+                    PTK_assert(VX_SUCCESS == status);
+                    status = vxWaitGraph(appCntxt->vxDispGraph);
 #endif
+                }
 
                 SDEAPP_releaseOutBuff(appCntxt);
 

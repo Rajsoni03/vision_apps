@@ -180,6 +180,7 @@ typedef struct {
     vx_uint32 num_iterations;
     uint32_t is_interactive;
     uint32_t test_mode;
+    uint8_t  bit_depth;
     tivx_task task;
     volatile uint32_t stop_task;
     volatile uint32_t stop_task_done;
