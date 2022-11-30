@@ -36,10 +36,4 @@ ifeq ($(BUILD_QNX_A72),yes)
 	@if [ ! -d $(QNX_BASE) ]; then echo 'ERROR: $(QNX_BASE) not found !!!'; echo 'Ensure all dependencies have been downloaded as per http://software-dl.ti.com/jacinto7/esd/processor-sdk-rtos-jacinto7/latest/exports/docs/vision_apps/docs/user_guide/ENVIRONMENT_SETUP.html#ENVIRONMENT_SETUP_QNX'; exit 1; fi
 endif
 
-edgeai_check_paths:
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
-	@if [ ! -d $(EDGEAI_MODULES_PATH) ]; then echo 'ERROR: $(EDGEAI_MODULES_PATH) not found !!!'; exit 1; fi
-	@if [ ! -d $(EDGEAI_PLUGINS_PATH) ]; then echo 'ERROR: $(EDGEAI_PLUGINS_PATH) not found !!!'; exit 1; fi
-endif
-
 	@echo "# SDK paths OK !!!"

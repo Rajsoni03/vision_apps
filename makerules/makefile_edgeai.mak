@@ -16,16 +16,16 @@ export CROSS_COMPILER_PATH
 export CROSS_COMPILER_PREFIX
 export TARGET_FS
 
+edgeai_check_paths:
+	@if [ ! -d $(EDGEAI_MODULES_PATH) ]; then echo 'ERROR: $(EDGEAI_MODULES_PATH) not found !!!'; exit 1; fi
+	@if [ ! -d $(EDGEAI_PLUGINS_PATH) ]; then echo 'ERROR: $(EDGEAI_PLUGINS_PATH) not found !!!'; exit 1; fi
+
 edgeai:
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2 am62a))
 	@echo "Building EdgeAI Components"
 	$(MAKE) edgeai_check_paths
 	$(MAKE) linux_fs_install
 	$(MAKE) edgeai_modules
 	$(MAKE) edgeai_plugins
-else ifeq ($(SOC),j784s4)
-	@echo "Building EdgeAI Components not Supported"
-endif
 
 edgeai_modules:
 	@echo "Building EdgeAI Modules"
@@ -43,16 +43,12 @@ edgeai_plugins:
 	DESTDIR=$(TARGET_FS) ninja -C build install
 
 edgeai_install:
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2 am62a))
 	@echo "Install EdgeAI Modules and Plugins to EDGEAI_INSTALL_PATH"
 	cd $(EDGEAI_MODULES_PATH); \
 	if [ -d "build" ]; then $(MAKE) install DESTDIR=$(EDGEAI_INSTALL_PATH) -C build; else echo edgeai-tiovx-modules has not been built yet, skipping install; fi;
 	cd $(EDGEAI_PLUGINS_PATH); \
 	if [ -d "build" ]; then DESTDIR=$(EDGEAI_INSTALL_PATH) ninja -C build install; else echo edgeai-gst-plugins has not been built yet, skipping install; fi; \
 	sync
-else ifeq ($(SOC),j784s4)
-	@echo "Building EdgeAI Components not Supported"
-endif
 
 edgeai_scrub:
 	@echo "EdgeAI Scrub"
