@@ -127,6 +127,9 @@ BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
 # PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm am62a_evm
 BUILD_PDK_BOARD=$(SOC)_evm
 
+# Flag to build for an HS device. Signs the built remote proc firmware binaries
+HS?=0
+
 # Flag to select silicon revision: 1_1 for SR 1.1, 1_0 for SR 1.0
 HS_SR?=1_1
 ifeq ($(SOC),j721s2)

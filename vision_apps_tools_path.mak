@@ -48,6 +48,7 @@ GLM_PATH           ?= $(PSDK_PATH)/glm
 NDK_PATH           ?= $(PSDK_PATH)/ndk_3_80_00_19
 NS_PATH            ?= $(PSDK_PATH)/ns_2_80_00_17
 ETHFW_PATH         ?= $(PSDK_PATH)/ethfw
+TI_SECURE_DEV_PKG  ?= $(PSDK_PATH)/core-secdev-k3
 
 BUILD_OS ?= Linux
 
