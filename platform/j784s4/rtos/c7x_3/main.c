@@ -296,12 +296,6 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
-    {
-        goto mmu_exit;
-    }
-
     /*-------------------------------------------------------*/
     /* Cachable region memory attributes                     */
     /*-------------------------------------------------------*/
@@ -357,6 +351,12 @@ void appMmuMap(Bool is_secure)
     }
 
     retVal = Mmu_map(DDR_C7X_3_SCRATCH_VADDR, DDR_C7X_3_SCRATCH_PADDR, DDR_C7X_3_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
