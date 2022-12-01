@@ -92,7 +92,6 @@
 #include <TI/tivx_fileio.h>
 #include <TI/tivx_srv.h>
 #include <TI/tivx_stereo.h>
-#include <TI/tivx_park_assist.h>
 
 /* Imaging header files */
 #include <TI/j7_imaging_aewb.h>

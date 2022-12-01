@@ -76,8 +76,6 @@ else
 	DIRECTORIES += apps/basic_demos/app_c7x_kernel
 	DIRECTORIES += apps/utilities
 	DIRECTORIES += apps/tests
-	DIRECTORIES += apps/ptk_demos/app_common
-	DIRECTORIES += apps/ptk_demos/applibs
 endif
 endif
 

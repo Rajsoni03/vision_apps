@@ -34,14 +34,11 @@ STATIC_LIBS += app_utils_sciclient
 STATIC_LIBS += app_utils_misc
 STATIC_LIBS += app_utils_perf_stats
 STATIC_LIBS += vx_target_kernels_img_proc_c66
-STATIC_LIBS += vx_app_ptk_demo_common
 STATIC_LIBS += vx_kernels_common
 STATIC_LIBS += vx_target_kernels_stereo
 
 PTK_LIBS =
 PTK_LIBS += ptk_algos
-PTK_LIBS += ptk_utils
-PTK_LIBS += ptk_base
 PTK_LIBS += ptk_base
 
 SYS_STATIC_LIBS += $(PTK_LIBS)
@@ -56,7 +53,6 @@ TIOVX_LIBS += vx_target_kernels_ivision_common
 TIOVX_LIBS += vx_target_kernels_j7_arm
 
 STATIC_LIBS += vx_target_kernels_srv_c66
-STATIC_LIBS += vx_target_kernels_park_assist
 STATIC_LIBS += vx_target_kernels_stereo
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS)

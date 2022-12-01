@@ -50,9 +50,7 @@ LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/c7x_2/$(TARGET_BUILD)/
 
 STATIC_LIBS += vx_target_kernels_srv_c66
 STATIC_LIBS += vx_target_kernels_img_proc_c66
-STATIC_LIBS += vx_target_kernels_park_assist
 STATIC_LIBS += vx_target_kernels_stereo
-STATIC_LIBS += vx_app_ptk_demo_common
 
 ADDITIONAL_STATIC_LIBS += dmautils.ae71
 ADDITIONAL_STATIC_LIBS += libtiadalg_fisheye_transformation.a

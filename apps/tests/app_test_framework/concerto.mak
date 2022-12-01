@@ -6,8 +6,6 @@ TARGET      := vx_app_test_framework
 TARGETTYPE  := exe
 CSOURCES    := $(call all-c-files)
 
-include $(VISION_APPS_PATH)/apps/ptk_demos/concerto_inc.mak
-
 ifeq ($(TARGET_CPU),x86_64)
 
 CFLAGS      += -DTARGET_X86_64
@@ -25,15 +23,14 @@ endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72))
 
-ifeq ($(TARGET_OS), $(filter $(TARGET_OS), QNX))
 include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
-endif
 
-CFLAGS      += -DGL_ES 
+CFLAGS      += -DGL_ES
 
 ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX))
-CFLAGS      += -DEGL_NO_X11
-SYS_SHARED_LIBS += gbm
+CFLAGS      += -DEGL_NO_X11 -DPLATFORM_EGL
+SYS_SHARED_LIBS += gbm rt
+LDIRS           += $(LINUX_FS_PATH)/lib
 endif
 
 ifeq ($(TARGET_OS),QNX)

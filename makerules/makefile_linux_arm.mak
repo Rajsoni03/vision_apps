@@ -44,16 +44,6 @@ endif
 ifeq ($(YOCTO_STAGE),)
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_evm/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 	chmod +x $(LINUX_FS_STAGE_PATH)/opt/vision_apps/*.sh
-
-	# copy ptk cfg files
-	$(eval PTK_DEMO_DIR = $(VISION_APPS_PATH)/apps/ptk_demos)
-	$(eval PTK_DEMO_CFG_DIR = $(LINUX_FS_STAGE_PATH)/opt/vision_apps/ptk_app_cfg)
-	$(eval PTK_APP_LIST = app_surround_radar_ogmap app_dof_sfm_fisheye app_lidar_ogmap app_valet_parking app_sde app_sde_obstacle_detection)
-	mkdir -p $(PTK_DEMO_CFG_DIR)
-	for var in $(PTK_APP_LIST); do \
-		mkdir -p $(PTK_DEMO_CFG_DIR)/$$var; \
-		cp -R $(PTK_DEMO_DIR)/$$var/config $(PTK_DEMO_CFG_DIR)/$$var; \
-	done
 endif
 
 	# copy imaging sensor dcc binaries

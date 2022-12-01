@@ -24,9 +24,7 @@ LDIRS += $(TIDL_PATH)/lib/$(SOC)/dsp/algo/$(TARGET_BUILD)
 
 STATIC_LIBS += vx_target_kernels_srv_c66
 STATIC_LIBS += vx_target_kernels_img_proc_c66
-STATIC_LIBS += vx_target_kernels_park_assist
 STATIC_LIBS += vx_target_kernels_stereo
-STATIC_LIBS += vx_app_ptk_demo_common
 
 TIDL_LIBS =
 TIDL_LIBS += common_C7120

@@ -75,7 +75,6 @@
 
 #if defined(PC)
 #include <perception/perception.h>
-#include <perception/gui/c/gui.h>
 #endif
 
 #include <utils/perf_stats/include/app_perf_stats.h>

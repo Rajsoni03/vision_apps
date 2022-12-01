@@ -93,7 +93,6 @@
 #include <TI/tivx_fileio.h>
 #include <TI/tivx_srv.h>
 #include <TI/tivx_stereo.h>
-#include <TI/tivx_park_assist.h>
 
 /* Imaging header files */
 #include <TI/j7_imaging_aewb.h>
@@ -764,7 +763,6 @@ static void appRegisterOpenVXTargetKernels()
         }
         tivxRegisterTIDLTargetKernels();
         tivxRegisterTVMTargetKernels();
-        tivxRegisterParkAssistTargetKernels();
         tivxRegisterStereoTargetKernels();
         tivxRegisterImgProcTargetC71Kernels();
         #endif
@@ -772,8 +770,6 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterImgProcTargetC66Kernels();
         tivxRegisterSrvTargetC66Kernels();
         tivxRegisterHwaTargetArmKernels();
-        tivxRegisterParkAssistTargetKernels();
-        tivxRegisterParkAssistTargetC6XKernels();
         tivxRegisterStereoTargetKernels();
         #endif
         #ifdef ENABLE_VHWA_VPAC
@@ -817,7 +813,6 @@ static void appUnRegisterOpenVXTargetKernels()
         }
         tivxUnRegisterTIDLTargetKernels();
         tivxUnRegisterTVMTargetKernels();
-        tivxUnRegisterParkAssistTargetKernels();
         tivxUnRegisterStereoTargetKernels();
         tivxUnRegisterImgProcTargetC71Kernels();
         #endif
@@ -825,8 +820,6 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterImgProcTargetC66Kernels();
         tivxUnRegisterSrvTargetC66Kernels();
         tivxUnRegisterHwaTargetArmKernels();
-        tivxUnRegisterParkAssistTargetKernels();
-        tivxUnRegisterParkAssistTargetC6XKernels();
         tivxUnRegisterStereoTargetKernels();
         #endif
         #ifdef ENABLE_VHWA_VPAC

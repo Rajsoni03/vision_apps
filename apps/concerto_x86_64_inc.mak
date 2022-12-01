@@ -26,12 +26,19 @@ VISION_APPS_SRV_IDIRS += $(VISION_APPS_PATH)/kernels/sample/host
 VISION_APPS_APPLIBS_IDIRS =
 VISION_APPS_APPLIBS_IDIRS += $(VISION_APPS_PATH)/applibs
 
+PTK_IDIRS = 
+PTK_IDIRS += $(PTK_PATH)/include
+
+VISION_APPS_STEREO_KERNELS_IDIRS = 
+VISION_APPS_STEREO_KERNELS_IDIRS += $(VISION_APPS_PATH)/kernels/stereo/include
+
 LDIRS       += $(VISION_APPS_PATH)/out/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIOVX_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(IMAGING_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 LDIRS       += $(CGT7X_ROOT)/host_emulation
 LDIRS       += $(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
+LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unused-variable
@@ -101,6 +108,15 @@ VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
 
 VISION_APPS_MODULES_LIBS  =
 VISION_APPS_MODULES_LIBS += vx_app_modules
+
+PTK_LIBS =
+PTK_LIBS += ptk_base
+PTK_LIBS += ptk_algos
+
+VISION_APPS_STEREO_LIBS =
+VISION_APPS_STEREO_LIBS += vx_kernels_common
+VISION_APPS_STEREO_LIBS += vx_kernels_stereo
+VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 
 TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule

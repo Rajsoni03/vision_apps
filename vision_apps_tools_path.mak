@@ -41,7 +41,7 @@ LINUX_SD_FS_ROOT_PATH ?= /media/$(USER)/rootfs
 LINUX_SD_FS_BOOT_PATH ?= /media/$(USER)/BOOT
 
 TIOVX_CUSTOM_KERNEL_PATH ?= $(CUSTOM_KERNEL_PATH)
-PTK_PATH           ?= $(PSDK_PATH)/perception
+PTK_PATH           ?= $(PSDK_PATH)/ti-perception-toolkit
 REMOTE_DEVICE_PATH ?= $(PSDK_PATH)/remote_device
 TIADALG_PATH       ?= $(PSDK_PATH)/tiadalg
 GLM_PATH           ?= $(PSDK_PATH)/glm

@@ -6,7 +6,6 @@ TARGETTYPE  := library
 CSOURCES    := $(call all-c-files)
 
 IDIRS       += $(VISION_APPS_PATH)/kernels/srv/include
-IDIRS       += $(PTK_PATH)/include
 
 include $(FINALE)
 
