@@ -317,8 +317,15 @@ mcu4_0_ddr_local_heap_size  = 8*MB;
 mcu4_1_ddr_local_heap_addr  = mcu4_0_ddr_local_heap_addr + mcu4_0_ddr_local_heap_size;
 mcu4_1_ddr_local_heap_size  = 8*MB;
 
+ddr_intercore_eth_desc_addr = mcu4_1_ddr_local_heap_addr + mcu4_1_ddr_local_heap_size;
+ddr_intercore_eth_desc_size = 8*MB;
+
+ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_desc_size;
+ddr_intercore_eth_data_size = 24*MB;
+
+
 # C7x 1 Persistent DDR
-c7x_1_ddr_local_heap_non_cacheable_addr  = mcu4_1_ddr_local_heap_addr + mcu4_1_ddr_local_heap_size;
+c7x_1_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
 c7x_1_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_1_ddr_local_heap_addr = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
 c7x_1_ddr_local_heap_size = 64*MB;
@@ -328,14 +335,8 @@ c7x_1_ddr_scratch_non_cacheable_size     = 64*MB;
 c7x_1_ddr_scratch_addr = c7x_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
 c7x_1_ddr_scratch_size = 64*MB;
 
-ddr_intercore_eth_desc_addr = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
-ddr_intercore_eth_desc_size = 8*MB;
-
-ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_desc_size;
-ddr_intercore_eth_data_size = 24*MB;
-
 # C7x 2 Persistent DDR
-c7x_2_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
+c7x_2_ddr_local_heap_non_cacheable_addr  = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
 c7x_2_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_2_ddr_local_heap_addr = c7x_2_ddr_local_heap_non_cacheable_addr + c7x_2_ddr_local_heap_non_cacheable_size;
 c7x_2_ddr_local_heap_size = 64*MB;
@@ -595,13 +596,9 @@ vision_apps_core_heaps_lo.concat(mcu3_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu3_1_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu4_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu4_1_ddr_local_heap);
-vision_apps_core_heaps_lo.concat(c7x_1_ddr_local_heap_non_cacheable);
-vision_apps_core_heaps_lo.concat(c7x_1_ddr_local_heap);
-vision_apps_core_heaps_lo.concat(c7x_1_ddr_scratch_non_cacheable);
-vision_apps_core_heaps_lo.concat(c7x_1_ddr_scratch);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
 
-c7x_ddr_local_heap_phy  = MemSection("DDR_C7X_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, ((c7x_4_ddr_scratch_addr + c7x_4_ddr_scratch_size)-ddr_mem_addr_hi), "DDR for c7x-2 thru c7x-4 for local heap and scratch");
+c7x_ddr_local_heap_phy  = MemSection("DDR_C7X_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, ((c7x_4_ddr_scratch_addr + c7x_4_ddr_scratch_size)-ddr_mem_addr_hi), "DDR for c7x-1 thru c7x-4 for local heap and scratch");
 
 vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
 vision_apps_core_heaps_hi.concat(c7x_ddr_local_heap_phy);
