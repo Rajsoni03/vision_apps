@@ -88,7 +88,7 @@ endif # ifeq ($(TARGET_OS), QNX)
 # This section is for apps to link against tivision_apps library instead of static libs
 ifeq ($(LINK_SHARED_OBJ)$(TARGETTYPE),yesexe)
 
-$(info $(TARGET) links against libtivision_apps.so)
+#$(info $(TARGET) links against libtivision_apps.so)
 
 SHARED_LIBS += tivision_apps
 
