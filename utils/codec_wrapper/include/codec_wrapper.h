@@ -111,9 +111,9 @@ int32_t appCodecSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHA
  * Registers the data_pointers that will map to the bufferpool of pulled CODECBuffers.
  * The output parameters (out_*) must be properly initialised.
  * 
- * \param [in]      data_ptr        pointers to hold the pulled buffers
+ * \param [in]      data_ptr        memory that the CODECBuffers will map to
  */
-int32_t appCodecSinkInit(void* (*data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES]);
+int32_t appCodecSinkInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES]);
 
 /**
  * \brief 

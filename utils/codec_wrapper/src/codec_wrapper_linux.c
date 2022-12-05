@@ -48,7 +48,7 @@ int32_t appCodecSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHA
     return appGstSrcInit(data_ptr);
 }
 
-int32_t appCodecSinkInit(void* (*data_ptr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
+int32_t appCodecSinkInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES])
 {
     return appGstSinkInit(data_ptr);
 }

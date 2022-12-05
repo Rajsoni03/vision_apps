@@ -82,6 +82,22 @@
 
 #define APP_BUFFER_Q_DEPTH   (4)
 #define CODEC_ENC_BUFQ_DEPTH   (2)
+
+#if defined(QNX)
+#define CODEC_DEC_BUFQ_DEPTH   (4)
+#else
+#define CODEC_DEC_BUFQ_DEPTH   (0)
+#endif
+
+#define APP_ENC_BUFFER_Q_DEPTH   (APP_BUFFER_Q_DEPTH + CODEC_ENC_BUFQ_DEPTH)
+#define APP_DEC_BUFFER_Q_DEPTH   (APP_BUFFER_Q_DEPTH + CODEC_DEC_BUFQ_DEPTH)
+
+#if defined(QNX)
+#define CODEC_DEC_BUFQ_SIZE   (3)
+#else
+#define CODEC_DEC_BUFQ_SIZE   (APP_DEC_BUFFER_Q_DEPTH + 1)
+#endif
+
 #define COPY_BUFFER_Q_DEPTH   (1)
 
 #define CAPTURE_PIPELINE_DEPTH   (5)
@@ -136,7 +152,7 @@ typedef struct {
 
     vx_uint32 is_interactive;
 
-    vx_uint32  num_codec_bufs;
+    vx_uint32 num_codec_bufs;
     vx_uint32 num_ch;
 
     vx_uint32 num_frames_to_run;
@@ -194,7 +210,9 @@ static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_
 static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels);
 static vx_status capture_encode(AppObj* obj, vx_int32 frame_id);
 static vx_status decode_display(AppObj* obj, vx_int32 frame_id);
+#if defined(LINUX)
 static vx_status delete_array_image_buffers(vx_object_array arr);
+#endif
 static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_uint32 sizes[CODEC_MAX_NUM_PLANES]);
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
@@ -1379,14 +1397,36 @@ static vx_status app_verify_graph(AppObj *obj)
         {
             if(VX_SUCCESS == status)
             {
+#if defined(QNX)
+                status = map_vx_object_arr(obj->dec_pool.arr[buf_id], obj->dec_pool.data_ptr[buf_id], obj->dec_pool.map_id[buf_id], obj->dec_pool.num_channels);
+#endif
+#if defined(LINUX)
                 status = delete_array_image_buffers(obj->dec_pool.arr[buf_id]);
+#endif
             }
         }
+        
         if(VX_SUCCESS == status)
         {
             status = appCodecSinkInit(obj->dec_pool.data_ptr);
-            APP_PRINTF("appCodecSinkInit Done!\n");
+            if(VX_SUCCESS == status)
+            {
+                APP_PRINTF("\nappCodecSinkInit Done!\n");
+            }
+            else
+            {
+                APP_ERROR("\nappCodecSinkInit Failed!\n");
+            }
         }
+    #if defined(QNX)        
+        for (vx_int8 buf_id=0; buf_id<obj->dec_pool.bufq_depth; buf_id++)
+        {
+            if(VX_SUCCESS == status)
+            {
+                status = unmap_vx_object_arr(obj->dec_pool.arr[buf_id], obj->dec_pool.map_id[buf_id], obj->dec_pool.num_channels);
+            }
+        }
+    #endif
     }
 
     /* wait a while for prints to flush */
@@ -1407,11 +1447,19 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             status = capture_encode(obj, frame_id);
         }
 
+    #if defined(QNX)
+        /* dec_pool buffer recycling */
+        if (status==VX_SUCCESS && (obj->decode==1) && frame_id>=obj->dec_pool.bufq_depth)
+        {
+            status = decode_display(obj,frame_id-obj->dec_pool.bufq_depth);
+        }
+    #else
         /* dec_pool buffer recycling */
         if (status==VX_SUCCESS && (obj->decode==1) && frame_id>=obj->enc_pool.bufq_depth)
         {
             status = decode_display(obj,frame_id-obj->enc_pool.bufq_depth);
         }
+    #endif
 
     appPerfPointEnd(&obj->total_perf);
     return status;
@@ -1420,7 +1468,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 
 static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
 {
-    APP_PRINTF("capture_encode: frame %d beginning\n", frame_id);
+    APP_PRINTF("\ncapture_encode: frame %d beginning\n", frame_id);
     vx_status status = VX_SUCCESS;
 
     CaptureObj *captureObj = &obj->captureObj;
@@ -1483,7 +1531,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
 
 static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
 {
-    APP_PRINTF("decode_display: frame %d beginning\n", frame_id);
+    APP_PRINTF("\ndecode_display: frame %d beginning\n", frame_id);
     vx_status status = VX_SUCCESS;
 
     TIOVXImgMosaicModuleObj *imgMosaicObj = &obj->imgMosaicObj;
@@ -1511,6 +1559,7 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
         {
             obj->EOS=1;
             obj->stop_task=1;
+            APP_PRINTF("\nCODEC=> EOS Recieved\n");
             goto exit;
         }
         else if (pull_status != 0)
@@ -1597,6 +1646,7 @@ exit:
     return status;
 }
 
+#if defined(LINUX)
 static vx_status delete_array_image_buffers(vx_object_array arr)
 {
     vx_status status = VX_SUCCESS;
@@ -1647,7 +1697,7 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
     }
     return status;
 }
-
+#endif
 
 static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_uint32 sizes[CODEC_MAX_NUM_PLANES])
 {
@@ -1971,9 +2021,9 @@ static void app_default_param_set(AppObj *obj)
     obj->decode     = 1;
     obj->downscale  = 0;
 
-    obj->enc_pool.bufq_depth    = APP_BUFFER_Q_DEPTH + CODEC_ENC_BUFQ_DEPTH;
-    obj->dec_pool.bufq_depth    = APP_BUFFER_Q_DEPTH;    
-    obj->num_codec_bufs           = obj->dec_pool.bufq_depth + 1;
+    obj->enc_pool.bufq_depth    = APP_ENC_BUFFER_Q_DEPTH;
+    obj->dec_pool.bufq_depth    = APP_DEC_BUFFER_Q_DEPTH;
+    obj->num_codec_bufs         = CODEC_DEC_BUFQ_SIZE;
 }
 
 static void app_querry_param_set(AppObj *obj)

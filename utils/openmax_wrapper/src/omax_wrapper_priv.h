@@ -49,8 +49,6 @@
 
 #include <utils/openmax_wrapper/include/omax_wrapper.h>
 
-// NAL start code length in bytes.
-
 // #define WRAPPER_DEBUG_MODE
 
 #ifdef WRAPPER_DEBUG_MODE
@@ -61,9 +59,9 @@
 
 #define WRAPPER_ERROR(f_, ...) printf((f_), ##__VA_ARGS__)
 
-#define OMX_SPEC_VERSION 0x00000001     // OMX Version
-#define SET_OMX_VERSION_SIZE( param, size ) {             \
-    param.nVersion.nVersion = OMX_SPEC_VERSION;           \
+#define OMAX_SPEC_VERSION 0x00000001     /* OMX Version */
+#define SET_OMAX_VERSION_SIZE( param, size ) {             \
+    param.nVersion.nVersion = OMAX_SPEC_VERSION;           \
     param.nSize = size;                                   \
 }
 
@@ -74,21 +72,18 @@
 #endif
 
 #define OMAX_MAX_FILE_PATH           (256u)
-
-typedef struct mm_buffer mm_buffer_t;
-typedef int32_t (*f_read_frame)(void *handle, mm_buffer_t *buffer);
+#define OMAX_DEFAULT_BUFFER_SIZE (10*1024*1024)
+#define OMAX_CONFIG_DATA_BUFFER_SIZE 8096
+#define OMAX_SECOND_BYTE      0x8000000
+#define OMAX_H264_CUSTOM_ASPECT_RATIO     255
+#define OMAX_DEC_EXTRA_OUT_BUFFERS 0
 
 typedef struct {
     void *addr;
     uint32_t size;
     off64_t offset; /* offset or physical address of the buffer. */
-} OmxilEncInputBuffer_t;
+} OmxilBuffer_t;
 
-typedef struct enc_params_s {
-    const char *name;
-    int32_t    *value;
-    const int32_t range[2];
-} enc_params_t;
 
 /*! \brief A Boolean value.
  * This allows 0 to be FALSE, as it is in C, and any non-zero to be TRUE.
@@ -123,8 +118,18 @@ typedef struct OmxilVideoEncDec_ {
     int32_t in_fd;
     int32_t out_fd;
     
-    OmxilEncInputBuffer_t* input_bufs[CODEC_MAX_BUFFER_DEPTH];
-    OMX_U32                input_buf_num;
+    uint8_t* large_input_buf;
+    uint8_t* currPtr;
+    OMX_U32 large_input_buf_data_size;
+
+    uint32_t config_size;
+    uint8_t configPtr[OMAX_CONFIG_DATA_BUFFER_SIZE];
+
+    OmxilBuffer_t* input_bufs[CODEC_MAX_BUFFER_DEPTH];
+    OMX_U32        input_buf_num;
+
+    OmxilBuffer_t* output_bufs[CODEC_MAX_BUFFER_DEPTH];
+    OMX_U32        output_buf_num;
 
     int32_t input_format;
 
@@ -133,25 +138,27 @@ typedef struct OmxilVideoEncDec_ {
     int32_t frame_rate;
     int32_t src_width;
     int32_t src_height;
+    int32_t aligned_width;
     int32_t aligned_height;
     int32_t frame_size;
     int32_t src_stride;
     int32_t channelIdx;
 
-    //component
+    /* component */
     OMX_HANDLETYPE compHandle;
     OMX_VIDEO_CODINGTYPE compressFmt;
     OMX_U32 inPortIndex;
     OMX_U32 outPortIndex;
-    uint16_t numOfPorts; // Data ports
+    uint16_t numOfPorts; /* Data ports */
     omxil_bool cmdComplete;
     omxil_bool inPortFlushed;
     omxil_bool outPortFlushed;
     omxil_bool eos_received;
     omxil_bool eos_sent;
+    omxil_bool eof_received;
     OMX_ERRORTYPE compError;
 
-    //output port
+    /* output port */
     OMX_U32 outputPortBufSize;
     OMX_U32 nOutputBufs;
     int32_t qOutputBufHdr[CODEC_MAX_BUFFER_DEPTH];
@@ -159,8 +166,13 @@ typedef struct OmxilVideoEncDec_ {
     int32_t qOutputBufHdrLastIdx;
     int32_t qOutputBufHdrFirstIdx;
     omxil_bool outBufFull[CODEC_MAX_BUFFER_DEPTH];
+    omxil_bool sentOutBuf[CODEC_MAX_BUFFER_DEPTH];
 
-    //Input port
+    int32_t qOutputBufReturn[CODEC_MAX_BUFFER_DEPTH];
+    int32_t qOutputBufReturnLastIdx;
+    int32_t qOutputBufReturnFirstIdx;
+
+    /* Input port */
     OMX_U32 nInputBufs;
     OMX_U32 inputPortBufSize;
     int32_t qInputBufHdr[CODEC_MAX_BUFFER_DEPTH];
@@ -169,10 +181,10 @@ typedef struct OmxilVideoEncDec_ {
     int32_t qInputBufHdrFirstIdx;
     omxil_bool inBufEmpty[CODEC_MAX_BUFFER_DEPTH];
 
-    uint32_t srcWidth; // source width, width from configure data, output buffer is allocated with this size
-    uint32_t srcHeight; // source height, height from configure data
+    uint32_t srcWidth; /* source width, width from configure data, output buffer is allocated with this size */
+    uint32_t srcHeight; /* source height, height from configure data */
 
-    //encoder configure parameters
+    /* encoder configure parameters */
     int32_t bitrate;
     int32_t idr_period;
     int32_t rcmode;
@@ -185,12 +197,23 @@ typedef struct OmxilVideoEncDec_ {
     uint64_t enc_frame_rate;
 
     /* Threads */
-    pthread_t encoder_push;
+    pthread_t push_thread;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
 
     int32_t push_count;
     int32_t pull_count;
+
+    uint32_t frame_duration;
+    uint64_t frame_ts;
+    uint64_t last_frame_ts;
+    omxil_bool frame_rate_control;
+
+    uint32_t mLumaDepth;
+    uint32_t mChromaDepth;
+    int32_t mChromaFmt;
+
+    omxil_bool doneReadFrames;
 } OmxilVideoEncDec_t;
 
 typedef struct 
@@ -203,6 +226,10 @@ typedef struct
     OmxilVideoEncDec_t compHandleArray[CODEC_MAX_NUM_CHANNELS];
 
     int32_t input_format;
+    omxil_bool isH264;
+    omxil_bool isH265;
+
+    void* (*pdataPtr)[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
 } app_omax_wrapper_obj_t;
 
 extern app_omax_wrapper_obj_t g_app_omax_wrapper_obj;

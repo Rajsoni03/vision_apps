@@ -39,7 +39,6 @@
  * \brief 
  * 
  * Launches the OMXPipeline described by user defined parameters.
- * Initializes the omax_wrapper and calls omax_parse_launch() on the command string.
  * 
  * \param [in]      prm         Init parameters
  */
