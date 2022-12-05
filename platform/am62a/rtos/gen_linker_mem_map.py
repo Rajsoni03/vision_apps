@@ -111,7 +111,7 @@ ddr_mem_addr_1  = 0x0099800000;
 ddr_mem_size_1  = 80*MB
 
 ddr_mem_addr_2 = 0xA0000000;
-ddr_mem_size_2 = 384*MB
+ddr_mem_size_2 = 515*MB
 
 #
 # Other constant sizes
@@ -211,11 +211,11 @@ dm_r5f_ddr_local_heap_size  = 16*MB;
 carveout_size += dm_r5f_ddr_local_heap_size
 
 c7x_1_ddr_local_heap_addr  = dm_r5f_ddr_local_heap_addr + dm_r5f_ddr_local_heap_size;
-c7x_1_ddr_local_heap_size  = 32*MB;
+c7x_1_ddr_local_heap_size  = 128*MB;
 carveout_size += c7x_1_ddr_local_heap_size
 
 c7x_1_ddr_scratch_addr     = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
-c7x_1_ddr_scratch_size     = 32*MB;
+c7x_1_ddr_scratch_size     = 128*MB;
 carveout_size += c7x_1_ddr_scratch_size
 
 assert carveout_size <= ddr_mem_size_2
