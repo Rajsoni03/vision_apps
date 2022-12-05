@@ -194,8 +194,14 @@ int32_t appCsi2RxInit(void)
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_PSILSS0);
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_RX_IF0);
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_RX_IF1);
+    #if defined(SOC_J784S4)
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_RX_IF2);
+    #endif
     SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_RX0);
     SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_RX1);
+    #if defined(SOC_J784S4)
+    SET_DEVICE_STATE_ON(TISCI_DEV_DPHY_RX2);
+    #endif
 
     Csirx_initParamsInit(&initPrmsCsirx);
     initPrmsCsirx.drvHandle = appUdmaCsirxCsitxGetObj();

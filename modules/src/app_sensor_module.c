@@ -68,7 +68,7 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
 {
     vx_status status = VX_SUCCESS;
     char* sensor_list[ISS_SENSORS_MAX_SUPPORTED_SENSOR];
-    vx_uint8 selectedSensor = 0xFF;
+    vx_uint16 selectedSensor = 0xFFF;
     vx_uint8 sensors_detected[ISS_SENSORS_MAX_SUPPORTED_SENSOR];
     vx_bool sensorSelected = vx_false_e;
     vx_bool ldcSelected = vx_false_e;
@@ -107,9 +107,9 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
             if(ch == '0')
             {
                 uint8_t num_sensors_found= 0;
-                uint8_t channel_mask = 0xFF;
+                uint16_t channel_mask = 0xFFF;
                 /*AutoDetect*/
-                memset(sensors_detected, 0xFF, ISS_SENSORS_MAX_SUPPORTED_SENSOR);
+                memset(sensors_detected, 0xFFF, ISS_SENSORS_MAX_SUPPORTED_SENSOR);
                 status = appDetectImageSensor(sensors_detected, &num_sensors_found, channel_mask);
                 if(0 == status)
                 {

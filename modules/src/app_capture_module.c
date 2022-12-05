@@ -74,14 +74,20 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     vx_int32 id, lane, ch, vcNum;
     int32_t ch_mask = sensorObj->ch_mask;
 
-    if(ch_mask > 0xF)
+    if (ch_mask <= 0xF)
     {
-        num_capt_instances= 2;
+        num_capt_instances = 1;
     }
+    else if ((ch_mask > 0xF) && (ch_mask <= 0xFF))
+    {
+        num_capt_instances = 2;
+    }
+    #if defined(SOC_J784S4)
     else
     {
-        num_capt_instances= 1;
+        num_capt_instances = 3;
     }
+    #endif
 
     captureObj->capture_format = sensorObj->sensor_out_format;
 
@@ -117,7 +123,11 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     id = 0;/*CSI2 Instance ID*/
     while(ch_mask > 0)
     {
-        if(ch > 3)
+        if(ch > 7)
+        {
+            id = 2;
+        }
+        else if( (ch > 3) && (ch <= 7) )
         {
             id = 1;
         }
