@@ -69,9 +69,7 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2 J784S4 AM62A))
         SYSIDIRS += $(PDK_PATH)/packages
     endif
 
-    ifeq ($(TARGET_CPU),R5F)
-        SYSIDIRS += $(NDK_PATH)/packages
-    else ifeq ($(TARGET_CPU),C66)
+    ifeq ($(TARGET_CPU),C66)
         SYSIDIRS += $(MATHLIB_PATH)/packages
     endif
 
