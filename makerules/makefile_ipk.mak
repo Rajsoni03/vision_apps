@@ -57,7 +57,7 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					vision_apps/utils
 
 ifneq ($(SOC),am62a)
-IPK_INCLUDE_FOLDERS += perception/include \
+IPK_INCLUDE_FOLDERS += ti-perception-toolkit/include \
 					tiadalg
 endif
 
