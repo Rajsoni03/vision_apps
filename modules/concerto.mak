@@ -19,7 +19,11 @@ ifneq ($(SOC), am62a)
 STATIC_LIBS     += $(VISION_APPS_STEREO_LIBS)
 STATIC_LIBS     += $(VISION_APPS_SRV_LIBS)
 
-SHARED_LIBS += rt GLESv2 EGL gbm
+SHARED_LIBS += GLESv2 EGL
+
+ifeq ($(TARGET_OS),LINUX)
+SHARED_LIBS += rt gbm
+endif
 endif
 
 ifeq ($(TARGET_OS),QNX)
