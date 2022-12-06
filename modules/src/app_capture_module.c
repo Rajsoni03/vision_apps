@@ -70,7 +70,7 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
 {
     vx_status status = VX_SUCCESS;
 
-    vx_uint32 num_capt_instances;
+    vx_uint32 num_capt_instances = 0;
     vx_int32 id, lane, ch, vcNum;
     int32_t ch_mask = sensorObj->ch_mask;
 
@@ -83,70 +83,78 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
         num_capt_instances = 2;
     }
     #if defined(SOC_J784S4)
-    else
+    else if ((ch_mask > 0xFF) && (ch_mask <= 0xFFF))
     {
         num_capt_instances = 3;
     }
     #endif
-
-    captureObj->capture_format = sensorObj->sensor_out_format;
-
-    tivx_capture_params_init(&captureObj->params);
-
-    if (captureObj->enable_error_detection || captureObj->test_mode)
+    else
     {
-        captureObj->params.timeout        = 90;
-        captureObj->params.timeoutInitial = 500;
-    }
-    captureObj->params.numInst  = num_capt_instances;
-    captureObj->params.numCh    = sensorObj->num_cameras_enabled;
-
-    for(id = 0; id < num_capt_instances; id++)
-    {
-        captureObj->params.instId[id]                       = id;
-        captureObj->params.instCfg[id].enableCsiv2p0Support = (uint32_t)vx_true_e;
-        captureObj->params.instCfg[id].numDataLanes         = sensorObj->sensorParams.sensorInfo.numDataLanes;
-        APP_PRINTF("captureObj->params.numDataLanes = %d \n", captureObj->params.instCfg[id].numDataLanes);
-        captureObj->params.instCfg[id].laneBandSpeed        = sensorObj->sensorParams.sensorInfo.csi_laneBandSpeed;
-
-        for (lane = 0; lane < captureObj->params.instCfg[id].numDataLanes; lane++)
-        {
-            captureObj->params.instCfg[id].dataLanesMap[lane] = lane + 1;
-            APP_PRINTF("captureObj->params.dataLanesMap[%d] = %d \n",
-                        lane,
-                        captureObj->params.instCfg[id].dataLanesMap[lane]);
-        }
+        printf("[CAPTURE_MODULE] - ch_mask parameter is invalid! \n");
+        status = VX_ERROR_INVALID_PARAMETERS;
     }
 
-    ch = 0;/*Camera Physical Channel Number*/
-    vcNum = 0;/*CSI2 Virtual Channel Number*/
-    id = 0;/*CSI2 Instance ID*/
-    while(ch_mask > 0)
+    if(status != VX_SUCCESS)
     {
-        if(ch > 7)
-        {
-            id = 2;
-        }
-        else if( (ch > 3) && (ch <= 7) )
-        {
-            id = 1;
-        }
-        else
-        {
-            id = 0;
-        }
-        if(ch_mask & 0x1)
-        {
-            captureObj->params.chVcNum[vcNum] = ch%4;
-            captureObj->params.chInstMap[vcNum] = id;
-            vcNum++;
-        }
-        ch++;
-        ch_mask = ch_mask >> 1;
-    }
+        captureObj->capture_format = sensorObj->sensor_out_format;
 
-    captureObj->config = vxCreateUserDataObject(context, "tivx_capture_params_t", sizeof(tivx_capture_params_t), &captureObj->params);
-    status = vxGetStatus((vx_reference)captureObj->config);
+        tivx_capture_params_init(&captureObj->params);
+
+        if (captureObj->enable_error_detection || captureObj->test_mode)
+        {
+            captureObj->params.timeout        = 90;
+            captureObj->params.timeoutInitial = 500;
+        }
+        captureObj->params.numInst  = num_capt_instances;
+        captureObj->params.numCh    = sensorObj->num_cameras_enabled;
+
+        for(id = 0; id < num_capt_instances; id++)
+        {
+            captureObj->params.instId[id]                       = id;
+            captureObj->params.instCfg[id].enableCsiv2p0Support = (uint32_t)vx_true_e;
+            captureObj->params.instCfg[id].numDataLanes         = sensorObj->sensorParams.sensorInfo.numDataLanes;
+            APP_PRINTF("captureObj->params.numDataLanes = %d \n", captureObj->params.instCfg[id].numDataLanes);
+            captureObj->params.instCfg[id].laneBandSpeed        = sensorObj->sensorParams.sensorInfo.csi_laneBandSpeed;
+
+            for (lane = 0; lane < captureObj->params.instCfg[id].numDataLanes; lane++)
+            {
+                captureObj->params.instCfg[id].dataLanesMap[lane] = lane + 1;
+                APP_PRINTF("captureObj->params.dataLanesMap[%d] = %d \n",
+                            lane,
+                            captureObj->params.instCfg[id].dataLanesMap[lane]);
+            }
+        }
+
+        ch = 0;/*Camera Physical Channel Number*/
+        vcNum = 0;/*CSI2 Virtual Channel Number*/
+        id = 0;/*CSI2 Instance ID*/
+        while(ch_mask > 0)
+        {
+            if(ch > 7)
+            {
+                id = 2;
+            }
+            else if( (ch > 3) && (ch <= 7) )
+            {
+                id = 1;
+            }
+            else
+            {
+                id = 0;
+            }
+            if(ch_mask & 0x1)
+            {
+                captureObj->params.chVcNum[vcNum] = ch%4;
+                captureObj->params.chInstMap[vcNum] = id;
+                vcNum++;
+            }
+            ch++;
+            ch_mask = ch_mask >> 1;
+        }
+
+        captureObj->config = vxCreateUserDataObject(context, "tivx_capture_params_t", sizeof(tivx_capture_params_t), &captureObj->params);
+        status = vxGetStatus((vx_reference)captureObj->config);
+    }
 
     if(status != VX_SUCCESS)
     {
