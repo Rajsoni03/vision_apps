@@ -94,7 +94,7 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
         status = VX_ERROR_INVALID_PARAMETERS;
     }
 
-    if(status != VX_SUCCESS)
+    if(status == VX_SUCCESS)
     {
         captureObj->capture_format = sensorObj->sensor_out_format;
 
