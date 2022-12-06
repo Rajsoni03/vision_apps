@@ -1104,12 +1104,16 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(obj->enable_psd == 1 && (status == VX_SUCCESS))
     {
-        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->psdTIDLObj, obj->psdPreProcObj.output_tensor_arr);
+        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->psdTIDLObj, obj->psdPreProcObj.output_tensor_arr, 1);
     }
 
     if(obj->enable_vd == 1 && (status == VX_SUCCESS))
     {
-        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->vdTIDLObj, obj->vdPreProcObj.output_tensor_arr);
+        #if defined(SOC_J784S4)
+        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->vdTIDLObj, obj->vdPreProcObj.output_tensor_arr, 4);
+        #else
+        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->vdTIDLObj, obj->vdPreProcObj.output_tensor_arr, 1);
+        #endif
     }
 
     if(obj->enable_sem_seg == 1 && (status == VX_SUCCESS))
