@@ -751,7 +751,6 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterImgProcTargetC71Kernels();
         #endif
         #ifdef CPU_c7x_2
-        tivxRegisterParkAssistTargetKernels();
         tivxRegisterStereoTargetKernels();
         tivxRegisterSrvTargetC66Kernels();
         tivxRegisterHwaTargetArmKernels();
@@ -803,7 +802,6 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterImgProcTargetC71Kernels();
         #endif
         #ifdef CPU_c7x_2
-        tivxUnRegisterParkAssistTargetKernels();
         tivxUnRegisterStereoTargetKernels();
         tivxUnRegisterSrvTargetC66Kernels();
         tivxUnRegisterHwaTargetArmKernels();
