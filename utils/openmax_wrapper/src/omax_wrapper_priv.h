@@ -45,7 +45,7 @@
 #include <pthread.h>
 #include <OMX_Core.h>
 #include <OMX_Component.h>
-#include <OMX_Extension_video_QNX.h>
+#include <OMX_Extension_video_TI.h>
 
 #include <utils/openmax_wrapper/include/omax_wrapper.h>
 
