@@ -68,12 +68,6 @@
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
 
-#if defined(SOC_AM62A)
-#include <ti/board/board.h>
-#include <ti/drv/uart/UART.h>
-#include <ti/drv/uart/UART_stdio.h>
-#endif
-
 /* High Priority for SCI Server - must be higher than Low priority task */
 #define SETUP_SCISERVER_TASK_PRI_HIGH   (5)
 /*
@@ -88,10 +82,6 @@ int32_t appSciserverSciclientInit()
     int32_t retVal = CSL_PASS;
     Board_initCfg           boardCfg;
     Sciclient_ConfigPrms_t  clientParams;
-
-#if defined(SOC_AM62A)
-    Board_initCfg   boardCfg;
-#endif
 
     retVal = Sciclient_configPrmsInit(&clientParams);
 
@@ -135,12 +125,6 @@ void appSciserverInit(void* arg0, void* arg1)
     Sciserver_TirtosCfgPrms_t serverParams;
     char *version_str = NULL;
     char *rmpmhal_version_str = NULL;
-
-
-    #if defined(SOC_AM62A)
-    char *version_str = NULL;
-    char *rmpmhal_version_str = NULL;
-    #endif
 
     retVal = Sciserver_tirtosInitPrms_Init(&serverParams);
 
