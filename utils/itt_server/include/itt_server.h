@@ -202,7 +202,7 @@ void itt_ctrl_cmdHandlerIssDevCtrl(char *cmd, uint32_t prmSize);
  * Currenlty only two nodes are supported: VISS and LDC.
  * 
  */
-int32_t itt_register_object(vx_context *context,
+int32_t itt_register_object(vx_context context,
                             vx_node *node,
                             tivx_raw_image *raw_image_handle,
                             vx_image *yuv_image_handle, 

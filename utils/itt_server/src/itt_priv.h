@@ -150,7 +150,7 @@ int i2cInit();
 */
 typedef struct
 {
-    vx_context *context;
+    vx_context context;
     vx_node *node;
     tivx_raw_image *raw_image_handle;
     vx_image *yuv_image_handle;

@@ -321,7 +321,7 @@ int32_t save_debug_images(ITTServerEdgeAIObj *obj)
     return (file_index-1);
 }
 
-int32_t itt_register_object(vx_context *context,
+int32_t itt_register_object(vx_context context,
                               vx_node *node,
                               tivx_raw_image *raw_image_handle,
                               vx_image *yuv_image_handle, 
@@ -369,7 +369,7 @@ int32_t itt_handle_dcc(ITTServerEdgeAIObj *obj, uint8_t* dcc_buf, uint32_t dcc_b
         else
         {
             /* Trigger VISS udpate dcc callback */
-            status = appUpdateVpacDcc(dcc_buf, dcc_buf_size, *(g_ITTobj.obj_viss.context),
+            status = appUpdateVpacDcc(dcc_buf, dcc_buf_size, g_ITTobj.obj_viss.context,
                 *(g_ITTobj.obj_viss.node) /* node_viss */, 0,
                 NULL /* node_aewb*/, 0,
                 NULL /* node_ldc */, 0
@@ -385,7 +385,7 @@ int32_t itt_handle_dcc(ITTServerEdgeAIObj *obj, uint8_t* dcc_buf, uint32_t dcc_b
         else
         {
             /* Trigger LDC update dcc callback */
-            status = appUpdateVpacDcc(dcc_buf, dcc_buf_size, *(g_ITTobj.obj_ldc.context),
+            status = appUpdateVpacDcc(dcc_buf, dcc_buf_size, g_ITTobj.obj_ldc.context,
                 NULL /* node_viss */, 0,
                 NULL /* node_aewb*/, 0,
                 *(g_ITTobj.obj_ldc.node) /* node_ldc */, 0
