@@ -58,6 +58,11 @@ SHARED_LIBS += slog2
 STATIC_LIBS += omxcore_j7$(BUILD_PROFILE_QNX_SUFFIX)S
 STATIC_LIBS += omxil_j7_utility$(BUILD_PROFILE_QNX_SUFFIX)S
 endif
+
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2))
+SKIPBUILD=1
+endif
+
 endif
 
 include $(FINALE)
