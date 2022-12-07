@@ -39,7 +39,7 @@ edgeai_plugins:
 	@echo "Building EdgeAI Plugins"
 	cd $(EDGEAI_PLUGINS_PATH); \
 	PKG_CONFIG_PATH='' crossbuild/environment $(PSDK_PATH) > aarch64-none-linux-gnu.ini; \
-	PKG_CONFIG_PATH='' meson build --cross-file aarch64-none-linux-gnu.ini --cross-file crossbuild/crosscompile.ini; \
+	PKG_CONFIG_PATH='' meson build -Ddl-plugins=disabled --cross-file aarch64-none-linux-gnu.ini --cross-file crossbuild/crosscompile.ini; \
 	DESTDIR=$(TARGET_FS) ninja -C build install
 
 edgeai_install:
