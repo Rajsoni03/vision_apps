@@ -51,17 +51,14 @@ DIRECTORIES += utils/udma
 
 DIRECTORIES += platform/$(SOC)
 
-ifeq ($(BUILD_TARGET_MODE),yes)
 DIRECTORIES += modules
 DIRECTORIES += apps/basic_demos/app_c7x_kernel
 DIRECTORIES += apps/basic_demos/app_fd_exchange
-DIRECTORIES += apps/basic_demos/app_rtos_fileio
 DIRECTORIES += apps/tests/app_vx_conformance
 DIRECTORIES += apps/utilities
 
 DIRECTORIES += kernels/fileio
 DIRECTORIES += kernels/img_proc
-endif
 
 else
 DIRECTORIES += utils

@@ -23,6 +23,12 @@ IDIRS       += $(TIDL_PATH)/inc
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 IDIRS       += $(VXLIB_PATH)/packages
 
+ifeq ($(TARGET_CPU), x86_64)
+ifeq ($(SOC),am62a)
+SKIPBUILD=1
+endif
+endif
+
 include $(FINALE)
 
 endif

@@ -50,6 +50,9 @@ endif
 
 ifeq ($(TARGET_CPU), x86_64)
 DEFS += _HOST_BUILD _TMS320C6600 TMS320C66X HOST_EMULATION
+ifeq ($(SOC),am62a)
+SKIPBUILD=1
+endif
 endif
 
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7120))
