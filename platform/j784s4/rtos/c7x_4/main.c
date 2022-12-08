@@ -417,7 +417,7 @@ void appCacheInit()
     /* init cache size here, since this needs to be done in secure mode */
     cacheSize.l1pSize = Cache_L1Size_32K;
     cacheSize.l1dSize = Cache_L1Size_32K;
-    cacheSize.l2Size  = Cache_L2Size_64K;
+    cacheSize.l2Size  = Cache_L2Size_0K;
 
     Cache_setSize(&cacheSize);
 }
