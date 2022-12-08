@@ -13,7 +13,6 @@ CSOURCES    += main_x86.c
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 
 SYSLDIRS += /usr/lib64
-SYS_SHARED_LIBS += $(x86_64_OPENGL_SYS_SHARED_LIBS)
 
 endif
 

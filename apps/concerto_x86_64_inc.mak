@@ -154,9 +154,6 @@ include $(TIOVX_CUSTOM_KERNEL_PATH)/custom_tools_path.mak
 include $(TIOVX_CUSTOM_KERNEL_PATH)/concerto_inc.mak
 endif
 
-x86_64_OPENGL_SYS_SHARED_LIBS =
-x86_64_OPENGL_SYS_SHARED_LIBS += SDL2 SDL2_image GL GLEW freetype tiff
-
 SYS_SHARED_LIBS += stdc++ m rt
 
 endif
