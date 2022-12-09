@@ -102,10 +102,14 @@ endif
 ifeq ($(BUILD_LINUX_A72), yes)
 	SBL_SD_FS_PATH=$(LINUX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/linux/linux_lds
+	# With or without OP-TEE (1 or 0)
+	USE_OPTEE ?= 1
 endif
 ifeq ($(BUILD_QNX_A72), yes)
 	SBL_SD_FS_PATH=$(QNX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/qnx/qnx_lds
+	# With or without OP-TEE (1 or 0)
+	USE_OPTEE ?= 0
 endif
 
 # Supported : pdk, mcusw
@@ -113,17 +117,30 @@ BOOTAPP ?= pdk
 
 sbl_atf_optee:
 ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	# For ATF, setting HANDLE_EA_EL3_FIRST=0 for QNX so that the all runtime exception to be routed to current exception level (or in EL1 if the current exception level is EL0)
 	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed  HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
+else
+	# For ATF, setting HANDLE_EA_EL3_FIRST=0 for QNX so that the all runtime exception to be routed to current exception level (or in EL1 if the current exception level is EL0)
+	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
+endif
 endif
 ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed K3_USART=$(K3_USART)
+else
+	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) K3_USART=$(K3_USART)
+endif
 endif
 
+ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	$(MAKE) -C $(VISION_APPS_PATH)/../ti-optee-os -s -j32 CROSS_COMPILE_core=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- NOWERROR=1 CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=2 CFG_ARM64_core=y ta-targets=ta_arm64 PLATFORM=k3 PLATFORM_FLAVOR=j7 CFG_CONSOLE_UART=$(CFG_CONSOLE_UART)
+endif
 	mkdir -p $(ATF_OPTEE_PATH)
 	cp $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3/$(ATF_TARGET_BOARD)/release/bl31.bin $(ATF_OPTEE_PATH)/bl31.bin
+ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	cp $(VISION_APPS_PATH)/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin $(ATF_OPTEE_PATH)/bl32.bin
+endif
 
 
 sbl_atf_optee_scrub:
@@ -296,6 +313,7 @@ ifeq ("$(wildcard $(QNX_BOOT_PATH)/qnx-ifs)","")
 endif
 	mkdir -p $(SBL_BOOTFILES_PATH)/rprcs
 	curr_dir=$(PWD)
+ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	cd $(ATF_OPTEE_PATH) && \
 	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/atf_optee.lds -o $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.elf && \
 	cd $(QNX_BOOT_PATH) && \
@@ -305,6 +323,17 @@ endif
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/atf_optee.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
+else
+	cd $(ATF_OPTEE_PATH) && \
+	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/atf_only.lds -o $(SBL_BOOTFILES_PATH)/rprcs/atf_only.elf && \
+	cd $(QNX_BOOT_PATH) && \
+	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/ifs_qnx.lds -o $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf && \
+	cd $(curr_dir)
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/atf_only.elf $(SBL_BOOTFILES_PATH)/rprcs/atf_only.rprc
+	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
+	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/atf_only.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.rprc
+	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
+endif
 endif
 
 sbl_qnx_bootimage_hs:
