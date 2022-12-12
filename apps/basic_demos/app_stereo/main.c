@@ -147,6 +147,7 @@ vx_status load_vximage_from_bin_16(vx_image image, char *filename)
 
                     vxUnmapImagePatch(image, map_id);
                 }
+                free(data_ptr);
             }
             else
             {
@@ -970,7 +971,7 @@ static vx_status app_run_graph(AppObj *obj)
     if (obj->bit_depth == 8)
     {
         strncpy(fileExt, ".bmp", sizeof(fileExt));
-    } else 
+    } else
     {
         strncpy(fileExt, ".bin", sizeof(fileExt));
     }
@@ -1064,7 +1065,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
         if (obj->bit_depth == 8)
         {
             tivx_utils_load_vximage_from_bmpfile(obj->input_img_left[obj->enqueueCnt], obj->left_input_file_name, vx_true_e);
-        } else 
+        } else
         {
             load_vximage_from_bin_16(obj->input_img_left[obj->enqueueCnt], obj->left_input_file_name);
         }
@@ -1081,7 +1082,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
         {
             load_vximage_from_bin_16(obj->input_img_right[obj->enqueueCnt], obj->right_input_file_name);
         }
-        
+
         appPerfPointEnd(&obj->fileio_perf);
 
         /* Enqueue input - start execution */
@@ -1140,7 +1141,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
                 {
                     status = load_vximage_from_bin_16(obj->input_img_left[left_img_obj_array_idx], obj->left_input_file_name);
                 }
-                
+
             }
         }
 
@@ -1163,7 +1164,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 curF
                 {
                     status = load_vximage_from_bin_16(obj->input_img_right[right_img_obj_array_idx], obj->right_input_file_name);
                 }
-                
+
             }
         }
 
@@ -1258,7 +1259,7 @@ static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 cu
         {
             status = load_vximage_from_bin_16(obj->input_img_left[0], obj->left_input_file_name);
         }
-        
+
     }
     if(0 == obj->is_interactive)
     {
@@ -1273,7 +1274,7 @@ static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 cu
         {
             status = load_vximage_from_bin_16(obj->input_img_right[0], obj->right_input_file_name);
         }
-        
+
     }
     appPerfPointEnd(&obj->fileio_perf);
 
@@ -1815,7 +1816,7 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                 {
                     obj->bit_depth = atoi(token);
                 }
-            }            
+            }
         }
     }
 
