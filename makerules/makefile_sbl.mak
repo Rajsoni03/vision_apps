@@ -99,17 +99,18 @@ ifeq ($(BUILD_CPU_C7x_4),yes)
 	REMOTE_CORE_LIST_LATEAPP2+=21 $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
 endif
 
+USE_OPTEE ?= 1
+
 ifeq ($(BUILD_LINUX_A72), yes)
 	SBL_SD_FS_PATH=$(LINUX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/linux/linux_lds
 	# With or without OP-TEE (1 or 0)
-	USE_OPTEE ?= 1
 endif
 ifeq ($(BUILD_QNX_A72), yes)
 	SBL_SD_FS_PATH=$(QNX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/qnx/qnx_lds
 	# With or without OP-TEE (1 or 0)
-	USE_OPTEE ?= 0
+	USE_OPTEE = 0
 endif
 
 # Supported : pdk, mcusw
@@ -331,7 +332,7 @@ else
 	cd $(curr_dir)
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/atf_only.elf $(SBL_BOOTFILES_PATH)/rprcs/atf_only.rprc
 	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
-	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/atf_only.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.rprc
+	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/atf_optee.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/atf_only.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
 endif
 endif
