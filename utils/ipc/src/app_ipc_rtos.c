@@ -476,7 +476,7 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
         appLogPrintf("IPC: ERROR: Invalid ipc vring memory address or size !!!\n");
         status = -1;
     }
-    if(prm->self_cpu_id>APP_IPC_CPU_MAX)
+    if(prm->self_cpu_id>=APP_IPC_CPU_MAX)
     {
         appLogPrintf("IPC: ERROR: Invalid self cpu id !!!\n");
         status = -1;
@@ -493,7 +493,7 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
     {
         for(cpu_id=0; cpu_id<prm->num_cpus; cpu_id++)
         {
-            if(prm->enabled_cpu_id_list[cpu_id]>APP_IPC_CPU_MAX)
+            if(prm->enabled_cpu_id_list[cpu_id]>=APP_IPC_CPU_MAX)
             {
                 appLogPrintf("IPC: ERROR: Invalid cpu id in enabled_cpu_id_list @ index %d !!!\n", cpu_id);
                 status = -1;
