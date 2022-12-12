@@ -101,48 +101,64 @@ vx_status load_vximage_from_bin_16(vx_image image, char *filename)
         // read 16-bit input file
         pf = (FILE *)fopen(filename, "rb");
 
-        data_ptr = (uint16_t *) malloc(img_width*img_height*sizeof(uint16_t));
-        fread(data_ptr, sizeof(uint16_t), img_width*img_height, pf);
-        fclose(pf);
-
-        if(status == (vx_status)VX_SUCCESS)
+        if (NULL != pf)
         {
-            vx_imagepatch_addressing_t image_addr;
-            vx_rectangle_t rect;
-            
-            uint32_t y, x;
+            data_ptr = (uint16_t *) malloc(img_width*img_height*sizeof(uint16_t));
 
-            rect.start_x = 0;
-            rect.start_y = 0;
-            rect.end_x = img_width;
-            rect.end_y = img_height;
-
-            //data_ptr = (void*)((uint8_t*)data_ptr);            
-
-            vxMapImagePatch(image,
-                &rect,
-                0,
-                &map_id,
-                &image_addr,
-                &dst_data_ptr,
-                (vx_enum)VX_WRITE_ONLY,
-                (vx_enum)VX_MEMORY_TYPE_HOST,
-                (vx_enum)VX_NOGAP_X
-            );
-
-            dst_data_ptr = (uint16_t*) dst_data_ptr;
-            for (y = 0; y < img_height; y++)
+            if (NULL != data_ptr)
             {
-                for (x = 0; x < img_width; x++)
+                fread(data_ptr, sizeof(uint16_t), img_width*img_height, pf);
+                fclose(pf);
+
+                if(status == (vx_status)VX_SUCCESS)
                 {
-                    ((uint16_t*)dst_data_ptr)[x] = (data_ptr[x] >> 4);
+                    vx_imagepatch_addressing_t image_addr;
+                    vx_rectangle_t rect;
+
+                    uint32_t y, x;
+
+                    rect.start_x = 0;
+                    rect.start_y = 0;
+                    rect.end_x = img_width;
+                    rect.end_y = img_height;
+
+                    vxMapImagePatch(image,
+                        &rect,
+                        0,
+                        &map_id,
+                        &image_addr,
+                        &dst_data_ptr,
+                        (vx_enum)VX_WRITE_ONLY,
+                        (vx_enum)VX_MEMORY_TYPE_HOST,
+                        (vx_enum)VX_NOGAP_X
+                    );
+
+                    dst_data_ptr = (uint16_t*) dst_data_ptr;
+                    for (y = 0; y < img_height; y++)
+                    {
+                        for (x = 0; x < img_width; x++)
+                        {
+                            ((uint16_t*)dst_data_ptr)[x] = (data_ptr[x] >> 4);
+                        }
+
+                        data_ptr = (uint16_t*)((uint8_t*)data_ptr + stride);
+                        dst_data_ptr = (uint16_t*)((uint8_t*)dst_data_ptr + image_addr.stride_y);
+                    }
+
+                    vxUnmapImagePatch(image, map_id);
                 }
-
-                data_ptr = (uint16_t*)((uint8_t*)data_ptr + stride);
-                dst_data_ptr = (uint16_t*)((uint8_t*)dst_data_ptr + image_addr.stride_y);
             }
-
-            vxUnmapImagePatch(image, map_id);
+            else
+            {
+                printf("# ERROR: Unable to allocate memory for reading file [%s]\n", filename);
+                status = VX_FAILURE;
+                fclose(pf);
+            }
+        }
+        else
+        {
+            printf("# ERROR: Unable to open file for reading [%s]\n", filename);
+            status = VX_FAILURE;
         }
     }
 
