@@ -114,6 +114,7 @@ vx_status load_vximage_from_bin_16(vx_image image, char *filename)
                 {
                     vx_imagepatch_addressing_t image_addr;
                     vx_rectangle_t rect;
+                    uint16_t *data_ptr_local = data_ptr;
 
                     uint32_t y, x;
 
@@ -138,10 +139,10 @@ vx_status load_vximage_from_bin_16(vx_image image, char *filename)
                     {
                         for (x = 0; x < img_width; x++)
                         {
-                            ((uint16_t*)dst_data_ptr)[x] = (data_ptr[x] >> 4);
+                            ((uint16_t*)dst_data_ptr)[x] = (data_ptr_local[x] >> 4);
                         }
 
-                        data_ptr = (uint16_t*)((uint8_t*)data_ptr + stride);
+                        data_ptr_local = (uint16_t*)((uint8_t*)data_ptr_local + stride);
                         dst_data_ptr = (uint16_t*)((uint8_t*)dst_data_ptr + image_addr.stride_y);
                     }
 
