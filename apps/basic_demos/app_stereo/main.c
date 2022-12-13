@@ -1415,6 +1415,8 @@ static vx_status app_save_sde_output(char* filename, vx_image disparity, AppObj 
     {
         /* Check that you are within the first n frames, where n is the number
             of samples in the checksums_expected */
+        /* TODO: This looks like only inputs are being checked,  need to check output, as of now, may be
+         * false positives. */
         vx_uint32 expected_idx = curFileNum - obj->start_fileno - MAX_NUM_BUF;
         if((obj->test_mode == 1) && (expected_idx < (sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0]))))
         {
@@ -1907,15 +1909,20 @@ static void app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 
     if (set_test_mode == vx_true_e)
     {
+        uint32_t temp_end_fileno;
         obj->test_mode = 1;
         obj->is_interactive = 0;
         obj->num_iterations = 1;
         /* if testing, just run the number of frames that are found in the expected
             checksums + a BUFFER to maintain data integrity (-1 bc of the <= comparison
             in the loop) */
-        obj->end_fileno = obj->start_fileno +
+        temp_end_fileno = obj->start_fileno +
                             sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0])
                             + TEST_BUFFER - 1;
+        if ( obj->end_fileno > temp_end_fileno)
+        {
+            obj->end_fileno = temp_end_fileno;
+        }
     }
 }
 #ifndef x86_64
