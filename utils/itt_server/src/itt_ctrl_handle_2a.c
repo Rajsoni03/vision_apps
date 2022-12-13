@@ -65,7 +65,7 @@ static uint8_t cmd_param_aewb[CMD_PARAM_SIZE];
 #ifdef ENABLE_EDGEAI
 #define APP_IPC_CPU APP_IPC_CPU_MPU1_0
 #else
-#define APP_IPC_CPU APP_IPC_CPU_MPU1_0
+#define APP_IPC_CPU APP_IPC_CPU_MCU2_0
 #endif
 
 void itt_ctrl_cmdHandlerIssRead2AParams(char *cmd, uint32_t prmSize)
