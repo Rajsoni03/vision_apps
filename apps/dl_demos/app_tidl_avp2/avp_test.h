@@ -75,10 +75,10 @@ static vx_bool test_result = vx_true_e;
 #define NUM_CHECKSUM_SETS 1
 #define NUM_CHECKSUM_SAMPLES 16
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
-  {0x3fd3ba00,0xf6842008,0x804d81e7,0xb527ac34,
-  0x36186916,0x16cb3656,0x4b32ac52,0x941afbcd,
-  0x9bf06a4b,0x7082b848,0x94416f3a,0x9d0a6863,
-  0x709f6f17,0xb46185e2,0xf185a2c3,0x271985f4}
+  {0x93c7ec65,0x514b2185,0x19748f68,0x643a2ddb,
+  0xb845fe5e,0x347730be,0x12f01482,0x4802cd83,
+  0x15e974a0,0x0294cbf1,0x4f098653,0x6d91fa30,
+  0x6f46a256,0xde2bb781,0xd226684e,0x9910c60c}
 };
 
 /* use this to get new checksums if the input data

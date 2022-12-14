@@ -75,10 +75,10 @@ static vx_bool test_result = vx_true_e;
 #define NUM_CHECKSUM_SETS 1
 #define NUM_CHECKSUM_SAMPLES 16
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
-  {0xb81f8e78,0x459d1630,0xb4733f9e,0xc39d9bdc,
-  0xfdfaf6db,0xa37bed64,0xfca0189d,0xe74c0765,
-  0x62c5131e,0x124056a8,0x8097041a,0x02e961ac,
-  0x0de0b2a0,0x238b1906,0x091ad9a5,0x7c8abd60}
+  {0xf054ec86,0x8b9c7dd9,0xb42546b6,0xb6596cf2,
+  0xed6cc506,0xcf91970c,0x49b022c0,0x404c864d,
+  0x8b3dffee,0x11a3ffe2,0xc3e08ec6,0x5fda9770,
+  0x4f000351,0x220afa53,0xdc2e588d,0x013639a2}
 };
 
 /* use this to get new checksums if the input data
@@ -106,7 +106,7 @@ static void print_new_checksum_structs()
             }
             else
             {
-                printf("0x%08x,", checksums_expected[j][i]);           
+                printf("0x%08x,", checksums_expected[j][i]);
             }
             i++;
         }
