@@ -226,7 +226,7 @@ pdk_bootapp_sd:
 pdk_bootapp_sd_hs: pdk_bootapp_sd
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx_hs -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	mkdir -p $(SBL_BOOTFILES_PATH)/hs_signed
-	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/mmcsd/sbl_boot_app_mmcsd_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage $(SBL_BOOTFILES_PATH)/hs_signed/app
+	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/mmcsd/sbl_boot_app_mmcsd_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage.signed $(SBL_BOOTFILES_PATH)/hs_signed/app
 
 pdk_bootapp_ospi: pdk_bootapp_sd
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx -s BOARD=$(BOARD) CORE=$(SBL_CORE)
@@ -236,7 +236,7 @@ pdk_bootapp_ospi: pdk_bootapp_sd
 pdk_bootapp_ospi_hs: pdk_bootapp_ospi
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx_hs -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	mkdir -p $(SBL_BOOTFILES_PATH)/hs_signed
-	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/ospi/sbl_boot_app_ospi_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage $(SBL_BOOTFILES_PATH)/hs_signed/app_ospi
+	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/ospi/sbl_boot_app_ospi_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage.signed $(SBL_BOOTFILES_PATH)/hs_signed/app_ospi
 
 
 sbl_vision_apps_bootimage_1:
