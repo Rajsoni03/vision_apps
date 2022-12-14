@@ -64,9 +64,12 @@
 #include <ti/drv/sciclient/sciclient.h>
 #include <ti/drv/sciclient/sciserver_tirtos.h>
 #include <stdio.h>
+
+#if defined(SOC_AM62A)
 #include <ti/board/board.h>
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
+#endif
 
 /* High Priority for SCI Server - must be higher than Low priority task */
 #define SETUP_SCISERVER_TASK_PRI_HIGH   (5)
@@ -80,8 +83,11 @@
 int32_t appSciserverSciclientInit()
 {
     int32_t retVal = CSL_PASS;
-    Board_initCfg           boardCfg;
     Sciclient_ConfigPrms_t  clientParams;
+
+#if defined(SOC_AM62A)
+    Board_initCfg   boardCfg;
+#endif
 
     retVal = Sciclient_configPrmsInit(&clientParams);
 
@@ -92,11 +98,13 @@ int32_t appSciserverSciclientInit()
                 &clientParams.inPmPrms, &clientParams.inRmPrms);
     }
 
+#if defined(SOC_AM62A)
     if(retVal==CSL_PASS)
     {
         boardCfg = BOARD_INIT_PINMUX_CONFIG | BOARD_INIT_UART_STDIO;
         Board_init(boardCfg);
     }
+#endif
 
     if(retVal==CSL_PASS)
     {
@@ -113,7 +121,11 @@ int32_t appSciserverSciclientDeInit()
     retVal = Sciclient_deinit();
     if(retVal!=0)
     {
+        #if defined(SOC_AM62A)
         UART_printf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
+        #else
+        appLogPrintf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
+        #endif
     }
 
     return retVal;
@@ -123,8 +135,11 @@ void appSciserverInit(void* arg0, void* arg1)
 {
     int32_t retVal = CSL_PASS;
     Sciserver_TirtosCfgPrms_t serverParams;
+
+    #if defined(SOC_AM62A)
     char *version_str = NULL;
     char *rmpmhal_version_str = NULL;
+    #endif
 
     retVal = Sciserver_tirtosInitPrms_Init(&serverParams);
 
@@ -136,6 +151,7 @@ void appSciserverInit(void* arg0, void* arg1)
         retVal = Sciserver_tirtosInit(&serverParams);
     }
 
+    #if defined(SOC_AM62A)
     version_str = Sciserver_getVersionStr();
     rmpmhal_version_str = Sciserver_getRmPmHalVersionStr();
     UART_printf("##DM Built On: %s %s\n", __DATE__, __TIME__);
@@ -150,6 +166,7 @@ void appSciserverInit(void* arg0, void* arg1)
     {
         UART_printf("Starting Sciserver..... FAILED\n");
     }
+    #endif
 }
 
 void appSciserverDeInit()
