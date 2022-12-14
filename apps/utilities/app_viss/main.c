@@ -466,11 +466,27 @@ int main(int argc, char *argv[])
     load = atoi(argv[1]);
     time = atoi(argv[2]);
 
-    appInit();
+    if (load >= 0 && load <= 100)
+    {
+        if (time > 0 && time <= 0x7FFFFFFF)
+        {
+            appInit();
 
-    TestGraProcessingDcc(load, time);
+            TestGraProcessingDcc(load, time);
 
-    appDeInit();
+            appDeInit();
+        }
+        else
+        {
+            status = -1;
+            printf("Invalid parameter: time = %d; 'time' should be a positive integer\n", time);
+        }
+    }
+    else
+    {
+        status = -1;
+        printf("Invalid parameter: load = %d; 'load' should be between 0 and 100\n", load);
+    }
 
     return status;
 }

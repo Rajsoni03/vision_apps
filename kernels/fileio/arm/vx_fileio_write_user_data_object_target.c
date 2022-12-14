@@ -148,20 +148,23 @@ static vx_status VX_CALLBACK tivxKernelWriteUserDataObjectControl
         }
     }
 
-    switch (node_cmd_id)
+    if(status==VX_SUCCESS)
     {
-        case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+        switch (node_cmd_id)
         {
-            tivxKernelWriteUserDataObjectCmd(prms,
-                (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
-            break;
-        }
-        default:
-        {
-            VX_PRINT(VX_ZONE_ERROR,
-                "tivxKernelWriteUserDataObjectControl: Invalid Command Id\n");
-            status = (vx_status)VX_FAILURE;
-            break;
+            case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+            {
+                tivxKernelWriteUserDataObjectCmd(prms,
+                    (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
+                break;
+            }
+            default:
+            {
+                VX_PRINT(VX_ZONE_ERROR,
+                    "tivxKernelWriteUserDataObjectControl: Invalid Command Id\n");
+                status = (vx_status)VX_FAILURE;
+                break;
+            }
         }
     }
 
@@ -287,7 +290,9 @@ static vx_status VX_CALLBACK tivxKernelWriteUserDataObjectProcess
 
         /* This helps in synchonizing frames across nodes */
         if(prms->frame_counter == prms->cmd.start_frame)
+        {
             prms->skip_counter = 0;
+        }
 
         if((prms->frame_counter >= prms->cmd.start_frame) &&
            (prms->frame_counter < (prms->cmd.start_frame + (prms->cmd.num_frames * (prms->cmd.num_skip + 1)))) &&
@@ -297,8 +302,23 @@ static vx_status VX_CALLBACK tivxKernelWriteUserDataObjectProcess
             char file_prefix[TIVX_FILEIO_FILE_PREFIX_LENGTH];
             char file_name[TIVX_FILEIO_FILE_PATH_LENGTH * 2];
 
-            strcpy(file_path, file_path_target_ptr);
-            strcpy(file_prefix, file_prefix_target_ptr);
+            if(file_path_desc != NULL)
+            {
+                strcpy(file_path, file_path_target_ptr);
+            }
+            else
+            {
+                strcpy(file_path, ".");
+            }
+
+            if(file_prefix_desc != NULL)
+            {
+                strcpy(file_prefix, file_prefix_target_ptr);
+            }
+            else
+            {
+                strcpy(file_prefix, "");
+            }
 
             sprintf(file_name, "%s/%s_ch_%d_%08d.bin", file_path, file_prefix, prms->ch_num, prms->frame_counter);
 

@@ -148,20 +148,23 @@ static vx_status VX_CALLBACK tivxKernelWriteImageControl
         }
     }
 
-    switch (node_cmd_id)
+    if(status==VX_SUCCESS)
     {
-        case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+        switch (node_cmd_id)
         {
-            tivxKernelWriteImageCmd(prms,
-                (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
-            break;
-        }
-        default:
-        {
-            VX_PRINT(VX_ZONE_ERROR,
-                "tivxKernelWriteImageControl: Invalid Command Id\n");
-            status = (vx_status)VX_FAILURE;
-            break;
+            case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+            {
+                tivxKernelWriteImageCmd(prms,
+                    (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
+                break;
+            }
+            default:
+            {
+                VX_PRINT(VX_ZONE_ERROR,
+                    "tivxKernelWriteImageControl: Invalid Command Id\n");
+                status = (vx_status)VX_FAILURE;
+                break;
+            }
         }
     }
 

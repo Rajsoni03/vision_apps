@@ -148,20 +148,23 @@ static vx_status VX_CALLBACK tivxKernelWriteTensorControl
         }
     }
 
-    switch (node_cmd_id)
+    if(status==VX_SUCCESS)
     {
-        case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+        switch (node_cmd_id)
         {
-            tivxKernelWriteTensorCmd(prms,
-                (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
-            break;
-        }
-        default:
-        {
-            VX_PRINT(VX_ZONE_ERROR,
-                "tivxKernelWriteTensorControl: Invalid Command Id\n");
-            status = (vx_status)VX_FAILURE;
-            break;
+            case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+            {
+                tivxKernelWriteTensorCmd(prms,
+                    (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
+                break;
+            }
+            default:
+            {
+                VX_PRINT(VX_ZONE_ERROR,
+                    "tivxKernelWriteTensorControl: Invalid Command Id\n");
+                status = (vx_status)VX_FAILURE;
+                break;
+            }
         }
     }
 
@@ -293,37 +296,52 @@ static vx_status VX_CALLBACK tivxKernelWriteTensorProcess
            (prms->frame_counter < (prms->cmd.start_frame + (prms->cmd.num_frames * (prms->cmd.num_skip + 1)))) &&
            (prms->skip_counter == 0))
         {
-          char file_path[TIVX_FILEIO_FILE_PATH_LENGTH];
-          char file_prefix[TIVX_FILEIO_FILE_PREFIX_LENGTH];
-          char file_name[TIVX_FILEIO_FILE_PATH_LENGTH * 2];
+            char file_path[TIVX_FILEIO_FILE_PATH_LENGTH];
+            char file_prefix[TIVX_FILEIO_FILE_PREFIX_LENGTH];
+            char file_name[TIVX_FILEIO_FILE_PATH_LENGTH * 2];
 
-          strcpy(file_path, file_path_target_ptr);
-          strcpy(file_prefix, file_prefix_target_ptr);
+            if(file_path_desc != NULL)
+            {
+                strcpy(file_path, file_path_target_ptr);
+            }
+            else
+            {
+                strcpy(file_path, ".");
+            }
 
-          sprintf(file_name, "%s/%s_%dx%dx%dx%d_ch_%d_%08d.bin", file_path, file_prefix,
+            if(file_prefix_desc != NULL)
+            {
+                strcpy(file_prefix, file_prefix_target_ptr);
+            }
+            else
+            {
+                strcpy(file_prefix, "");
+            }
+
+            sprintf(file_name, "%s/%s_%dx%dx%dx%d_ch_%d_%08d.bin", file_path, file_prefix,
                               in_tensor_desc->dimensions[0], in_tensor_desc->dimensions[1],
                               in_tensor_desc->dimensions[2], in_tensor_desc->dimensions[3],
                               prms->ch_num, prms->frame_counter);
 
-          printf("Writing %s ..\n", file_name);
+            printf("Writing %s ..\n", file_name);
 
 #ifdef WRITE_FILE_OUTPUT
-          FILE *fp = fopen(file_name, "wb");
-          if(fp == NULL)
-          {
-              printf("Unable to write file %s\n", file_name);
-          }
-          else
-          {
-            uint8_t *pData  = in_tensor_target_ptr;
+            FILE *fp = fopen(file_name, "wb");
+            if(fp == NULL)
+            {
+                printf("Unable to write file %s\n", file_name);
+            }
+            else
+            {
+                uint8_t *pData  = in_tensor_target_ptr;
 
-            fwrite(pData, 1, in_tensor_desc->mem_size, fp);
+                fwrite(pData, 1, in_tensor_desc->mem_size, fp);
 
-            fflush(fp);
-            fclose(fp);
-          }
+                fflush(fp);
+                fclose(fp);
+            }
 #endif
-          printf("Done!\n");
+            printf("Done!\n");
 
         }
         prms->skip_counter++;

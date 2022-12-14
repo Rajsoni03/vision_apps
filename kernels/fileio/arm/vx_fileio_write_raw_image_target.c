@@ -148,20 +148,23 @@ static vx_status VX_CALLBACK tivxKernelWriteRawImageControl
         }
     }
 
-    switch (node_cmd_id)
+    if(status==VX_SUCCESS)
     {
-        case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+        switch (node_cmd_id)
         {
-            tivxKernelWriteRawImageCmd(prms,
-                (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
-            break;
-        }
-        default:
-        {
-            VX_PRINT(VX_ZONE_ERROR,
-                "tivxKernelWriteRawImageControl: Invalid Command Id\n");
-            status = (vx_status)VX_FAILURE;
-            break;
+            case TIVX_FILEIO_CMD_SET_FILE_WRITE:
+            {
+                tivxKernelWriteRawImageCmd(prms,
+                    (tivx_obj_desc_user_data_object_t *)obj_desc[0U]);
+                break;
+            }
+            default:
+            {
+                VX_PRINT(VX_ZONE_ERROR,
+                    "tivxKernelWriteRawImageControl: Invalid Command Id\n");
+                status = (vx_status)VX_FAILURE;
+                break;
+            }
         }
     }
 
@@ -234,7 +237,7 @@ static vx_status VX_CALLBACK tivxKernelWriteRawImageProcess
 )
 {
     vx_status status = VX_SUCCESS;
-    uint32_t row_index = 0; 
+    uint32_t row_index = 0;
     uint32_t imgaddr_stride = 0;
 
     tivxWriteRawImageParams *prms = NULL;
@@ -302,8 +305,23 @@ static vx_status VX_CALLBACK tivxKernelWriteRawImageProcess
                 uint32_t BPP    = in_raw_img_desc->imagepatch_addr[exp_id].stride_x;
                 imgaddr_stride = in_raw_img_desc->imagepatch_addr[exp_id].stride_y;
 
-                strcpy(file_path, file_path_ptr);
-                strcpy(file_prefix, file_prefix_ptr);
+                if(file_path_desc != NULL)
+                {
+                    strcpy(file_path, file_path_ptr);
+                }
+                else
+                {
+                    strcpy(file_path, ".");
+                }
+
+                if(file_prefix_desc != NULL)
+                {
+                    strcpy(file_prefix, file_prefix_ptr);
+                }
+                else
+                {
+                    strcpy(file_prefix, "");
+                }
 
                 sprintf(file_name, "%s/%s_%dx%d_%dbpp_exp%d_ch_%d_%08d.raw", file_path, file_prefix, width, height, 8*BPP, exp_id, prms->ch_num, prms->frame_counter);
 
@@ -321,7 +339,7 @@ static vx_status VX_CALLBACK tivxKernelWriteRawImageProcess
                     tivxMemBufferMap(in_img_ptr, in_raw_img_desc->mem_size[exp_id], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
 
                     uint8_t *pData  = in_img_ptr;
-                    
+
                     for(row_index=0;row_index<height;row_index++)
                     {
                         fwrite(pData, 1, (width*BPP), fp);
