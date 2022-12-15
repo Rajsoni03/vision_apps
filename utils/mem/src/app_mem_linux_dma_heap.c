@@ -219,10 +219,11 @@ uint32_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 
     *dmaBufFdOffset = 0;
 
-    app_mem_list_t *mem_map_list = obj->plist;
+    app_mem_list_t *mem_map_list;
 
     /* Enter critical section */
     pthread_mutex_lock(&obj->list_mutex);
+    mem_map_list = obj->plist;
     while(mem_map_list != NULL)
     {
         if( (virt_addr >= mem_map_list->mem_data.virt_addr)
@@ -253,7 +254,7 @@ uint32_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 int32_t appMemTranslateDmaBufFd(uint32_t dmaBufFd, uint32_t size, uint64_t *virtPtr, uint64_t *phyPtr)
 {
     app_mem_obj_t  *obj = &g_app_mem_obj;
-    app_mem_list_t *mem_map_list = obj->plist;
+    app_mem_list_t *mem_map_list;
     int32_t         status = 0;
 
     *virtPtr = 0;
@@ -261,6 +262,7 @@ int32_t appMemTranslateDmaBufFd(uint32_t dmaBufFd, uint32_t size, uint64_t *virt
 
     /* Enter critical section */
     pthread_mutex_lock(&obj->list_mutex);
+    mem_map_list = obj->plist;
     while(mem_map_list != NULL)
     {
         if (dmaBufFd == mem_map_list->mem_data.dma_buf_fd)
@@ -336,12 +338,13 @@ uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
     app_mem_obj_t *obj = &g_app_mem_obj;
     /* Find out the physical address of this buffer */
 
-    app_mem_list_t *mem_map_list = obj->plist;
+    app_mem_list_t *mem_map_list;
 
     uint64_t virt_addr = (uint64_t)(virtPtr);
 
     /* Enter critical section */
     pthread_mutex_lock(&obj->list_mutex);
+    mem_map_list = obj->plist;
     while(mem_map_list != NULL)
     {
         if( (virt_addr >= mem_map_list->mem_data.virt_addr)
@@ -440,9 +443,10 @@ int32_t appMemFree(uint32_t block, void *virPtr, uint32_t size )
     uint8_t b_found_addr = 0;
 
     app_mem_obj_t *obj = &g_app_mem_obj;
-    app_mem_list_t *mem_map_list = obj->plist;
+    app_mem_list_t *mem_map_list;
 
     pthread_mutex_lock(&(obj->list_mutex));
+    mem_map_list = obj->plist;
 
     while(mem_map_list != NULL)
     {
