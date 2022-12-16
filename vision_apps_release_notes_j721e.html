@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.04.00</h2>
+<h2 align='center'>Version: 08.05.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -191,7 +191,7 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
-    <li><strong>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display</strong></li>
+    <li>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Displaywith Linux <strong>and QNX</strong> running on A72</li>
     <li>C7x algorithm offload demo (with DMA acceleration)</li>
     </ul>
 </li>
@@ -257,36 +257,56 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
-<td align="center">ADASVISION-5591</td>
-<td align="left"><span>Wrong comments for pinmux in PSDKR</span></td>
+<td align="center">ADASVISION-5731</td>
+<td align="left"><span>Mutex lock for app_mem_linux memory ops has to be taken before accessing the data structures</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5559</td>
-<td align="left"><span>sdk_clean make target from vision_apps fails</span></td>
+<td align="center">ADASVISION-5710</td>
+<td align="left"><span>gst_init fails to create endpoint if rpmsg_char_init is already called</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5525</td>
-<td align="left"><span>canny edge detection kernel crashes calling application on node release</span></td>
+<td align="center">ADASVISION-5709</td>
+<td align="left"><span>Build error "make[5]: *** No rule to make target 'portasm.asm'" seen during Safertos build</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5519</td>
-<td align="left"><span>AVP4 app is not releasing all resources</span></td>
+<td align="center">ADASVISION-5708</td>
+<td align="left"><span>GTC incorrectly configured/enabled in vision apps, causing corruption</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5509</td>
-<td align="left"><span>Segmentation Fault in tidl avp2 demo when en_out_img_write is enabled</span></td>
+<td align="center">ADASVISION-5686</td>
+<td align="left"><span>vision_apps appIPCInit incorrectly checks errors from mmap_device_memory</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5498</td>
-<td align="left"><span>vision_apps demo: The MAX payload size in the FD exchange demo needs to be increased</span></td>
+<td align="center">ADASVISION-5672</td>
+<td align="left"><span>Multiple definition of display size makes it difficult to change output resolution</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-5495</td>
-<td align="left"><span>For dl_demo avp2, when enable en_out_img_write, no mosaic image</span></td>
+<td align="center">ADASVISION-5668</td>
+<td align="left"><span>Number of CPU error boundary check incorrect</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-5491</td>
-<td align="left"><span>Error during code generation using scripts in vision_apps/kernels/srv/scripts/</span></td>
+<td align="center">ADASVISION-5662</td>
+<td align="left"><span>vision_apps demo: PC based memory allocation scheme across processes does not enforce exclusion</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5661</td>
+<td align="left"><span>Incorrect fps reported with mcu1_0 included</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5660</td>
+<td align="left"><span>Code error in appPerfStatsCpuLoadCalc</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5640</td>
+<td align="left"><span>QOS Parameters are not enabled in SPL for HS device</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5616</td>
+<td align="left"><span>J721E: QNX: SafeRTOS: eDP to HDMI adaptor Board function causes hang</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5566</td>
+<td align="left"><span>SDE crashes with 12-bit input</span></td>
 </tr>
 </tbody>
 </table>
@@ -417,8 +437,24 @@ Send die ID to TI. </span></td>
 </table>
 </table>
 <h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
-
-None for 8.4 release.
+<table>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="left">Headline</th>
+<th align="left">Original Fix Version</th>
+<th align="left">New Fix Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">JACINTOREQ-4978</a></td>
+<td align="left"><span>Remove PTK Demos from all SDKs</span></td>
+<td align="left"><span>08.05.00</span></td>
+<td align="left"><span>08.05.00</span></td>
+</tr>
+</tbody>
+</table>
 <p>
 <hr>
 <p>

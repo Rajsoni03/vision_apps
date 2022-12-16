@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 08.04.03</h2>
+<h2 align='center'>Version: 08.05.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -184,6 +184,14 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
+    <li><strong>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display with Linux running on A72</strong></li>
+    <li>C7x algorithm offload demo (with DMA acceleration)</li>
+    </ul>
+</li>
+
+<li>CV Demos
+    <ul>
+    <li>Structure from motion</li>
     </ul>
 </li>
 
@@ -244,24 +252,56 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
-<td align="center">ADASVISION-5375</td>
-<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
+<td align="center">ADASVISION-5731</td>
+<td align="left"><span>Mutex lock for app_mem_linux memory ops has to be taken before accessing the data structures</span></td>
 </tr>
 <tr class="odd">
+<td align="center">ADASVISION-5710</td>
+<td align="left"><span>gst_init fails to create endpoint if rpmsg_char_init is already called</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5708</td>
+<td align="left"><span>GTC incorrectly configured/enabled in vision apps, causing corruption</span></td>
+</tr>
+<tr class="even">
 <td align="center">ADASVISION-5686</td>
 <td align="left"><span>vision_apps appIPCInit incorrectly checks errors from mmap_device_memory</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center">ADASVISION-5672</td>
 <td align="left"><span>Multiple definition of display size makes it difficult to change output resolution</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center">ADASVISION-5668</td>
 <td align="left"><span>Number of CPU error boundary check incorrect</span></td>
 </tr>
+<tr class="odd">
+<td align="center">ADASVISION-5662</td>
+<td align="left"><span>vision_apps demo: PC based memory allocation scheme across processes does not enforce exclusion</span></td>
+</tr>
 <tr class="even">
+<td align="center">ADASVISION-5576</td>
+<td align="left"><span>MCU1-0 IPC sync failing for J7AHP</span></td>
+</tr>
+<tr class="odd">
 <td align="center">ADASVISION-5660</td>
 <td align="left"><span>Code error in appPerfStatsCpuLoadCalc</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5608</td>
+<td align="left"><span>PC Emulation: DOF visualize is not registered for J721S2/J7AHP</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5566</td>
+<td align="left"><span>SDE crashes with 12-bit input</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5375</td>
+<td align="left"><span>Hang observed in 4+ ch multi cam app with LDC on J721S2</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5573</td>
+<td align="left"><span>AVP2/AVP3 apps fail on J7AHP due to TIDL models</span></td>
 </tr>
 </tbody>
 </table>
@@ -354,6 +394,28 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tbody>
 </table>
 </table>
+<h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="left">Headline</th>
+<th align="left">Original Fix Version</th>
+<th align="left">New Fix Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">JACINTOREQ-4978</a></td>
+<td align="left"><span>Remove PTK Demos from all SDKs</span></td>
+<td align="left"><span>08.05.00</span></td>
+<td align="left"><span>08.05.00</span></td>
+</tr>
+</tbody>
+</table>
+<p>
+<hr>
+<p>
 <h2><a class="anchor" name="Support"></a>Technical Support</h2>
 For technical support and additional assistance, contact local TI Field Application Engineer <p>
 <hr>
