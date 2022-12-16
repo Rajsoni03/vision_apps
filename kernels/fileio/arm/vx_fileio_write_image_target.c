@@ -306,8 +306,23 @@ static vx_status VX_CALLBACK tivxKernelWriteImageProcess
             char file_prefix[TIVX_FILEIO_FILE_PREFIX_LENGTH];
             char file_name[TIVX_FILEIO_FILE_PATH_LENGTH * 2];
 
-            strcpy(file_path, file_path_target_ptr);
-            strcpy(file_prefix, file_prefix_target_ptr);
+            if(file_path_desc != NULL)
+            {
+                strcpy(file_path, file_path_target_ptr);
+            }
+            else
+            {
+                strcpy(file_path, ".");
+            }
+
+            if(file_prefix_desc != NULL)
+            {
+                strcpy(file_prefix, file_prefix_target_ptr);
+            }
+            else
+            {
+                strcpy(file_prefix, "");
+            }
 
             sprintf(file_name, "%s/%s_%dx%d_ch_%d_%08d", file_path, file_prefix, in_img_desc->width, in_img_desc->height, prms->ch_num, prms->frame_counter);
 
