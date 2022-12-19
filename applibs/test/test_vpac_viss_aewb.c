@@ -67,6 +67,7 @@
 #include "test_engine/test.h"
 #include "tivx_utils_file_rd_wr.h"
 #include <string.h>
+#include <utils/ipc/include/app_ipc.h>
 
 #include <iss_sensors.h>
 #include <iss_sensor_if.h>
@@ -861,6 +862,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
     vx_delay delay_arr;
     vx_object_array ae_awb_result_arr;
     char *sensor_name;
+    uint32_t i;
 
     /* VISS Output */
     vx_image sample_nv12_img;
@@ -885,6 +887,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
     tivx_aewb_config_t aewb_cfg;
     tivx_vpac_viss_params_t params;
     tivx_ae_awb_params_t ae_awb_params;
+    tivx_h3a_data_t h3a_params;
     vx_bool viss_prms_replicate[] =
         {vx_false_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e,
          vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
@@ -979,6 +982,19 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
 
         ASSERT_VX_OBJECT(h3a_aew_af_arr = vxCreateObjectArray(context,
             (vx_reference)h3a_aew_af_exemplar, NUM_CAPT_CHANNELS), VX_TYPE_OBJECT_ARRAY);
+
+        for (i = 0; i < NUM_CAPT_CHANNELS; i++)
+        {
+            ASSERT_VX_OBJECT(h3a_aew_af = (vx_user_data_object) vxGetObjectArrayItem(h3a_aew_af_arr, i), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
+
+            memset(&h3a_params, 0, sizeof(tivx_h3a_data_t));
+
+            h3a_params.cpu_id = APP_IPC_CPU_MCU2_0;
+
+            VX_CALL(vxCopyUserDataObject(h3a_aew_af, 0, sizeof(tivx_h3a_data_t), &h3a_params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
+
+            VX_CALL(vxReleaseUserDataObject(&h3a_aew_af));
+        }
 
         ASSERT_VX_OBJECT(h3a_aew_af = (vx_user_data_object) vxGetObjectArrayItem(h3a_aew_af_arr, 0), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
 
