@@ -186,9 +186,12 @@ qnx_fs_install_nfs_test_data:
 
 qnx_fs_install_tar: qnx_fs_install_nfs qnx_fs_install_nfs_test_data
 	# Creating bootfs tar
-	cd $(QNX_FS_PATH) && tar czf $(VISION_APPS_PATH)/bootfs.tar.gz .
+	cd $(QNX_BOOT_PATH) && tar czf $(VISION_APPS_PATH)/bootfs.tar.gz .
+	# Creating qnxfs tar
+	cd $(QNX_FS_PATH) && tar czf $(VISION_APPS_PATH)/qnxfs.tar.gz .
 	# Creating rootfs tar
-	cp -r $(QNX_FS_PATH) $(QNX_AUX_FS_PATH)/
+	cp -r $(QNX_FS_PATH)/* $(QNX_BOOT_PATH)/
+	cp -r $(QNX_BOOT_PATH) $(QNX_AUX_FS_PATH)/
 	cd  $(QNX_AUX_FS_PATH) && sudo tar cpzf $(VISION_APPS_PATH)/rootfs.tar.xz .
 
 qnx_fs_install_sd_sbl: qnx_fs_install sbl_bootimage_install_sd
