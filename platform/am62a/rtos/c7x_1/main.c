@@ -312,6 +312,22 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    Mmu_initMapAttrs(&attrs);
+    attrs.attrIndx = Mmu_AttrIndx_MAIR0;
+    attrs.ns = ns;
+
+    retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure);
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure);
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
 mmu_exit:
     if(retVal == FALSE)
     {

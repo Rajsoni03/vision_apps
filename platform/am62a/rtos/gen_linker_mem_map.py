@@ -210,12 +210,20 @@ dm_r5f_ddr_local_heap_addr  = mcu_r5f_ddr_local_heap_addr + mcu_r5f_ddr_local_he
 dm_r5f_ddr_local_heap_size  = 16*MB;
 carveout_size += dm_r5f_ddr_local_heap_size
 
-c7x_1_ddr_local_heap_addr  = dm_r5f_ddr_local_heap_addr + dm_r5f_ddr_local_heap_size;
-c7x_1_ddr_local_heap_size  = 128*MB;
+c7x_1_ddr_local_heap_non_cacheable_addr  = dm_r5f_ddr_local_heap_addr + dm_r5f_ddr_local_heap_size;
+c7x_1_ddr_local_heap_non_cacheable_size  = 64*MB;
+carveout_size += c7x_1_ddr_local_heap_non_cacheable_size
+
+c7x_1_ddr_scratch_non_cacheable_addr     = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
+c7x_1_ddr_scratch_non_cacheable_size     = 64*MB;
+carveout_size += c7x_1_ddr_scratch_non_cacheable_size
+
+c7x_1_ddr_local_heap_addr  = c7x_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
+c7x_1_ddr_local_heap_size  = 64*MB;
 carveout_size += c7x_1_ddr_local_heap_size
 
 c7x_1_ddr_scratch_addr     = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
-c7x_1_ddr_scratch_size     = 128*MB;
+c7x_1_ddr_scratch_size     = 64*MB;
 carveout_size += c7x_1_ddr_scratch_size
 
 assert carveout_size <= ddr_mem_size_2
@@ -270,6 +278,8 @@ c7x_1_ddr_ipc_tracebuf    = MemSection("DDR_C7X_1_IPC_TRACEBUF", "RWIX", c7x_1_d
 c7x_1_ddr_boot            = MemSection("DDR_C7x_1_BOOT", "RWIX", c7x_1_ddr_boot_addr, c7x_1_ddr_boot_size, "DDR for C7x_1 for boot section");
 c7x_1_ddr_vecs            = MemSection("DDR_C7x_1_VECS", "RWIX", c7x_1_ddr_vecs_addr, c7x_1_ddr_vecs_size, "DDR for C7x_1 for vecs section");
 c7x_1_ddr                 = MemSection("DDR_C7x_1", "RWIX", c7x_1_ddr_addr, c7x_1_ddr_size, "DDR for C7x_1 for code/data");
+c7x_1_ddr_local_heap_non_cacheable      = MemSection("DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr, c7x_1_ddr_local_heap_non_cacheable_size, "DDR for c7x_1 for non cacheable local heap");
+c7x_1_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_1_SCRATCH_NON_CACHEABLE", "RWIX", c7x_1_ddr_scratch_non_cacheable_addr, c7x_1_ddr_scratch_non_cacheable_size, "DDR for c7x_1 for non cacheable scratch Memory");
 c7x_1_ddr_local_heap      = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_addr, c7x_1_ddr_local_heap_size, "DDR for c7x_1 for local heap");
 c7x_1_ddr_scratch         = MemSection("DDR_C7X_1_SCRATCH", "RWIX", c7x_1_ddr_scratch_addr, c7x_1_ddr_scratch_size, "DDR for c7x_1 for Scratch Memory");
 c7x_1_ddr_total           = MemSection("DDR_C7x_1_DTS", "", 0, 0, "DDR for C7x_1 for all sections, used for reserving memory in DTS file");
@@ -364,6 +374,8 @@ c7x_1_mmap.addMemSection( c7x_1_ddr          );
 c7x_1_mmap.addMemSection( app_log_mem        );
 c7x_1_mmap.addMemSection( tiovx_obj_desc_mem );
 c7x_1_mmap.addMemSection( ipc_vring_mem      );
+c7x_1_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable  );
+c7x_1_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable  );
 c7x_1_mmap.addMemSection( c7x_1_ddr_local_heap  );
 c7x_1_mmap.addMemSection( c7x_1_ddr_scratch  );
 c7x_1_mmap.addMemSection( ddr_shared_mem     );
@@ -389,6 +401,8 @@ html_mmap.addMemSection( c7x_1_ddr_resource_table     );
 html_mmap.addMemSection( c7x_1_ddr_ipc_tracebuf     );
 html_mmap.addMemSection( c7x_1_ddr_boot    );
 html_mmap.addMemSection( c7x_1_ddr_vecs    );
+html_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable );
+html_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable );
 html_mmap.addMemSection( c7x_1_ddr_local_heap         );
 html_mmap.addMemSection( c7x_1_ddr_scratch );
 html_mmap.addMemSection( c7x_1_ddr         );
@@ -415,6 +429,8 @@ c_header_mmap.addMemSection( c7x_1_ddr_total     );
 
 c_header_mmap.addMemSection( mcu_r5f_ddr_local_heap);
 c_header_mmap.addMemSection( dm_r5f_ddr_local_heap);
+c_header_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable);
+c_header_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable);
 c_header_mmap.addMemSection( c7x_1_ddr_local_heap);
 c_header_mmap.addMemSection( c7x_1_ddr_scratch);
 c_header_mmap.addMemSection( tiovx_log_rt_mem );

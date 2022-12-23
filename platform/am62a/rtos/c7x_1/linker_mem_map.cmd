@@ -92,8 +92,12 @@ MEMORY
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA0340000 , LENGTH = 0x00FC0000
     /* Memory for shared memory buffers in DDR [ size 192.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xA2300000 , LENGTH = 0x0C000000
-    /* DDR for c7x_1 for local heap [ size 128.00 MB ] */
-    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0xB0300000 , LENGTH = 0x08000000
-    /* DDR for c7x_1 for Scratch Memory [ size 128.00 MB ] */
-    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xB8300000 , LENGTH = 0x08000000
+    /* DDR for c7x_1 for non cacheable local heap [ size 64.00 MB ] */
+    DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB0300000 , LENGTH = 0x04000000
+    /* DDR for c7x_1 for non cacheable scratch Memory [ size 64.00 MB ] */
+    DDR_C7X_1_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB4300000 , LENGTH = 0x04000000
+    /* DDR for c7x_1 for local heap [ size 64.00 MB ] */
+    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0xB8300000 , LENGTH = 0x04000000
+    /* DDR for c7x_1 for Scratch Memory [ size 64.00 MB ] */
+    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xBC300000 , LENGTH = 0x04000000
 }
