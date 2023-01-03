@@ -117,40 +117,32 @@ static uint8_t gTskStackMain[64*1024]
 __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
-#if 0
-/* A copy of this function is in both C7 main files, except the cfgClec.rtMap value */
-static void appC7xClecInitDru(void)
-{
-    CSL_ClecEventConfig   cfgClec;
-    #if defined(SOC_J721S2)
-    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_BASE;
-    #elif defined(SOC_AM62A)
-    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_C7X256V0_CLEC_BASE;
-    #else
-    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_COMPUTE_CLUSTER0_CLEC_REGS_BASE;
-    #endif
 
-    uint32_t i;
-    uint32_t dru_input_start = 192;
-    uint32_t dru_input_num   = 16;
-    /* program CLEC events from DRU used for polling by TIDL
-     * to map to required events in C7x
-     */
-    for(i=dru_input_start; i<(dru_input_start+dru_input_num); i++)
-    {
-        /* Configure CLEC */
-        cfgClec.secureClaimEnable = FALSE;
-        cfgClec.evtSendEnable     = TRUE;
+#if defined(ENABLE_CACHE_WRITE_THROUGH)
 
-        /* cfgClec.rtMap value is different for each C7x */
-        cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_ALL;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-        cfgClec.extEvtNum         = 0;
-        cfgClec.c7xEvtNum         = (i-dru_input_start)+32;
-        CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
-    }
+void temp_CSL_c7xSetL1DCFG(uint64_t param);
+
+#ifdef __cplusplus
 }
 #endif
+
+__asm__ __volatile__("temp_CSL_c7xSetL1DCFG: \n"
+" MVC .S1 A4, ECR256 ; \n"
+" RET .B1\n"
+);
+
+static void configureL1DCacheAsWriteThrough()
+{
+    volatile uint64_t l1dcfg = 0x1U;
+    Cache_wbInvL1dAll();
+    temp_CSL_c7xSetL1DCFG(l1dcfg);
+}
+#endif
+
 int main(void)
 {
     TaskP_Params tskParams;
@@ -158,10 +150,12 @@ int main(void)
 
     StartupEmulatorWaitFxn();
 
-    OS_init();
-#if 0
-    appC7xClecInitDru();
+#if defined(ENABLE_CACHE_WRITE_THROUGH)
+    configureL1DCacheAsWriteThrough();
 #endif
+
+    OS_init();
+
     TaskP_Params_init(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;
