@@ -76,7 +76,7 @@ static uint32_t map_vision_apps_cpu_id_to_rpmsg_char_cpu_id(uint32_t cpu_id)
     if (APP_IPC_CPU_MCU1_0 == cpu_id)
     {
         #if defined(SOC_AM62A)
-        rpmsg_char_id = R5F_MAIN0_0;
+        rpmsg_char_id = R5F_WKUP0_0;
         #else
         rpmsg_char_id = R5F_MCU0_0;
         #endif
