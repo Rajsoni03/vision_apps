@@ -219,21 +219,21 @@ sbl_mcusw_bootimage_ospi_hs:
 ## PDK BootApp
 #################
 pdk_bootapp_sd:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)/mmcsd/sbl_boot_app_mmcsd_qnx_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage $(SBL_BOOTFILES_PATH)/app
 
 pdk_bootapp_sd_hs: pdk_bootapp_sd
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx_hs -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx_hs DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/mmcsd/sbl_boot_app_mmcsd_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage.signed $(SBL_BOOTFILES_PATH)/app.signed
 
 pdk_bootapp_ospi: pdk_bootapp_sd
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)/ospi/sbl_boot_app_ospi_qnx_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage $(SBL_BOOTFILES_PATH)/app_ospi
 
 pdk_bootapp_ospi_hs: pdk_bootapp_ospi
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx_hs -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx_hs DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/ospi/sbl_boot_app_ospi_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage.signed $(SBL_BOOTFILES_PATH)/app_ospi.signed
 
 
