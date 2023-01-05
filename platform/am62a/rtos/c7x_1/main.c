@@ -84,7 +84,7 @@
 #include <ti/sysbios/family/c7x/Mmu.h>
 #endif
 
-#define ENABLE_C7X_CACHE_WRITE_THROUGH (1)
+#undef ENABLE_C7X_CACHE_WRITE_THROUGH
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -264,6 +264,18 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure);
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure);
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
     Mmu_initMapAttrs(&attrs);
     attrs.attrIndx = Mmu_AttrIndx_MAIR7;
     attrs.ns = ns;
@@ -299,22 +311,6 @@ void appMmuMap(Bool is_secure)
     }
 
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
-    {
-        goto mmu_exit;
-    }
-
-    Mmu_initMapAttrs(&attrs);
-    attrs.attrIndx = Mmu_AttrIndx_MAIR0;
-    attrs.ns = ns;
-
-    retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure);
     if(retVal == FALSE)
     {
         goto mmu_exit;
