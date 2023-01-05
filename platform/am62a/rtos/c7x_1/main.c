@@ -84,6 +84,8 @@
 #include <ti/sysbios/family/c7x/Mmu.h>
 #endif
 
+#define ENABLE_C7X_CACHE_WRITE_THROUGH (1)
+
 static void appMain(void* arg0, void* arg1)
 {
     appUtilsTaskInit();
@@ -118,7 +120,7 @@ __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
 
-#if defined(ENABLE_CACHE_WRITE_THROUGH)
+#if defined(ENABLE_C7X_CACHE_WRITE_THROUGH)
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,7 +137,7 @@ __asm__ __volatile__("temp_CSL_c7xSetL1DCFG: \n"
 " RET .B1\n"
 );
 
-static void configureL1DCacheAsWriteThrough()
+static void configureC7xL1DCacheAsWriteThrough()
 {
     volatile uint64_t l1dcfg = 0x1U;
     Cache_wbInvL1dAll();
@@ -149,10 +151,6 @@ int main(void)
     TaskP_Handle task;
 
     StartupEmulatorWaitFxn();
-
-#if defined(ENABLE_CACHE_WRITE_THROUGH)
-    configureL1DCacheAsWriteThrough();
-#endif
 
     OS_init();
 
@@ -335,6 +333,10 @@ void appCacheInit()
 {
     /* Going with default cache setting on reset */
     /* L1P - 32kb$, L1D - 64kb$, L2 - 0kb$ */
+#if defined(ENABLE_C7X_CACHE_WRITE_THROUGH)
+    configureC7xL1DCacheAsWriteThrough();
+#endif
+
 
 }
 
