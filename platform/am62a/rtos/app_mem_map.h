@@ -131,21 +131,21 @@
 #define DDR_DM_R5F_LOCAL_HEAP_ADDR (0xAF300000u)
 #define DDR_DM_R5F_LOCAL_HEAP_SIZE (0x01000000u)
 
-/* DDR for c7x_1 for non cacheable local heap [ size 64.00 MB ] */
+/* DDR for c7x_1 for non cacheable local heap [ size 16.00 MB ] */
 #define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR (0xB0300000u)
-#define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x04000000u)
+#define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x01000000u)
 
-/* DDR for c7x_1 for non cacheable scratch Memory [ size 64.00 MB ] */
-#define DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR (0xB4300000u)
-#define DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE (0x04000000u)
+/* DDR for c7x_1 for non cacheable scratch Memory [ size 16.00 MB ] */
+#define DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR (0xB1300000u)
+#define DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE (0x01000000u)
 
-/* DDR for c7x_1 for local heap [ size 64.00 MB ] */
-#define DDR_C7X_1_LOCAL_HEAP_ADDR (0xB8300000u)
-#define DDR_C7X_1_LOCAL_HEAP_SIZE (0x04000000u)
+/* DDR for c7x_1 for local heap [ size 112.00 MB ] */
+#define DDR_C7X_1_LOCAL_HEAP_ADDR (0xB2300000u)
+#define DDR_C7X_1_LOCAL_HEAP_SIZE (0x07000000u)
 
-/* DDR for c7x_1 for Scratch Memory [ size 64.00 MB ] */
-#define DDR_C7X_1_SCRATCH_ADDR (0xBC300000u)
-#define DDR_C7X_1_SCRATCH_SIZE (0x04000000u)
+/* DDR for c7x_1 for Scratch Memory [ size 112.00 MB ] */
+#define DDR_C7X_1_SCRATCH_ADDR (0xB9300000u)
+#define DDR_C7X_1_SCRATCH_SIZE (0x07000000u)
 
 #define DDR_64BIT_BASE_VADDR (0x00000000u)
 #define DDR_64BIT_BASE_PADDR (0x00000000u)

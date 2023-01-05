@@ -211,19 +211,19 @@ dm_r5f_ddr_local_heap_size  = 16*MB;
 carveout_size += dm_r5f_ddr_local_heap_size
 
 c7x_1_ddr_local_heap_non_cacheable_addr  = dm_r5f_ddr_local_heap_addr + dm_r5f_ddr_local_heap_size;
-c7x_1_ddr_local_heap_non_cacheable_size  = 64*MB;
+c7x_1_ddr_local_heap_non_cacheable_size  = 16*MB;
 carveout_size += c7x_1_ddr_local_heap_non_cacheable_size
 
 c7x_1_ddr_scratch_non_cacheable_addr     = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
-c7x_1_ddr_scratch_non_cacheable_size     = 64*MB;
+c7x_1_ddr_scratch_non_cacheable_size     = 16*MB;
 carveout_size += c7x_1_ddr_scratch_non_cacheable_size
 
 c7x_1_ddr_local_heap_addr  = c7x_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
-c7x_1_ddr_local_heap_size  = 64*MB;
+c7x_1_ddr_local_heap_size  = 112*MB;
 carveout_size += c7x_1_ddr_local_heap_size
 
 c7x_1_ddr_scratch_addr     = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
-c7x_1_ddr_scratch_size     = 64*MB;
+c7x_1_ddr_scratch_size     = 112*MB;
 carveout_size += c7x_1_ddr_scratch_size
 
 assert carveout_size <= ddr_mem_size_2
