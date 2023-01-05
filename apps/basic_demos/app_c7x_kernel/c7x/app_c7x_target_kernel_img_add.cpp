@@ -725,7 +725,7 @@ vx_status VX_CALLBACK app_c7x_target_kernel_img_add_create(tivx_target_kernel_in
 
             avail_size = l2_stats.free_size;
 
-            req_size = 480 * 1024; /* Out of available 512KB - 32KB is cache and 480KB is SRAM */
+            req_size = 448 * 1024; /* Out of available 512KB - 64KB is cache and 448KB is SRAM */
 
             if(req_size > avail_size)
                 req_size = avail_size;
