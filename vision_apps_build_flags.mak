@@ -132,8 +132,8 @@ HS?=0
 
 # Flag to select silicon revision: 1_1 for SR 1.1, 1_0 for SR 1.0
 HS_SR?=1_1
-ifeq ($(SOC),j721s2)
-# Note: There is only SR 1.0 for J721S2 HS
+ifeq ($(SOC), $(filter $(SOC), j721s2 j784s4))
+# Note: There is only SR 1.0 for J721S2 and J784S4 HS
 HS_SR=1_0
 endif
 
