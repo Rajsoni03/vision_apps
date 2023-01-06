@@ -228,7 +228,7 @@ static void appUdmaCacheWb(const void *addr, int32_t size);
 /** \brief Default channel object to be used when NULL is passed */
 static app_udma_ch_handle_t gAppUdmaDefaultChHandle;
 
-static app_udma_ch_handle_t gAppUdmaNDChHandle[APP_UDMA_ND_CHANNELS_MAX];
+static app_udma_ch_handle_t gAppUdmaNDChHandle[APP_UDMA_ND_CHANNELS_MAX] = {NULL};
 
 static int32_t gAppUdmaNDChRequest[APP_UDMA_ND_CHANNELS_MAX];
 
