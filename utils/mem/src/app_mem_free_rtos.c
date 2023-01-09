@@ -555,3 +555,53 @@ void appMemPrintMemAllocInfo()
 {
     return;
 }
+
+#if defined (SOC_J784S4) && defined (C7120)
+
+#define APP_MEM_DMC_L1DWBINV_WBINV_MASK                             (0x00000001U)
+#define APP_MEM_DMC_L1DWBINV_WBINV_SHIFT                            (0U)
+#define APP_MEM_DMC_L1DWBINV_WBINV_RESETVAL                         (0x00000000U)
+#define APP_MEM_DMC_L1DWBINV_WBINV_MAX                              (0x00000001U)
+#define APP_MEM_UMC_L2WBINV_WBINV_MASK                              (0x00000001ULL)
+#define APP_MEM_UMC_L2WBINV_WBINV_SHIFT                             (0ULL)
+#define APP_MEM_UMC_L2WBINV_WBINV_RESETVAL                          (0x00000000ULL)
+#define APP_MEM_UMC_L2WBINV_WBINV_MAX                               (0x00000001ULL)
+
+__asm__ __volatile__("appMemC7xSetL1DWBINV: \n"
+                     "    MVC   .S1 A4,     ECR259; \n"
+                     "    RET   .B1\n"
+          );
+__asm__ __volatile__("appMemC7xGetL1DWBINV: \n"
+        " MVC   .S1 ECR259, A4  ; \n"
+          " RET .B1; \n"
+       );
+
+__asm__ __volatile__("appMemC7xSetL2WBINV: \n"
+                     "    MVC   .S1 A4,     ECR387  ; \n"
+                     "    RET   .B1\n"
+          );
+__asm__ __volatile__("appMemC7xGetL2WBINV: \n"
+        " MVC   .S1 ECR387, A4  ; \n"
+          " RET .B1; \n"
+       );
+
+void appMemC7xCleaninvalidateL1DCache()
+{
+    volatile uint64_t wbinv;
+    wbinv  = appMemC7xGetL1DWBINV();
+    wbinv  &= ~APP_MEM_DMC_L1DWBINV_WBINV_MASK;
+    wbinv |= (0x1U << APP_MEM_DMC_L1DWBINV_WBINV_SHIFT) & APP_MEM_DMC_L1DWBINV_WBINV_MASK;
+    appMemC7xSetL1DWBINV(wbinv);
+    return;
+}
+
+void appMemC7xCleaninvalidateL2Cache()
+{
+    volatile uint64_t       wbinv;
+    wbinv = appMemC7xGetL2WBINV() & ~APP_MEM_UMC_L2WBINV_WBINV_MASK;
+    wbinv |= (0x1U << APP_MEM_UMC_L2WBINV_WBINV_SHIFT) & APP_MEM_UMC_L2WBINV_WBINV_MASK;
+    appMemC7xSetL2WBINV(wbinv);
+    return;
+}
+
+#endif

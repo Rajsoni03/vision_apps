@@ -199,6 +199,53 @@ static inline uint32_t APP_MEM_ALIGN32(uint32_t val, uint32_t align)
     return (uint32_t)( (uint32_t)(val+align-1) / align) * align;
 }
 
+#if defined(C7120) && defined(SOC_J784S4)
+
+/**
+ * \brief J784S4 Set L2 Write Back Invalidate
+ */
+void appMemC7xSetL2WBINV(uint64_t param);
+
+/**
+ * \brief J784S4 Get L2 Write Back Invalidate
+ */
+uint64_t appMemC7xGetL2WBINV(void);
+
+/**
+ * \brief J784S4 Invalidating entire L2 Cache
+ */
+void appMemC7xCleaninvalidateL2Cache();
+
+/**
+ * \brief J784S4 Set L1D Write Back Invalidate
+ */
+void appMemC7xSetL1DWBINV(uint64_t param);
+
+/**
+ * \brief J784S4 Get L1D Write Back Invalidate
+ */
+uint64_t appMemC7xGetL1DWBINV(void);
+
+/**
+ * \brief J784S4 Invalidating entire L1D Cache
+ */
+void appMemC7xCleaninvalidateL1DCache();
+#endif
+
+/**
+ * \brief Enable L1D and L2 Cache by performing a WB
+ *
+ * Applicable only for J784S4 SOC due to
+ * coherency difference on these SOC's
+ */
+void static inline appMemEnableL1DandL2CacheWb()
+{
+#if defined(C7120) && defined(SOC_J784S4)
+  appMemC7xCleaninvalidateL1DCache();
+  appMemC7xCleaninvalidateL2Cache();
+#endif
+}
+
 /**
  * \brief Set defaults to app_mem_init_prm_t
  *
