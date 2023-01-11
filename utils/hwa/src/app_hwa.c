@@ -252,6 +252,12 @@ int32_t appCsi2TxInit(void)
     CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
                     CSL_MAIN_CTRL_MMR_CFG0_DPHY_TX0_CTRL,
                     0x1);
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    /* Select CSITX1 as the source for DPHYTX1 */
+    CSL_REG32_WR(CSL_CTRL_MMR0_CFG0_BASE +
+                    CSL_MAIN_CTRL_MMR_CFG0_DPHY_TX1_CTRL,
+                    0x1);
+    #endif
     /* Lock MMR back if unlocked here */
     if (unlocked == 1U)
     {
