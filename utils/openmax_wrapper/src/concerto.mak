@@ -1,6 +1,7 @@
 ifneq ($(TARGET_PLATFORM),PC)
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
 
 include $(PRELUDE)
 
@@ -14,6 +15,7 @@ IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/core/public/khronos/openma
 
 include $(FINALE)
 
+endif
 endif
 
 endif
