@@ -6,7 +6,7 @@
 
 SBL_CORE=mcu1_0
 BOARD=$(BUILD_PDK_BOARD)
-ATF_OPTEE_PATH=$(VISION_APPS_PATH)/out/sbl_combined_bootfiles/atf_optee_dir
+COMBINED_APPIMAGE_ATF_OPTEE_PATH=$(VISION_APPS_PATH)/out/sbl_combined_bootfiles/atf_optee_dir
 ATF_TARGET_BOARD=generic
 ifeq ($(SOC),j784s4)
 	ATF_TARGET_BOARD=j784s4
@@ -49,9 +49,9 @@ ifeq ($(BUILD_LINUX_A72), yes)
 	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed
 endif
 	$(MAKE) -C $(VISION_APPS_PATH)/../ti-optee-os -s -j32 CROSS_COMPILE_core=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- NOWERROR=1 CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=2 CFG_ARM64_core=y ta-targets=ta_arm64 PLATFORM=k3 PLATFORM_FLAVOR=j7
-	mkdir -p $(ATF_OPTEE_PATH)
-	cp $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3/$(ATF_TARGET_BOARD)/release/bl31.bin $(ATF_OPTEE_PATH)/bl31.bin
-	cp $(VISION_APPS_PATH)/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin $(ATF_OPTEE_PATH)/bl32.bin
+	mkdir -p $(COMBINED_APPIMAGE_ATF_OPTEE_PATH)
+	cp $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3/$(ATF_TARGET_BOARD)/release/bl31.bin $(COMBINED_APPIMAGE_ATF_OPTEE_PATH)/bl31.bin
+	cp $(VISION_APPS_PATH)/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin $(COMBINED_APPIMAGE_ATF_OPTEE_PATH)/bl32.bin
 
 
 ##############
@@ -122,8 +122,8 @@ endif
 ## Combined bootapp image
 ##############################
 OUT_DIR=$(VISION_APPS_PATH)/out/sbl_combined_bootfiles/
-ATF_IMG=mpu1_0,$(ATF_OPTEE_PATH)/bl31.bin,0x70000000,0x70000000
-OPTEE_IMG=load_only,$(ATF_OPTEE_PATH)/bl32.bin,0x9e800000,0x9e800000
+ATF_IMG=mpu1_0,$(COMBINED_APPIMAGE_ATF_OPTEE_PATH)/bl31.bin,0x70000000,0x70000000
+OPTEE_IMG=load_only,$(COMBINED_APPIMAGE_ATF_OPTEE_PATH)/bl32.bin,0x9e800000,0x9e800000
 KERNEL_IMG=load_only,$(QNX_BOOT_PATH)/qnx-ifs,0x80080000,0x80080000
 DTB_IMG=
 SPL_IMG=
