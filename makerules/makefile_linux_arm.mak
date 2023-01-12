@@ -80,7 +80,9 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(eval IMAGE_NAME := vx_app_rtos_linux_mcu1_0.out)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(LINUX_APP_PROFILE)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/.
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME)
+ifneq ($(SOC), am62a)
 	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-mcu-r5f0_0-fw
+endif
 else
 	# Copy MCU1_0 firmware which is used in the default uboot
 	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/pdk-ipc/ipc_echo_testb_mcu1_0_release_strip.xer5f $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-mcu-r5f0_0-fw
@@ -250,11 +252,16 @@ define MODIFY_FS =
 	sync
 endef
 
+ifeq ($(SOC), am62a)
+	FIRMWARE_PREFIX_TO_DELETE=c7*-fw
+else
+	FIRMWARE_PREFIX_TO_DELETE=*-fw
+endif
 # CLEAN_COPY_FROM_STAGE macro for updating a file system from the stage fs
 # $1 : destination rootfs path
 define CLEAN_COPY_FROM_STAGE =
 	# remove old remote files from filesystem
-	-rm -f $(1)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-*-fw
+	-rm -f $(1)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-$(FIRMWARE_PREFIX_TO_DELETE)
 	-rm -f $(1)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-*-fw-sec
 	-rm -rf $(1)/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	-rm -rf $(1)/opt/tidl_test/*
