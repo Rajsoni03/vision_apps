@@ -39,8 +39,8 @@ STATIC_LIBS += app_utils_perf_stats
 
 TIOVX_LIBS =
 TIOVX_LIBS += vx_target_kernels_tidl
-#TIOVX_LIBS += vx_target_kernels_tvm
-#TIOVX_LIBS += vx_target_kernels_tvm_dynload
+TIOVX_LIBS += vx_target_kernels_tvm
+TIOVX_LIBS += vx_target_kernels_tvm_dynload
 TIOVX_LIBS += vx_target_kernels_ivision_common
 TIOVX_LIBS += vx_framework vx_platform_psdk_j7_rtos vx_kernels_target_utils
 TIOVX_LIBS += vx_target_kernels_tutorial
