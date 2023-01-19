@@ -56,9 +56,12 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					vision_apps/modules \
 					vision_apps/utils
 
+ifeq ($(BUILD_PTK),yes)
+IPK_INCLUDE_FOLDERS += ti-perception-toolkit/include
+endif
+
 ifneq ($(SOC),am62a)
-IPK_INCLUDE_FOLDERS += ti-perception-toolkit/include \
-					tiadalg
+IPK_INCLUDE_FOLDERS += tiadalg
 endif
 
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))

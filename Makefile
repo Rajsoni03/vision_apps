@@ -207,20 +207,27 @@ vision_apps_docs: sdk_check_paths doxy_docs
 
 # Set Variables for SOC specific rule dependencies used in make rules below
 ifeq ($(SOC), $(filter $(SOC), j721e j784s4))
-SOC_VARIABLE_RULES=ethfw remote_device ptk tiadalg qnx
-SOC_VARIABLE_CLEAN=ethfw_clean remote_device_clean ptk_clean tiadalg_clean qnx_clean
-SOC_VARIABLE_SCRUB=ethfw_scrub remote_device_scrub ptk_scrub tiadalg_scrub qnx_scrub
-SOC_VARIABLE_DOCS=ptk_docs tiadalg_docs
+SOC_VARIABLE_RULES=ethfw remote_device tiadalg qnx
+SOC_VARIABLE_CLEAN=ethfw_clean remote_device_clean tiadalg_clean qnx_clean
+SOC_VARIABLE_SCRUB=ethfw_scrub remote_device_scrub tiadalg_scrub qnx_scrub
+SOC_VARIABLE_DOCS=tiadalg_docs
 else ifeq ($(SOC),j721s2)
-SOC_VARIABLE_RULES=ptk tiadalg qnx
-SOC_VARIABLE_CLEAN=ptk_clean tiadalg_clean qnx_clean
-SOC_VARIABLE_SCRUB=ptk_scrub tiadalg_scrub qnx_scrub
-SOC_VARIABLE_DOCS=ptk_docs tiadalg_docs
+SOC_VARIABLE_RULES=tiadalg qnx
+SOC_VARIABLE_CLEAN=tiadalg_clean qnx_clean
+SOC_VARIABLE_SCRUB=tiadalg_scrub qnx_scrub
+SOC_VARIABLE_DOCS=tiadalg_docs
 else ifeq ($(SOC),am62a)
 SOC_VARIABLE_RULES=
 SOC_VARIABLE_CLEAN=
 SOC_VARIABLE_SCRUB=
 SOC_VARIABLE_DOCS=
+endif
+
+ifeq ($(BUILD_PTK),yes)
+SOC_VARIABLE_RULES += ptk
+SOC_VARIABLE_CLEAN += ptk_clean
+SOC_VARIABLE_SCRUB += ptk_scrub
+SOC_VARIABLE_DOCS  += ptk_docs
 endif
 
 sdk: sdk_check_paths pdk imaging vxlib tiovx $(SOC_VARIABLE_RULES)

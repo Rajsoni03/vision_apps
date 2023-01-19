@@ -47,11 +47,7 @@ BUILD_CPU_MCU1_0?=yes
 BUILD_CPU_C7x_1?=yes
 endif
 
-ifneq ($(SOC), am62a)
 BUILD_PTK?=yes
-else
-BUILD_PTK?=no
-endif
 
 BUILD_ENABLE_ETHFW?=yes
 
