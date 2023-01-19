@@ -45,13 +45,18 @@
 #include <pthread.h>
 #include <OMX_Core.h>
 #include <OMX_Component.h>
+#if defined(SOC_J721E)
 #include <OMX_Extension_video_TI.h>
+#else
+#include <OMX_Extension_index_QNX.h>
+#include <OMX_Extension_video_QNX.h>
+#endif /* SOC_J721E */
 
 #include <utils/openmax_wrapper/include/omax_wrapper.h>
 
 // #define WRAPPER_DEBUG_MODE
 
-#ifdef WRAPPER_DEBUG_MODE
+#if defined (WRAPPER_DEBUG_MODE)
 #define WRAPPER_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)
 #else
 #define WRAPPER_PRINTF(f_, ...)
@@ -71,12 +76,21 @@
     #define TIMEOUT_WAIT (5000 * 1000LL * 1000LL)  /* 5000 ms */
 #endif
 
-#define OMAX_MAX_FILE_PATH           (256u)
-#define OMAX_DEFAULT_BUFFER_SIZE (10*1024*1024)
-#define OMAX_CONFIG_DATA_BUFFER_SIZE 8096
-#define OMAX_SECOND_BYTE      0x8000000
-#define OMAX_H264_CUSTOM_ASPECT_RATIO     255
-#define OMAX_DEC_EXTRA_OUT_BUFFERS 0
+#define OMAX_MAX_FILE_PATH               (256u)
+#define OMAX_DEFAULT_BUFFER_SIZE         (10*1024*1024)
+#define OMAX_CONFIG_DATA_BUFFER_SIZE     8096
+#define OMAX_SECOND_BYTE                 0x8000000
+#define OMAX_H264_CUSTOM_ASPECT_RATIO    255
+#define OMAX_DEC_EXTRA_OUT_BUFFERS       0
+#define OMAX_DEFAULT_BITRATE             10000000
+#define OMAX_DEFAULT_IDR_PERIOD          30
+#define OMAX_DEFAULT_FRAME_RATE          30
+
+#if defined(SOC_J721E)
+#define OMAX_DEFAULT_RATE_CONTROL_MODE   OMX_Video_ControlRateConstant  //Other option: OMX_Video_ControlRateVariable
+#else
+#define OMAX_DEFAULT_RATE_CONTROL_MODE   OMX_Video_ControlRateVariable  //Other option: OMX_Video_ControlRateConstant
+#endif /* SOC_J721E */
 
 typedef struct {
     void *addr;
@@ -212,6 +226,8 @@ typedef struct OmxilVideoEncDec_ {
     uint32_t mLumaDepth;
     uint32_t mChromaDepth;
     int32_t mChromaFmt;
+
+    int32_t core_idx;
 
     omxil_bool doneReadFrames;
 } OmxilVideoEncDec_t;

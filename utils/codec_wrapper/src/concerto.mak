@@ -19,13 +19,18 @@ STATIC_LIBS += app_utils_gst_wrapper
 endif
 
 ifeq ($(TARGET_OS),QNX)
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
 CSOURCES    := codec_wrapper_qnx.c
 
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/khronos/openmaxil/
+endif
+
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2))
+IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/OpenMAXIL/khronos/openmaxil/
+endif
 
 STATIC_LIBS += app_utils_omax_wrapper
-endif
+
 endif
 
 include $(FINALE)

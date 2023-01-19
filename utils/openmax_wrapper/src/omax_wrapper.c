@@ -27,7 +27,9 @@
 #include "omax_dec_priv.h"
 
 #define ALIGN64(X)  (((X)+63) &~63)
+#define ALIGN32(X)  (((X)+31) &~31)
 #define ALIGN16(X)  (((X)+15) &~15)
+#define ALIGN8(X)   (((X)+7) &~7)
 
 app_omax_wrapper_obj_t g_app_omax_wrapper_obj = { 0 };
 pthread_cond_t g_cond = PTHREAD_COND_INITIALIZER;
@@ -572,7 +574,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
     else if(p_omax_pipe_obj->params.appEncode == 0 && p_omax_pipe_obj->params.appDecode == 1)
     {
         /* Allocate input port buffers */
-        WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating %u input buffers of %u size",
+        WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers allocating %u input buffers of %u size",
                 encH->nInputBufs, encH->inputPortBufSize);
         for(i = 0; i < encH->nInputBufs; i++)
         {
@@ -585,13 +587,13 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                     encH->inputPortBufSize);
             if(omxErr != OMX_ErrorNone)
             {
-                WRAPPER_ERROR("\nOmxilEnc=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
+                WRAPPER_ERROR("\nOmxilDec=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
                 pthread_mutex_unlock(&encH->mutex);
                 return omxErr;
             }
             else
             {
-                WRAPPER_PRINTF("\nOmxilEnc=> %s:%d Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
+                WRAPPER_PRINTF("\nOmxilDec=> %s:%d Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
                         i, encH->compHandle, encH->inPortIndex, pBufHdr, pBufHdr->pBuffer, encH->inputPortBufSize);
                 encH->inputBufHdrList[i] = pBufHdr;
                 OMAX_qPush(encH, omxil_true_e, i);
@@ -599,7 +601,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
         }
         
         /* Allocate output port buffers */
-        WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers using %u output buffers of %u size",
+        WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers using %u output buffers of %u size",
                     encH->nOutputBufs, encH->outputPortBufSize);
 
         for(i = 0; i < encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS; i++)
@@ -618,13 +620,13 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
 
             if(omxErr != OMX_ErrorNone)
             {
-                WRAPPER_ERROR("\nOmxilEnc=> ERROR: %s:%d OMX_UseBuffer() returned 0x%08x", __func__, __LINE__, omxErr);
+                WRAPPER_ERROR("\nOmxilDec=> ERROR: %s:%d OMX_UseBuffer() returned 0x%08x", __func__, __LINE__, omxErr);
                 pthread_mutex_unlock(&encH->mutex);
                 return omxErr;
             }
             else
             {
-                WRAPPER_PRINTF("\nOmxilEnc=> %s:%d Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
+                WRAPPER_PRINTF("\nOmxilDec=> %s:%d Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
                         i, encH->compHandle, encH->outPortIndex, pBufHdr, pBufHdr->pBuffer, pBufHdr->nAllocLen);
                 pBufHdr->pAppPrivate = (OMX_PTR)pBuf->addr;
                 encH->outputBufHdrList[i] = pBufHdr;
@@ -633,7 +635,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
         }
 
         /* Allocate extra output port buffers for OMAX decode */
-        WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating an extra %u output buffers of %u size",
+        WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers allocating an extra %u output buffers of %u size",
                     OMAX_DEC_EXTRA_OUT_BUFFERS, encH->outputPortBufSize);
 
         for(i = 0; i < OMAX_DEC_EXTRA_OUT_BUFFERS; i++)
@@ -647,13 +649,13 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                     encH->outputPortBufSize);
             if(omxErr != OMX_ErrorNone)
             {
-                WRAPPER_ERROR("\nOmxilEnc=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
+                WRAPPER_ERROR("\nOmxilDec=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
                 pthread_mutex_unlock(&encH->mutex);
                 return omxErr;
             }
             else
             {
-                WRAPPER_PRINTF("\nOmxilEnc=> %s:%d  Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
+                WRAPPER_PRINTF("\nOmxilDec=> %s:%d  Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
                         (encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS + i), encH->compHandle, encH->outPortIndex, pBufHdr, pBufHdr->pBuffer, encH->outputPortBufSize);
                 encH->outputBufHdrList[(encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS + i)] = pBufHdr;
                 OMAX_qPush(encH, omxil_false_e, (encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS + i));
@@ -821,10 +823,13 @@ static OMX_ERRORTYPE MoveToState(OMX_STATETYPE newState, OmxilVideoEncDec_t *enc
 
 static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
 {
-    OMX_ERRORTYPE omxErr;
+    OMX_ERRORTYPE omxErr = OMX_ErrorNone;
     OMX_PORT_PARAM_TYPE portParam;
     OMX_PARAM_PORTDEFINITIONTYPE inPortParam;
     OMX_PARAM_PORTDEFINITIONTYPE outPortParam;
+    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    OMX_VENDOR_TIVPU_PARAM_TYPE vpuParam = { 0 };
+    #endif /* SOC_J721S2 or SOC_J784S4 */
 
     /* Create the OMX component */
     OMX_STRING comp_name = (OMX_STRING)QNX_ENC_COMP_NAME;
@@ -845,6 +850,30 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             encH->compHandleArray[ch].compError = omxErr;
             return omxErr;
         }
+
+        #if defined(SOC_J721S2) || defined(SOC_J784S4)
+        /* Get number of VPU cores */
+        omxErr = OMX_GetParameter(encH->compHandleArray[ch].compHandle,
+                    (OMX_INDEXTYPE)OMX_VendorTIVPUConfigCoreIndex,
+                    &vpuParam);
+        if(omxErr != OMX_ErrorNone) 
+        {
+            WRAPPER_ERROR("\nOmxilEnc=> ERROR: Component OMX_GetParameter() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
+            return omxErr;
+        }
+
+        vpuParam.coreIdx = encH->compHandleArray[ch].core_idx;
+
+        /* Set the chosen coreIdx for decode. */
+        omxErr = OMX_SetParameter(encH->compHandleArray[ch].compHandle, (OMX_INDEXTYPE)OMX_VendorTIVPUConfigCoreIndex,
+                                &vpuParam);
+
+        if(omxErr != OMX_ErrorNone)
+        {
+            WRAPPER_ERROR("\nOmxilEnc=> ERROR: Component OMX_SetParameter() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
+            return omxErr;
+        }
+        #endif /* SOC_J721S2 or SOC_J784S4 */
 
         /* Get component ports info and prepare internal port contexts. */
         SET_OMAX_VERSION_SIZE(portParam, sizeof(OMX_PORT_PARAM_TYPE));
@@ -947,7 +976,9 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             return omxErr;
         }
         bitrate_ctl_t.eControlRate = (OMX_VIDEO_CONTROLRATETYPE)encH->compHandleArray[ch].rcmode;
-        bitrate_ctl_t.nTargetBitrate = 10000000;
+        #if defined(SOC_J721E)
+        bitrate_ctl_t.nTargetBitrate = encH->compHandleArray[ch].bitrate;
+        #endif /* SOC_J721E */
 
         omxErr = OMX_SetParameter(encH->compHandleArray[ch].compHandle,
                                 OMX_IndexParamVideoBitrate,
@@ -1044,9 +1075,10 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             return omxErr;
         }
         WRAPPER_PRINTF("\nOmxilEnc=> Port comp %p, port %u, eCompressionFormat: %d, nFrameWidth: %d, nFrameHeight: %d", encH->compHandleArray[ch].compHandle, outPortParam.nPortIndex, outPortParam.format.video.eCompressionFormat, outPortParam.format.video.nFrameWidth, outPortParam.format.video.nFrameHeight);
+        
         encH->compHandleArray[ch].outputPortBufSize = outPortParam.nBufferSize;
         encH->compHandleArray[ch].nOutputBufs = outPortParam.nBufferCountActual;
-
+        
         /* set avc type */
         OMX_VIDEO_PARAM_AVCTYPE avc;
         SET_OMAX_VERSION_SIZE(avc, sizeof(OMX_VIDEO_PARAM_AVCTYPE));
@@ -1085,7 +1117,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
 
 static OMX_ERRORTYPE InitDecComp(app_omax_wrapper_obj_t *encH)
 {
-    OMX_ERRORTYPE omxErr;
+    OMX_ERRORTYPE omxErr = OMX_ErrorNone;
     OMX_PORT_PARAM_TYPE portParam;
     OMX_PARAM_PORTDEFINITIONTYPE inPortParam;
     OMX_PARAM_PORTDEFINITIONTYPE outPortParam;
@@ -1213,10 +1245,12 @@ static OMX_ERRORTYPE InitDecComp(app_omax_wrapper_obj_t *encH)
             {
                 outPortParam.format.video.eColorFormat = (OMX_COLOR_FORMATTYPE)OMXQ_COLOR_FormatNV12;
             }
+            #if defined(SOC_J721E)
             else if(encH->compHandleArray[ch].mLumaDepth == 10)
             {
                 outPortParam.format.video.eColorFormat = (OMX_COLOR_FORMATTYPE)OMXQ_COLOR_Format1210;
             }
+            #endif /* SOC_J721E */
             else
             {
                 WRAPPER_ERROR("\nUnsupported depth %d\n", encH->compHandleArray[ch].mLumaDepth);
@@ -1229,10 +1263,12 @@ static OMX_ERRORTYPE InitDecComp(app_omax_wrapper_obj_t *encH)
             {
                 outPortParam.format.video.eColorFormat = (OMX_COLOR_FORMATTYPE)OMXQ_COLOR_FormatNV16;
             }
+            #if defined(SOC_J721E)
             else if(encH->compHandleArray[ch].mLumaDepth == 10)
             {
                 outPortParam.format.video.eColorFormat = (OMX_COLOR_FORMATTYPE)OMXQ_COLOR_Format1610;
             }
+            #endif /* SOC_J721E */
             else
             {
                 WRAPPER_ERROR("\nUnsupported depth %d\n", encH->compHandleArray[ch].mLumaDepth);
@@ -1648,20 +1684,26 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
     
     for (uint8_t ch = 0; ch < p_omax_pipe_obj->params.in_num_channels && status==0; ch++)
     {
-        p_omax_pipe_obj->compHandleArray[ch].bitrate = 1024000;
-        p_omax_pipe_obj->compHandleArray[ch].idr_period = 30;
-        p_omax_pipe_obj->compHandleArray[ch].frame_rate = 30;
-        p_omax_pipe_obj->compHandleArray[ch].rcmode = (int32_t)OMX_Video_ControlRateConstant;
+        p_omax_pipe_obj->compHandleArray[ch].bitrate = OMAX_DEFAULT_BITRATE;
+        p_omax_pipe_obj->compHandleArray[ch].idr_period = OMAX_DEFAULT_IDR_PERIOD;
+        p_omax_pipe_obj->compHandleArray[ch].frame_rate = OMAX_DEFAULT_FRAME_RATE;
+        p_omax_pipe_obj->compHandleArray[ch].rcmode = (int32_t)OMAX_DEFAULT_RATE_CONTROL_MODE;
         
         p_omax_pipe_obj->compHandleArray[ch].output_buf_num = p_omax_pipe_obj->params.out_buffer_depth;
         p_omax_pipe_obj->compHandleArray[ch].input_buf_num = p_omax_pipe_obj->params.in_buffer_depth;
         p_omax_pipe_obj->compHandleArray[ch].channelIdx = ch;
         p_omax_pipe_obj->compHandleArray[ch].src_height = p_omax_pipe_obj->params.in_height;
         p_omax_pipe_obj->compHandleArray[ch].src_width = p_omax_pipe_obj->params.in_width;
+        #if defined(SOC_J721E)
         p_omax_pipe_obj->compHandleArray[ch].aligned_height = ALIGN16(p_omax_pipe_obj->compHandleArray[ch].src_height);
         p_omax_pipe_obj->compHandleArray[ch].src_stride = ALIGN64(p_omax_pipe_obj->compHandleArray[ch].src_width);
         p_omax_pipe_obj->compHandleArray[ch].frame_size = p_omax_pipe_obj->compHandleArray[ch].src_width * p_omax_pipe_obj->compHandleArray[ch].src_height * 3 / 2; /* default yuv420 format. */
-        snprintf(p_omax_pipe_obj->compHandleArray[ch].out_path, OMAX_MAX_FILE_PATH, "output_video_%d.264", ch);
+        #else
+        p_omax_pipe_obj->compHandleArray[ch].aligned_height = ALIGN8(p_omax_pipe_obj->compHandleArray[ch].src_height);
+        p_omax_pipe_obj->compHandleArray[ch].src_stride = ALIGN32(p_omax_pipe_obj->compHandleArray[ch].src_width);
+        p_omax_pipe_obj->compHandleArray[ch].frame_size = p_omax_pipe_obj->compHandleArray[ch].src_stride * p_omax_pipe_obj->compHandleArray[ch].aligned_height * 3 / 2; /* default yuv420 format. */
+        #endif /* SOC_J721E */
+        snprintf(p_omax_pipe_obj->compHandleArray[ch].out_path, OMAX_MAX_FILE_PATH, "/tmp/output_video_%d.264", ch);
         
         if(p_omax_pipe_obj->params.appEncode == 1 && p_omax_pipe_obj->params.appDecode == 0)
         {
@@ -1675,6 +1717,7 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
 
         WRAPPER_PRINTF("\nInput stride is %d", p_omax_pipe_obj->compHandleArray[ch].src_stride);
 
+        /* Allocate the input buffer pointers. */
         for (uint8_t idx = 0; idx < p_omax_pipe_obj->params.in_buffer_depth && status==0; idx++)
         {
             void *pointer = data_ptr[idx][ch][0];
@@ -1693,7 +1736,7 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
             p_omax_pipe_obj->compHandleArray[ch].input_bufs[idx]->addr = pointer;
             p_omax_pipe_obj->compHandleArray[ch].input_bufs[idx]->size = p_omax_pipe_obj->compHandleArray[ch].frame_size;
             p_omax_pipe_obj->compHandleArray[ch].input_bufs[idx]->offset = offset;
-            WRAPPER_PRINTF("\nGet frame size for input_bufs[%d][%d]: %d, %p, %lx", idx, ch, p_omax_pipe_obj->compHandleArray[ch].frame_size, pointer, offset);
+            WRAPPER_PRINTF("\nGet frame size for input_bufs[%d][%d]: %d, %p, %lx", ch, idx, p_omax_pipe_obj->compHandleArray[ch].frame_size, pointer, offset);
         }
     }
 
@@ -1731,7 +1774,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
     
     for (uint8_t ch = 0; ch < p_omax_pipe_obj->params.out_num_channels && status==0; ch++)
     {
-        p_omax_pipe_obj->compHandleArray[ch].frame_rate = 30;
+        p_omax_pipe_obj->compHandleArray[ch].frame_rate = OMAX_DEFAULT_FRAME_RATE;
         p_omax_pipe_obj->compHandleArray[ch].frame_duration = 33333;
 
         p_omax_pipe_obj->compHandleArray[ch].output_buf_num = p_omax_pipe_obj->params.out_buffer_depth + OMAX_DEC_EXTRA_OUT_BUFFERS;

@@ -45,8 +45,14 @@ endif
 ifeq ($(TARGET_OS), QNX)
 STATIC_LIBS += app_utils_omax_wrapper
 
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2))
+LDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/OpenMAXIL/core/nto/aarch64/$(BUILD_PROFILE_QNX_SO)/
+LDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/OpenMAXIL/utility/nto/aarch64/$(BUILD_PROFILE_QNX_SO)/
+endif
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
 LDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/core/nto/aarch64/$(BUILD_PROFILE_QNX_SO)/
 LDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/utility/nto/aarch64/$(BUILD_PROFILE_QNX_SO)/
+endif
 
 ifeq ($(TARGET_BUILD), release)
 SHARED_LIBS += omxcore_j7$(BUILD_PROFILE_QNX_SUFFIX)
@@ -57,10 +63,6 @@ CFLAGS      += -DDEBUG_MODE
 SHARED_LIBS += slog2
 STATIC_LIBS += omxcore_j7$(BUILD_PROFILE_QNX_SUFFIX)S
 STATIC_LIBS += omxil_j7_utility$(BUILD_PROFILE_QNX_SUFFIX)S
-endif
-
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2))
-SKIPBUILD=1
 endif
 
 endif
