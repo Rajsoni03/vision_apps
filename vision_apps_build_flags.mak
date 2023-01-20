@@ -56,10 +56,6 @@ ifneq (,$(filter $(SOC),j721s2 am62a))
 BUILD_ENABLE_ETHFW=no
 endif
 
-ifeq ($(RTOS),SAFERTOS)
-BUILD_ENABLE_ETHFW=no
-endif
-
 # Proxy ARP handling support
 # To enable this feature, ETHFW_PROXY_ARP_SUPPORT must be set to "yes" in
 # ethfw_build_flags.mk. This feature is enabled by default.

@@ -164,7 +164,7 @@ typedef struct
     /* Host MAC address */
     uint8_t hostMacAddr[ENET_MAC_ADDR_LEN];
 
-#if defined(FREERTOS)
+#if defined(FREERTOS) || defined(SAFERTOS)
     /* Host IP address */
     uint32_t hostIpAddr;
 #elif (SYSBIOS)
@@ -174,7 +174,7 @@ typedef struct
     /* Enet instance id */
     uint32_t instId;
 
-#if defined(FREERTOS)
+#if defined(FREERTOS) || defined(SAFERTOS)
     /* DHCP network interface */
     struct dhcp dhcpNetif;
 #endif

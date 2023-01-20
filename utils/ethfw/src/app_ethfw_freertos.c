@@ -66,9 +66,15 @@
 /*                            Global Variables                                */
 /* ========================================================================== */
 
+#if defined(SAFERTOS)
+#define ETHAPP_LWIP_TASK_STACKSIZE      (16U * 1024U)
+#define ETHAPP_LWIP_TASK_STACKALIGN     ETHAPP_LWIP_TASK_STACKSIZE
+#else
 #define ETHAPP_LWIP_TASK_STACKSIZE      (4U * 1024U)
+#define ETHAPP_LWIP_TASK_STACKALIGN     (32U)
+#endif
 
-static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((section(".bss:taskStackSection"))) __attribute__((aligned(32)));
+static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((section(".bss:taskStackSection"))) __attribute__((aligned(ETHAPP_LWIP_TASK_STACKALIGN)));
 
 /* lwIP features that EthFw relies on */
 #ifndef LWIP_IPV4
@@ -174,6 +180,10 @@ static EthFw_VirtPortCfg gEthApp_autosarVirtPortCfg[] =
         .portId       = ETHREMOTECFG_SWITCH_PORT_1,
     },
 };
+
+#if defined(SAFERTOS)
+static sys_sem_t gEthApp_lwipMainTaskSemObj;
+#endif
 
 /* ========================================================================== */
 /*                          Function Declarations                             */
@@ -350,6 +360,9 @@ int32_t appEthFwInit()
         taskParams.stack     = &gEthAppLwipStackBuf[0];
         taskParams.stacksize = sizeof(gEthAppLwipStackBuf);
         taskParams.name      = "lwIP main loop";
+#if defined(SAFERTOS)
+        taskParams.userData  = &gEthApp_lwipMainTaskSemObj;
+#endif
 
         TaskP_create(&EthApp_lwipMain, &taskParams);
     }

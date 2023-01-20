@@ -1,4 +1,5 @@
 DEFS+=CPU_mcu2_0
+RTOS_LC := $(call lowercase,$(RTOS))
 
 ifeq ($(RTOS),SYSBIOS)
 	XDC_BLD_FILE = $($(_MODULE)_SDIR)/../bios_cfg/config_r5f.bld
@@ -52,15 +53,17 @@ LDIRS += $(ETHFW_PATH)/out/J721E/R5Ft/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(REMOTE_DEVICE_PATH)/lib/J721E/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 ifeq ($(RTOS),FREERTOS)
-    LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
-    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
-    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/freertos/$(SOC)/r5f/$(TARGET_BUILD)/
-    LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/lib/freertos/${SOC}/r5f/$(TARGET_BUILD)/
-    LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/freertos/j721e/r5f/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/kernel/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
 endif
-
 ifeq ($(RTOS),SAFERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/kernel/safertos/lib/$(SOC)/mcu2_0/$(TARGET_BUILD)/
+endif
+
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
+	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/lib/$(RTOS_LC)/${SOC}/r5f/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
 endif
 
 include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
@@ -85,7 +88,7 @@ ETHFW_LIBS += ethfw_callbacks
 ETHFW_LIBS += eth_intervlan
 ETHFW_LIBS += ethfw_board
 ETHFW_LIBS += lib_remoteswitchcfg_server
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	ETHFW_LIBS += ethfw_lwip
 endif
 endif
@@ -105,17 +108,18 @@ ADDITIONAL_STATIC_LIBS += ti.drv.gpio.aer5f
 ADDITIONAL_STATIC_LIBS += enetsoc.aer5f
 ADDITIONAL_STATIC_LIBS += enet.aer5f
 ADDITIONAL_STATIC_LIBS += enetphy.aer5f
-ADDITIONAL_STATIC_LIBS += enet_cfgserver.aer5f
 ADDITIONAL_STATIC_LIBS += enet_timesync_ptp.aer5f
 ADDITIONAL_STATIC_LIBS += enet_timesync_hal.aer5f
-ifeq ($(RTOS),FREERTOS)
-	ADDITIONAL_STATIC_LIBS += lwipstack_freertos.aer5f
-	ADDITIONAL_STATIC_LIBS += lwipcontrib_freertos.aer5f
-	ADDITIONAL_STATIC_LIBS += lwipport_freertos.aer5f
-	ADDITIONAL_STATIC_LIBS += lwipif_freertos.aer5f
-	ADDITIONAL_STATIC_LIBS += lwipific_freertos.aer5f
+
+ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
+	ADDITIONAL_STATIC_LIBS += lwipstack_$(RTOS_LC).aer5f
+	ADDITIONAL_STATIC_LIBS += lwipcontrib_$(RTOS_LC).aer5f
+	ADDITIONAL_STATIC_LIBS += lwipport_$(RTOS_LC).aer5f
+	ADDITIONAL_STATIC_LIBS += lwipif_$(RTOS_LC).aer5f
+	ADDITIONAL_STATIC_LIBS += lwipific_$(RTOS_LC).aer5f
 	ADDITIONAL_STATIC_LIBS += enet_intercore.aer5f
-	ADDITIONAL_STATIC_LIBS += enet_example_utils_freertos.aer5f
+	ADDITIONAL_STATIC_LIBS += enet_example_utils_$(RTOS_LC).aer5f
+	ADDITIONAL_STATIC_LIBS += enet_cfgserver_$(RTOS_LC).aer5f
 endif
 endif
 
