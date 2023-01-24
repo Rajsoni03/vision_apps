@@ -63,6 +63,7 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <thread>
+#include <cstdlib>
 
 #include <utils/mem/include/app_mem.h>
 #include <utils/mem/include/app_mem_limits.h>
@@ -137,7 +138,7 @@ static int32_t appMemAllocTest(int32_t  loopCnt, void **ptr, const char *str, bo
                 printf("APP_MEM: %d: Exported dmaBufId %d with offset %d\n", i, dmaBufFd, offset);
             }
         }
-        
+
         if (ptr[i] == NULL)
         {
             printf("APP_MEM: %d: ERROR: Unable to allocate memory size %d bytes.\n", i, size);
@@ -270,7 +271,7 @@ App_parseCmdLineArgs(int32_t            argc,
         {0,              0,                 0,   0  }
     };
 
-    while ((opt = getopt_long(argc, argv,"hvc:i:", 
+    while ((opt = getopt_long(argc, argv,"hvc:i:",
                    long_options, &longIndex )) != -1) {
         switch (opt)
         {

@@ -62,5 +62,5 @@
 
 #define ANGLE_TABLE_ROWS (983)
 
-const float fisheye_angle_table[ANGLE_TABLE_ROWS][2];
-const float fisheye_angle_table_rev[ANGLE_TABLE_ROWS][2];
+extern const float fisheye_angle_table[ANGLE_TABLE_ROWS][2];
+extern const float fisheye_angle_table_rev[ANGLE_TABLE_ROWS][2];
