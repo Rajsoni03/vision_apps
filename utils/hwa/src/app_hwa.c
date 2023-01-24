@@ -724,10 +724,10 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
                 break;
             #endif
 
-#if defined(SOC_J721E) || defined(SOC_J721S2)
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
             case APP_VPAC_720_DMPAC_480:
                 SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 480000000);
-                #if defined(SOC_J721S2)
+                #if defined(SOC_J721S2) || defined(SOC_J784S4)
                 SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_MAIN_CLK,   720000000);
                 #else
                 SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   720000000);
@@ -737,7 +737,7 @@ int32_t appVhwaHandler(char *service_name, uint32_t cmd, void *prm, uint32_t prm
 
             case APP_VPAC_650_DMPAC_520:
                 SET_CLOCK_FREQ (TISCI_DEV_DMPAC0, TISCI_DEV_DMPAC0_CLK, 520000000);
-                #if defined(SOC_J721S2)
+                #if defined(SOC_J721S2) || defined(SOC_J784S4)
                 SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_MAIN_CLK,   650000000);
                 #else
                 SET_CLOCK_FREQ (TISCI_DEV_VPAC0, TISCI_DEV_VPAC0_CLK,   650000000);
