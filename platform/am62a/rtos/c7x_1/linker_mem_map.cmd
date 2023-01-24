@@ -84,20 +84,20 @@ MEMORY
     DDR_C7x_1_VECS           ( RWIX ) : ORIGIN = 0x99C00000 , LENGTH = 0x00004000
     /* DDR for C7x_1 for code/data [ size 27.94 MB ] */
     DDR_C7x_1                ( RWIX ) : ORIGIN = 0x99C10000 , LENGTH = 0x01BF0000
-    /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size  3.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xA0000000 , LENGTH = 0x00300000
+    /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
+    IPC_VRING_MEM                     : ORIGIN = 0xA0000000 , LENGTH = 0x01000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xA0300000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xA1000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 15.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA0340000 , LENGTH = 0x00FC0000
-    /* Memory for shared memory buffers in DDR [ size 192.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xA2300000 , LENGTH = 0x0C000000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA1040000 , LENGTH = 0x00FC0000
+    /* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0B000000
     /* DDR for c7x_1 for non cacheable local heap [ size 16.00 MB ] */
-    DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB0300000 , LENGTH = 0x01000000
+    DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB0000000 , LENGTH = 0x01000000
     /* DDR for c7x_1 for non cacheable scratch Memory [ size 16.00 MB ] */
-    DDR_C7X_1_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB1300000 , LENGTH = 0x01000000
+    DDR_C7X_1_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB1000000 , LENGTH = 0x01000000
     /* DDR for c7x_1 for local heap [ size 112.00 MB ] */
-    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0xB2300000 , LENGTH = 0x07000000
+    DDR_C7X_1_LOCAL_HEAP     ( RWIX ) : ORIGIN = 0xB2000000 , LENGTH = 0x07000000
     /* DDR for c7x_1 for Scratch Memory [ size 112.00 MB ] */
-    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xB9300000 , LENGTH = 0x07000000
+    DDR_C7X_1_SCRATCH        ( RWIX ) : ORIGIN = 0xB9000000 , LENGTH = 0x07000000
 }

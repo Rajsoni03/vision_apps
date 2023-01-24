@@ -107,7 +107,6 @@ GB = KB*MB;
 #
 
 ddr_mem_addr_1  = 0x0099800000;
-#ddr_mem_addr_1  = 0x0099740000;
 ddr_mem_size_1  = 80*MB
 
 ddr_mem_addr_2 = 0xA0000000;
@@ -182,7 +181,7 @@ carveout_size = 0
 # exactly at 0xAA000000 offset. This gap of 16MB is not currently used and
 # can be used for Linux..
 ipc_vring_mem_addr      = ddr_mem_addr_2;
-ipc_vring_mem_size      = 3*MB;
+ipc_vring_mem_size      = 16*MB;
 carveout_size += ipc_vring_mem_size
 
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
@@ -199,7 +198,7 @@ carveout_size += tiovx_log_rt_mem_size
 
 # Shared memory for Buffers/ION allocator
 ddr_shared_mem_addr     = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
-ddr_shared_mem_size     = 192*MB;
+ddr_shared_mem_size     = 176*MB;
 carveout_size += ddr_shared_mem_size
 
 mcu_r5f_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;

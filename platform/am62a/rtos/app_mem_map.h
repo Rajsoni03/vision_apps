@@ -103,48 +103,48 @@
 #define DDR_DM_R5F_DTS_ADDR (0x9C900000u)
 #define DDR_DM_R5F_DTS_SIZE (0x01E00000u)
 
-/* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size  3.00 MB ] */
+/* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
 #define IPC_VRING_MEM_ADDR (0xA0000000u)
-#define IPC_VRING_MEM_SIZE (0x00300000u)
+#define IPC_VRING_MEM_SIZE (0x01000000u)
 
 /* Memory for remote core logging [ size 256.00 KB ] */
-#define APP_LOG_MEM_ADDR (0xA0300000u)
+#define APP_LOG_MEM_ADDR (0xA1000000u)
 #define APP_LOG_MEM_SIZE (0x00040000u)
 
 /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 15.75 MB ] */
-#define TIOVX_OBJ_DESC_MEM_ADDR (0xA0340000u)
+#define TIOVX_OBJ_DESC_MEM_ADDR (0xA1040000u)
 #define TIOVX_OBJ_DESC_MEM_SIZE (0x00FC0000u)
 
 /* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
-#define TIOVX_LOG_RT_MEM_ADDR (0xA1300000u)
+#define TIOVX_LOG_RT_MEM_ADDR (0xA2000000u)
 #define TIOVX_LOG_RT_MEM_SIZE (0x01000000u)
 
-/* Memory for shared memory buffers in DDR [ size 192.00 MB ] */
-#define DDR_SHARED_MEM_ADDR (0xA2300000u)
-#define DDR_SHARED_MEM_SIZE (0x0C000000u)
+/* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
+#define DDR_SHARED_MEM_ADDR (0xA3000000u)
+#define DDR_SHARED_MEM_SIZE (0x0B000000u)
 
 /* DDR for MCU R5F for local heap [ size 16.00 MB ] */
-#define DDR_MCU_R5F_LOCAL_HEAP_ADDR (0xAE300000u)
+#define DDR_MCU_R5F_LOCAL_HEAP_ADDR (0xAE000000u)
 #define DDR_MCU_R5F_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for DM R5F for local heap [ size 16.00 MB ] */
-#define DDR_DM_R5F_LOCAL_HEAP_ADDR (0xAF300000u)
+#define DDR_DM_R5F_LOCAL_HEAP_ADDR (0xAF000000u)
 #define DDR_DM_R5F_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for c7x_1 for non cacheable local heap [ size 16.00 MB ] */
-#define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR (0xB0300000u)
+#define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR (0xB0000000u)
 #define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x01000000u)
 
 /* DDR for c7x_1 for non cacheable scratch Memory [ size 16.00 MB ] */
-#define DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR (0xB1300000u)
+#define DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR (0xB1000000u)
 #define DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE (0x01000000u)
 
 /* DDR for c7x_1 for local heap [ size 112.00 MB ] */
-#define DDR_C7X_1_LOCAL_HEAP_ADDR (0xB2300000u)
+#define DDR_C7X_1_LOCAL_HEAP_ADDR (0xB2000000u)
 #define DDR_C7X_1_LOCAL_HEAP_SIZE (0x07000000u)
 
 /* DDR for c7x_1 for Scratch Memory [ size 112.00 MB ] */
-#define DDR_C7X_1_SCRATCH_ADDR (0xB9300000u)
+#define DDR_C7X_1_SCRATCH_ADDR (0xB9000000u)
 #define DDR_C7X_1_SCRATCH_SIZE (0x07000000u)
 
 #define DDR_64BIT_BASE_VADDR (0x00000000u)

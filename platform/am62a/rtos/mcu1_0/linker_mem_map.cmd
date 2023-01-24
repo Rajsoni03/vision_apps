@@ -82,14 +82,14 @@ MEMORY
     DDR_DM_R5F_IPC_TRACEBUF  ( RWIX ) : ORIGIN = 0x9C900400 , LENGTH = 0x000FFC00
     /* DDR for DM R5F for code/data [ size 29.00 MB ] */
     DDR_DM_R5F               ( RWIX ) : ORIGIN = 0x9CA00000 , LENGTH = 0x01D00000
-    /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size  3.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xA0000000 , LENGTH = 0x00300000
+    /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
+    IPC_VRING_MEM                     : ORIGIN = 0xA0000000 , LENGTH = 0x01000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xA0300000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xA1000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 15.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA0340000 , LENGTH = 0x00FC0000
-    /* Memory for shared memory buffers in DDR [ size 192.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xA2300000 , LENGTH = 0x0C000000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA1040000 , LENGTH = 0x00FC0000
+    /* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0B000000
     /* DDR for DM R5F for local heap [ size 16.00 MB ] */
-    DDR_DM_R5F_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xAF300000 , LENGTH = 0x01000000
+    DDR_DM_R5F_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xAF000000 , LENGTH = 0x01000000
 }

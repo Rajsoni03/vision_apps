@@ -86,6 +86,29 @@
 
 #undef ENABLE_C7X_CACHE_WRITE_THROUGH
 
+#define C7x_EL2_SNOOP_CFG_REG (0x7C00000Cu)
+
+#define DISABLE_C7X_SNOOP_FILTER    (0) /*On reset value is 0*/
+#define ENABLE_C7X_MMU_TO_DMC_SNOOP (1) /*On reset value is 1*/
+#define ENABLE_C7X_PMC_TO_DMC_SNOOP (0) /*On reset value is 1*/
+#define ENABLE_C7X_SE_TO_DMC_SNOOP  (1) /*On reset value is 1*/
+#define ENABLE_C7X_DRU_TO_DMC_SNOOP (1) /*On reset value is 1*/
+#define ENABLE_C7X_SOC_TO_DMC_SNOOP (1) /*On reset value is 1*/
+
+static void setC7xSnoopCfgReg()
+{
+    volatile uint32_t *pReg = (uint32_t *)C7x_EL2_SNOOP_CFG_REG;
+
+    /* This operation overrides the existing value of snoop config!*/
+    *pReg = (uint32_t)((DISABLE_C7X_SNOOP_FILTER    << 31) |
+                       (ENABLE_C7X_MMU_TO_DMC_SNOOP << 18) |
+                       (ENABLE_C7X_PMC_TO_DMC_SNOOP << 17) |
+                       (ENABLE_C7X_SE_TO_DMC_SNOOP  << 16) |
+                       (ENABLE_C7X_DRU_TO_DMC_SNOOP << 1)  |
+                       (ENABLE_C7X_SOC_TO_DMC_SNOOP << 0));
+}
+
+
 static void appMain(void* arg0, void* arg1)
 {
     appUtilsTaskInit();
@@ -333,6 +356,7 @@ void appCacheInit()
     configureC7xL1DCacheAsWriteThrough();
 #endif
 
+    setC7xSnoopCfgReg();
 
 }
 
