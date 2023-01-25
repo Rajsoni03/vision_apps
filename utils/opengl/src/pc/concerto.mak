@@ -5,8 +5,9 @@ TARGET      := app_utils_opengl
 TARGETTYPE  := library
 IDIRS       += $(VISION_APPS_PATH)
 IDIRS       += $(GLM_PATH)/
-CFLAGS      += --std=c++14 -D_HOST_EMULATION -pedantic -fPIC -w -c -g
-CFLAGS      += -Wno-sign-compare
+CPPFLAGS    += --std=c++14 -D_HOST_EMULATION -pedantic -fPIC -w -c -g
+CPPFLAGS    += -Wno-sign-compare
+DEFS        += USE_X11
 
 CPPSOURCES  := app_gl_egl_utils_pc.cpp
 
