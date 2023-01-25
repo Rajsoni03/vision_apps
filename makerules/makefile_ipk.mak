@@ -54,7 +54,8 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					vision_apps/applibs \
 					vision_apps/kernels \
 					vision_apps/modules \
-					vision_apps/utils
+					vision_apps/utils \
+					vxlib/packages/ti/vxlib/src/common
 
 ifeq ($(BUILD_PTK),yes)
 IPK_INCLUDE_FOLDERS += ti-perception-toolkit/include
