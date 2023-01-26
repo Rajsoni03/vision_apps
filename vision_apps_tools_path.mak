@@ -11,7 +11,7 @@ include $(TIOVX_PATH)/build_flags.mak
 # This is required to be set when pulling in the safertos_version
 BOARD=$(SOC)_evm
 
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2))
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2 j784s4))
 ifneq ($(wildcard $(PDK_PATH)),)
   include $(PDK_PATH)/packages/ti/build/safertos_version.mk
 

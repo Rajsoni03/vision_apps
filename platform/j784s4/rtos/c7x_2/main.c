@@ -73,15 +73,13 @@
 #include <app_ipc_rsctable.h>
 #include <ti/csl/soc.h>
 #include <ti/csl/csl_clec.h>
+#include <ti/csl/arch/c7x/Cache.h>
+#include <ti/csl/arch/c7x/Hwi.h>
+#include <ti/csl/arch/c7x/Mmu.h>
 
-#if (defined (FREERTOS))
-#include <ti/kernel/freertos/portable/TI_CGT/c7x/Cache.h>
-#include <ti/kernel/freertos/portable/TI_CGT/c7x/Hwi.h>
-#include <ti/kernel/freertos/portable/TI_CGT/c7x/Mmu.h>
-#else
-#include <ti/sysbios/family/c7x/Cache.h>
-#include <ti/sysbios/family/c7x/Hwi.h>
-#include <ti/sysbios/family/c7x/Mmu.h>
+#if (defined (SAFERTOS))
+#include "SafeRTOS_API.h"
+#include "SafeRTOSConfig.h"
 #endif
 
 #define C7X_CORE_ID 1

@@ -16,6 +16,9 @@ endif
 ifeq ($(RTOS),FREERTOS)
 	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/c7x/$(TARGET_BUILD)/
 endif
+ifeq ($(RTOS),SAFERTOS)
+	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/safertos/$(SOC)/c7x/$(TARGET_BUILD)/
+endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c7x/$(TARGET_BUILD)/
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -66,6 +69,9 @@ ADDITIONAL_STATIC_LIBS += udma.ae71
 
 ifeq ($(RTOS),FREERTOS)
 	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.ae71
+endif
+ifeq ($(RTOS),SAFERTOS)
+	ADDITIONAL_STATIC_LIBS += ti.kernel.safertos.ae71
 endif
 ADDITIONAL_STATIC_LIBS += ti.csl.ae71
 
