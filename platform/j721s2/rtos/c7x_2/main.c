@@ -73,20 +73,13 @@
 #include <app_ipc_rsctable.h>
 #include <ti/csl/soc.h>
 #include <ti/csl/csl_clec.h>
+#include <ti/csl/arch/c7x/Cache.h>
+#include <ti/csl/arch/c7x/Hwi.h>
+#include <ti/csl/arch/c7x/Mmu.h>
 
-#if (defined (FREERTOS))
-#include <ti/kernel/freertos/portable/TI_CGT/c7x/Cache.h>
-#include <ti/kernel/freertos/portable/TI_CGT/c7x/Hwi.h>
-#include <ti/kernel/freertos/portable/TI_CGT/c7x/Mmu.h>
-#elif (defined (SAFERTOS))
+#if (defined (SAFERTOS))
 #include "SafeRTOS_API.h"
 #include "SafeRTOSConfig.h"
-#include "Mmu.h"
-#include "Cache.h"
-#else
-#include <ti/sysbios/family/c7x/Cache.h>
-#include <ti/sysbios/family/c7x/Hwi.h>
-#include <ti/sysbios/family/c7x/Mmu.h>
 #endif
 
 /* For J7ES/J721E/TDA4VM the upper 2GB DDR starts from 0x0008_8000_0000 */

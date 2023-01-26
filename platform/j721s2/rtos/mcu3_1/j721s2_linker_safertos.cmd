@@ -48,12 +48,12 @@ SECTIONS
     {
         .bootCode                                               : {} palign( 8 )
         .startupCode                                            : {} palign( 8 )
-        .cinit                                                  : {} align( 32 )
         .pinit                                                  : {} align( 32 )
         .MPU_INIT_FUNCTION                                      : {} palign( 8 )
         .startupData                                            : {} palign( 8 ), type = NOINIT
     } > R5F_TCMA
-    
+
+    .cinit                                                  : {} align( 32 ) > DDR_MCU3_1
 
     .data_buffer     : {} palign(128)    > DDR_MCU3_1
 
@@ -79,7 +79,7 @@ SECTIONS
 
     .tracebuf                : {} align(1024)   > DDR_MCU3_1
 
-    .bss:ddr_local_mem     (NOLOAD) : {} > DDR_MCU3_1_LOCAL_HEAP
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_MCU3_1_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM

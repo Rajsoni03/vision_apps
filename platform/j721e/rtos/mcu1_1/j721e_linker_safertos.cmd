@@ -20,7 +20,7 @@
 --diag_suppress=10063                   /* entry point not _c_int00 */
 --stack_size=0x8000
 --heap_size=0x10000
---entry_point=_safeRTOSresetvectors     /* C RTS boot.asm with added SVC handler	*/
+--entry_point=_axSafeRTOSresetVectors     /* C RTS boot.asm with added SVC handler	*/
 
 -stack  0x8000  /* SOFTWARE STACK SIZE */
 -heap   0x10000 /* HEAP AREA SIZE      */

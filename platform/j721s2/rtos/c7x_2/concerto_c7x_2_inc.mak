@@ -32,8 +32,8 @@ ifeq ($(RTOS),SAFERTOS)
 	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_c7x)
 	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_c7x)/$(SAFERTOS_COMPILER_EXT_c7x)
 	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/SafeRTOS/api/NoWrapper
-	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/demo_projects/SafeRTOS_TDA4VL_C7x_Demo/TI_c7x_Support
 	IDIRS+=${SAFERTOS_KERNEL_INSTALL_PATH_c7x}/source_code_and_projects/demo_projects/SafeRTOS_TDA4VL_C7x_Demo
+	IDIRS+=$(PDK_PATH)/packages/ti/kernel/safertos/TI_CGT/c7x
 endif
 
 ifeq ($(RTOS),FREERTOS)

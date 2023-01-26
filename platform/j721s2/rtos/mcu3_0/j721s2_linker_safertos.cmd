@@ -48,38 +48,38 @@ SECTIONS
     {
         .bootCode                                               : {} palign( 8 )
         .startupCode                                            : {} palign( 8 )
-        .cinit                                                  : {} align( 32 )
         .pinit                                                  : {} align( 32 )
         .MPU_INIT_FUNCTION                                      : {} palign( 8 )
         .startupData                                            : {} palign( 8 ), type = NOINIT
     } > R5F_TCMA
-    
 
-    .data_buffer     : {} palign(128)    > DDR_MCU3_1
+    .cinit                                                  : {} align( 32 ) > DDR_MCU3_0
+
+    .data_buffer     : {} palign(128)    > DDR_MCU3_0
 
     /* USB or any other LLD buffer for benchmarking */
-    .benchmark_buffer (NOLOAD) {} ALIGN (8) > DDR_MCU3_1
+    .benchmark_buffer (NOLOAD) {} ALIGN (8) > DDR_MCU3_0
     
     .resource_table          :
     {
         __RESOURCE_TABLE = .;
-    }                                           > DDR_MCU3_1_RESOURCE_TABLE
+    }                                           > DDR_MCU3_0_RESOURCE_TABLE
 
     GROUP LOAD_START( lnkFlashStartAddr ), LOAD_END( lnkFlashEndAddr )
     {
         .KERNEL_FUNCTION LOAD_START( lnkKernelFuncStartAddr ),
                          LOAD_END( lnkKernelFuncEndAddr )       : {} palign( 0x10000 )
-    } > DDR_MCU3_1
+    } > DDR_MCU3_0
 
     .unpriv_flash palign( 0x10000 ) :
     {
         *(.text)
         *(.rodata)
-    } > DDR_MCU3_1
+    } > DDR_MCU3_0
 
-    .tracebuf                : {} align(1024)   > DDR_MCU3_1
+    .tracebuf                : {} align(1024)   > DDR_MCU3_0
 
-    .bss:ddr_local_mem     (NOLOAD) : {} > DDR_MCU3_1_LOCAL_HEAP
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_MCU3_0_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
@@ -114,5 +114,5 @@ SECTIONS
         .svcStack    END( lnkStacksEndAddr )    : {. = . + __SVC_STACK_SIZE;}   align(4)
         RUN_START(__SVC_STACK_START)
         RUN_END(__SVC_STACK_END)
-    } > DDR_MCU3_1   (HIGH)
+    } > DDR_MCU3_0   (HIGH)
 }
