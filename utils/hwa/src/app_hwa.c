@@ -225,9 +225,12 @@ int32_t appCsi2TxInit(void)
     appLogPrintf("CSI2TX: Init ... !!!\n");
 
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_PSILSS0);
-    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    #if defined(SOC_J721S2)
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF_V2_0);
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF_V2_1);
+    #elif defined(SOC_J784S4)
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF0);
+    SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF1);
     #else
     SET_DEVICE_STATE_ON(TISCI_DEV_CSI_TX_IF0);
     #endif
