@@ -160,7 +160,9 @@ sbl_pdk_sd_hs:
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img_hs DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/binary/$(BOARD)_hs/mmcsd/bin/sbl_mmcsd_img_$(SBL_CORE)_release.tiimage $(SBL_BOOTFILES_PATH)/tiboot3.bin.signed
-ifeq ($(HS_SR), 1_1)
+ifeq ($(HS_SR), 2_0)
+	cp $(PDK_PATH)/packages/ti/drv/sciclient/soc/$(SCICLIENT_VERSION)/tifs_sr2-hs-enc.bin $(SBL_BOOTFILES_PATH)/tifs.bin.signed
+else ifeq ($(HS_SR), 1_1)
 	cp $(PDK_PATH)/packages/ti/drv/sciclient/soc/$(SCICLIENT_VERSION)/tifs_sr1.1-hs-enc.bin $(SBL_BOOTFILES_PATH)/tifs.bin.signed
 else
 	cp $(PDK_PATH)/packages/ti/drv/sciclient/soc/$(SCICLIENT_VERSION)/tifs-hs-enc.bin $(SBL_BOOTFILES_PATH)/tifs.bin.signed
