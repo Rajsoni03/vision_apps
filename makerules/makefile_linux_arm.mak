@@ -358,6 +358,7 @@ linux_fs_install_sd_ip: ip_addr_check linux_fs_install
 	#(call CLEAN_COPY_FROM_STAGE,/tmp/j7-evm)
 	$(call CLEAN_COPY_FROM_STAGE_FAST,/tmp/j7-evm)
 	$(MAKE) EDGEAI_INSTALL_PATH=/tmp/j7-evm edgeai_install
+	chmod 777 -R /tmp/j7-evm/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	fusermount -u /tmp/j7-evm/
 
 linux_fs_install_sd_test_data:
