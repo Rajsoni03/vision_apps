@@ -84,7 +84,7 @@
 #include <ti/sysbios/family/c7x/Mmu.h>
 #endif
 
-#undef ENABLE_C7X_CACHE_WRITE_THROUGH
+#define ENABLE_C7X_CACHE_WRITE_THROUGH
 
 #define C7x_EL2_SNOOP_CFG_REG (0x7C00000Cu)
 
