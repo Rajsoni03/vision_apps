@@ -164,9 +164,9 @@
 		reg = <0x00 0xe6800000 0x00 0x01800000>;
 		no-map;
 	};
-	vision_apps_core_heaps_hi: vision-apps-core-heap-memory-hi@880000000 {
+	vision_apps_core_heaps_hi: vision-apps-core-heap-memory-hi@8d0000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x08 0x80000000 0x00 0x40000000>;
+		reg = <0x08 0xd0000000 0x00 0x40000000>;
 		no-map;
 	};
 
