@@ -264,7 +264,7 @@ static vx_status configure_ldc_params(vx_context context, LDCObj *ldcObj, Sensor
     return status;
 }
 
-static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj)
+static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
 
@@ -273,7 +273,7 @@ static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorOb
     status = vxGetStatus((vx_reference)output_img);
     if(status == VX_SUCCESS)
     {
-        ldcObj->output_arr = vxCreateObjectArray(context, (vx_reference)output_img, sensorObj->num_cameras_enabled);
+        ldcObj->output_arr = vxCreateObjectArray(context, (vx_reference)output_img, num_cameras_enabled);
         vxReleaseImage(&output_img);
 
         status = vxGetStatus((vx_reference)ldcObj->output_arr);
@@ -345,7 +345,7 @@ static vx_status create_ldc_outputs(vx_context context, LDCObj *ldcObj, SensorOb
 
     return status;
 }
-vx_status app_init_ldc(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj, char *objName)
+vx_status app_init_ldc(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj, char *objName, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
 
@@ -372,7 +372,7 @@ vx_status app_init_ldc(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj,
 
     if(status == VX_SUCCESS)
     {
-        status = create_ldc_outputs(context, ldcObj, sensorObj);
+        status = create_ldc_outputs(context, ldcObj, sensorObj, num_cameras_enabled);
     }
 
     return (status);
@@ -411,7 +411,7 @@ void app_delete_ldc(LDCObj *ldcObj)
     }
 }
 
-vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array input_arr)
+vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array input_arr, const char *target)
 {
     vx_status status = VX_SUCCESS;
 
@@ -432,7 +432,7 @@ vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array i
         if(status == VX_SUCCESS)
         {
             vxSetReferenceName((vx_reference)ldcObj->node, "ldc_node");
-            vxSetNodeTarget(ldcObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_LDC1);
+            vxSetNodeTarget(ldcObj->node, VX_TARGET_STRING, target);
 
             vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e};
             vxReplicateNode(graph, ldcObj->node, replicate, 9);

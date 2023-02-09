@@ -680,17 +680,17 @@ static vx_status app_init(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-        status = app_init_viss(obj->context, &obj->vissObj, &obj->sensorObj, "viss_obj");
+        status = app_init_viss(obj->context, &obj->vissObj, &obj->sensorObj, "viss_obj", obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("VISS init done!\n");
     }
     if(status == VX_SUCCESS)
     {
-        status = app_init_aewb(obj->context, &obj->aewbObj, &obj->sensorObj, "aewb_obj");
+        status = app_init_aewb(obj->context, &obj->aewbObj, &obj->sensorObj, "aewb_obj", 0, obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("AEWB init done!\n");
     }
     if(status == VX_SUCCESS)
     {
-        status = app_init_ldc(obj->context, &obj->ldcObj, &obj->sensorObj, "ldc_obj");
+        status = app_init_ldc(obj->context, &obj->ldcObj, &obj->sensorObj, "ldc_obj", obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("LDC init done!\n");
     }
 
@@ -879,7 +879,7 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_viss(obj->graph, &obj->vissObj, obj->captureObj.raw_image_arr[0]);
+        status = app_create_graph_viss(obj->graph, &obj->vissObj, obj->captureObj.raw_image_arr[0], TIVX_TARGET_VPAC_VISS1);
         APP_PRINTF("VISS graph done!\n");
     }
 
@@ -891,7 +891,7 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_ldc(obj->graph, &obj->ldcObj, obj->vissObj.output_arr);
+        status = app_create_graph_ldc(obj->graph, &obj->ldcObj, obj->vissObj.output_arr, TIVX_TARGET_VPAC_LDC1);
         APP_PRINTF("LDC graph done!\n");
     }
 

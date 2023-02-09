@@ -70,6 +70,7 @@
 #include "app_common.h"
 #include "app_sensor_module.h"
 #include "app_capture_module.h"
+#include "app_obj_arr_split_module.h"
 #include "app_viss_module.h"
 #include "app_aewb_module.h"
 #include "app_ldc_module.h"
@@ -77,16 +78,21 @@
 #include "app_display_module.h"
 #include "app_test.h"
 
-#define APP_BUFFER_Q_DEPTH   (4)
-#define APP_PIPELINE_DEPTH   (7)
+#define CAPTURE_BUFFER_Q_DEPTH  (4)
+#define APP_BUFFER_Q_DEPTH      (4)
+#define APP_PIPELINE_DEPTH      (7)
 
 typedef struct {
 
     SensorObj     sensorObj;
     CaptureObj    captureObj;
+    ObjArrSplitObj  objArrSplitObj;
     VISSObj       vissObj;
     AEWBObj       aewbObj;
     LDCObj        ldcObj;
+    VISSObj       vissObj1;
+    AEWBObj       aewbObj1;
+    LDCObj        ldcObj1;
     ImgMosaicObj  imgMosaicObj;
     DisplayObj    displayObj;
 
@@ -116,6 +122,7 @@ typedef struct {
 
     int32_t enable_ldc;
     int32_t enable_viss;
+    int32_t enable_split_graph;
     int32_t enable_aewb;
     int32_t enable_mosaic;
 
@@ -128,6 +135,7 @@ typedef struct {
 
     vx_uint32 enable_configure_hwa_freq;
     vx_uint32 hwa_freq_config;
+    vx_uint32 bypass_split_graph;
 
 } AppObj;
 
@@ -146,7 +154,8 @@ static void app_update_param_set(AppObj *obj);
 static void app_pipeline_params_defaults(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static vx_int32 calc_grid_size(vx_uint32 ch);
-static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh);
+static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh, ObjArrSplitObj *objArrSplitObj, int32_t enable_split_graph);
+static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -293,14 +302,23 @@ static void app_set_cfg_default(AppObj *obj)
 {
     snprintf(obj->captureObj.output_file_path,APP_MAX_FILE_PATH, ".");
     snprintf(obj->vissObj.output_file_path,APP_MAX_FILE_PATH, ".");
+    snprintf(obj->vissObj1.output_file_path,APP_MAX_FILE_PATH, ".");
     snprintf(obj->ldcObj.output_file_path,APP_MAX_FILE_PATH, ".");
 
     obj->captureObj.en_out_capture_write = 0;
     obj->vissObj.en_out_viss_write = 0;
+    obj->vissObj1.en_out_viss_write = 0;
     obj->ldcObj.en_out_ldc_write = 0;
+    obj->ldcObj1.en_out_ldc_write = 0;
 
     obj->num_frames_to_write = 0;
     obj->num_frames_to_skip = 0;
+
+    obj->objArrSplitObj.num_outputs = 2;
+    obj->objArrSplitObj.output0_num_elements = 0;
+    obj->objArrSplitObj.output1_num_elements = 0;
+    obj->objArrSplitObj.output2_num_elements = 0;
+    obj->objArrSplitObj.output3_num_elements = 0;
 }
 
 static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
@@ -436,7 +454,9 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     token[strlen(token)-1]=0;
                     strcpy(obj->captureObj.output_file_path, token);
                     strcpy(obj->vissObj.output_file_path, token);
+                    strcpy(obj->vissObj1.output_file_path, token);
                     strcpy(obj->ldcObj.output_file_path, token);
+                    strcpy(obj->ldcObj1.output_file_path, token);
                     strcpy(obj->output_file_path, token);
                 }
             }
@@ -465,6 +485,20 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     }
                 }
                 obj->sensorObj.is_interactive = obj->is_interactive;
+            }
+            else
+            if(strcmp(token, "bypass_split_graph")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->bypass_split_graph = atoi(token);
+                    if(obj->bypass_split_graph > 1)
+                    {
+                        obj->bypass_split_graph = 1;
+                    }
+                }
             }
             else
 
@@ -590,6 +624,7 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
         obj->test_mode = 1;
         obj->captureObj.test_mode = 1;
         obj->is_interactive = 0;
+        obj->bypass_split_graph = 0;
         obj->enable_configure_hwa_freq = 0;
         obj->hwa_freq_config = 0;
         obj->sensorObj.is_interactive = 0;
@@ -625,12 +660,14 @@ vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
     {
         printf("YUV Input selected. VISS, AEWB and Mosaic nodes will be bypassed. \n");
         obj->enable_viss = 0;
+        obj->enable_split_graph = 0;
         obj->enable_aewb = 0;
         obj->enable_mosaic = 0;
     }
     else
     {
         obj->enable_viss = 1;
+        obj->enable_split_graph = 1;
         obj->enable_aewb = 1;
         obj->enable_mosaic = 1;
     }
@@ -703,6 +740,7 @@ vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
 static vx_status app_init(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
+    app_grpx_init_prms_t grpx_prms;
 
     if (1U == obj->enable_configure_hwa_freq)
     {
@@ -750,27 +788,49 @@ static vx_status app_init(AppObj *obj)
     if (status == VX_SUCCESS)
     {
         APP_PRINTF("Sensor init done!\n");
-        status = app_init_capture(obj->context, &obj->captureObj, &obj->sensorObj, "capture_obj", APP_BUFFER_Q_DEPTH);
+        status = app_init_capture(obj->context, &obj->captureObj, &obj->sensorObj, "capture_obj", CAPTURE_BUFFER_Q_DEPTH);
+    }
+
+    if( (1 == obj->enable_split_graph) && (status == VX_SUCCESS) )
+    {
+        obj->objArrSplitObj.input_arr = obj->captureObj.raw_image_arr[0];
+        APP_PRINTF("Obj arr splitter init done!\n");
+        status = app_init_obj_arr_split(obj->context, &obj->objArrSplitObj, "objArrSplit_obj");
     }
 
     if((1 == obj->enable_viss) && (status == VX_SUCCESS))
     {
-        status = app_init_viss(obj->context, &obj->vissObj, &obj->sensorObj, "viss_obj");
+        status = app_init_viss(obj->context, &obj->vissObj, &obj->sensorObj, "viss_obj", obj->objArrSplitObj.output0_num_elements);
         APP_PRINTF("VISS init done!\n");
     }
 
     if((1 == obj->enable_aewb) && (status == VX_SUCCESS))
     {
-        status = app_init_aewb(obj->context, &obj->aewbObj, &obj->sensorObj, "aewb_obj");
+        status = app_init_aewb(obj->context, &obj->aewbObj, &obj->sensorObj, "aewb_obj", 0, obj->objArrSplitObj.output0_num_elements);
         APP_PRINTF("AEWB init done!\n");
     }
 
     if((obj->sensorObj.enable_ldc == 1) && (status == VX_SUCCESS))
     {
-        status = app_init_ldc(obj->context, &obj->ldcObj, &obj->sensorObj, "ldc_obj");
+        status = app_init_ldc(obj->context, &obj->ldcObj, &obj->sensorObj, "ldc_obj", obj->objArrSplitObj.output0_num_elements);
         APP_PRINTF("LDC init done!\n");
     }
 
+    if((1 == obj->enable_split_graph) && (status == VX_SUCCESS))
+    {
+        status = app_init_viss(obj->context, &obj->vissObj1, &obj->sensorObj, "viss_obj1", obj->objArrSplitObj.output1_num_elements);
+        APP_PRINTF("VISS init done!\n");
+        if((1 == obj->enable_aewb) && (status == VX_SUCCESS))
+        {
+            status = app_init_aewb(obj->context, &obj->aewbObj1, &obj->sensorObj, "aewb_obj", obj->objArrSplitObj.output0_num_elements, obj->objArrSplitObj.output1_num_elements);
+            APP_PRINTF("AEWB init done!\n");
+        }
+        if((obj->sensorObj.enable_ldc == 1) && (status == VX_SUCCESS))
+        {
+            status = app_init_ldc(obj->context, &obj->ldcObj1, &obj->sensorObj, "ldc_obj",obj->objArrSplitObj.output1_num_elements);
+            APP_PRINTF("LDC init done!\n");
+        }        
+    }
 
     if((obj->enable_mosaic == 1) && (status == VX_SUCCESS))
     {
@@ -784,6 +844,10 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("Display init done!\n");
     }
 
+    appGrpxInitParamsInit(&grpx_prms, obj->context);
+    grpx_prms.draw_callback = app_draw_graphics;
+    appGrpxInit(&grpx_prms);
+
     appPerfPointSetName(&obj->total_perf , "TOTAL");
     appPerfPointSetName(&obj->fileio_perf, "FILEIO");
     return status;
@@ -794,8 +858,14 @@ static void app_deinit(AppObj *obj)
     app_deinit_sensor(&obj->sensorObj);
     APP_PRINTF("Sensor deinit done!\n");
 
-    app_deinit_capture(&obj->captureObj, APP_BUFFER_Q_DEPTH);
+    app_deinit_capture(&obj->captureObj, CAPTURE_BUFFER_Q_DEPTH);
     APP_PRINTF("Capture deinit done!\n");
+
+    if(1 == obj->enable_split_graph)
+    {
+        app_deinit_obj_arr_split(&obj->objArrSplitObj);
+        APP_PRINTF("Object array splitter deinit done!\n");
+    }
 
     if(1 == obj->enable_viss)
     {
@@ -815,6 +885,22 @@ static void app_deinit(AppObj *obj)
         APP_PRINTF("LDC deinit done!\n");
     }
 
+    if(1 == obj->enable_split_graph)
+    {
+        app_deinit_viss(&obj->vissObj1);
+        APP_PRINTF("VISS deinit done!\n");
+        if(1 == obj->enable_aewb)
+        {
+            app_deinit_aewb(&obj->aewbObj1);
+            APP_PRINTF("AEWB deinit done!\n");
+        }
+        if(obj->sensorObj.enable_ldc == 1)
+        {
+            app_deinit_ldc(&obj->ldcObj1);
+            APP_PRINTF("LDC deinit done!\n");
+        }
+    }
+
     if(obj->enable_mosaic == 1)
     {
         app_deinit_img_mosaic(&obj->imgMosaicObj, APP_BUFFER_Q_DEPTH);
@@ -823,6 +909,8 @@ static void app_deinit(AppObj *obj)
 
     app_deinit_display(&obj->displayObj);
     APP_PRINTF("Display deinit done!\n");
+
+    appGrpxDeInit();
 
     tivxHwaUnLoadKernels(obj->context);
     tivxImagingUnLoadKernels(obj->context);
@@ -838,16 +926,36 @@ static void app_delete_graph(AppObj *obj)
     app_delete_capture(&obj->captureObj);
     APP_PRINTF("Capture delete done!\n");
 
+    if(1 == obj->enable_split_graph)
+    {
+        app_delete_obj_arr_split(&obj->objArrSplitObj);
+        APP_PRINTF("Object array splitter delete done!\n");
+    }
+
     app_delete_viss(&obj->vissObj);
     APP_PRINTF("VISS delete done!\n");
 
     app_delete_aewb(&obj->aewbObj);
     APP_PRINTF("AEWB delete done!\n");
 
+    if(1 == obj->enable_split_graph)
+    {
+        app_delete_viss(&obj->vissObj1);
+        APP_PRINTF("VISS delete done!\n");
+
+        app_delete_aewb(&obj->aewbObj1);
+        APP_PRINTF("AEWB delete done!\n");  
+    }
+
     if(obj->sensorObj.enable_ldc == 1)
     {
         app_delete_ldc(&obj->ldcObj);
         APP_PRINTF("LDC delete done!\n");
+        if(1 == obj->enable_split_graph)
+        {
+            app_delete_ldc(&obj->ldcObj1);
+            APP_PRINTF("LDC delete done!\n");
+        }
     }
 
     app_delete_img_mosaic(&obj->imgMosaicObj);
@@ -880,11 +988,24 @@ static vx_status app_create_graph(AppObj *obj)
         APP_PRINTF("Capture graph done!\n");
     }
 
+    if( (1 == obj->enable_split_graph) && (status == VX_SUCCESS) )
+    {
+        status = app_create_graph_obj_arr_split(obj->graph, &obj->objArrSplitObj);
+        APP_PRINTF("Object array splitter graph done!\n");
+    }
+
     if(1 == obj->enable_viss)
     {
         if(status == VX_SUCCESS)
         {
-            status = app_create_graph_viss(obj->graph, &obj->vissObj, obj->captureObj.raw_image_arr[0]);
+            if(1 == obj->enable_split_graph)
+            {
+                status = app_create_graph_viss(obj->graph, &obj->vissObj, obj->objArrSplitObj.output0_arr, TIVX_TARGET_VPAC_VISS1);
+            }
+            else
+            {
+                status = app_create_graph_viss(obj->graph, &obj->vissObj, obj->captureObj.raw_image_arr[0], TIVX_TARGET_VPAC_VISS1);
+            }
             APP_PRINTF("VISS graph done!\n");
         }
     }
@@ -909,14 +1030,15 @@ static vx_status app_create_graph(AppObj *obj)
         }
         else
         {
-            ldc_in_arr = obj->captureObj.raw_image_arr[0];
+            ldc_in_arr = obj->objArrSplitObj.output0_arr;
         }
         if (status == VX_SUCCESS)
         {
-            status = app_create_graph_ldc(obj->graph, &obj->ldcObj, ldc_in_arr);
+            status = app_create_graph_ldc(obj->graph, &obj->ldcObj, ldc_in_arr, TIVX_TARGET_VPAC_LDC1);
             APP_PRINTF("LDC graph done!\n");
         }
         obj->imgMosaicObj.input_arr[idx++] = obj->ldcObj.output_arr;
+        APP_PRINTF("IDX = %i!\n",idx);
     }
     else
     {
@@ -927,10 +1049,69 @@ static vx_status app_create_graph(AppObj *obj)
         }
         else
         {
-            mosaic_in_arr = obj->captureObj.raw_image_arr[0];
+            mosaic_in_arr = obj->objArrSplitObj.output0_arr;
         }
 
         obj->imgMosaicObj.input_arr[idx++] = mosaic_in_arr;
+    }
+
+    if(1 == obj->enable_split_graph)
+    {
+        if(status == VX_SUCCESS)
+        {
+            #if defined(SOC_J784S4)
+            status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC2_VISS1);
+            #else
+            status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC_VISS1);
+            #endif
+            APP_PRINTF("VISS graph done!\n");
+        }
+        if(1 == obj->enable_aewb)
+        {
+            if(status == VX_SUCCESS)
+            {
+                status = app_create_graph_aewb(obj->graph, &obj->aewbObj1, obj->vissObj1.h3a_stats_arr);
+
+                APP_PRINTF("AEWB graph done!\n");
+            }
+        }
+        if(obj->sensorObj.enable_ldc == 1)
+        {
+            vx_object_array ldc_in_arr;
+            if(1 == obj->enable_split_graph)
+            {
+                ldc_in_arr = obj->vissObj1.output_arr;
+            }
+            else
+            {
+                ldc_in_arr = obj->objArrSplitObj.output1_arr;
+            }
+            if (status == VX_SUCCESS)
+            {
+                #if defined(SOC_J784S4)
+                status = app_create_graph_ldc(obj->graph, &obj->ldcObj1, ldc_in_arr, TIVX_TARGET_VPAC2_LDC1);
+                #else
+                status = app_create_graph_ldc(obj->graph, &obj->ldcObj1, ldc_in_arr, TIVX_TARGET_VPAC_LDC1);
+                #endif
+                APP_PRINTF("LDC graph done!\n");
+            }
+            obj->imgMosaicObj.input_arr[idx++] = obj->ldcObj1.output_arr;
+            APP_PRINTF("IDX = %i!\n",idx);
+        }
+        else
+        {
+            vx_object_array mosaic_in_arr;
+            if(1 == obj->enable_split_graph)
+            {
+                mosaic_in_arr = obj->vissObj1.output_arr;
+            }
+            else
+            {
+                mosaic_in_arr = obj->objArrSplitObj.output1_arr;
+            }
+
+            obj->imgMosaicObj.input_arr[idx++] = mosaic_in_arr;
+        }
     }
 
     vx_image display_in_image;
@@ -962,7 +1143,7 @@ static vx_status app_create_graph(AppObj *obj)
         add_graph_parameter_by_node_index(obj->graph, obj->captureObj.node, 1);
         obj->captureObj.graph_parameter_index = graph_parameter_index;
         graph_parameters_queue_params_list[graph_parameter_index].graph_parameter_index = graph_parameter_index;
-        graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
+        graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = CAPTURE_BUFFER_Q_DEPTH;
         graph_parameters_queue_params_list[graph_parameter_index].refs_list = (vx_reference*)&obj->captureObj.raw_image_arr[0];
         graph_parameter_index++;
 
@@ -971,7 +1152,7 @@ static vx_status app_create_graph(AppObj *obj)
             add_graph_parameter_by_node_index(obj->graph, obj->imgMosaicObj.node, 1);
             obj->imgMosaicObj.graph_parameter_index = graph_parameter_index;
             graph_parameters_queue_params_list[graph_parameter_index].graph_parameter_index = graph_parameter_index;
-            graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
+            graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = CAPTURE_BUFFER_Q_DEPTH;
             graph_parameters_queue_params_list[graph_parameter_index].refs_list = (vx_reference*)&obj->imgMosaicObj.output_image[0];
             graph_parameter_index++;
         }
@@ -1005,11 +1186,32 @@ static vx_status app_create_graph(AppObj *obj)
         {
             status = tivxSetNodeParameterNumBufByIndex(obj->ldcObj.node, 7, APP_BUFFER_Q_DEPTH);
         }
+        if((obj->enable_split_graph == 1) && (status == VX_SUCCESS))
+        {
+            status = tivxSetNodeParameterNumBufByIndex(obj->vissObj1.node, 6, APP_BUFFER_Q_DEPTH);
+
+            if (status == VX_SUCCESS)
+            {
+                status = tivxSetNodeParameterNumBufByIndex(obj->vissObj1.node, 9, APP_BUFFER_Q_DEPTH);
+            }
+            if((obj->enable_aewb == 1) && (status == VX_SUCCESS))
+            {
+                if (status == VX_SUCCESS)
+                {
+                    status = tivxSetNodeParameterNumBufByIndex(obj->aewbObj1.node, 4, APP_BUFFER_Q_DEPTH);
+                }
+            }
+            if((obj->sensorObj.enable_ldc == 1) && (status == VX_SUCCESS))
+            {
+                status = tivxSetNodeParameterNumBufByIndex(obj->ldcObj1.node, 7, APP_BUFFER_Q_DEPTH);
+            }
+        }
+
         if((obj->enable_mosaic == 1) && (status == VX_SUCCESS))
         {
             if(!((obj->en_out_img_write == 1) || (obj->test_mode == 1)))
             {
-                status = tivxSetNodeParameterNumBufByIndex(obj->imgMosaicObj.node, 1, APP_BUFFER_Q_DEPTH);
+                status = tivxSetNodeParameterNumBufByIndex(obj->imgMosaicObj.node, 1, CAPTURE_BUFFER_Q_DEPTH);
                 APP_PRINTF("Pipeline params setup done!\n");
             }
         }
@@ -1032,7 +1234,7 @@ static vx_status app_verify_graph(AppObj *obj)
     #if 1
     if(VX_SUCCESS == status)
     {
-      status = tivxExportGraphToDot(obj->graph,".", "vx_app_multi_cam");
+      status = tivxExportGraphToDot(obj->graph,".", "vx_app_multi_cam_ahp");
     }
     #endif
 
@@ -1079,7 +1281,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             status = vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&obj->captureObj.raw_image_arr[obj->enqueueCnt], 1);
         }
         obj->enqueueCnt++;
-        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
+        obj->enqueueCnt   = (obj->enqueueCnt  >= CAPTURE_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
         obj->pipeline++;
     }
 
@@ -1096,7 +1298,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             status = vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&obj->captureObj.raw_image_arr[obj->enqueueCnt], 1);
         }
         obj->enqueueCnt++;
-        obj->enqueueCnt   = (obj->enqueueCnt  >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
+        obj->enqueueCnt   = (obj->enqueueCnt  >= CAPTURE_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
         obj->pipeline++;
     }
 
@@ -1132,7 +1334,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 
             if (obj->en_out_img_write == 1) {
                 appPerfPointBegin(&obj->fileio_perf);
-                snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - APP_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
+                snprintf(output_file_name, APP_MAX_FILE_PATH, "%s/mosaic_output_%010d_%dx%d.yuv", obj->output_file_path, (frame_id - CAPTURE_BUFFER_Q_DEPTH), imgMosaicObj->out_width, imgMosaicObj->out_height);
                 if (status == VX_SUCCESS)
                 {
                     status = writeMosaicOutput(output_file_name, mosaic_output_image);
@@ -1154,8 +1356,8 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         obj->enqueueCnt++;
         obj->dequeueCnt++;
 
-        obj->enqueueCnt = (obj->enqueueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
-        obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
+        obj->enqueueCnt = (obj->enqueueCnt >= CAPTURE_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
+        obj->dequeueCnt = (obj->dequeueCnt >= CAPTURE_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
     }
 
     appPerfPointEnd(&obj->total_perf);
@@ -1194,6 +1396,10 @@ static vx_status app_run_graph(AppObj *obj)
     {
         obj->vissObj.en_out_viss_write = 0;
     }
+    if(0 == obj->enable_split_graph)
+    {
+        obj->vissObj1.en_out_viss_write = 0;
+    }
 
     if (obj->test_mode == 1) {
         // The buffer allows AWB/AE algos to converge before checksums are calculated
@@ -1212,9 +1418,17 @@ static vx_status app_run_graph(AppObj *obj)
             {
                 status = app_send_cmd_viss_write_node(&obj->vissObj, frame_id, obj->num_frames_to_write, obj->num_frames_to_skip);
             }
+            if((obj->vissObj1.en_out_viss_write == 1) && (status == VX_SUCCESS))
+            {
+                status = app_send_cmd_viss_write_node(&obj->vissObj1, frame_id, obj->num_frames_to_write, obj->num_frames_to_skip);
+            }
             if((obj->ldcObj.en_out_ldc_write == 1) && (status == VX_SUCCESS))
             {
                 status = app_send_cmd_ldc_write_node(&obj->ldcObj, frame_id, obj->num_frames_to_write, obj->num_frames_to_skip);
+            }
+            if((obj->ldcObj1.en_out_ldc_write == 1) && (status == VX_SUCCESS))
+            {
+                status = app_send_cmd_ldc_write_node(&obj->ldcObj1, frame_id, obj->num_frames_to_write, obj->num_frames_to_skip);
             }
             obj->write_file = 0;
         }
@@ -1250,7 +1464,7 @@ static void set_display_defaults(DisplayObj *displayObj)
 
 static void app_pipeline_params_defaults(AppObj *obj)
 {
-    obj->pipeline       = -APP_BUFFER_Q_DEPTH + 1;
+    obj->pipeline       = -CAPTURE_BUFFER_Q_DEPTH + 1;
     obj->enqueueCnt     = 0;
     obj->dequeueCnt     = 0;
 }
@@ -1279,6 +1493,7 @@ static void app_default_param_set(AppObj *obj)
     obj->is_interactive = 1;
     obj->test_mode = 0;
     obj->write_file = 0;
+    obj->bypass_split_graph = 0;
 
     obj->sensorObj.enable_ldc = 0;
     obj->sensorObj.num_cameras_enabled = 1;
@@ -1313,14 +1528,22 @@ static vx_int32 calc_grid_size(vx_uint32 ch)
     }
 }
 
-static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh)
+static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh, ObjArrSplitObj *objArrSplitObj, int32_t enable_split_graph)
 {
     vx_int32 idx, ch;
     vx_int32 grid_size = calc_grid_size(numCh);
 
     imgMosaicObj->out_width    = DISPLAY_WIDTH;
     imgMosaicObj->out_height   = DISPLAY_HEIGHT;
-    imgMosaicObj->num_inputs   = 1;
+
+    if (1 == enable_split_graph)
+    {
+        imgMosaicObj->num_inputs   = 2;
+    }
+    else
+    {
+        imgMosaicObj->num_inputs   = 1;
+    }
 
     idx = 0;
 
@@ -1336,24 +1559,50 @@ static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width
         imgMosaicObj->params.windows[idx].width   = in_width/grid_size;
         imgMosaicObj->params.windows[idx].height  = in_height/grid_size;
         imgMosaicObj->params.windows[idx].input_select   = 0;
-        imgMosaicObj->params.windows[idx].channel_select = ch;
+        if (1 == enable_split_graph)
+        {
+            if(ch >= objArrSplitObj->output0_num_elements)
+            {
+                imgMosaicObj->params.windows[idx].input_select   = 1;
+            }
+            imgMosaicObj->params.windows[idx].channel_select = ch%objArrSplitObj->output0_num_elements;
+        }
+        else
+        {
+            imgMosaicObj->params.windows[idx].channel_select = ch;
+        }
         idx++;
     }
 
     imgMosaicObj->params.num_windows  = idx;
 
     /* Number of time to clear the output buffer before it gets reused */
-    imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
+    imgMosaicObj->params.clear_count  = CAPTURE_BUFFER_Q_DEPTH;
 }
 
 static void app_update_param_set(AppObj *obj)
 {
-
     vx_uint16 resized_width, resized_height;
     appIssGetResizeParams(obj->sensorObj.image_width, obj->sensorObj.image_height, DISPLAY_WIDTH, DISPLAY_HEIGHT, &resized_width, &resized_height);
-
-    set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled);
-
+    
+    if ( (obj->sensorObj.num_cameras_enabled == 1))
+    {
+        obj->objArrSplitObj.output0_num_elements = 1;
+        obj->objArrSplitObj.output1_num_elements = 0;
+        obj->enable_split_graph = 0;
+    }
+    else if (1 == obj->bypass_split_graph)
+    {
+        obj->objArrSplitObj.output0_num_elements = obj->sensorObj.num_cameras_enabled;
+        obj->objArrSplitObj.output1_num_elements = 0;
+        obj->enable_split_graph = 0;
+    }
+    else
+    {
+        obj->objArrSplitObj.output0_num_elements = obj->sensorObj.num_cameras_enabled/2;
+        obj->objArrSplitObj.output1_num_elements = obj->sensorObj.num_cameras_enabled - obj->objArrSplitObj.output0_num_elements;
+    }
+    set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled, &obj->objArrSplitObj, obj->enable_split_graph);
 }
 
 /*
@@ -1365,4 +1614,19 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
 
     vxAddParameterToGraph(graph, parameter);
     vxReleaseParameter(&parameter);
+}
+
+static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
+{
+    appGrpxDrawDefault(handle, draw2dBufInfo, update_type);
+
+    if(update_type == 0)
+    {
+        Draw2D_FontPrm sHeading;
+
+        sHeading.fontIdx = 4;
+        Draw2D_drawString(handle, 700, 5, "Multi Cam Demo", &sHeading);
+    }
+
+  return;
 }

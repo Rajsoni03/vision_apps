@@ -115,9 +115,11 @@ typedef struct {
  * \param [in]  sensorObj  Sensor Module object used to initialize AEWB data object parameters;
  *                         must be initialized prior to passing to this function
  * \param [in]  objName    String of the name of this object
+ * \param [in]  starting_channel     First channel enabled
+ * \param [in]  num_cameras_enabled  Number of cameras enabled
  *
  */
-vx_status app_init_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, char *objName);
+vx_status app_init_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, char *objName, uint32_t starting_channel, uint32_t num_cameras_enabled);
 
 /** \brief AEWB module deinit helper function
  *

@@ -138,9 +138,10 @@ typedef struct {
  * \param [in]  sensorObj  Sensor Module object used to initialize VISS data object parameters;
  *                         must be initialized prior to passing to this function
  * \param [in]  objName    String of the name of this object
+ * \param [in]  num_cameras_enabled  Number of cameras enabled
  *
  */
-vx_status app_init_viss(vx_context context, VISSObj *vissObj, SensorObj *sensorObj, char *objName);
+vx_status app_init_viss(vx_context context, VISSObj *vissObj, SensorObj *sensorObj, char *objName, uint32_t num_cameras_enabled);
 
 /** \brief VISS module deinit helper function
  *
@@ -168,9 +169,10 @@ void app_delete_viss(VISSObj *vissObj);
  * \param [in]     graph           OpenVX graph that has been created using \ref vxCreateGraph and where the VISS node is created
  * \param [in,out] vissObj         VISS Module object which contains VISS node and write node which are created in this function
  * \param [in]     raw_image_arr   Raw image input object array to VISS node.  Must be created separately, typically passed from output of capture node
+ * \param [in]     target          The name of the target (ASCII string) on which the node executes.
  *
  */
-vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_array raw_image_arr);
+vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_array raw_image_arr, const char *target);
 
 /** \brief VISS module write output helper function
  *

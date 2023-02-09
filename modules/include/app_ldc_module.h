@@ -183,8 +183,10 @@ typedef struct {
  *                         must be initialized prior to passing to this function
  * \param [in]  objName    String of the name of this object
  *
+ * \param [in]  num_cameras_enabled  Number of cameras enabled
+ *
  */
-vx_status app_init_ldc(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj, char *objName);
+vx_status app_init_ldc(vx_context context, LDCObj *ldcObj, SensorObj *sensorObj, char *objName, uint32_t num_cameras_enabled);
 
 /** \brief LDC module deinit helper function
  *
@@ -212,9 +214,10 @@ void app_delete_ldc(LDCObj *ldcObj);
  * \param [in]     graph      OpenVX graph that has been created using \ref vxCreateGraph and where the LDC node is created
  * \param [in,out] ldcObj     LDC Module object which contains LDC node and write node which are created in this function
  * \param [in]     input_arr  Input object array to LDC node.  Must be created separately using \ref vxCreateObjectArray
+ * \param [in]     target     The name of the target (ASCII string) on which the node executes.
  *
  */
-vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array input_arr);
+vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array input_arr, const char *target);
 
 /** \brief LDC module write output helper function
  *

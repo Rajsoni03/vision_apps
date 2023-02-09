@@ -869,13 +869,13 @@ static vx_status app_init(AppObj *obj)
 
     if((1 == obj->enable_viss) && (status == VX_SUCCESS))
     {
-        status = app_init_viss(obj->context, &obj->vissObj, &obj->sensorObj, "viss_obj");
+        status = app_init_viss(obj->context, &obj->vissObj, &obj->sensorObj, "viss_obj", obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("VISS init done!\n");
     }
 
     if((1 == obj->enable_aewb) && (status == VX_SUCCESS))
     {
-        status = app_init_aewb(obj->context, &obj->aewbObj, &obj->sensorObj, "aewb_obj");
+        status = app_init_aewb(obj->context, &obj->aewbObj, &obj->sensorObj, "aewb_obj", 0, obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("AEWB init done!\n");
     }
 
@@ -1141,7 +1141,7 @@ static vx_status app_create_graph(AppObj *obj)
     {
         if(status == VX_SUCCESS)
         {
-            status = app_create_graph_viss(obj->capture_graph, &obj->vissObj, obj->captureObj.raw_image_arr[0]);
+            status = app_create_graph_viss(obj->capture_graph, &obj->vissObj, obj->captureObj.raw_image_arr[0], TIVX_TARGET_VPAC_VISS1);
             APP_PRINTF("VISS graph done!\n");
         }
     }

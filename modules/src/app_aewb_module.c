@@ -117,7 +117,7 @@ static vx_status configure_dcc(vx_context context, AEWBObj *aewbObj, SensorObj *
     return status;
 }
 
-static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj)
+static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, uint32_t starting_channel, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
     vx_int32 ch;
@@ -139,13 +139,13 @@ static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj 
 
     aewbObj->params.awb_num_skip_frames = 9;
     aewbObj->params.ae_num_skip_frames  = 9;
-    aewbObj->params.channel_id          = 0;
+    aewbObj->params.channel_id          = starting_channel;
 
     vx_user_data_object config = vxCreateUserDataObject(context, "tivx_aewb_config_t", sizeof(tivx_aewb_config_t), &aewbObj->params);
     status = vxGetStatus((vx_reference)config);
     if(status == VX_SUCCESS)
     {
-        aewbObj->config_arr = vxCreateObjectArray(context, (vx_reference)config, sensorObj->num_cameras_enabled);
+        aewbObj->config_arr = vxCreateObjectArray(context, (vx_reference)config, num_cameras_enabled);
         status = vxGetStatus((vx_reference)aewbObj->config_arr);
         if(status != VX_SUCCESS)
         {
@@ -159,19 +159,23 @@ static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj 
             vxSetReferenceName((vx_reference)aewbObj->config_arr, "aewb_node_config_arr");
 
             ch = 0;
-            ch_mask = sensorObj->ch_mask;
+            ch_mask = sensorObj->ch_mask >> starting_channel;
             while(ch_mask > 0)
             {
                 if(ch_mask & 0x1)
                 {
                     vx_user_data_object config = (vx_user_data_object)vxGetObjectArrayItem(aewbObj->config_arr, array_obj_index);
                     array_obj_index++;
-	                aewbObj->params.channel_id = ch;
-	                vxCopyUserDataObject(config, 0, sizeof(tivx_aewb_config_t), &aewbObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
-	                vxReleaseUserDataObject(&config);
+                    aewbObj->params.channel_id = ch + starting_channel;
+                    vxCopyUserDataObject(config, 0, sizeof(tivx_aewb_config_t), &aewbObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
+                    vxReleaseUserDataObject(&config);
                 }
                 ch++;
                 ch_mask = ch_mask >> 1;
+                if (ch >= num_cameras_enabled)
+                {
+                    break;
+                }
             }
         }
     }
@@ -183,7 +187,7 @@ static vx_status configure_aewb(vx_context context, AEWBObj *aewbObj, SensorObj 
     return status;
 }
 
-static vx_status create_histogram(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj)
+static vx_status create_histogram(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
 
@@ -191,7 +195,7 @@ static vx_status create_histogram(vx_context context, AEWBObj *aewbObj, SensorOb
     status = vxGetStatus((vx_reference)histogram);
     if(status == VX_SUCCESS)
     {
-        aewbObj->histogram_arr = vxCreateObjectArray(context, (vx_reference)histogram, sensorObj->num_cameras_enabled);
+        aewbObj->histogram_arr = vxCreateObjectArray(context, (vx_reference)histogram, num_cameras_enabled);
         status = vxGetStatus((vx_reference)aewbObj->histogram_arr);
         if(status != VX_SUCCESS)
         {
@@ -211,7 +215,7 @@ static vx_status create_histogram(vx_context context, AEWBObj *aewbObj, SensorOb
     return status;
 }
 
-static vx_status create_aewb_output(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj)
+static vx_status create_aewb_output(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
 
@@ -219,7 +223,7 @@ static vx_status create_aewb_output(vx_context context, AEWBObj *aewbObj, Sensor
     status = vxGetStatus((vx_reference)aewb_output);
     if(status == VX_SUCCESS)
     {
-        aewbObj->aewb_output_arr = vxCreateObjectArray(context, (vx_reference)aewb_output, sensorObj->num_cameras_enabled);
+        aewbObj->aewb_output_arr = vxCreateObjectArray(context, (vx_reference)aewb_output, num_cameras_enabled);
         status = vxGetStatus((vx_reference)aewbObj->aewb_output_arr);
         if(status != VX_SUCCESS)
         {
@@ -239,7 +243,7 @@ static vx_status create_aewb_output(vx_context context, AEWBObj *aewbObj, Sensor
     return status;
 }
 
-vx_status app_init_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, char *objName)
+vx_status app_init_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorObj, char *objName, uint32_t starting_channel, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
 
@@ -247,17 +251,17 @@ vx_status app_init_aewb(vx_context context, AEWBObj *aewbObj, SensorObj *sensorO
 
     if(status == VX_SUCCESS)
     {
-        status = configure_aewb(context, aewbObj, sensorObj);
+        status = configure_aewb(context, aewbObj, sensorObj, starting_channel, num_cameras_enabled);
     }
 
     if(status == VX_SUCCESS)
     {
-        status = create_histogram(context, aewbObj, sensorObj);
+        status = create_histogram(context, aewbObj, sensorObj, num_cameras_enabled);
     }
 
     if(status == VX_SUCCESS)
     {
-        status = create_aewb_output(context, aewbObj, sensorObj);
+        status = create_aewb_output(context, aewbObj, sensorObj, num_cameras_enabled);
     }
 
     return (status);

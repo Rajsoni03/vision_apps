@@ -161,7 +161,7 @@ static vx_status configure_dcc_params(vx_context context, VISSObj *vissObj, Sens
     return status;
 }
 
-static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, SensorObj *sensorObj)
+static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, SensorObj *sensorObj, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
     vx_uint32 img_height, img_width;
@@ -171,7 +171,7 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
     status = vxGetStatus((vx_reference)h3a_stats);
     if(status == VX_SUCCESS)
     {
-        vissObj->h3a_stats_arr = vxCreateObjectArray(context, (vx_reference)h3a_stats, sensorObj->num_cameras_enabled);
+        vissObj->h3a_stats_arr = vxCreateObjectArray(context, (vx_reference)h3a_stats, num_cameras_enabled);
         vxReleaseUserDataObject(&h3a_stats);
 
         status = vxGetStatus((vx_reference)vissObj->h3a_stats_arr);
@@ -201,7 +201,7 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
         status = vxGetStatus((vx_reference)output_img);
         if(status == VX_SUCCESS)
         {
-            vissObj->output_arr = vxCreateObjectArray(context, (vx_reference)output_img, sensorObj->num_cameras_enabled);
+            vissObj->output_arr = vxCreateObjectArray(context, (vx_reference)output_img, num_cameras_enabled);
             vxReleaseImage(&output_img);
 
             status = vxGetStatus((vx_reference)vissObj->output_arr);
@@ -291,7 +291,7 @@ static vx_status create_viss_outputs(vx_context context, VISSObj *vissObj, Senso
     return status;
 }
 
-vx_status app_init_viss(vx_context context, VISSObj *vissObj, SensorObj *sensorObj, char *objName)
+vx_status app_init_viss(vx_context context, VISSObj *vissObj, SensorObj *sensorObj,  char *objName, uint32_t num_cameras_enabled)
 {
     vx_status status = VX_SUCCESS;
 
@@ -304,7 +304,7 @@ vx_status app_init_viss(vx_context context, VISSObj *vissObj, SensorObj *sensorO
 
     if(status == VX_SUCCESS)
     {
-        status = create_viss_outputs(context, vissObj, sensorObj);
+        status = create_viss_outputs(context, vissObj, sensorObj, num_cameras_enabled);
     }
 
     return (status);
@@ -348,7 +348,7 @@ void app_delete_viss(VISSObj *vissObj)
     }
 }
 
-vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_array raw_image_arr)
+vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_array raw_image_arr, const char *target)
 {
     vx_status status = VX_SUCCESS;
 
@@ -373,7 +373,7 @@ vx_status app_create_graph_viss(vx_graph graph, VISSObj *vissObj, vx_object_arra
     if(status == VX_SUCCESS)
     {
         vxSetReferenceName((vx_reference)vissObj->node, "viss_node");
-        vxSetNodeTarget(vissObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_VISS1);
+        vxSetNodeTarget(vissObj->node, VX_TARGET_STRING, target);
 
         vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
         vxReplicateNode(graph, vissObj->node, replicate, 13);
