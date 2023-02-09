@@ -302,47 +302,83 @@ ddr_intercore_eth_data_size = 24*MB;
 
 # C7x 1 Persistent DDR
 c7x_1_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
+c7x_1_ddr_local_heap_non_cacheable_addr_phys  = ddr_mem_addr_hi_phy;
 c7x_1_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_1_ddr_local_heap_addr = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
+c7x_1_ddr_local_heap_addr_phys = c7x_1_ddr_local_heap_non_cacheable_addr_phys + c7x_1_ddr_local_heap_non_cacheable_size;
 c7x_1_ddr_local_heap_size = 64*MB;
+total_c7x_1_local_ddr = c7x_1_ddr_local_heap_non_cacheable_size + c7x_1_ddr_local_heap_size;
+
 # C7x 1 Scratch DDR
-c7x_1_ddr_scratch_non_cacheable_addr     = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
-c7x_1_ddr_scratch_non_cacheable_size     = 64*MB;
+c7x_1_ddr_scratch_non_cacheable_addr      = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
+c7x_1_ddr_scratch_non_cacheable_addr_phys = c7x_1_ddr_local_heap_addr_phys + c7x_1_ddr_local_heap_size;
+c7x_1_ddr_scratch_non_cacheable_size      = 64*MB;
 c7x_1_ddr_scratch_addr = c7x_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
+c7x_1_ddr_scratch_addr_phys = c7x_1_ddr_scratch_non_cacheable_addr_phys + c7x_1_ddr_scratch_non_cacheable_size;
 c7x_1_ddr_scratch_size = 64*MB;
+total_c7x_1_scratch_ddr = c7x_1_ddr_scratch_non_cacheable_size + c7x_1_ddr_scratch_size
+
+total_c7x_1_ddr = total_c7x_1_local_ddr + total_c7x_1_scratch_ddr
 
 # C7x 2 Persistent DDR
-c7x_2_ddr_local_heap_non_cacheable_addr  = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
+c7x_2_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
+c7x_2_ddr_local_heap_non_cacheable_addr_phys  = c7x_1_ddr_scratch_addr_phys + c7x_1_ddr_scratch_size;
 c7x_2_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_2_ddr_local_heap_addr = c7x_2_ddr_local_heap_non_cacheable_addr + c7x_2_ddr_local_heap_non_cacheable_size;
+c7x_2_ddr_local_heap_addr_phys = c7x_2_ddr_local_heap_non_cacheable_addr_phys + c7x_2_ddr_local_heap_non_cacheable_size;
 c7x_2_ddr_local_heap_size = 64*MB;
+total_c7x_2_local_ddr = c7x_2_ddr_local_heap_non_cacheable_size + c7x_2_ddr_local_heap_size
+
 # C7x 2 Scratch DDR
 c7x_2_ddr_scratch_non_cacheable_addr     = c7x_2_ddr_local_heap_addr + c7x_2_ddr_local_heap_size;
+c7x_2_ddr_scratch_non_cacheable_addr_phys     = c7x_2_ddr_local_heap_addr_phys + c7x_2_ddr_local_heap_size;
 c7x_2_ddr_scratch_non_cacheable_size     = 64*MB;
 c7x_2_ddr_scratch_addr = c7x_2_ddr_scratch_non_cacheable_addr + c7x_2_ddr_scratch_non_cacheable_size;
+c7x_2_ddr_scratch_addr_phys = c7x_2_ddr_scratch_non_cacheable_addr_phys + c7x_2_ddr_scratch_non_cacheable_size;
 c7x_2_ddr_scratch_size = 64*MB;
+total_c7x_2_scratch_ddr = c7x_2_ddr_scratch_non_cacheable_size + c7x_2_ddr_scratch_size
+
+total_c7x_2_ddr = total_c7x_2_local_ddr + total_c7x_2_scratch_ddr
 
 # C7x 3 Persistent DDR
-c7x_3_ddr_local_heap_non_cacheable_addr  = c7x_2_ddr_scratch_addr + c7x_2_ddr_scratch_size;
+c7x_3_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
+c7x_3_ddr_local_heap_non_cacheable_addr_phys  = c7x_2_ddr_scratch_addr_phys + c7x_2_ddr_scratch_size;
 c7x_3_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_3_ddr_local_heap_addr = c7x_3_ddr_local_heap_non_cacheable_addr + c7x_3_ddr_local_heap_non_cacheable_size;
+c7x_3_ddr_local_heap_addr_phys = c7x_3_ddr_local_heap_non_cacheable_addr_phys + c7x_3_ddr_local_heap_non_cacheable_size;
 c7x_3_ddr_local_heap_size = 64*MB;
+total_c7x_3_local_ddr = c7x_3_ddr_local_heap_non_cacheable_size + c7x_3_ddr_local_heap_size
 # C7x 3 Scratch DDR
 c7x_3_ddr_scratch_non_cacheable_addr     = c7x_3_ddr_local_heap_addr + c7x_3_ddr_local_heap_size;
+c7x_3_ddr_scratch_non_cacheable_addr_phys     = c7x_3_ddr_local_heap_addr_phys + c7x_3_ddr_local_heap_size;
 c7x_3_ddr_scratch_non_cacheable_size     = 64*MB;
 c7x_3_ddr_scratch_addr = c7x_3_ddr_scratch_non_cacheable_addr + c7x_3_ddr_scratch_non_cacheable_size;
+c7x_3_ddr_scratch_addr_phys = c7x_3_ddr_scratch_non_cacheable_addr_phys + c7x_3_ddr_scratch_non_cacheable_size;
 c7x_3_ddr_scratch_size = 64*MB;
+total_c7x_3_scratch_ddr = c7x_3_ddr_scratch_non_cacheable_size + c7x_3_ddr_scratch_size
+
+total_c7x_3_ddr = total_c7x_3_local_ddr + total_c7x_3_scratch_ddr
 
 # C7x 4 Persistent DDR
-c7x_4_ddr_local_heap_non_cacheable_addr  = c7x_3_ddr_scratch_addr + c7x_3_ddr_scratch_size;
+c7x_4_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
+c7x_4_ddr_local_heap_non_cacheable_addr_phys  = c7x_3_ddr_scratch_addr_phys + c7x_3_ddr_scratch_size;
 c7x_4_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_4_ddr_local_heap_addr = c7x_4_ddr_local_heap_non_cacheable_addr + c7x_4_ddr_local_heap_non_cacheable_size;
+c7x_4_ddr_local_heap_addr_phys = c7x_4_ddr_local_heap_non_cacheable_addr_phys + c7x_4_ddr_local_heap_non_cacheable_size;
 c7x_4_ddr_local_heap_size = 64*MB;
+total_c7x_4_local_ddr = c7x_4_ddr_local_heap_non_cacheable_size + c7x_4_ddr_local_heap_size
 # C7x 4 Scratch DDR
 c7x_4_ddr_scratch_non_cacheable_addr     = c7x_4_ddr_local_heap_addr + c7x_4_ddr_local_heap_size;
+c7x_4_ddr_scratch_non_cacheable_addr_phys     = c7x_4_ddr_local_heap_addr_phys + c7x_4_ddr_local_heap_size;
 c7x_4_ddr_scratch_non_cacheable_size     = 64*MB;
 c7x_4_ddr_scratch_addr = c7x_4_ddr_scratch_non_cacheable_addr + c7x_4_ddr_scratch_non_cacheable_size;
+c7x_4_ddr_scratch_addr_phys = c7x_4_ddr_scratch_non_cacheable_addr_phys + c7x_4_ddr_scratch_non_cacheable_size;
 c7x_4_ddr_scratch_size = 64*MB;
+total_c7x_4_scratch_ddr = c7x_4_ddr_scratch_non_cacheable_size + c7x_4_ddr_scratch_size
+
+total_c7x_4_ddr = total_c7x_4_local_ddr + total_c7x_4_scratch_ddr
+
+total_c7x_ddr = total_c7x_1_ddr + total_c7x_2_ddr + total_c7x_3_ddr + total_c7x_4_ddr
 
 #
 # Create memory section based on addr and size defined above, including
@@ -361,8 +397,6 @@ mcu_r5f_tcmb0        = MemSection("R5F_TCMB0", "RWIX", 0x41010040, (32*KB) - (KB
 # MSMC memory sections
 mpu1_msmc   = MemSection("MSMC_MPU1", "RWIX", mpu1_msmc_addr  , mpu1_msmc_size  , "MSMC reserved for MPU1 for ATF");
 dmsc_msmc  = MemSection("MSMC_DMSC", "RWIX", dmsc_msmc_addr  , dmsc_msmc_size  , "MSMC reserved for DMSC IPC");
-
-#TODO: MSMC for C7X-3/C7X-4
 
 # C7x L1/L2 memory sections
 c7x_1_l2   = MemSection("L2RAM_C7x_1", "RWIX", c7x_1_l2_addr  , c7x_1_l2_size  , "L2 for C7x_1");
@@ -471,10 +505,14 @@ c7x_1_ddr_ipc             = MemSection("DDR_C7x_1_IPC", "RWIX", c7x_1_ddr_ipc_ad
 c7x_1_ddr_ipc.setDtsName("vision_apps_c71_0_dma_memory_region", "vision-apps-c71-dma-memory");
 c7x_1_ddr_resource_table  = MemSection("DDR_C7x_1_RESOURCE_TABLE", "RWIX", c7x_1_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_1 for Linux resource table");
 c7x_1_ddr                 = MemSection("DDR_C7x_1", "RWIX", c7x_1_ddr_addr, c7x_1_ddr_size, "DDR for C7x_1 for code/data");
-c7x_1_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr, c7x_1_ddr_local_heap_non_cacheable_size, "Non-cacheable DDR for c7x_1 for local heap");
-c7x_1_ddr_local_heap      = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_addr, c7x_1_ddr_local_heap_size, "Cacheable DDR for c7x_1 for local heap");
-c7x_1_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_1_SCRATCH_NON_CACHEABLE", "RWIX", c7x_1_ddr_scratch_non_cacheable_addr, c7x_1_ddr_scratch_non_cacheable_size, "Non-cacheable DDR for c7x_1 for Scratch Memory");
-c7x_1_ddr_scratch         = MemSection("DDR_C7X_1_SCRATCH", "RWIX", c7x_1_ddr_scratch_addr, c7x_1_ddr_scratch_size, "Cacheabe DDR for c7x_1 for Scratch Memory");
+c7x_1_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr, c7x_1_ddr_local_heap_non_cacheable_size, "Virtual address of non-cacheable DDR for c7x_1 for local heap");
+c7x_1_ddr_local_heap_non_cacheable_phys = MemSection("DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr_phys, c7x_1_ddr_local_heap_non_cacheable_size, "Physical address of non-cacheable DDR for c7x_1 for local heap");
+c7x_1_ddr_local_heap      = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_addr, c7x_1_ddr_local_heap_size, "Virtual address of cacheable DDR for c7x_1 for local heap");
+c7x_1_ddr_local_heap_phys = MemSection("DDR_C7X_1_LOCAL_HEAP_PHYS", "RWIX", c7x_1_ddr_local_heap_addr_phys, c7x_1_ddr_local_heap_size, "Physical address of cacheable DDR for c7x_1 for local heap");
+c7x_1_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_1_SCRATCH_NON_CACHEABLE", "RWIX", c7x_1_ddr_scratch_non_cacheable_addr, c7x_1_ddr_scratch_non_cacheable_size, "Virtual address of non-cacheable DDR for c7x_1 for Scratch Memory");
+c7x_1_ddr_scratch_non_cacheable_phys    = MemSection("DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS", "RWIX", c7x_1_ddr_scratch_non_cacheable_addr_phys, c7x_1_ddr_scratch_non_cacheable_size, "Physical address of non-cacheable DDR for c7x_1 for Scratch Memory");
+c7x_1_ddr_scratch         = MemSection("DDR_C7X_1_SCRATCH", "RWIX", c7x_1_ddr_scratch_addr, c7x_1_ddr_scratch_size, "Virtual address of cacheable DDR for c7x_1 for Scratch Memory");
+c7x_1_ddr_scratch_phys    = MemSection("DDR_C7X_1_SCRATCH_PHYS", "RWIX", c7x_1_ddr_scratch_addr_phys, c7x_1_ddr_scratch_size, "Physical address of cacheable DDR for c7x_1 for Scratch Memory");
 c7x_1_ddr_total           = MemSection("DDR_C7x_1_DTS", "", 0, 0, "DDR for C7x_1 for all sections, used for reserving memory in DTS file");
 c7x_1_ddr_total.concat(c7x_1_ddr_resource_table);
 c7x_1_ddr_total.concat(c7x_1_ddr);
@@ -484,10 +522,14 @@ c7x_2_ddr_ipc             = MemSection("DDR_C7x_2_IPC", "RWIX", c7x_2_ddr_ipc_ad
 c7x_2_ddr_ipc.setDtsName("vision_apps_c71_1_dma_memory_region", "vision-apps-c71_1-dma-memory");
 c7x_2_ddr_resource_table  = MemSection("DDR_C7x_2_RESOURCE_TABLE", "RWIX", c7x_2_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_2 for Linux resource table");
 c7x_2_ddr                 = MemSection("DDR_C7x_2", "RWIX", c7x_2_ddr_addr, c7x_2_ddr_size, "DDR for C7x_2 for code/data");
-c7x_2_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_2_ddr_local_heap_non_cacheable_addr, c7x_2_ddr_local_heap_non_cacheable_size, "Non-cacheable DDR for c7x_2 for local heap");
-c7x_2_ddr_local_heap      = MemSection("DDR_C7X_2_LOCAL_HEAP", "RWIX", c7x_2_ddr_local_heap_addr, c7x_2_ddr_local_heap_size, "Cacheable DDR for c7x_2 for local heap");
-c7x_2_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_2_SCRATCH_NON_CACHEABLE", "RWIX", c7x_2_ddr_scratch_non_cacheable_addr, c7x_2_ddr_scratch_non_cacheable_size, "Non-cacheable DDR for c7x_2 for Scratch Memory");
-c7x_2_ddr_scratch         = MemSection("DDR_C7X_2_SCRATCH", "RWIX", c7x_2_ddr_scratch_addr, c7x_2_ddr_scratch_size, "Cacheabe DDR for c7x_2 for Scratch Memory");
+c7x_2_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_2_ddr_local_heap_non_cacheable_addr, c7x_2_ddr_local_heap_non_cacheable_size, "Virtual address of Non-cacheable DDR for c7x_2 for local heap");
+c7x_2_ddr_local_heap_non_cacheable_phys = MemSection("DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS", "RWIX", c7x_2_ddr_local_heap_non_cacheable_addr_phys, c7x_2_ddr_local_heap_non_cacheable_size, "Non-cacheable DDR for c7x_2 for local heap");
+c7x_2_ddr_local_heap      = MemSection("DDR_C7X_2_LOCAL_HEAP", "RWIX", c7x_2_ddr_local_heap_addr, c7x_2_ddr_local_heap_size, "Virtual address of Cacheable DDR for c7x_2 for local heap");
+c7x_2_ddr_local_heap_phys      = MemSection("DDR_C7X_2_LOCAL_HEAP_PHYS", "RWIX", c7x_2_ddr_local_heap_addr_phys, c7x_2_ddr_local_heap_size, "Physical address of Cacheable DDR for c7x_2 for local heap");
+c7x_2_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_2_SCRATCH_NON_CACHEABLE", "RWIX", c7x_2_ddr_scratch_non_cacheable_addr, c7x_2_ddr_scratch_non_cacheable_size, "Virtual address of Non-cacheable DDR for c7x_2 for Scratch Memory");
+c7x_2_ddr_scratch_non_cacheable_phys    = MemSection("DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS", "RWIX", c7x_2_ddr_scratch_non_cacheable_addr_phys, c7x_2_ddr_scratch_non_cacheable_size, "Physical address of Non-cacheable DDR for c7x_2 for Scratch Memory");
+c7x_2_ddr_scratch         = MemSection("DDR_C7X_2_SCRATCH", "RWIX", c7x_2_ddr_scratch_addr, c7x_2_ddr_scratch_size, "Virtual address of cacheable DDR for c7x_2 for Scratch Memory");
+c7x_2_ddr_scratch_phys    = MemSection("DDR_C7X_2_SCRATCH_PHYS", "RWIX", c7x_2_ddr_scratch_addr_phys, c7x_2_ddr_scratch_size, "Physical address of cacheable DDR for c7x_2 for Scratch Memory");
 c7x_2_ddr_total           = MemSection("DDR_C7x_2_DTS", "", 0, 0, "DDR for C7x_2 for all sections, used for reserving memory in DTS file");
 c7x_2_ddr_total.concat(c7x_2_ddr_resource_table);
 c7x_2_ddr_total.concat(c7x_2_ddr);
@@ -497,10 +539,14 @@ c7x_3_ddr_ipc             = MemSection("DDR_C7x_3_IPC", "RWIX", c7x_3_ddr_ipc_ad
 c7x_3_ddr_ipc.setDtsName("vision_apps_c71_2_dma_memory_region", "vision-apps-c71_2-dma-memory");
 c7x_3_ddr_resource_table  = MemSection("DDR_C7x_3_RESOURCE_TABLE", "RWIX", c7x_3_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_3 for Linux resource table");
 c7x_3_ddr                 = MemSection("DDR_C7x_3", "RWIX", c7x_3_ddr_addr, c7x_3_ddr_size, "DDR for C7x_3 for code/data");
-c7x_3_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_3_ddr_local_heap_non_cacheable_addr, c7x_3_ddr_local_heap_non_cacheable_size, "Non-cacheable DDR for c7x_3 for local heap");
-c7x_3_ddr_local_heap      = MemSection("DDR_C7X_3_LOCAL_HEAP", "RWIX", c7x_3_ddr_local_heap_addr, c7x_3_ddr_local_heap_size, "Cacheable DDR for c7x_3 for local heap");
-c7x_3_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_3_SCRATCH_NON_CACHEABLE", "RWIX", c7x_3_ddr_scratch_non_cacheable_addr, c7x_3_ddr_scratch_non_cacheable_size, "Non-cacheable DDR for c7x_3 for Scratch Memory");
-c7x_3_ddr_scratch         = MemSection("DDR_C7X_3_SCRATCH", "RWIX", c7x_3_ddr_scratch_addr, c7x_3_ddr_scratch_size, "Cacheabe DDR for c7x_3 for Scratch Memory");
+c7x_3_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_3_ddr_local_heap_non_cacheable_addr, c7x_3_ddr_local_heap_non_cacheable_size, "Virtual address of Non-cacheable DDR for c7x_3 for local heap");
+c7x_3_ddr_local_heap_non_cacheable_phys = MemSection("DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS", "RWIX", c7x_3_ddr_local_heap_non_cacheable_addr_phys, c7x_3_ddr_local_heap_non_cacheable_size, "Physical address of Non-cacheable DDR for c7x_3 for local heap");
+c7x_3_ddr_local_heap      = MemSection("DDR_C7X_3_LOCAL_HEAP", "RWIX", c7x_3_ddr_local_heap_addr, c7x_3_ddr_local_heap_size, "Virtual address of Cacheable DDR for c7x_3 for local heap");
+c7x_3_ddr_local_heap_phys = MemSection("DDR_C7X_3_LOCAL_HEAP_PHYS", "RWIX", c7x_3_ddr_local_heap_addr_phys, c7x_3_ddr_local_heap_size, "Physical address of Cacheable DDR for c7x_3 for local heap");
+c7x_3_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_3_SCRATCH_NON_CACHEABLE", "RWIX", c7x_3_ddr_scratch_non_cacheable_addr, c7x_3_ddr_scratch_non_cacheable_size, "Virtual address of Non-cacheable DDR for c7x_3 for Scratch Memory");
+c7x_3_ddr_scratch_non_cacheable_phys    = MemSection("DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS", "RWIX", c7x_3_ddr_scratch_non_cacheable_addr_phys, c7x_3_ddr_scratch_non_cacheable_size, "Physical address of Non-cacheable DDR for c7x_3 for Scratch Memory");
+c7x_3_ddr_scratch         = MemSection("DDR_C7X_3_SCRATCH", "RWIX", c7x_3_ddr_scratch_addr, c7x_3_ddr_scratch_size, "Virtual address of cacheable DDR for c7x_3 for Scratch Memory");
+c7x_3_ddr_scratch_phys    = MemSection("DDR_C7X_3_SCRATCH_PHYS", "RWIX", c7x_3_ddr_scratch_addr_phys, c7x_3_ddr_scratch_size, "Physical address of cacheable DDR for c7x_3 for Scratch Memory");
 c7x_3_ddr_total           = MemSection("DDR_C7x_3_DTS", "", 0, 0, "DDR for C7x_3 for all sections, used for reserving memory in DTS file");
 c7x_3_ddr_total.concat(c7x_3_ddr_resource_table);
 c7x_3_ddr_total.concat(c7x_3_ddr);
@@ -510,10 +556,14 @@ c7x_4_ddr_ipc             = MemSection("DDR_C7x_4_IPC", "RWIX", c7x_4_ddr_ipc_ad
 c7x_4_ddr_ipc.setDtsName("vision_apps_c71_3_dma_memory_region", "vision-apps-c71_3-dma-memory");
 c7x_4_ddr_resource_table  = MemSection("DDR_C7x_4_RESOURCE_TABLE", "RWIX", c7x_4_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_4 for Linux resource table");
 c7x_4_ddr                 = MemSection("DDR_C7x_4", "RWIX", c7x_4_ddr_addr, c7x_4_ddr_size, "DDR for C7x_4 for code/data");
-c7x_4_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_4_ddr_local_heap_non_cacheable_addr, c7x_4_ddr_local_heap_non_cacheable_size, "Non-cacheable DDR for c7x_4 for local heap");
-c7x_4_ddr_local_heap      = MemSection("DDR_C7X_4_LOCAL_HEAP", "RWIX", c7x_4_ddr_local_heap_addr, c7x_4_ddr_local_heap_size, "Cacheable DDR for c7x_4 for local heap");
-c7x_4_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_4_SCRATCH_NON_CACHEABLE", "RWIX", c7x_4_ddr_scratch_non_cacheable_addr, c7x_4_ddr_scratch_non_cacheable_size, "Non-cacheable DDR for c7x_4 for Scratch Memory");
-c7x_4_ddr_scratch         = MemSection("DDR_C7X_4_SCRATCH", "RWIX", c7x_4_ddr_scratch_addr, c7x_4_ddr_scratch_size, "Cacheabe DDR for c7x_4 for Scratch Memory");
+c7x_4_ddr_local_heap_non_cacheable = MemSection("DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_4_ddr_local_heap_non_cacheable_addr, c7x_4_ddr_local_heap_non_cacheable_size, "Virtual address of Non-cacheable DDR for c7x_4 for local heap");
+c7x_4_ddr_local_heap_non_cacheable_phys = MemSection("DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS", "RWIX", c7x_4_ddr_local_heap_non_cacheable_addr_phys, c7x_4_ddr_local_heap_non_cacheable_size, "Physical address of Non-cacheable DDR for c7x_4 for local heap physical addr");
+c7x_4_ddr_local_heap      = MemSection("DDR_C7X_4_LOCAL_HEAP", "RWIX", c7x_4_ddr_local_heap_addr, c7x_4_ddr_local_heap_size, "Virtual address of Cacheable DDR for c7x_4 for local heap");
+c7x_4_ddr_local_heap_phys      = MemSection("DDR_C7X_4_LOCAL_HEAP_PHYS", "RWIX", c7x_4_ddr_local_heap_addr_phys, c7x_4_ddr_local_heap_size, "Physical address of Cacheable DDR for c7x_4 for local heap");
+c7x_4_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_4_SCRATCH_NON_CACHEABLE", "RWIX", c7x_4_ddr_scratch_non_cacheable_addr, c7x_4_ddr_scratch_non_cacheable_size, "Virtual address of Non-cacheable DDR for c7x_4 for Scratch Memory");
+c7x_4_ddr_scratch_non_cacheable_phys    = MemSection("DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS", "RWIX", c7x_4_ddr_scratch_non_cacheable_addr_phys, c7x_4_ddr_scratch_non_cacheable_size, "Physical address of Non-cacheable DDR for c7x_4 for Scratch Memory");
+c7x_4_ddr_scratch         = MemSection("DDR_C7X_4_SCRATCH", "RWIX", c7x_4_ddr_scratch_addr, c7x_4_ddr_scratch_size, "Virtual address of cacheable DDR for c7x_4 for Scratch Memory");
+c7x_4_ddr_scratch_phys    = MemSection("DDR_C7X_4_SCRATCH_PHYS", "RWIX", c7x_4_ddr_scratch_addr_phys, c7x_4_ddr_scratch_size, "Physical address of cacheable DDR for c7x_4 for Scratch Memory");
 c7x_4_ddr_total           = MemSection("DDR_C7x_4_DTS", "", 0, 0, "DDR for C7x_4 for all sections, used for reserving memory in DTS file");
 c7x_4_ddr_total.concat(c7x_4_ddr_resource_table);
 c7x_4_ddr_total.concat(c7x_4_ddr);
@@ -550,7 +600,7 @@ vision_apps_core_heaps_lo.concat(mcu4_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu4_1_ddr_local_heap);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
 
-c7x_ddr_local_heap_phy  = MemSection("DDR_C7X_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, ((c7x_4_ddr_scratch_addr + c7x_4_ddr_scratch_size)-ddr_mem_addr_hi), "DDR for c7x-1 thru c7x-4 for local heap and scratch");
+c7x_ddr_local_heap_phy  = MemSection("DDR_C7X_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, total_c7x_ddr, "DDR for c7x-1 thru c7x-4 for local heap and scratch");
 
 vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
 vision_apps_core_heaps_hi.concat(c7x_ddr_local_heap_phy);
@@ -888,21 +938,37 @@ c_header_mmap.addMemSection( mcu3_1_ddr_local_heap);
 c_header_mmap.addMemSection( mcu4_0_ddr_local_heap);
 c_header_mmap.addMemSection( mcu4_1_ddr_local_heap);
 c_header_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable);
+c_header_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_1_ddr_local_heap);
+c_header_mmap.addMemSection( c7x_1_ddr_local_heap_phys);
 c_header_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable);
+c_header_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_1_ddr_scratch);
+c_header_mmap.addMemSection( c7x_1_ddr_scratch_phys);
 c_header_mmap.addMemSection( c7x_2_ddr_local_heap_non_cacheable);
+c_header_mmap.addMemSection( c7x_2_ddr_local_heap_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_2_ddr_local_heap);
+c_header_mmap.addMemSection( c7x_2_ddr_local_heap_phys);
 c_header_mmap.addMemSection( c7x_2_ddr_scratch_non_cacheable);
+c_header_mmap.addMemSection( c7x_2_ddr_scratch_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_2_ddr_scratch);
+c_header_mmap.addMemSection( c7x_2_ddr_scratch_phys);
 c_header_mmap.addMemSection( c7x_3_ddr_local_heap_non_cacheable);
+c_header_mmap.addMemSection( c7x_3_ddr_local_heap_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_3_ddr_local_heap);
+c_header_mmap.addMemSection( c7x_3_ddr_local_heap_phys);
 c_header_mmap.addMemSection( c7x_3_ddr_scratch_non_cacheable);
+c_header_mmap.addMemSection( c7x_3_ddr_scratch_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_3_ddr_scratch);
+c_header_mmap.addMemSection( c7x_3_ddr_scratch_phys);
 c_header_mmap.addMemSection( c7x_4_ddr_local_heap_non_cacheable);
+c_header_mmap.addMemSection( c7x_4_ddr_local_heap_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_4_ddr_local_heap);
+c_header_mmap.addMemSection( c7x_4_ddr_local_heap_phys);
 c_header_mmap.addMemSection( c7x_4_ddr_scratch_non_cacheable);
+c_header_mmap.addMemSection( c7x_4_ddr_scratch_non_cacheable_phys);
 c_header_mmap.addMemSection( c7x_4_ddr_scratch);
+c_header_mmap.addMemSection( c7x_4_ddr_scratch_phys);
 c_header_mmap.addMemSection( tiovx_log_rt_mem );
 c_header_mmap.addMemSection( app_log_mem        );
 c_header_mmap.addMemSection( tiovx_obj_desc_mem );

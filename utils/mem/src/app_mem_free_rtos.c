@@ -86,6 +86,7 @@
 
 #if defined(__C7100__) || defined(__C7120__)
 
+#if defined(SOC_J721S2) || defined(SOC_J721E)
 /* Offset to be added to convert virtual address to physical address */
 #define VIRT_PHY_ADDR_OFFSET (DDR_64BIT_BASE_PADDR - DDR_64BIT_BASE_VADDR)
 
@@ -102,6 +103,11 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
 
   return phyAddr;
 }
+#elif defined(SOC_J784S4)
+extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData);
+#endif
 #elif defined(__C7504__)
 /* For AM62A max DDR size assumed is 2GB which falls within the 32-bit range */
 /* This routine should be implemented if addition memory above 2GB is added */

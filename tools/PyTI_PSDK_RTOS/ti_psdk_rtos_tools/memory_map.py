@@ -151,6 +151,8 @@ class MemoryMap :
                     (memSection.name == "L2RAM_C66x_1" and curMemSection.name == "L2RAM_C66x_2") or
                     (memSection.name == "L2RAM_C66x_2" and curMemSection.name == "L2RAM_C66x_1") ):
                     continue;
+                if (memSection.origin >= 0x100000000):
+                    continue;
                 start_addr = memSection.origin;
                 end_addr = start_addr + memSection.length;
                 if(cur_start_addr >= start_addr and cur_start_addr < end_addr) :

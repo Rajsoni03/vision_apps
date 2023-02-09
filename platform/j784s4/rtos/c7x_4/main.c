@@ -87,21 +87,6 @@
 /* For J7ES/J721E/TDA4VM the upper 2GB DDR starts from 0x0008_8000_0000 */
 /* This address is mapped to a virtual address of 0x0001_0000_0000 */
 
-/* Cacheable memories*/
-#define DDR_C7X_4_LOCAL_HEAP_VADDR (DDR_C7X_4_LOCAL_HEAP_ADDR)
-#define DDR_C7X_4_LOCAL_HEAP_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_LOCAL_HEAP_ADDR - DDR_64BIT_BASE_VADDR))
-
-#define DDR_C7X_4_SCRATCH_VADDR    (DDR_C7X_4_SCRATCH_ADDR)
-#define DDR_C7X_4_SCRATCH_PADDR    (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_SCRATCH_ADDR - DDR_64BIT_BASE_VADDR))
-
-/* Non-cacheable memories*/
-#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_VADDR (DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR)
-#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PADDR (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR - DDR_64BIT_BASE_VADDR))
-
-#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_VADDR    (DDR_C7X_4_SCRATCH_NON_CACHEABLE_ADDR)
-#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_PADDR    (DDR_64BIT_BASE_PADDR + (DDR_C7X_4_SCRATCH_NON_CACHEABLE_ADDR - DDR_64BIT_BASE_VADDR))
-
-
 static void appMain(void* arg0, void* arg1)
 {
     appInit();
@@ -282,13 +267,13 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_VADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_4_SCRATCH_NON_CACHEABLE_VADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_PADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_4_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
@@ -341,13 +326,13 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_4_LOCAL_HEAP_VADDR, DDR_C7X_4_LOCAL_HEAP_PADDR, DDR_C7X_4_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_4_LOCAL_HEAP_ADDR, DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_4_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_4_SCRATCH_VADDR, DDR_C7X_4_SCRATCH_PADDR, DDR_C7X_4_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_C7X_4_SCRATCH_ADDR, DDR_C7X_4_SCRATCH_PHYS_ADDR, DDR_C7X_4_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
@@ -435,3 +420,19 @@ void InitMmu(void)
     appCacheInit();
 }
 
+/* Offset to be added to convert virutal address to physical address */
+#define VIRT_PHY_ADDR_OFFSET (DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR - DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR)
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+  uint64_t phyAddr = (uint64_t)virtAddr;
+
+  if ((uint64_t)virtAddr >= DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR)
+  {
+    phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
+  }
+
+  return phyAddr;
+}
