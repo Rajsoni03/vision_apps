@@ -198,15 +198,17 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
         sensorObj->num_cameras_enabled = 0;
         while(sensorObj->num_cameras_enabled == 0)
         {
+            int ret;
+            int num_cameras;
             fflush(stdin);
             printf("Max number of cameras supported by sensor %s = %d \n", sensorObj->sensor_name, sensorObj->sensorParams.num_channels);
             printf("Please enter number of cameras to be enabled \n");
-            ch = getchar();
-            sensorObj->num_cameras_enabled = ch - '0';
-            if((sensorObj->num_cameras_enabled > sensorObj->sensorParams.num_channels) || (sensorObj->num_cameras_enabled <= 0))
+            ret = scanf("%d", &num_cameras);
+            sensorObj->num_cameras_enabled = num_cameras;
+            if( (1==ret) && ((sensorObj->num_cameras_enabled > sensorObj->sensorParams.num_channels) || (sensorObj->num_cameras_enabled <= 0)) )
             {
                 sensorObj->num_cameras_enabled = 0;
-                printf("Invalid selection %c. Try again \n", ch);
+                printf("Invalid selection %d. Try again \n", num_cameras);
             }
         }
         sensorObj->ch_mask = (1<<sensorObj->num_cameras_enabled) - 1;
