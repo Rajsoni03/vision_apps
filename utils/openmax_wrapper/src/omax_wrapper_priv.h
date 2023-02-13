@@ -45,12 +45,10 @@
 #include <pthread.h>
 #include <OMX_Core.h>
 #include <OMX_Component.h>
-#if defined(SOC_J721E)
 #include <OMX_Extension_video_TI.h>
-#else
-#include <OMX_Extension_index_QNX.h>
-#include <OMX_Extension_video_QNX.h>
-#endif /* SOC_J721E */
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
+#include <OMX_Extension_index_TI.h>
+#endif /* SOC_J721S2 or SOC_J784S4 */
 
 #include <utils/openmax_wrapper/include/omax_wrapper.h>
 

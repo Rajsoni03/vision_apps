@@ -1,6 +1,6 @@
-if [[ -f /ti_fs/vision_apps/test_data/psdkra/app_multi_cam_codec/TI_Custom_1920x1080_5secs.264 ]]
+if [[ -f /opt/vision_apps/test_data/psdkra/app_multi_cam_codec/TI_Custom_1920x1080_5secs.264 ]]
 then
-    cp /ti_fs/vision_apps/test_data/psdkra/app_multi_cam_codec/TI_Custom_1920x1080_5secs.264 /tmp/test_data.264
+    cp /opt/vision_apps/test_data/psdkra/app_multi_cam_codec/TI_Custom_1920x1080_5secs.264 /tmp/test_data.264
 else
     echo "ERROR=> Test Data Not Found"
     exit -1

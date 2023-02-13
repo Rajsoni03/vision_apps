@@ -2284,9 +2284,9 @@ static void app_update_param_set(AppObj *obj)
     {
         /* decoder outputs 16 byte alligned buffers */
         obj->dec_pool.height = 1088;
-#if defined(QNX)
+    #if defined(QNX)
         obj->enc_pool.height = 1088;
-#endif /* QNX */
+    #endif /* QNX */
     }
 #endif /* SOC_J721E */
     obj->enc_pool.plane_sizes[0] = obj->enc_pool.width * obj->enc_pool.height;

@@ -1,6 +1,7 @@
 ifneq ($(TARGET_PLATFORM),PC)
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J784S4 J721S2))
 include $(PRELUDE)
 
 TARGET      := app_utils_omax_wrapper
@@ -21,6 +22,8 @@ IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/tivpucodec/helper
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/tivpucodec/helper/misc
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/tivpucodec/helper/yuv
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/resmgrlib
+
+CFLAGS      += -DCODEC_USE_HIGHMEM
 endif
 ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/khronos/openmaxil/
@@ -29,6 +32,7 @@ endif
 
 include $(FINALE)
 
+endif
 endif
 
 endif
