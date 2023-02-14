@@ -69,6 +69,10 @@
 #include <utils/console_io/include/app_log.h>
 #include <app_mem_map.h>
 
+#if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
+#include <ti/csl/csl_rat.h>
+#endif
+
 #define ENABLE_CACHE_OPS
 
 #if 0
@@ -608,6 +612,70 @@ void appMemC7xCleaninvalidateL2Cache()
     wbinv |= (0x1U << APP_MEM_UMC_L2WBINV_WBINV_SHIFT) & APP_MEM_UMC_L2WBINV_WBINV_MASK;
     appMemC7xSetL2WBINV(wbinv);
     return;
+}
+#endif
+
+#if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
+
+int32_t appMemAddrTranslate(app_mem_rat_prm_t *prm)
+{
+    int32_t status = 0;
+    bool ret = false, availableRatRegion = false;
+    uint32_t maxRegions, i;
+    bool        bIsEnabled;
+    uintptr_t key;
+
+    CSL_RatTranslationCfgInfo translationCfg;
+    CSL_ratRegs *pGTCRatRegs = (CSL_ratRegs *)(CSL_R5FSS0_RAT_CFG_BASE);
+
+    maxRegions = CSL_ratGetMaxRegions(pGTCRatRegs);
+
+    key = HwiP_disable();
+
+    for (i = 0; i < maxRegions; i++)
+    {
+        bIsEnabled = CSL_ratIsRegionTranslationEnabled(pGTCRatRegs,i);
+        if (false == bIsEnabled)
+        {
+            #ifdef APP_MEM_DEBUG
+            appLogPrintf("appMemAddrTranslate(): Using RAT region %d for translation of address : %llx\n", i, prm->translatedAddress);
+            #endif
+            availableRatRegion = (bool)true;
+            break;
+        }
+    }
+
+    if ((bool)true == availableRatRegion)
+    {
+        translationCfg.sizeInBytes       = prm->size;
+        translationCfg.baseAddress       = prm->baseAddress;
+        translationCfg.translatedAddress = prm->translatedAddress;
+
+        ret = CSL_ratConfigRegionTranslation(pGTCRatRegs, i, &translationCfg);
+
+        if(ret == (bool)false)
+        {
+            appLogPrintf("appMemAddrTranslate(): Error in CSL_ratConfigRegionTranslation()\n");
+            status = -1;
+        }
+
+        #ifdef APP_MEM_DEBUG
+        for (i = 0; i < maxRegions; i++)
+        {
+            bIsEnabled = CSL_ratIsRegionTranslationEnabled(pGTCRatRegs,i);
+            appLogPrintf("appMemAddrTranslate(): RAT region %d translation enabled status after OCMC map (0: disabled, 1: enabled): %d\n", i, bIsEnabled);
+        }
+        #endif
+    }
+    else
+    {
+        appLogPrintf("appMemAddrTranslate(): No available RAT regions for mapping\n");
+        status = -1;
+    }
+
+    HwiP_restore(key);
+
+    return status;
 }
 
 #endif

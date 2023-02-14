@@ -68,12 +68,16 @@
 
 
 /* Main OCRAM for MCU2_0 [ size 256.00 KB ] */
-#define MAIN_OCRAM_MCU2_0_ADDR (0x03600000u)
+#define MAIN_OCRAM_MCU2_0_ADDR (0x60000000u)
 #define MAIN_OCRAM_MCU2_0_SIZE (0x00040000u)
 
 /* Main OCRAM for MCU2_1 [ size 256.00 KB ] */
-#define MAIN_OCRAM_MCU2_1_ADDR (0x03640000u)
+#define MAIN_OCRAM_MCU2_1_ADDR (0x60040000u)
 #define MAIN_OCRAM_MCU2_1_SIZE (0x00040000u)
+
+/* Main OCRAM for MCU4_0 [ size 512.00 KB ] */
+#define MAIN_OCRAM_MCU4_0_ADDR (0x60080000u)
+#define MAIN_OCRAM_MCU4_0_SIZE (0x00080000u)
 
 /* L2 for C7x_1 [ size 448.00 KB ] */
 #define L2RAM_C7x_1_ADDR (0x64800000u)
@@ -406,6 +410,18 @@
 /* Physical address of cacheable DDR for c7x_4 for Scratch Memory [ size 128.00 MB ] */
 #define DDR_C7X_4_SCRATCH_PHYS_ADDR (0x8F8000000u)
 #define DDR_C7X_4_SCRATCH_PHYS_SIZE (0x08000000u)
+
+/* Main OCRAM Physical Address for MCU2_0 [ size 256.00 KB ] */
+#define MAIN_OCRAM_MCU2_0_PHYS_ADDR (0x4F02000000u)
+#define MAIN_OCRAM_MCU2_0_PHYS_SIZE (0x00040000u)
+
+/* Main OCRAM Physical Address for MCU2_1 [ size 256.00 KB ] */
+#define MAIN_OCRAM_MCU2_1_PHYS_ADDR (0x4F02040000u)
+#define MAIN_OCRAM_MCU2_1_PHYS_SIZE (0x00040000u)
+
+/* Main OCRAM Physical Address for MCU4_0 [ size 512.00 KB ] */
+#define MAIN_OCRAM_MCU4_0_PHYS_ADDR (0x4F02080000u)
+#define MAIN_OCRAM_MCU4_0_PHYS_SIZE (0x00080000u)
 
 #define DDR_64BIT_BASE_VADDR (0x100000000u)
 #define DDR_64BIT_BASE_PADDR (0x880000000u)

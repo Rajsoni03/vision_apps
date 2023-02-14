@@ -175,6 +175,23 @@ typedef struct {
 
 } app_mem_stats_t;
 
+#if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
+
+/**
+ * \brief This structure contains information required to configure an
+ *          address translation region.
+ */
+typedef struct {
+    /**< The size of the region (in bytes). If this value is not a power-of-2, it is automatically rounded-up to the next power-of-2 size. */
+    uint64_t size;
+    /**< The translated address returned on a successful match */
+    uint64_t translatedAddress;
+    /**< The 32-bit base address used in the address comparison */
+    uint32_t baseAddress;
+} app_mem_rat_prm_t;
+
+#endif
+
 /**
  * \brief Align ptr value to 'align' bytes
  */
@@ -405,6 +422,16 @@ void  appMemCacheWbInv(void *ptr, uint32_t size);
  *
  */
 void appMemPrintMemAllocInfo();
+
+#if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
+
+/**
+ * \brief Print memory allocation from shared memory region
+ *
+ * \param prm [in] Structure of type \ref app_mem_rat_prm_t used for determining translation
+ */
+int32_t appMemAddrTranslate(app_mem_rat_prm_t *prm);
+#endif
 
 /* @} */
 

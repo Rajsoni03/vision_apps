@@ -65,7 +65,7 @@
 
 #include <app_cfg.h>
 
-//#define L3_MEM_SIZE (MAIN_OCRAM_MCU2_1_SIZE)
+#define L3_MEM_SIZE (MAIN_OCRAM_MCU2_1_SIZE)
 
 #define DDR_HEAP_MEM_SIZE               (DDR_MCU2_1_LOCAL_HEAP_SIZE)
 #define ENABLE_FVID2

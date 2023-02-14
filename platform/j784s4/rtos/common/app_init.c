@@ -186,6 +186,10 @@ int32_t appInit()
 
     app_mem_heap_prm_t *heap_prm;
 
+    #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1) || defined(CPU_mcu4_0)
+    app_mem_rat_prm_t mem_rat_prm;
+    #endif
+
     #ifdef ENABLE_IPC
     uint32_t host_os_type;
     void *ipc_resource_table = NULL;
@@ -489,6 +493,27 @@ int32_t appInit()
 
     #ifdef CPU_mcu2_0
     status = appUdmaCsirxCsitxInit();
+    APP_ASSERT_SUCCESS(status);
+    #endif
+    #endif
+
+    #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1) || defined(CPU_mcu4_0)
+    #ifdef L3_MEM_SIZE
+
+    mem_rat_prm.size        = L3_MEM_SIZE;
+
+    #if defined(CPU_mcu2_0)
+    mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU2_0_ADDR;
+    mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU2_0_PHYS_ADDR;
+    #elif defined(CPU_mcu2_1)
+    mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU2_1_ADDR;
+    mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU2_1_PHYS_ADDR;
+    #elif defined(CPU_mcu4_0)
+    mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU4_0_ADDR;
+    mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU4_0_PHYS_ADDR;
+    #endif
+
+    status = appMemAddrTranslate(&mem_rat_prm);
     APP_ASSERT_SUCCESS(status);
     #endif
     #endif

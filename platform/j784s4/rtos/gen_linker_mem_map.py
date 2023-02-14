@@ -121,7 +121,8 @@ ddr_mem_addr_hi = 0x100000000;
 ddr_mem_size_hi = 256*MB;
 
 msmc_mem_addr = 0x70000000;
-main_ocram_mem_addr = 0x03600000;
+main_ocram_mem_addr = 0x60000000; # Note: uses RAT to translate to proper address
+main_ocram_mem_addr_phys = 0x4F02000000;
 
 #
 # Other constant sizes
@@ -187,11 +188,17 @@ c7x_4_msmc_size  = 3*MB;
 #
 # Main OCRAM memory allocation
 #
-mcu2_0_main_ocram_addr = main_ocram_mem_addr;
-mcu2_0_main_ocram_size = 256*KB;
+mcu2_0_main_ocram_addr       = main_ocram_mem_addr;
+mcu2_0_main_ocram_addr_phys  = main_ocram_mem_addr_phys;
+mcu2_0_main_ocram_size       = 256*KB;
 
-mcu2_1_main_ocram_addr = mcu2_0_main_ocram_addr + mcu2_0_main_ocram_size;
-mcu2_1_main_ocram_size = 256*KB;
+mcu2_1_main_ocram_addr       = mcu2_0_main_ocram_addr + mcu2_0_main_ocram_size;
+mcu2_1_main_ocram_addr_phys  = mcu2_0_main_ocram_addr_phys + mcu2_0_main_ocram_size;
+mcu2_1_main_ocram_size       = 256*KB;
+
+mcu4_0_main_ocram_addr       = mcu2_1_main_ocram_addr + mcu2_1_main_ocram_size;
+mcu4_0_main_ocram_addr_phys  = mcu2_1_main_ocram_addr_phys + mcu2_1_main_ocram_size;
+mcu4_0_main_ocram_size       = 512*KB;
 
 #
 # DDR memory allocation for various CPUs
@@ -442,7 +449,11 @@ c7x_4_msmc  = MemSection("MSMC_C7x_4", "RWIX", c7x_4_msmc_addr  , c7x_4_msmc_siz
 # Main OCRAM memory sections
 mcu2_0_main_ocram   = MemSection("MAIN_OCRAM_MCU2_0", "RWIX", mcu2_0_main_ocram_addr  , mcu2_0_main_ocram_size  , "Main OCRAM for MCU2_0");
 mcu2_1_main_ocram   = MemSection("MAIN_OCRAM_MCU2_1", "RWIX", mcu2_1_main_ocram_addr  , mcu2_1_main_ocram_size  , "Main OCRAM for MCU2_1");
+mcu4_0_main_ocram   = MemSection("MAIN_OCRAM_MCU4_0", "RWIX", mcu4_0_main_ocram_addr  , mcu4_0_main_ocram_size  , "Main OCRAM for MCU4_0");
 
+mcu2_0_main_ocram_phys   = MemSection("MAIN_OCRAM_MCU2_0_PHYS", "RWIX", mcu2_0_main_ocram_addr_phys  , mcu2_0_main_ocram_size  , "Main OCRAM Physical Address for MCU2_0");
+mcu2_1_main_ocram_phys   = MemSection("MAIN_OCRAM_MCU2_1_PHYS", "RWIX", mcu2_1_main_ocram_addr_phys  , mcu2_1_main_ocram_size  , "Main OCRAM Physical Address for MCU2_1");
+mcu4_0_main_ocram_phys   = MemSection("MAIN_OCRAM_MCU4_0_PHYS", "RWIX", mcu4_0_main_ocram_addr_phys  , mcu4_0_main_ocram_size  , "Main OCRAM Physical Address for MCU4_0");
 
 # CPU code/data memory sections in DDR
 mcu1_0_ddr_ipc             = MemSection("DDR_MCU1_0_IPC", "RWIX", mcu1_0_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for MCU1_0 for Linux IPC");
@@ -769,6 +780,7 @@ mcu4_0_mmap.addMemSection( tiovx_obj_desc_mem );
 mcu4_0_mmap.addMemSection( ipc_vring_mem      );
 mcu4_0_mmap.addMemSection( mcu4_0_ddr_local_heap  );
 mcu4_0_mmap.addMemSection( ddr_shared_mem     );
+mcu2_1_mmap.addMemSection( mcu4_0_main_ocram );
 mcu4_0_mmap.checkOverlap();
 
 mcu4_1_mmap = MemoryMap("mcu4_1");
@@ -959,6 +971,7 @@ html_mmap.addMemSection( ddr_shared_mem     );
 html_mmap.addMemSection( tiovx_log_rt_mem );
 html_mmap.addMemSection( mcu2_0_main_ocram );
 html_mmap.addMemSection( mcu2_1_main_ocram );
+html_mmap.addMemSection( mcu4_0_main_ocram );
 html_mmap.addMemSection( intercore_eth_desc_mem );
 html_mmap.addMemSection( intercore_eth_data_mem );
 html_mmap.checkOverlap();
@@ -1052,6 +1065,10 @@ c_header_mmap.addMemSection( c7x_3_msmc         );
 c_header_mmap.addMemSection( c7x_4_msmc         );
 c_header_mmap.addMemSection( mcu2_0_main_ocram  );
 c_header_mmap.addMemSection( mcu2_1_main_ocram  );
+c_header_mmap.addMemSection( mcu4_0_main_ocram  );
+c_header_mmap.addMemSection( mcu2_0_main_ocram_phys  );
+c_header_mmap.addMemSection( mcu2_1_main_ocram_phys  );
+c_header_mmap.addMemSection( mcu4_0_main_ocram_phys  );
 c_header_mmap.addMemSection( intercore_eth_desc_mem  );
 c_header_mmap.addMemSection( intercore_eth_data_mem  );
 c_header_mmap.checkOverlap();

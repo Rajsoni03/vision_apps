@@ -70,10 +70,10 @@ MEMORY
     R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000040
     /* R5F_TCMA [ size 31.94 KB ] */
     R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x00007FC0
-    /* Main OCRAM for MCU2_0 [ size 256.00 KB ] */
-    MAIN_OCRAM_MCU2_0        ( RWIX ) : ORIGIN = 0x03600000 , LENGTH = 0x00040000
     /* R5F_TCMB0 [ size 32.00 KB ] */
     R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00008000
+    /* Main OCRAM for MCU2_0 [ size 256.00 KB ] */
+    MAIN_OCRAM_MCU2_0        ( RWIX ) : ORIGIN = 0x60000000 , LENGTH = 0x00040000
     /* DDR for MCU2_0 for Linux IPC [ size 1024.00 KB ] */
     DDR_MCU2_0_IPC           ( RWIX ) : ORIGIN = 0xA2000000 , LENGTH = 0x00100000
     /* DDR for MCU2_0 for Linux resource table [ size 1024 B ] */

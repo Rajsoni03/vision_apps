@@ -121,7 +121,8 @@ ddr_mem_addr_hi = 0x100000000;
 ddr_mem_size_hi = 736*MB;
 
 msmc_mem_addr = 0x70000000;
-main_ocram_mem_addr = 0x03600000;
+main_ocram_mem_addr = 0x60000000; # Note: uses RAT to translate to proper address
+main_ocram_mem_addr_phys = 0x4F02000000;
 
 #
 # Other constant sizes
@@ -161,11 +162,13 @@ c7x_2_l1_size  = 16*KB;
 #
 # Main OCRAM memory allocation
 #
-mcu2_0_main_ocram_addr = main_ocram_mem_addr;
-mcu2_0_main_ocram_size = 256*KB;
+mcu2_0_main_ocram_addr       = main_ocram_mem_addr;
+mcu2_0_main_ocram_addr_phys  = main_ocram_mem_addr_phys;
+mcu2_0_main_ocram_size       = 512*KB;
 
-mcu2_1_main_ocram_addr = mcu2_0_main_ocram_addr + mcu2_0_main_ocram_size;
-mcu2_1_main_ocram_size = 256*KB;
+mcu2_1_main_ocram_addr       = mcu2_0_main_ocram_addr + mcu2_0_main_ocram_size;
+mcu2_1_main_ocram_addr_phys  = mcu2_0_main_ocram_addr_phys + mcu2_0_main_ocram_size;
+mcu2_1_main_ocram_size       = 512*KB;
 
 #
 # DDR memory allocation for various CPUs
@@ -296,6 +299,8 @@ c7x_2_l1   = MemSection("L1RAM_C7x_2", "RWIX", c7x_2_l1_addr  , c7x_2_l1_size  ,
 mcu2_0_main_ocram   = MemSection("MAIN_OCRAM_MCU2_0", "RWIX", mcu2_0_main_ocram_addr  , mcu2_0_main_ocram_size  , "Main OCRAM for MCU2_0");
 mcu2_1_main_ocram   = MemSection("MAIN_OCRAM_MCU2_1", "RWIX", mcu2_1_main_ocram_addr  , mcu2_1_main_ocram_size  , "Main OCRAM for MCU2_1");
 
+mcu2_0_main_ocram_phys   = MemSection("MAIN_OCRAM_MCU2_0_PHYS", "RWIX", mcu2_0_main_ocram_addr_phys  , mcu2_0_main_ocram_size  , "Main OCRAM Physical Address for MCU2_0");
+mcu2_1_main_ocram_phys   = MemSection("MAIN_OCRAM_MCU2_1_PHYS", "RWIX", mcu2_1_main_ocram_addr_phys  , mcu2_1_main_ocram_size  , "Main OCRAM Physical Address for MCU2_1");
 
 # CPU code/data memory sections in DDR
 mcu1_0_ddr_ipc             = MemSection("DDR_MCU1_0_IPC", "RWIX", mcu1_0_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for MCU1_0 for Linux IPC");
@@ -654,6 +659,8 @@ c_header_mmap.addMemSection( ddr_shared_mem     );
 c_header_mmap.addMemSection( c7x_1_msmc         );
 c_header_mmap.addMemSection( mcu2_0_main_ocram  );
 c_header_mmap.addMemSection( mcu2_1_main_ocram  );
+c_header_mmap.addMemSection( mcu2_0_main_ocram_phys  );
+c_header_mmap.addMemSection( mcu2_1_main_ocram_phys  );
 c_header_mmap.checkOverlap();
 
 dts_mmap = MemoryMap("Memory Map for Linux kernel dts/dtsi file");
