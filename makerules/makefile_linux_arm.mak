@@ -321,6 +321,24 @@ yocto_clean: imaging_scrub tiovx_scrub ptk_scrub scrub
 yocto_install:
 	$(YOCTO_VARS) YOCTO_STAGE=1 $(MAKE) linux_fs_stage
 
+#### USED FOR FIRMWARE ONLY BUILD ####
+
+FIRMWARE_VARS = PROFILE=release \
+	BUILD_EMULATION_MODE=no \
+	BUILD_CPU_MPU1=no \
+	BUILD_EDGEAI=yes
+
+firmware:
+	$(FIRMWARE_VARS) $(MAKE) sdk
+	$(FIRMWARE_VARS) $(MAKE) update_fw
+
+firmware_scrub:
+	$(FIRMWARE_VARS) $(MAKE) sdk_scrub
+
+update_fw: linux_fs_stage
+	mkdir -p $(PSDK_PATH)/psdk_fw/$(SOC)/$(FIRMWARE_SUBFOLDER)/
+	cp $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/* $(PSDK_PATH)/psdk_fw/$(SOC)/$(FIRMWARE_SUBFOLDER)/.
+
 ######################################
 
 linux_host_libs_includes:
@@ -380,5 +398,3 @@ linux_fs_install_from_custom_stage:
 	# Set LINUX_FS_STAGE_PATH=source dir
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_FS_PATH))
 
-update_fw: linux_fs_stage
-	cp $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/* $(PSDK_PATH)/psdk_fw/$(SOC)/$(FIRMWARE_SUBFOLDER)/.
