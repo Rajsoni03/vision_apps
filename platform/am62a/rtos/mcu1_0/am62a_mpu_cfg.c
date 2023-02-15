@@ -178,4 +178,18 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .cachePolicy      = CSL_ARM_R5_CACHE_POLICY_NON_CACHEABLE,
         .memAttr          = 0U,
     },
+    { 
+        /* Region 9 configuration: 256KB of HSM RAM, This is required for SBL to boot the MCU1_0 firmware */ 
+        .regionId = 9U, 
+        .enable = 1U, 
+        .baseAddr = 0x43C00000U, 
+        .size = CSL_ARM_R5_MPU_REGION_SIZE_256KB, 
+        .subRegionEnable = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL, 
+        .exeNeverControl = 0U, 
+        .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR, 
+        .shareable = 0U, 
+        .cacheable = (uint32_t)TRUE, 
+        .cachePolicy = CSL_ARM_R5_CACHE_POLICY_WB_WA, 
+        .memAttr = 0U, 
+    }, 
 };
