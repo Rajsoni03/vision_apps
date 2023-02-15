@@ -120,35 +120,35 @@ sbl_atf_optee:
 ifeq ($(BUILD_QNX_A72), yes)
 ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	# For ATF, setting HANDLE_EA_EL3_FIRST=0 for QNX so that the all runtime exception to be routed to current exception level (or in EL1 if the current exception level is EL0)
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed  HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
+	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed  HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
 else
 	# For ATF, setting HANDLE_EA_EL3_FIRST=0 for QNX so that the all runtime exception to be routed to current exception level (or in EL1 if the current exception level is EL0)
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
+	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
 endif
 endif
 ifeq ($(BUILD_LINUX_A72), yes)
 ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed K3_USART=$(K3_USART)
+	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed K3_USART=$(K3_USART)
 else
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) K3_USART=$(K3_USART)
+	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) K3_USART=$(K3_USART)
 endif
 endif
 
 ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
-	$(MAKE) -C $(VISION_APPS_PATH)/../ti-optee-os -s -j32 CROSS_COMPILE_core=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- NOWERROR=1 CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=2 CFG_ARM64_core=y ta-targets=ta_arm64 PLATFORM=k3 PLATFORM_FLAVOR=j7 CFG_CONSOLE_UART=$(CFG_CONSOLE_UART)
+	$(MAKE) -C $(VISION_APPS_PATH)/../optee_os -s -j32 CROSS_COMPILE_core=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- NOWERROR=1 CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=2 CFG_ARM64_core=y ta-targets=ta_arm64 PLATFORM=k3 PLATFORM_FLAVOR=j7 CFG_CONSOLE_UART=$(CFG_CONSOLE_UART)
 endif
 	mkdir -p $(ATF_OPTEE_PATH)
-	cp $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3/$(ATF_TARGET_BOARD)/release/bl31.bin $(ATF_OPTEE_PATH)/bl31.bin
+	cp $(VISION_APPS_PATH)/../trusted-firmware-a/build/k3/$(ATF_TARGET_BOARD)/release/bl31.bin $(ATF_OPTEE_PATH)/bl31.bin
 ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
-	cp $(VISION_APPS_PATH)/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin $(ATF_OPTEE_PATH)/bl32.bin
+	cp $(VISION_APPS_PATH)/../optee_os/out/arm-plat-k3/core/tee-pager_v2.bin $(ATF_OPTEE_PATH)/bl32.bin
 endif
 
 
 sbl_atf_optee_scrub:
-	$(MAKE) -C $(VISION_APPS_PATH)/../arm-trusted-firmware clean
-	$(MAKE) -C $(VISION_APPS_PATH)/../ti-optee-os clean CFG_ARM64_core=y PLATFORM=k3 PLATFORM_FLAVOR=j7
-	rm -rf $(VISION_APPS_PATH)/../arm-trusted-firmware/build/k3
-	rm -rf $(VISION_APPS_PATH)/../ti-optee-os/out/arm-plat-k3
+	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a clean
+	$(MAKE) -C $(VISION_APPS_PATH)/../optee_os clean CFG_ARM64_core=y PLATFORM=k3 PLATFORM_FLAVOR=j7
+	rm -rf $(VISION_APPS_PATH)/../trusted-firmware-a/build/k3
+	rm -rf $(VISION_APPS_PATH)/../optee_os/out/arm-plat-k3
 
 sbl_pdk_sd:
 	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
