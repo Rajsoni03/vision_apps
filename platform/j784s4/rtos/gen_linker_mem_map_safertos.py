@@ -123,9 +123,6 @@ ddr_mem_size_hi = 256*MB;
 msmc_mem_addr = 0x70000000;
 main_ocram_mem_addr = 0x03600000;
 
-codec_carveout_addr = 0x880000000;
-codec_carveout_size = 0x50000000;
-
 #
 # Other constant sizes
 #
@@ -305,7 +302,7 @@ ddr_intercore_eth_data_size = 24*MB;
 
 # C7x 1 Persistent DDR
 c7x_1_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
-c7x_1_ddr_local_heap_non_cacheable_addr_phys  = ddr_mem_addr_hi_phy+codec_carveout_size;
+c7x_1_ddr_local_heap_non_cacheable_addr_phys  = ddr_mem_addr_hi_phy;
 c7x_1_ddr_local_heap_non_cacheable_size  = 64*MB;
 c7x_1_ddr_local_heap_addr = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
 c7x_1_ddr_local_heap_addr_phys = c7x_1_ddr_local_heap_non_cacheable_addr_phys + c7x_1_ddr_local_heap_non_cacheable_size;
