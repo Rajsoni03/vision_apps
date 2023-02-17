@@ -303,19 +303,19 @@ ddr_intercore_eth_data_size = 24*MB;
 # C7x 1 Persistent DDR
 c7x_1_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
 c7x_1_ddr_local_heap_non_cacheable_addr_phys  = ddr_mem_addr_hi_phy;
-c7x_1_ddr_local_heap_non_cacheable_size  = 64*MB;
+c7x_1_ddr_local_heap_non_cacheable_size  = 128*MB;
 c7x_1_ddr_local_heap_addr = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
 c7x_1_ddr_local_heap_addr_phys = c7x_1_ddr_local_heap_non_cacheable_addr_phys + c7x_1_ddr_local_heap_non_cacheable_size;
-c7x_1_ddr_local_heap_size = 64*MB;
+c7x_1_ddr_local_heap_size = 128*MB;
 total_c7x_1_local_ddr = c7x_1_ddr_local_heap_non_cacheable_size + c7x_1_ddr_local_heap_size;
 
 # C7x 1 Scratch DDR
 c7x_1_ddr_scratch_non_cacheable_addr      = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
 c7x_1_ddr_scratch_non_cacheable_addr_phys = c7x_1_ddr_local_heap_addr_phys + c7x_1_ddr_local_heap_size;
-c7x_1_ddr_scratch_non_cacheable_size      = 64*MB;
+c7x_1_ddr_scratch_non_cacheable_size      = 128*MB;
 c7x_1_ddr_scratch_addr = c7x_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
 c7x_1_ddr_scratch_addr_phys = c7x_1_ddr_scratch_non_cacheable_addr_phys + c7x_1_ddr_scratch_non_cacheable_size;
-c7x_1_ddr_scratch_size = 64*MB;
+c7x_1_ddr_scratch_size = 128*MB;
 total_c7x_1_scratch_ddr = c7x_1_ddr_scratch_non_cacheable_size + c7x_1_ddr_scratch_size
 
 total_c7x_1_ddr = total_c7x_1_local_ddr + total_c7x_1_scratch_ddr
@@ -323,19 +323,19 @@ total_c7x_1_ddr = total_c7x_1_local_ddr + total_c7x_1_scratch_ddr
 # C7x 2 Persistent DDR
 c7x_2_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
 c7x_2_ddr_local_heap_non_cacheable_addr_phys  = c7x_1_ddr_scratch_addr_phys + c7x_1_ddr_scratch_size;
-c7x_2_ddr_local_heap_non_cacheable_size  = 64*MB;
+c7x_2_ddr_local_heap_non_cacheable_size  = 128*MB;
 c7x_2_ddr_local_heap_addr = c7x_2_ddr_local_heap_non_cacheable_addr + c7x_2_ddr_local_heap_non_cacheable_size;
 c7x_2_ddr_local_heap_addr_phys = c7x_2_ddr_local_heap_non_cacheable_addr_phys + c7x_2_ddr_local_heap_non_cacheable_size;
-c7x_2_ddr_local_heap_size = 64*MB;
+c7x_2_ddr_local_heap_size = 128*MB;
 total_c7x_2_local_ddr = c7x_2_ddr_local_heap_non_cacheable_size + c7x_2_ddr_local_heap_size
 
 # C7x 2 Scratch DDR
 c7x_2_ddr_scratch_non_cacheable_addr     = c7x_2_ddr_local_heap_addr + c7x_2_ddr_local_heap_size;
 c7x_2_ddr_scratch_non_cacheable_addr_phys     = c7x_2_ddr_local_heap_addr_phys + c7x_2_ddr_local_heap_size;
-c7x_2_ddr_scratch_non_cacheable_size     = 64*MB;
+c7x_2_ddr_scratch_non_cacheable_size     = 128*MB;
 c7x_2_ddr_scratch_addr = c7x_2_ddr_scratch_non_cacheable_addr + c7x_2_ddr_scratch_non_cacheable_size;
 c7x_2_ddr_scratch_addr_phys = c7x_2_ddr_scratch_non_cacheable_addr_phys + c7x_2_ddr_scratch_non_cacheable_size;
-c7x_2_ddr_scratch_size = 64*MB;
+c7x_2_ddr_scratch_size = 128*MB;
 total_c7x_2_scratch_ddr = c7x_2_ddr_scratch_non_cacheable_size + c7x_2_ddr_scratch_size
 
 total_c7x_2_ddr = total_c7x_2_local_ddr + total_c7x_2_scratch_ddr
@@ -343,18 +343,18 @@ total_c7x_2_ddr = total_c7x_2_local_ddr + total_c7x_2_scratch_ddr
 # C7x 3 Persistent DDR
 c7x_3_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
 c7x_3_ddr_local_heap_non_cacheable_addr_phys  = c7x_2_ddr_scratch_addr_phys + c7x_2_ddr_scratch_size;
-c7x_3_ddr_local_heap_non_cacheable_size  = 64*MB;
+c7x_3_ddr_local_heap_non_cacheable_size  = 128*MB;
 c7x_3_ddr_local_heap_addr = c7x_3_ddr_local_heap_non_cacheable_addr + c7x_3_ddr_local_heap_non_cacheable_size;
 c7x_3_ddr_local_heap_addr_phys = c7x_3_ddr_local_heap_non_cacheable_addr_phys + c7x_3_ddr_local_heap_non_cacheable_size;
-c7x_3_ddr_local_heap_size = 64*MB;
+c7x_3_ddr_local_heap_size = 128*MB;
 total_c7x_3_local_ddr = c7x_3_ddr_local_heap_non_cacheable_size + c7x_3_ddr_local_heap_size
 # C7x 3 Scratch DDR
 c7x_3_ddr_scratch_non_cacheable_addr     = c7x_3_ddr_local_heap_addr + c7x_3_ddr_local_heap_size;
 c7x_3_ddr_scratch_non_cacheable_addr_phys     = c7x_3_ddr_local_heap_addr_phys + c7x_3_ddr_local_heap_size;
-c7x_3_ddr_scratch_non_cacheable_size     = 64*MB;
+c7x_3_ddr_scratch_non_cacheable_size     = 128*MB;
 c7x_3_ddr_scratch_addr = c7x_3_ddr_scratch_non_cacheable_addr + c7x_3_ddr_scratch_non_cacheable_size;
 c7x_3_ddr_scratch_addr_phys = c7x_3_ddr_scratch_non_cacheable_addr_phys + c7x_3_ddr_scratch_non_cacheable_size;
-c7x_3_ddr_scratch_size = 64*MB;
+c7x_3_ddr_scratch_size = 128*MB;
 total_c7x_3_scratch_ddr = c7x_3_ddr_scratch_non_cacheable_size + c7x_3_ddr_scratch_size
 
 total_c7x_3_ddr = total_c7x_3_local_ddr + total_c7x_3_scratch_ddr
@@ -362,18 +362,18 @@ total_c7x_3_ddr = total_c7x_3_local_ddr + total_c7x_3_scratch_ddr
 # C7x 4 Persistent DDR
 c7x_4_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
 c7x_4_ddr_local_heap_non_cacheable_addr_phys  = c7x_3_ddr_scratch_addr_phys + c7x_3_ddr_scratch_size;
-c7x_4_ddr_local_heap_non_cacheable_size  = 64*MB;
+c7x_4_ddr_local_heap_non_cacheable_size  = 128*MB;
 c7x_4_ddr_local_heap_addr = c7x_4_ddr_local_heap_non_cacheable_addr + c7x_4_ddr_local_heap_non_cacheable_size;
 c7x_4_ddr_local_heap_addr_phys = c7x_4_ddr_local_heap_non_cacheable_addr_phys + c7x_4_ddr_local_heap_non_cacheable_size;
-c7x_4_ddr_local_heap_size = 64*MB;
+c7x_4_ddr_local_heap_size = 128*MB;
 total_c7x_4_local_ddr = c7x_4_ddr_local_heap_non_cacheable_size + c7x_4_ddr_local_heap_size
 # C7x 4 Scratch DDR
 c7x_4_ddr_scratch_non_cacheable_addr     = c7x_4_ddr_local_heap_addr + c7x_4_ddr_local_heap_size;
 c7x_4_ddr_scratch_non_cacheable_addr_phys     = c7x_4_ddr_local_heap_addr_phys + c7x_4_ddr_local_heap_size;
-c7x_4_ddr_scratch_non_cacheable_size     = 64*MB;
+c7x_4_ddr_scratch_non_cacheable_size     = 128*MB;
 c7x_4_ddr_scratch_addr = c7x_4_ddr_scratch_non_cacheable_addr + c7x_4_ddr_scratch_non_cacheable_size;
 c7x_4_ddr_scratch_addr_phys = c7x_4_ddr_scratch_non_cacheable_addr_phys + c7x_4_ddr_scratch_non_cacheable_size;
-c7x_4_ddr_scratch_size = 64*MB;
+c7x_4_ddr_scratch_size = 128*MB;
 total_c7x_4_scratch_ddr = c7x_4_ddr_scratch_non_cacheable_size + c7x_4_ddr_scratch_size
 
 total_c7x_4_ddr = total_c7x_4_local_ddr + total_c7x_4_scratch_ddr
