@@ -423,6 +423,14 @@ void  appMemCacheWbInv(void *ptr, uint32_t size);
  */
 void appMemPrintMemAllocInfo();
 
+/**
+ * \brief Return the physical pointer from a shared pointer
+ *
+ * \param shared_ptr  [in] pointer to allocated memory
+ * \param heap_id     [in] heap ID
+ */
+uint64_t appMemShared2PhysPtr(uint64_t shared_ptr, uint32_t heap_id);
+
 #if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
 
 /**

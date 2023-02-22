@@ -722,3 +722,7 @@ int32_t appMemFree(uint32_t block, void *virPtr, uint32_t size )
     return(status);
 }
 
+uint64_t appMemShared2PhysPtr(uint64_t shared_ptr, uint32_t heap_id)
+{
+    return shared_ptr;
+}

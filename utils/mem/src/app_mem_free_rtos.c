@@ -540,6 +540,60 @@ uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 #endif
 }
 
+uint64_t appMemShared2PhysPtr(uint64_t shared_ptr, uint32_t heap_id)
+{
+#if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
+    uint64_t offset, physPtr, translatedAddress, sizeInBytes;
+    uint32_t maxRegions, i, baseAddress;
+    bool        bIsEnabled, ratTranslationFound = false;
+
+    CSL_RatTranslationCfgInfo translationCfg;
+    CSL_ratRegs *pRatRegs = (CSL_ratRegs *)(CSL_R5FSS0_RAT_CFG_BASE);
+
+    maxRegions = CSL_ratGetMaxRegions(pRatRegs);
+
+    for (i = 0; i < maxRegions; i++)
+    {
+        bIsEnabled = CSL_ratIsRegionTranslationEnabled(pRatRegs,i);
+        if (true == bIsEnabled)
+        {
+            uint32_t regVal, regVal1;
+
+            baseAddress = pRatRegs->REGION[i].BASE;
+
+            regVal  = pRatRegs->REGION[i].TRANS_L;
+            regVal1 = pRatRegs->REGION[i].TRANS_U;
+            translatedAddress  = (((uint64_t)regVal1 & 0x0000FFFFU) << 32U) | (uint64_t)regVal;
+
+            sizeInBytes = (uint64_t)1 << CSL_REG32_FEXT( &pRatRegs->REGION[i].CTRL, RAT_REGION_CTRL_SIZE );
+
+            #ifdef APP_MEM_DEBUG
+            appLogPrintf("appMemShared2PhysPtr(): Using RAT region %d for translation of baseAddress : %lx\n", i, baseAddress);
+            appLogPrintf("appMemShared2PhysPtr(): Using RAT region %d for translation of translatedAddress : %llx\n", i, translatedAddress);
+            appLogPrintf("appMemShared2PhysPtr(): Using RAT region %d for translation of sizeInBytes : %lx\n", i, sizeInBytes);
+            #endif
+
+            if ((shared_ptr >= baseAddress) && (shared_ptr < (baseAddress + sizeInBytes)))
+            {
+                offset = translatedAddress - pRatRegs->REGION[i].BASE;
+                physPtr = shared_ptr + offset;
+                ratTranslationFound = true;
+                break;
+            }
+        }
+    }
+
+    if (false == ratTranslationFound)
+    {
+        physPtr = shared_ptr;
+    }
+
+    return physPtr;
+#else
+    return shared_ptr;
+#endif
+}
+
 uint32_t appMemGetDmaBufFd(void *virPtr, volatile uint32_t *dmaBufFdOffset)
 {
    /* For rtos implementation, dmaBufFd is not valid and just return 0
@@ -626,15 +680,15 @@ int32_t appMemAddrTranslate(app_mem_rat_prm_t *prm)
     uintptr_t key;
 
     CSL_RatTranslationCfgInfo translationCfg;
-    CSL_ratRegs *pGTCRatRegs = (CSL_ratRegs *)(CSL_R5FSS0_RAT_CFG_BASE);
+    CSL_ratRegs *pRatRegs = (CSL_ratRegs *)(CSL_R5FSS0_RAT_CFG_BASE);
 
-    maxRegions = CSL_ratGetMaxRegions(pGTCRatRegs);
+    maxRegions = CSL_ratGetMaxRegions(pRatRegs);
 
     key = HwiP_disable();
 
     for (i = 0; i < maxRegions; i++)
     {
-        bIsEnabled = CSL_ratIsRegionTranslationEnabled(pGTCRatRegs,i);
+        bIsEnabled = CSL_ratIsRegionTranslationEnabled(pRatRegs,i);
         if (false == bIsEnabled)
         {
             #ifdef APP_MEM_DEBUG
@@ -651,7 +705,7 @@ int32_t appMemAddrTranslate(app_mem_rat_prm_t *prm)
         translationCfg.baseAddress       = prm->baseAddress;
         translationCfg.translatedAddress = prm->translatedAddress;
 
-        ret = CSL_ratConfigRegionTranslation(pGTCRatRegs, i, &translationCfg);
+        ret = CSL_ratConfigRegionTranslation(pRatRegs, i, &translationCfg);
 
         if(ret == (bool)false)
         {
@@ -662,7 +716,7 @@ int32_t appMemAddrTranslate(app_mem_rat_prm_t *prm)
         #ifdef APP_MEM_DEBUG
         for (i = 0; i < maxRegions; i++)
         {
-            bIsEnabled = CSL_ratIsRegionTranslationEnabled(pGTCRatRegs,i);
+            bIsEnabled = CSL_ratIsRegionTranslationEnabled(pRatRegs,i);
             appLogPrintf("appMemAddrTranslate(): RAT region %d translation enabled status after OCMC map (0: disabled, 1: enabled): %d\n", i, bIsEnabled);
         }
         #endif

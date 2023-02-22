@@ -791,3 +791,7 @@ static int32_t appMemAddTupleToList(uint32_t dmaBufFd, uint32_t size, uint64_t *
     return status;
 }
 
+uint64_t appMemShared2PhysPtr(uint64_t shared_ptr, uint32_t heap_id)
+{
+    return shared_ptr;
+}
