@@ -326,6 +326,9 @@ yocto_install:
 FIRMWARE_VARS = PROFILE=release \
 	BUILD_EMULATION_MODE=no \
 	BUILD_CPU_MPU1=no \
+	BUILD_LINUX_A72=no \
+	BUILD_QNX_A72=no \
+	BUILD_APP_RTOS_LINUX=yes \
 	BUILD_EDGEAI=yes
 
 firmware:
