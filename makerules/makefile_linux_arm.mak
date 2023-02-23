@@ -243,7 +243,7 @@ endif
 # $1 : rootfs path
 # $2 : bootfs path
 define MODIFY_FS =
-	# copy uEnv.txt and sysfw.itb for PSDK RTOS
+	# copy uEnv.txt for PSDK RTOS
 	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/uEnv_$(SOC)_vision_apps.txt $(2)/
 	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/uEnv_$(SOC)_edgeai_apps.txt $(2)/
 	cp $(2)/$(UENV_NAME) $(2)/uEnv.txt
