@@ -496,21 +496,24 @@ int32_t appRemoteServiceTestRunTimerTest(uint32_t cpu_id)
     int32_t status = 0;
     uint32_t value = 10*1000;
 
-    appLogPrintf("REMOTE_SERVICE_TEST: Running timer test of %d msecs for CPU %s !!!\n",
+    appLogPrintf("REMOTE_SERVICE_TEST: Running test for timer of %d msecs for CPU %s !!!\n",
         value,
         appIpcGetCpuName(cpu_id)
         );
 
     status = appRemoteServiceRun(cpu_id, APP_REMOTE_SERVICE_TEST_NAME, APP_REMOTE_SERVICE_TEST_CMD_2, &value, sizeof(uint32_t), 0);
+    appLogPrintf("REMOTE_SERVICE_TEST: Timer test of %d msecs for CPU %s ... DONE !!!\n",
+        value,
+        appIpcGetCpuName(cpu_id)
+        );
     if(status != 0)
     {
         appLogPrintf("REMOTE_SERVICE_TEST: ERROR: Timer test !!!\n");
     }
-
-    appLogPrintf("REMOTE_SERVICE_TEST: Running timer test of %d msecs for CPU %s ... DONE !!!\n",
-        value,
-        appIpcGetCpuName(cpu_id)
-        );
+    else
+    {
+        appLogPrintf("REMOTE_SERVICE_TEST: Test passed !!!\n");
+    }
 
     return status;
 }

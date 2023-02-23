@@ -66,18 +66,16 @@ endif
 endif
 endif
 
-uboot_linux_install_sd: uboot_check
+uboot_linux_install: uboot_check
 ifeq ($(BUILD_TARGET_MODE),yes)
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-linux/tispl.bin $(LINUX_SD_FS_BOOT_PATH)/
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-linux/u-boot.img $(LINUX_SD_FS_BOOT_PATH)/
-	sync
+	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-linux/tispl.bin $(LINUX_BOOTFS_STAGE_PATH)/
+	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-linux/u-boot.img $(LINUX_BOOTFS_STAGE_PATH)/
 endif
 
-uboot_qnx_install_sd: uboot_check
+uboot_qnx_install: uboot_check
 ifeq ($(BUILD_TARGET_MODE),yes)
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-qnx/tispl.bin $(QNX_SD_FS_BOOT_PATH)/
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-qnx/u-boot.img $(QNX_SD_FS_BOOT_PATH)/
-	sync
+	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-qnx/tispl.bin $(QNX_BOOT_PATH)/
+	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-qnx/u-boot.img $(QNX_BOOT_PATH)/
 endif
 
-.PHONY: uboot_check uboot_check_firmware uboot_clean uboot uboot_linux_install_sd uboot_qnx_install_sd
+.PHONY: uboot_check uboot_check_firmware uboot_clean uboot uboot_linux_install uboot_qnx_install

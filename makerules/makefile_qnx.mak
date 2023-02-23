@@ -43,6 +43,9 @@ endif
 qnx_fs_copy_spl_uboot:
 ifeq ($(BUILD_QNX_A72),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_copy_spl_uboot      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_qnx_install
+endif
 endif
 
 qnx_fs_install:
@@ -172,9 +175,6 @@ qnx_fs_install_firmware:
 
 qnx_fs_install_sd: qnx_fs_copy_spl_uboot qnx_fs_install qnx_fs_install_firmware
 	$(call MODIFY_QNX_SD_FS)
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_qnx_install_sd
-endif
 
 qnx_fs_install_nfs: qnx_fs_copy_spl_uboot qnx_fs_install
 	cp $(PSDK_QNX_PATH)/qnx/bsp/images/ifs-$(SOC)-evm-ti-spl-nfs-with-cpsw2g.raw $(QNX_AUX_FS_PATH)/qnx-ifs-spl-nfs

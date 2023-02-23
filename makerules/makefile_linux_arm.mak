@@ -20,11 +20,14 @@ endif
 FIRMWARE_SUBFOLDER?=vision_apps_evm
 UENV_NAME?=uEnv_$(SOC)_vision_apps.txt
 LINUX_FS_STAGE_PATH?=/tmp/tivision_apps_targetfs_stage
+LINUX_BOOTFS_STAGE_PATH?=/tmp/tivision_apps_bootfs_stage
 
 linux_fs_stage:
 ifeq ($(YOCTO_STAGE),)
 	@rm -rf $(LINUX_FS_STAGE_PATH)
+	rm -rf $(LINUX_BOOTFS_STAGE_PATH)
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)
+	install -m 775 -d $(LINUX_BOOTFS_STAGE_PATH)
 endif
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/usr/lib
 
@@ -359,19 +362,23 @@ linux_host_libs_includes:
 	rm -Rf $(LINUX_FS_STAGE_PATH)/lib $(LINUX_FS_STAGE_PATH)/opt
 
 linux_fs_install: linux_fs_stage
+	cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_FS_PATH))
+
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+	$(MAKE) uboot_linux_install
+endif
 
 linux_fs_install_sd: linux_fs_install
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_SD_FS_ROOT_PATH))
+	rm -rf $(LINUX_SD_FS_BOOT_PATH)/*
+	cp -rf $(LINUX_BOOTFS_STAGE_PATH)/* $(LINUX_SD_FS_BOOT_PATH)/
 
 	$(call MODIFY_FS,$(LINUX_SD_FS_ROOT_PATH),$(LINUX_SD_FS_BOOT_PATH))
-
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_linux_install_sd
-endif
+	sync
 
 linux_fs_install_nfs: linux_fs_install
-	$(call MODIFY_FS,$(LINUX_FS_PATH),$(LINUX_FS_BOOT_PATH))
+	$(call MODIFY_FS,$(LINUX_FS_PATH),$(LINUX_BOOTFS_STAGE_PATH))
 
 linux_fs_install_sd_ip: ip_addr_check linux_fs_install
 	mkdir -p /tmp/j7-evm
@@ -390,7 +397,7 @@ linux_fs_install_nfs_test_data:
 
 linux_fs_install_tar: linux_fs_install_nfs linux_fs_install_nfs_test_data
 	# Creating bootfs tar - zipping with gzip (-z option in tar)
-	cd $(LINUX_FS_BOOT_PATH) && tar czf $(VISION_APPS_PATH)/bootfs.tar.gz .
+	cd $(LINUX_BOOTFS_STAGE_PATH) && tar czf $(VISION_APPS_PATH)/bootfs.tar.gz .
 	# Creating rootfs tar - using lzma compression, but parallelized to increase performance (-I pxz)
 	# (-J would do lzma compression, but without parallelization)
 	cd $(LINUX_FS_PATH) && sudo tar -I pxz -cpf $(VISION_APPS_PATH)/rootfs.tar.xz .
