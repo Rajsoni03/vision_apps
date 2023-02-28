@@ -1599,7 +1599,7 @@ static void app_update_param_set(AppObj *obj)
     }
     else
     {
-        obj->objArrSplitObj.output0_num_elements = obj->sensorObj.num_cameras_enabled/2;
+        obj->objArrSplitObj.output0_num_elements = (obj->sensorObj.num_cameras_enabled + 1) / 2;
         obj->objArrSplitObj.output1_num_elements = obj->sensorObj.num_cameras_enabled - obj->objArrSplitObj.output0_num_elements;
     }
     set_img_mosaic_params(&obj->imgMosaicObj, resized_width, resized_height, obj->sensorObj.num_cameras_enabled, &obj->objArrSplitObj, obj->enable_split_graph);
