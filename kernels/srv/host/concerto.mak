@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 TARGET      := vx_kernels_srv
@@ -6,7 +6,7 @@ TARGETTYPE  := library
 
 CSOURCES    := tivx_srv_node_api.c vx_generate_3dbowl_host.c vx_generate_gpulut_host.c vx_kernels_srv_host.c vx_point_detect_host.c vx_pose_estimation_host.c
 
-ifeq ($(TARGET_CPU), A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
 CFLAGS      += -DGL_ES
 CSOURCES    += vx_gl_srv_host.c

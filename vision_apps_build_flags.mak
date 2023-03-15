@@ -158,9 +158,9 @@ else
 BUILD_ISA_C7x=no
 endif
 ifneq (,$(filter yes,$(BUILD_CPU_MPU1)))
-BUILD_ISA_A72=yes
+BUILD_ISA_MPU=yes
 else
-BUILD_ISA_A72=no
+BUILD_ISA_MPU=no
 endif
 
 endif # ifndef $(VISION_APPS_BUILD_FLAGS_MAK)

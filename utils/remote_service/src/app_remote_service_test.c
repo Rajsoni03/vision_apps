@@ -449,7 +449,7 @@ int32_t appRemoteServiceTestRunCmd1(uint32_t cpu_id)
 
         appMemCacheWbInv((void*)virt_ptr, 256);
 
-        #ifdef A72
+        #if defined(A72) || defined(A53)
         asm("    DSB SY");
         #endif
 
@@ -457,7 +457,7 @@ int32_t appRemoteServiceTestRunCmd1(uint32_t cpu_id)
 
         appMemCacheInv((void*)virt_ptr, 256);
 
-        #ifdef A72
+        #if defined(A72) || defined(A53)
         asm("    DSB SY");
         #endif
 

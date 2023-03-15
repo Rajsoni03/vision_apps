@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66 C71 C7120 A72))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66 C71 C7120 A72 A53))
 
 include $(PRELUDE)
 TARGET      := vx_target_kernels_stereo

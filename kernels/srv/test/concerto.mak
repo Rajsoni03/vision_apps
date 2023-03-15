@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 TARGET      := vx_kernels_srv_tests
@@ -6,7 +6,7 @@ TARGETTYPE  := library
 
 CSOURCES    := test_point_detect.c test_pose_estimation.c  test_generate_3dbowl.c test_generate_gpulut.c
 
-ifeq ($(TARGET_CPU), A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 ifeq ($(TARGET_OS),LINUX)
 CFLAGS      += -DGL_ES -DEGL_NO_X11
 CSOURCES    += test_gpu_srv.c

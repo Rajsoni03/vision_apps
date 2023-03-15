@@ -65,7 +65,7 @@
 #include <utils/iss/include/app_iss.h>
 #include <utils/console_io/include/app_log.h>
 
-#ifdef A72
+#if defined(A72) || defined(A53)
 
 #if !defined (SOC_AM62A)
 static uint8_t  g_cmdPrm[CMD_PARAM_SIZE];
@@ -364,7 +364,7 @@ int32_t appDeInitImageSensor(char* sensor_name)
 #endif
 }
 
-#endif /*(A72)*/
+#endif /*#if defined(A72) || defined(A53)*/
 
 #if defined(R5F) && (defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS))
 int32_t appIssInit()

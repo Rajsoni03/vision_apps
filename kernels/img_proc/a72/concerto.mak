@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), A72 x86_64))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), A72 A53 x86_64))
 
 include $(PRELUDE)
 TARGET      := vx_target_kernels_img_proc_a72

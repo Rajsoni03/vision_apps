@@ -11,7 +11,7 @@ endif
 
 ifneq ($(TARGET_PLATFORM),PC)
 
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 CSOURCES    := app_iss_common.c app_iss.c
 endif
 

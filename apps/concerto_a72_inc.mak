@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 
 TEST_IDIRS =
 TEST_IDIRS += $(TIOVX_PATH)/conformance_tests
@@ -217,4 +217,5 @@ endif
 endif  # ifeq ($(LINK_SHARED_OBJ),yes)
 
 
-endif  # ifeq ($(TARGET_CPU),A72)
+endif  # ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
+

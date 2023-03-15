@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 TARGET      := vx_applib_tests
@@ -16,7 +16,7 @@ endif
 
 endif
 
-ifeq ($(TARGET_CPU), A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 CSOURCES    := test_srv_calib_applib.c
 CSOURCES    += test_srv_bowl_lut_gen_applib.c
 CSOURCES    += test_srv_app.c

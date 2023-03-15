@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 
@@ -16,7 +16,7 @@ SYSLDIRS += /usr/lib64
 
 endif
 
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 
 TARGETTYPE  := exe
 CSOURCES    += main_linux_arm.c

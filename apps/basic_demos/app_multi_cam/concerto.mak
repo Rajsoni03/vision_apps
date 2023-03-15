@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 
@@ -14,7 +14,7 @@ CSOURCES    += main_x86.c
 SKIPBUILD=1
 endif
 
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
 CSOURCES    += main_linux_arm.c

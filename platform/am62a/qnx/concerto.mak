@@ -1,5 +1,5 @@
 ifeq ($(BUILD_CPU_MPU1),yes)
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),A53)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
 
 include $(PRELUDE)
@@ -16,4 +16,4 @@ include $(FINALE)
 endif
 endif
 endif
-                                                   
+

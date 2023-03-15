@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 
@@ -32,7 +32,7 @@ SKIPBUILD=1
 endif
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 
 TARGETTYPE  := exe
 

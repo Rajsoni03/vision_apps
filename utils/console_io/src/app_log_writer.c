@@ -256,7 +256,7 @@ void appLogPrintf(const char *format, ...)
                     format, va_args_ptr);
         va_end(va_args_ptr);
 
-        #if defined(A72)
+        #if defined(A72) || defined (A53)
         {
             #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
             void appLogDeviceWrite(char *string, uint32_t max_size);

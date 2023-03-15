@@ -1,6 +1,6 @@
 ifneq ($(TARGET_PLATFORM),PC)
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 
 include $(PRELUDE)
 TARGET      := app_utils_opengl

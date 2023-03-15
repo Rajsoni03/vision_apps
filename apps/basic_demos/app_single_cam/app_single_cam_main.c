@@ -64,7 +64,7 @@
 #include <utils/iss/include/app_iss.h>
 #include "app_test.h"
 
-#ifdef A72
+#if defined(A72) || defined(A53)
 #if defined(LINUX)
 /*ITT server is supported only in target mode and only on Linux*/
 #include <itt_server.h>
@@ -109,7 +109,7 @@ vx_status app_init(AppObj *obj)
     char ch = 0xFF;
     vx_uint8 selectedSensor = 0xFF;
     vx_uint8 detectedSensors[ISS_SENSORS_MAX_CHANNEL];
-#ifdef A72
+#if defined(A72) || defined(A53)
 #if defined(LINUX)
 /*ITT server is supported only in target mode and only on Linux*/
     status = itt_server_init((void*)obj, (void*)save_debug_images, (void*)appSingleCamUpdateVpacDcc);
@@ -1097,7 +1097,7 @@ vx_status app_run_graph(AppObj *obj)
         frm_loop_cnt  = 0xFFFFFFFF;
     }
 
-#ifdef A72
+#if defined(A72) || defined(A53)
 #if defined(LINUX)
 
     appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode,
@@ -1223,7 +1223,7 @@ static char menu[] = {
     "\n"
 #endif
     "\n e: Export performance statistics"
-#ifdef A72
+#if defined(A72) || defined(A53)
 #if defined(LINUX)
     "\n"
     "\n u: Update DCC from File System"
@@ -1290,7 +1290,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                         printf("fp is null\n");
                     }
                     break;
-#ifdef A72
+#if defined(A72) || defined(A53)
 #if defined(LINUX)
                 case 'u':
                     appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode,
@@ -1333,7 +1333,7 @@ static void app_show_usage(int argc, char* argv[])
     printf("\n");
 }
 
-#ifdef A72
+#if defined(A72) || defined(A53)
 #if defined(LINUX)
 int appSingleCamUpdateVpacDcc(AppObj *obj, uint8_t* dcc_buf, uint32_t dcc_buf_size)
 {

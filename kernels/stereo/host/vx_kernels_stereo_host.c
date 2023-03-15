@@ -155,7 +155,7 @@ void tivxStereoLoadKernels(vx_context context)
         tivxRegisterStereoTargetKernels();
 #endif
 
-#if defined(A72) && defined(LINUX)
+#if (defined(A72) || defined(A53)) && defined(LINUX)
         tivxRegisterStereoTargetKernels();
 #endif
         gIsStereoKernelsLoad = 1U;
@@ -175,7 +175,7 @@ void tivxStereoUnLoadKernels(vx_context context)
         tivxUnRegisterStereoTargetKernels();
 #endif
 
-#if defined(A72) && defined(LINUX)
+#if (defined(A72) || defined(A53)) && defined(LINUX)
         tivxUnRegisterStereoTargetKernels();
 #endif
         gIsStereoKernelsLoad = 0U;

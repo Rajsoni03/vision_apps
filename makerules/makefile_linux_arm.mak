@@ -39,10 +39,10 @@ endif
 ifeq ($(BUILD_CPU_MPU1),yes)
 	# copy application binaries and scripts
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/opt/vision_apps
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out $(LINUX_FS_STAGE_PATH)/opt/vision_apps || true
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/vx_app_arm_remote_log.out $(LINUX_FS_STAGE_PATH)/opt || true
-	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp -P $(VISION_APPS_PATH)/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/*.out $(LINUX_FS_STAGE_PATH)/opt/vision_apps || true
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/vx_app_arm_remote_log.out $(LINUX_FS_STAGE_PATH)/opt || true
+	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so.$(PSDK_VERSION) $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp -P $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/libtivision_apps.so $(LINUX_FS_STAGE_PATH)/usr/lib
 	cp $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_init.sh $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_all/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 ifeq ($(YOCTO_STAGE),)
@@ -306,7 +306,7 @@ endef
 
 YOCTO_VARS = PROFILE=release \
 	BUILD_EMULATION_MODE=no \
-	TARGET_CPU=A72 \
+	TARGET_CPU=$(MPU_CPU) \
 	TARGET_OS=LINUX \
 	TIDL_PATH=$(PSDK_PATH)/tidl_j7/ti_dl
 
@@ -353,14 +353,14 @@ update_fw: linux_fs_stage
 ######################################
 
 linux_host_libs_includes:
-	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX $(MAKE) imaging
-	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX $(MAKE) tiovx
-	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX $(MAKE) ptk
-	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX \
+	BUILD_EMULATION_MODE=no TARGET_CPU=$(MPU_CPU) TARGET_OS=LINUX $(MAKE) imaging
+	BUILD_EMULATION_MODE=no TARGET_CPU=$(MPU_CPU) TARGET_OS=LINUX $(MAKE) tiovx
+	BUILD_EMULATION_MODE=no TARGET_CPU=$(MPU_CPU) TARGET_OS=LINUX $(MAKE) ptk
+	BUILD_EMULATION_MODE=no TARGET_CPU=$(MPU_CPU) TARGET_OS=LINUX \
 		BUILD_CPU_MPU1=yes BUILD_CPU_MCU1_0=no BUILD_CPU_MCU2_0=no BUILD_CPU_MCU2_1=no \
 		BUILD_CPU_MCU3_0=no BUILD_CPU_MCU3_1=no BUILD_CPU_C6x_1=no BUILD_CPU_C6x_2=no \
 		BUILD_CPU_C7x_1=no $(MAKE) tivision_apps
-	BUILD_EMULATION_MODE=no TARGET_CPU=A72 TARGET_OS=LINUX \
+	BUILD_EMULATION_MODE=no TARGET_CPU=$(MPU_CPU) TARGET_OS=LINUX \
 		BUILD_CPU_MPU1=yes BUILD_CPU_MCU1_0=no BUILD_CPU_MCU2_0=no BUILD_CPU_MCU2_1=no \
 		BUILD_CPU_MCU3_0=no BUILD_CPU_MCU3_1=no BUILD_CPU_C6x_1=no BUILD_CPU_C6x_2=no \
 		BUILD_CPU_C7x_1=no $(MAKE) linux_fs_install

@@ -9,7 +9,7 @@ CSOURCES += app_get.c
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS SAFERTOS))
 CSOURCES += app_log_rtos.c app_cli_rtos.c
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 CSOURCES += app_log_printf_gcc_rtos.c
 endif
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), R5F C66 C71 C7120 C7504))

@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64 A72))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), x86_64 A72 A53))
 
 include $(PRELUDE)
 
@@ -16,7 +16,7 @@ include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 
 endif
 
-ifeq ($(TARGET_CPU),A72)
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
 
 TARGETTYPE  := exe
@@ -29,7 +29,7 @@ endif
 endif
 
 ifeq ($(TARGET_OS),SYSBIOS)
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 TARGETTYPE  := library
 endif
 endif

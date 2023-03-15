@@ -33,7 +33,7 @@ SYS_XDC_IDIRS = $(BIOS_PATH)/packages
 ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2 J784S4 AM62A))
     SYSDEFS +=
     ifeq ($(TARGET_FAMILY),ARM)
-        ifeq ($(TARGET_CPU),A72)
+        ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
             ifeq ($(TARGET_OS),SYSBIOS)
                 SYSIDIRS += $(GCC_SYSBIOS_ARM_ROOT)/aarch64-elf/libc/usr/include/
                 SYSLDIRS += $(GCC_SYSBIOS_ARM_ROOT)/aarch64-elf/libc/usr/lib/
