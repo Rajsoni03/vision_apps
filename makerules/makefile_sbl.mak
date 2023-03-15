@@ -101,12 +101,12 @@ endif
 
 USE_OPTEE ?= 1
 
-ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(BUILD_LINUX_MPU), yes)
 	SBL_SD_FS_PATH=$(LINUX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/linux/linux_lds
 	# With or without OP-TEE (1 or 0)
 endif
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 	SBL_SD_FS_PATH=$(QNX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/qnx/qnx_lds
 	# With or without OP-TEE (1 or 0)
@@ -117,7 +117,7 @@ endif
 BOOTAPP ?= pdk
 
 sbl_atf_optee:
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	# For ATF, setting HANDLE_EA_EL3_FIRST=0 for QNX so that the all runtime exception to be routed to current exception level (or in EL1 if the current exception level is EL0)
 	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed  HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
@@ -126,7 +126,7 @@ else
 	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) HANDLE_EA_EL3_FIRST=0 K3_USART=$(K3_USART)
 endif
 endif
-ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(BUILD_LINUX_MPU), yes)
 ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	$(MAKE) -C $(VISION_APPS_PATH)/../trusted-firmware-a -s -j32 CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=$(ATF_TARGET_BOARD) SPD=opteed K3_USART=$(K3_USART)
 else
@@ -188,10 +188,10 @@ sbl_mcusw_bootimage_touch:
 
 sbl_mcusw_bootimage_sd:
 	$(MAKE) sbl_mcusw_bootimage_touch
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
 endif
-ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(BUILD_LINUX_MPU), yes)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=mmcsd BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
 endif
 	mkdir -p $(SBL_BOOTFILES_PATH)
@@ -203,10 +203,10 @@ sbl_mcusw_bootimage_sd_hs:
 
 sbl_mcusw_bootimage_ospi:
 	$(MAKE) sbl_mcusw_bootimage_touch
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=qnx BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
 endif
-ifeq ($(BUILD_LINUX_A72), yes)
+ifeq ($(BUILD_LINUX_MPU), yes)
 	$(MAKE) -C $(MCUSW_PATH)/build can_boot_app_mcu_rtos -s HLOSBOOT=linux BOOTMODE=ospi BOARD=$(BOARD) CORE=$(SBL_CORE) BUILD_OS_TYPE=freertos CANFUNC=none
 endif
 	mkdir -p $(SBL_BOOTFILES_PATH)
@@ -308,7 +308,7 @@ sbl_vision_apps_bootimage: sbl_vision_apps_bootimage_1 sbl_vision_apps_bootimage
 sbl_vision_apps_bootimage_hs:sbl_vision_apps_bootimage_hs_1 sbl_vision_apps_bootimage_hs_2
 
 sbl_qnx_bootimage:
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 ifeq ("$(wildcard $(QNX_BOOT_PATH)/qnx-ifs)","")
 	$(error qnx-ifs is still not built!)
 endif
@@ -338,7 +338,7 @@ endif
 endif
 
 sbl_qnx_bootimage_hs:
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 	$(MAKE) sbl_qnx_bootimage
 	$(CERT_SCRIPT) -b $(SBL_BOOTFILES_PATH)/atf_optee.appimage -o $(SBL_BOOTFILES_PATH)/atf_optee.appimage.signed -c R5 -l 0x0 -k $(PDK_PATH)/packages/ti/build/makerules/k3_dev_mpk.pem
 	$(CERT_SCRIPT) -b $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage -o $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage.signed -c R5 -l 0x0 -k $(PDK_PATH)/packages/ti/build/makerules/k3_dev_mpk.pem
@@ -419,7 +419,7 @@ sbl_bootimage_install_sd: sbl_vision_apps_bootimage sbl_qnx_bootimage sbl_linux_
 	cp $(SBL_BOOTFILES_PATH)/tifs.bin $(SBL_SD_FS_PATH)
 	cp $(SBL_BOOTFILES_PATH)/app $(SBL_SD_FS_PATH)
 	cp $(SBL_BOOTFILES_PATH)/lateapp* $(SBL_SD_FS_PATH)
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 	cp $(SBL_BOOTFILES_PATH)/atf_optee.appimage $(SBL_SD_FS_PATH)
 	cp $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage $(SBL_SD_FS_PATH)
 endif
@@ -431,7 +431,7 @@ sbl_bootimage_hs_install_sd: sbl_vision_apps_bootimage_hs sbl_qnx_bootimage_hs
 	cp $(SBL_BOOTFILES_PATH)/app.signed $(SBL_SD_FS_PATH)/app
 	cp $(SBL_BOOTFILES_PATH)/lateapp1.signed $(SBL_SD_FS_PATH)/lateapp1
 	cp $(SBL_BOOTFILES_PATH)/lateapp2.signed $(SBL_SD_FS_PATH)/lateapp2
-ifeq ($(BUILD_QNX_A72), yes)
+ifeq ($(BUILD_QNX_MPU), yes)
 	cp $(SBL_BOOTFILES_PATH)/atf_optee.appimage.signed $(SBL_SD_FS_PATH)/atf_optee.appimage
 	cp $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage.signed $(SBL_SD_FS_PATH)/ifs_qnx.appimage
 endif

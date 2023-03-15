@@ -69,7 +69,7 @@ endif
 # Inter-core virtual ethernet support
 # Supported Values: yes | no
 ifneq (,$(filter yes,$(BUILD_CPU_MCU2_0)))
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 ETHFW_INTERCORE_ETH_SUPPORT?=no
 else
 ETHFW_INTERCORE_ETH_SUPPORT?=yes
@@ -105,7 +105,7 @@ export BUILD_ENABLE_ETHFW
 LINK_SHARED_OBJ?=yes
 
 ifeq ($(SOC),j784s4)
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 LINK_SHARED_OBJ=no
 endif
 endif
@@ -117,10 +117,10 @@ BUILD_CPU_MCU1_1?=no
 BUILD_APP_RTOS_FILEIO?=no
 
 # Build RTOS + Linux binaries
-BUILD_APP_RTOS_LINUX?=$(BUILD_LINUX_A72)
+BUILD_APP_RTOS_LINUX?=$(BUILD_LINUX_MPU)
 
 # Build RTOS + QNX binaries
-BUILD_APP_RTOS_QNX?=$(BUILD_QNX_A72)
+BUILD_APP_RTOS_QNX?=$(BUILD_QNX_MPU)
 
 # PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm am62a_evm
 BUILD_PDK_BOARD=$(SOC)_evm

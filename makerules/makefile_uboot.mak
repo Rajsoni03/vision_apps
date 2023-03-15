@@ -27,10 +27,10 @@ endif
 
 uboot_check_firmware:
 ifeq ($(BUILD_TARGET_MODE),yes)
-ifeq ($(BUILD_LINUX_A72),yes)
+ifeq ($(BUILD_LINUX_MPU),yes)
 	@if [ ! -f  $(VISION_APPS_LINUX_DM) ]; then echo 'ERROR: $(VISION_APPS_LINUX_DM) not found !!!'; exit 1; fi
 endif
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	@if [ ! -f $(VISION_APPS_QNX_DM) ]; then echo 'ERROR: $(VISION_APPS_QNX_DM) !!!'; exit 1; fi
 endif
 endif
@@ -44,7 +44,7 @@ endif
 
 uboot: uboot_check uboot_check_firmware
 ifeq ($(BUILD_TARGET_MODE),yes)
-ifeq ($(BUILD_LINUX_A72),yes)
+ifeq ($(BUILD_LINUX_MPU),yes)
 	cp $(VISION_APPS_LINUX_DM) $(VISION_APPS_LINUX_DM_STRIP)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_LINUX_DM_STRIP)
 ifeq  ($(SOC), am62a)
@@ -54,7 +54,7 @@ else
 endif
 	$(MAKE) -C $(PSDK_LINUX_PATH)/board-support/u-boot-* ARCH=arm CROSS_COMPILE=$(GCC_LINUX_ARM_ROOT)/bin/aarch64-none-linux-gnu- ATF=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl31.bin TEE=$(PSDK_LINUX_PATH)/board-support/prebuilt-images/bl32.bin DM=$(VISION_APPS_LINUX_DM_STRIP) O=$(SOC)-arm64-linux
 endif
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	cp $(VISION_APPS_QNX_DM) $(VISION_APPS_QNX_DM_STRIP)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_QNX_DM_STRIP)
 ifeq  ($(SOC), am62a)

@@ -20,28 +20,28 @@ QNX_FIRMWARE_PREFIX=$(SOC)
 endif
 
 qnx:
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx all        VISION_APPS_BUILD_FLAGS_MAK=$(VISION_APPS_BUILD_FLAGS_MAK) QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD) -s
 endif
 
 qnx_clean:
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx clean      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 
 qnx_scrub:
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx scrub      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 
 qnx_fs_create:
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_clean       QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_create      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 
 qnx_fs_copy_spl_uboot:
-ifeq ($(BUILD_QNX_A72),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(MAKE) -C $(PSDK_QNX_PATH)/qnx qnx_fs_copy_spl_uboot      QNX_BASE=$(QNX_BASE) PROFILE=$(PROFILE) BOARD=$(BOARD)
 endif
 

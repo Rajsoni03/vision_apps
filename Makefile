@@ -81,10 +81,10 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):$(C7X_TARGET):1:debug:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_MPU),yes)
-		ifeq ($(BUILD_LINUX_A72),yes)
+		ifeq ($(BUILD_LINUX_MPU),yes)
 		TARGET_COMBOS += $(TARGET_SOC):LINUX:$(MPU_CPU):1:debug:GCC_LINUX_ARM
 		endif
-		ifeq ($(BUILD_QNX_A72),yes)
+		ifeq ($(BUILD_QNX_MPU),yes)
 		TARGET_COMBOS += $(TARGET_SOC):QNX:$(MPU_CPU):1:debug:GCC_QNX_ARM
 		endif
 	endif
@@ -101,10 +101,10 @@ ifeq ($(BUILD_TARGET_MODE),yes)
 	TARGET_COMBOS += $(TARGET_SOC):$(RTOS):$(C7X_TARGET):1:release:CGT7X
 	endif
 	ifeq ($(BUILD_ISA_MPU),yes)
-		ifeq ($(BUILD_LINUX_A72),yes)
+		ifeq ($(BUILD_LINUX_MPU),yes)
 		TARGET_COMBOS += $(TARGET_SOC):LINUX:$(MPU_CPU):1:release:GCC_LINUX_ARM
 		endif
-		ifeq ($(BUILD_QNX_A72),yes)
+		ifeq ($(BUILD_QNX_MPU),yes)
 		TARGET_COMBOS += $(TARGET_SOC):QNX:$(MPU_CPU):1:release:GCC_QNX_ARM
 		endif
 	endif
