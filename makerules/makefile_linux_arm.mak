@@ -20,14 +20,19 @@ endif
 FIRMWARE_SUBFOLDER?=vision_apps_evm
 UENV_NAME?=uEnv_$(SOC)_vision_apps.txt
 LINUX_FS_STAGE_PATH?=/tmp/tivision_apps_targetfs_stage
+# The bootfs stage path is used to keep the default bootfs dir unaltered.
+# EX: When enabaling "BUILD_CPU_MCU1_0", we copy over the tispl.bin and u-boot.img
+#	  files to the bootfs stage folder to avoid overwriting the default
+#	  tispl.bin and u-boot.img files.
 LINUX_BOOTFS_STAGE_PATH?=/tmp/tivision_apps_bootfs_stage
 
 linux_fs_stage:
 ifeq ($(YOCTO_STAGE),)
 	@rm -rf $(LINUX_FS_STAGE_PATH)
-	rm -rf $(LINUX_BOOTFS_STAGE_PATH)
+	@rm -rf $(LINUX_BOOTFS_STAGE_PATH)
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	install -m 775 -d $(LINUX_BOOTFS_STAGE_PATH)
+	cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/
 endif
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/usr/lib
 
@@ -362,23 +367,29 @@ linux_host_libs_includes:
 	rm -Rf $(LINUX_FS_STAGE_PATH)/lib $(LINUX_FS_STAGE_PATH)/opt
 
 linux_fs_install: linux_fs_stage
-	cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_FS_PATH))
-
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_linux_install
-endif
 
 linux_fs_install_sd: linux_fs_install
 	$(call CLEAN_COPY_FROM_STAGE,$(LINUX_SD_FS_ROOT_PATH))
-	rm -rf $(LINUX_SD_FS_BOOT_PATH)/*
 	cp -rf $(LINUX_BOOTFS_STAGE_PATH)/* $(LINUX_SD_FS_BOOT_PATH)/
 
 	$(call MODIFY_FS,$(LINUX_SD_FS_ROOT_PATH),$(LINUX_SD_FS_BOOT_PATH))
+
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(call UBOOT_INSTALL,linux,$(LINUX_SD_FS_BOOT_PATH))
+endif
+endif
 	sync
 
 linux_fs_install_nfs: linux_fs_install
 	$(call MODIFY_FS,$(LINUX_FS_PATH),$(LINUX_BOOTFS_STAGE_PATH))
+
+ifeq ($(BUILD_CPU_MCU1_0),yes)
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(call UBOOT_INSTALL,linux,$(LINUX_BOOTFS_STAGE_PATH))
+endif
+endif
 
 linux_fs_install_sd_ip: ip_addr_check linux_fs_install
 	mkdir -p /tmp/j7-evm

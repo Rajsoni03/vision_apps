@@ -66,16 +66,13 @@ endif
 endif
 endif
 
-uboot_linux_install: uboot_check
-ifeq ($(BUILD_TARGET_MODE),yes)
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-linux/tispl.bin $(LINUX_BOOTFS_STAGE_PATH)/
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-linux/u-boot.img $(LINUX_BOOTFS_STAGE_PATH)/
-endif
+# UBOOT_INSTALL macro for copying over u-boot binaries to directory
+# $1 : linux or qnx
+# $1 : destination bootfs path
+define UBOOT_INSTALL =
+	$(MAKE) uboot_check
+	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-$(1)/tispl.bin $(2)/
+	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-$(1)/u-boot.img $(2)/
+endef
 
-uboot_qnx_install: uboot_check
-ifeq ($(BUILD_TARGET_MODE),yes)
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-qnx/tispl.bin $(QNX_BOOT_PATH)/
-	cp $(PSDK_LINUX_PATH)/board-support/u-boot-*/$(SOC)-arm64-qnx/u-boot.img $(QNX_BOOT_PATH)/
-endif
-
-.PHONY: uboot_check uboot_check_firmware uboot_clean uboot uboot_linux_install uboot_qnx_install
+.PHONY: uboot_check uboot_check_firmware uboot_clean uboot 
