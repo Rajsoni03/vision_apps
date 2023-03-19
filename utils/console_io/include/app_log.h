@@ -63,6 +63,10 @@
 #ifndef APP_LOG_H_
 #define APP_LOG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /**
@@ -244,6 +248,10 @@ void appLogCpuSyncInit(uint32_t master_cpu_id, uint32_t self_cpu_id,
 
 
 /* @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
