@@ -306,7 +306,7 @@ void *appMemAlloc(uint32_t block, uint32_t size, uint32_t align)
     virtPtr = (void *) (bufs[i].vir_addr);
 
     #ifdef APP_MEM_DEBUG
-    printf("MEM: Allocated memory - virt base address = %p, phy/0x%08x size = %d \n", (void *) virtPtr, bufs[i].phy_addr, size);
+    printf("MEM: Allocated memory - virt base address = %p, phy/0x%08lx size = %d \n", (void *) virtPtr, bufs[i].phy_addr, size);
     #endif
     return(virtPtr);
 }
@@ -337,7 +337,7 @@ int32_t appMemFree(uint32_t block, void *virtPtr, uint32_t size )
     }
     else {
         #ifdef APP_MEM_DEBUG
-        printf("MEM: Found virtPtr at buf/%d, virt/%0x08x phy/%0x08x size/%d\n",i, bufs[i].vir_addr, bufs[i].phy_addr, size);
+        printf("MEM: Found virtPtr at buf/%d, virt/%0lx08x phy/%0lx08x size/%d\n",i, bufs[i].vir_addr, bufs[i].phy_addr, size);
         #endif
         status = SHM_release(&bufs[i]);
         if(status)
