@@ -61,20 +61,21 @@
  */
 
 #include APP_CFG_FILE
-#include <app.h>
 #include <app_run.h>
+#include <utils/console_io/include/app_log.h>
+
+#if defined(ENABLE_TIOVX_HOST)
+#include <app.h>
 #include <stdio.h>
 #include <string.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
 #include <TI/tivx.h>
 #include <ti/board/board.h>
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
 
-#if defined(ENABLE_TIOVX_HOST)
 int app_single_cam_main(int argc, char* argv[]);
 
 char vx_tutorial_get_char()

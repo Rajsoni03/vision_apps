@@ -66,7 +66,6 @@
 #include <app.h>
 #include <stdio.h>
 #include <string.h>
-#include <ti/csl/csl_types.h>
 
 /* Vision_apps utils header files */
 #include <utils/mem/include/app_mem.h>
@@ -75,31 +74,55 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
 #include <utils/misc/include/app_misc.h>
-#include <utils/hwa/include/app_hwa.h>
-#include <utils/iss/include/app_iss.h>
-#include <utils/udma/include/app_udma.h>
-#include <utils/dss/include/app_dss_defaults.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
-#include <utils/sciclient/include/app_sciclient.h>
-#include <utils/sciserver/include/app_sciserver.h>
+
+#if defined(ENABLE_FVID2)
+#include <utils/hwa/include/app_hwa.h>
+#endif
+
+#if defined(ENABLE_I2C) && defined(ENABLE_CSI2RX)
 #include <utils/sensors/include/app_sensors.h>
+#include <utils/iss/include/app_iss.h>
+#endif
+
+#ifdef ENABLE_UDMA
+#include <utils/udma/include/app_udma.h>
+#endif
+
+#if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
+#include <utils/dss/include/app_dss_defaults.h>
+#endif
+
+#ifdef ENABLE_SCICLIENT
+#include <utils/sciclient/include/app_sciclient.h>
+#endif
 
 /* TIOVX header files */
 #include <TI/tivx.h>
 
 /* Vision_apps custom kernel header files */
 #include <TI/tivx_img_proc.h>
-#include <TI/tivx_fileio.h>
+#if defined(C7120)
 #include <TI/tivx_srv.h>
 #include <TI/tivx_stereo.h>
+#endif
 
 /* Imaging header files */
+#if defined(ENABLE_TIOVX) && defined(ENABLE_VHWA_VPAC)
 #include <TI/j7_imaging_aewb.h>
+#endif
 
 /* PDK header files */
+#ifdef ENABLE_BOARD
+/* This header is only needed for the definition of TRUE used */
+#include <ti/csl/csl_types.h>
 #include <ti/board/board.h>
+#endif
+
+#ifdef ENABLE_UART
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
+#endif
 
 app_log_shared_mem_t g_app_log_shared_mem
 __attribute__ ((section(".bss:app_log_mem")))
@@ -714,7 +737,7 @@ void appDeInit()
     appI2cDeInit();
     #endif
 
-    #if defined(ENABLE_VHWA_VPAC0)
+    #if defined(ENABLE_VHWA_VPAC)
     appVissRemoteServiceDeInit();
     #endif
 

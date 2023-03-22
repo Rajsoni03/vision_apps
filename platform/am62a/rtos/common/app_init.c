@@ -66,7 +66,6 @@
 #include <app.h>
 #include <stdio.h>
 #include <string.h>
-#include <ti/csl/csl_types.h>
 
 /* Vision_apps utils header files */
 #include <utils/mem/include/app_mem.h>
@@ -75,31 +74,31 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
 #include <utils/misc/include/app_misc.h>
-#include <utils/hwa/include/app_hwa.h>
-#include <utils/iss/include/app_iss.h>
-#include <utils/udma/include/app_udma.h>
-#include <utils/dss/include/app_dss_defaults.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
+
+#if defined(ENABLE_FVID2)
+#include <utils/hwa/include/app_hwa.h>
+#endif
+
+#ifdef ENABLE_UDMA
+#include <utils/udma/include/app_udma.h>
+#endif
+
+#ifdef ENABLE_SCICLIENT
 #include <utils/sciclient/include/app_sciclient.h>
-#include <utils/sciserver/include/app_sciserver.h>
-#include <utils/sensors/include/app_sensors.h>
-#include <utils/ethfw/include/app_ethfw.h>
+#endif
 
 /* TIOVX header files */
 #include <TI/tivx.h>
 
 /* Vision_apps custom kernel header files */
 #include <TI/tivx_img_proc.h>
-#include <TI/tivx_fileio.h>
-#include <TI/tivx_srv.h>
-
-/* Imaging header files */
-#include <TI/j7_imaging_aewb.h>
 
 /* PDK header files */
-#include <ti/board/board.h>
+#ifdef ENABLE_UART
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
+#endif
 
 app_log_shared_mem_t g_app_log_shared_mem
 __attribute__ ((section(".bss:app_log_mem")))
@@ -362,18 +361,13 @@ int32_t appInit()
     #ifdef ENABLE_IPC
     status = appIpcInit(&ipc_init_prm);
     APP_ASSERT_SUCCESS(status);
-
-	{
+    {
         uint32_t sync_cpu_id_list[APP_LOG_MAX_CPUS];
         uint32_t i, self_cpu_id, master_cpu_id, num_sync_cpus;
 
         if((host_os_type == APP_HOST_TYPE_LINUX) || (host_os_type == APP_HOST_TYPE_QNX))
         {
-            #if defined(SOC_AM62A)
             master_cpu_id = APP_IPC_CPU_MCU1_0;
-            #else
-            master_cpu_id = APP_IPC_CPU_MCU2_0;
-            #endif
         }
         else
         {
@@ -405,7 +399,6 @@ int32_t appInit()
         appLogCpuSyncInit(master_cpu_id, self_cpu_id, sync_cpu_id_list, num_sync_cpus);
         appLogPrintf("APP: Syncing with %d CPUs ... Done !!!\n", num_sync_cpus);
     }
-
     {
         app_remote_service_init_prms_t init_prms;
 
