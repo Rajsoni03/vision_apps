@@ -41,7 +41,6 @@ STATIC_LIBS += app_utils_misc
 STATIC_LIBS += app_utils_sensors
 STATIC_LIBS += app_utils_perf_stats
 STATIC_LIBS += app_utils_iss
-STATIC_LIBS += app_utils_draw2d
 STATIC_LIBS += vx_target_kernels_img_proc_r5f
 
 TIOVX_LIBS =
