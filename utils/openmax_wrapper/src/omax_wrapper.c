@@ -1039,7 +1039,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
         inPortParam.format.video.nFrameHeight  = encH->compHandleArray[ch].src_height;
         inPortParam.format.video.nStride = encH->compHandleArray[ch].src_stride;
         inPortParam.format.video.xFramerate    = (OMX_U32)(encH->compHandleArray[ch].frame_rate << 16); /* FrameRate in Q16 format */
-        inPortParam.format.video.eColorFormat  = (OMX_COLOR_FORMATTYPE)OMXQ_COLOR_FormatNV12;
+        inPortParam.format.video.eColorFormat  = (OMX_COLOR_FORMATTYPE)OMX_COLOR_FormatYUV420SemiPlanar;
         inPortParam.nBufferCountActual = encH->compHandleArray[ch].input_buf_num;
 
         WRAPPER_PRINTF("\nOmxilEnc=> Port comp %p, port %u, nFrameWidth: %d, nFrameHeight: %d, nStride: %d, xFramerate: %d, eColorFormat: %d", encH->compHandleArray[ch].compHandle, inPortParam.nPortIndex, inPortParam.format.video.nFrameWidth, inPortParam.format.video.nFrameHeight, inPortParam.format.video.nStride, inPortParam.format.video.xFramerate, inPortParam.format.video.eColorFormat);
@@ -1273,7 +1273,7 @@ static OMX_ERRORTYPE InitDecComp(app_omax_wrapper_obj_t *encH)
         {
             if(encH->compHandleArray[ch].mLumaDepth == 8)
             {
-                outPortParam.format.video.eColorFormat = (OMX_COLOR_FORMATTYPE)OMXQ_COLOR_FormatNV12;
+                outPortParam.format.video.eColorFormat = (OMX_COLOR_FORMATTYPE)OMX_COLOR_FormatYUV420SemiPlanar;
             }
             #if defined(SOC_J721E)
             else if(encH->compHandleArray[ch].mLumaDepth == 10)
