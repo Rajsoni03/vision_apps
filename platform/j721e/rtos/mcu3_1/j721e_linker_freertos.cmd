@@ -57,11 +57,11 @@ SECTIONS
     .data               : {} palign(128)    > DDR_MCU3_1
     .sysmem             : {} align(8)       > DDR_MCU3_1
     .stack              : {} align(4)       > DDR_MCU3_1
-    .bss.devgroup*      : {} align(4)       > DDR_MCU3_1
+    .bss.devgroup     : {*(.bss.devgroup*)} align(4)       > DDR_MCU3_1
     .bss:taskStackSection > DDR_MCU3_1
 
     .data_buffer        : {} palign(128)    > DDR_MCU3_1
-    .const.devgroup*    : {} align(4)       > DDR_MCU3_1
+    .const.devgroup     : {*(.const.devgroup*)} align(4)       > DDR_MCU3_1
     .boardcfg_data      : {} align(4)       > DDR_MCU3_1
 
     .resource_table          :
@@ -71,7 +71,7 @@ SECTIONS
 
     .tracebuf                : {} align(1024)   > DDR_MCU3_1
 
-    .bss:ddr_local_mem     (NOLOAD) : {} > DDR_MCU3_1_LOCAL_HEAP
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_MCU3_1_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM

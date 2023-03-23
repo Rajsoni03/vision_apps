@@ -92,9 +92,9 @@ SECTIONS
         .data                                                   : {} palign( 128 )
         .boardcfg_data                                          : {} palign( 128 )
         .sysmem                                                 : {}
-        .bss.devgroup*                                          : {} align( 4 )
+        .bss.devgroup                                           : {*(.bss.devgroup*)} align(4)
         .bss:taskStackSection                                   : {}
-        .const.devgroup*                                        : {} align( 4 )
+        .const.devgroup                                         : {*(.const.devgroup*)} align(4)
         .KERNEL_DATA LOAD_START( lnkKernelDataStartAddr ),
                      LOAD_END( lnkKernelDataEndAddr )           : {} palign( 0x800 )
      /* Stack sections. */

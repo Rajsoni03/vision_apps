@@ -56,8 +56,8 @@ SECTIONS
     .data               : {} palign(128)    > DDR_MCU1_0
     .sysmem             : {}                > DDR_MCU1_0
     .data_buffer        : {} palign(128)    > DDR_MCU1_0
-    .bss.devgroup*      : {} align(4)       > DDR_MCU1_0
-    .const.devgroup*    : {} align(4)       > DDR_MCU1_0
+    .bss.devgroup     : {*(.bss.devgroup*)} align(4)       > DDR_MCU1_0
+    .const.devgroup     : {*(.const.devgroup*)} align(4)       > DDR_MCU1_0
     .boardcfg_data      : {} align(4)       > DDR_MCU1_0
     .bss:taskStackSection            : {}   > DDR_MCU1_0
 
@@ -65,9 +65,6 @@ SECTIONS
     {
         __RESOURCE_TABLE = .;
     }                                           > DDR_MCU1_0_RESOURCE_TABLE
-
-    .bss.devgroup*                : {} align(4)      > DDR_MCU1_0
-    .const.devgroup*              : {} align(4)      > DDR_MCU1_0
 
     .tracebuf                : {} align(1024)   > DDR_MCU1_0
 
