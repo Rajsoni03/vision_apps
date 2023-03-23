@@ -182,20 +182,23 @@ int32_t appInit()
     app_ipc_init_prm_t ipc_init_prm;
 
     app_mem_heap_prm_t *heap_prm;
-    uint32_t host_os_type;
 
+    #ifdef ENABLE_IPC
+    uint32_t host_os_type;
     void *ipc_resource_table = NULL;
+    #endif
 
     /* Init and start GTC timer */
     status = appLogGlobalTimeInit();
     APP_ASSERT_SUCCESS(status);
 
+    #ifdef ENABLE_IPC
     /* appGetIpcResourceTable() returns NULL in RTOS only mode and returns a valid resource table
      * in Linux+RTOS mode
      */
     ipc_resource_table = appGetIpcResourceTable();
-
     host_os_type = appGetHostOSType();
+    #endif
 
     appMemInitPrmSetDefault(&mem_init_prm);
     appLogInitPrmSetDefault(&log_init_prm);

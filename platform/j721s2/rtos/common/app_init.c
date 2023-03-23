@@ -200,13 +200,13 @@ int32_t appInit()
 
     app_mem_heap_prm_t *heap_prm;
 
-    #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1)
-    app_mem_rat_prm_t mem_rat_prm;
-    #endif
-
     #ifdef ENABLE_IPC
     uint32_t host_os_type;
     void *ipc_resource_table = NULL;
+    #endif
+
+    #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1)
+    app_mem_rat_prm_t mem_rat_prm;
     #endif
 
     /* Init and start GTC timer */

@@ -203,20 +203,23 @@ int32_t appInit()
     app_ipc_init_prm_t ipc_init_prm;
 
     app_mem_heap_prm_t *heap_prm;
-    uint32_t host_os_type;
 
+    #ifdef ENABLE_IPC
+    uint32_t host_os_type;
     void *ipc_resource_table = NULL;
+    #endif
 
     /* Init and start GTC timer */
     status = appLogGlobalTimeInit();
     APP_ASSERT_SUCCESS(status);
 
+    #ifdef ENABLE_IPC
     /* appGetIpcResourceTable() returns NULL in RTOS only mode and returns a valid resource table
      * in Linux+RTOS mode
      */
     ipc_resource_table = appGetIpcResourceTable();
-
     host_os_type = appGetHostOSType();
+    #endif
 
     appMemInitPrmSetDefault(&mem_init_prm);
     appLogInitPrmSetDefault(&log_init_prm);
@@ -793,10 +796,10 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterImgProcTargetC71Kernels();
         #endif
         #ifdef C66
-        tivxRegisterImgProcTargetC66Kernels();
+        tivxRegisterStereoTargetKernels();
         tivxRegisterSrvTargetC66Kernels();
         tivxRegisterHwaTargetArmKernels();
-        tivxRegisterStereoTargetKernels();
+        tivxRegisterImgProcTargetC66Kernels();
         #endif
         #ifdef ENABLE_VHWA_VPAC
         tivxRegisterImgProcTargetR5FKernels();
@@ -843,10 +846,10 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterImgProcTargetC71Kernels();
         #endif
         #ifdef C66
-        tivxUnRegisterImgProcTargetC66Kernels();
+        tivxUnRegisterStereoTargetKernels();
         tivxUnRegisterSrvTargetC66Kernels();
         tivxUnRegisterHwaTargetArmKernels();
-        tivxUnRegisterStereoTargetKernels();
+        tivxUnRegisterImgProcTargetC66Kernels();
         #endif
         #ifdef ENABLE_VHWA_VPAC
         tivxUnRegisterImgProcTargetR5FKernels();
