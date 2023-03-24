@@ -6,12 +6,7 @@ include $(PRELUDE)
 TARGET      := app_utils_itt_server
 TARGETTYPE  := library
 
-CSOURCES    := itt_server_main.c itt_ctrl_handle_echo.c itt_ctrl_handle_2a.c itt_ctrl_handle_image_save.c itt_ctrl_handle_dcc_send.c itt_ctrl_handle_sensor.c itt_ctrl_handle_dev_ctrl.c
-
-ifeq ($(BUILD_EDGEAI),yes)
-DEFS+=ENABLE_EDGEAI
-CSOURCES += itt_ctrl_edge_ai.c
-endif
+CSOURCES    := itt_server_main.c itt_ctrl_handle_echo.c itt_ctrl_handle_2a.c itt_ctrl_handle_image_save.c itt_ctrl_handle_dcc_send.c itt_ctrl_handle_sensor.c itt_ctrl_handle_dev_ctrl.c itt_ctrl_edge_ai.c
 
 IDIRS += $(IMAGING_PATH)/kernels/include/
 IDIRS += $(IMAGING_PATH)/itt_server_remote/include/

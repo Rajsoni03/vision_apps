@@ -138,8 +138,6 @@ typedef struct
     /**< DCC Buffer Size */
 } AlgItt_IssAewbDccControlParams;
 
-#ifdef ENABLE_EDGEAI
-
 /* Initialize I2C bus for camera register read/write */
 int i2cInit();
 
@@ -177,8 +175,5 @@ typedef enum {
     AEWB,
     LDC,
 } EDGEAI_NODES;
-
-#endif /* ENABLE_EDGEAI */
-
 
 #endif /* ITT_SERVER_LINUX_PRIV_H_ */

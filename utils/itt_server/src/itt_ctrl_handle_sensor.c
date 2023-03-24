@@ -62,7 +62,6 @@
 
 #include "itt_priv.h"
 
-#ifdef ENABLE_EDGEAI
 #include <linux/i2c-dev.h>
 #include <fcntl.h>		/* open() */
 #include <sys/ioctl.h>	/* ioctl() */
@@ -77,9 +76,8 @@ int file_g = -1;
 int i2c16BitRegRead(uint16_t regAddr, uint8_t *regData);
 int i2c16BitRegWrite(uint16_t regAddr, uint8_t regData);
 
-#endif /* ENABLE_EDGEAI */
-
 static uint8_t cmd_param_sensor_ctrl[CMD_PARAM_SIZE];
+extern uint8_t gEdgeAI;
 
 void itt_ctrl_cmdHandlerIssReadSensorReg(char *cmd, uint32_t prmSize)
 {
@@ -115,30 +113,34 @@ void itt_ctrl_cmdHandlerIssReadSensorReg(char *cmd, uint32_t prmSize)
         *ptr32 = sensorRegRdWr[1]; /*Register Address*/
         cmd_ptr += sizeof(uint32_t);
 
-        #ifdef ENABLE_EDGEAI
-        status = i2c16BitRegRead((uint16_t)sensorRegRdWr[1], (uint8_t*)&sensorRegRdWr[2]);
-
-        if(status != 0)
+        if(gEdgeAI)
         {
-            printf("Error : appRemoteServiceRun returned %d \n", status);
-        }
-        #else
-        status = appRemoteServiceRun(
-            APP_IPC_CPU_MCU2_0 ,
-            IMAGE_SENSOR_REMOTE_SERVICE_NAME,
-            IM_SENSOR_CMD_CTL,
-            (void*)cmd_param_sensor_ctrl,
-            CMD_PARAM_SIZE,
-            0);
+            status = i2c16BitRegRead((uint16_t)sensorRegRdWr[1], (uint8_t*)&sensorRegRdWr[2]);
 
-        if(status != 0)
-        {
-            printf("Error : appRemoteServiceRun returned %d \n", status);
+            if(status != 0)
+            {
+                printf("Error : i2c16BitRegRead returned %d \n", status);
+            }
         }
-        
-        ptr32 = (uint32_t *)cmd_ptr;
-        sensorRegRdWr[2] = *ptr32; /*Remote host should write register Value here */
-        #endif
+        else
+        {
+            status = appRemoteServiceRun(
+                APP_IPC_CPU_MCU2_0 ,
+                IMAGE_SENSOR_REMOTE_SERVICE_NAME,
+                IM_SENSOR_CMD_CTL,
+                (void*)cmd_param_sensor_ctrl,
+                CMD_PARAM_SIZE,
+                0);
+
+            if(status != 0)
+            {
+                printf("Error : appRemoteServiceRun returned %d \n", status);
+            }
+            
+            ptr32 = (uint32_t *)cmd_ptr;
+            sensorRegRdWr[2] = *ptr32; /*Remote host should write register Value here */
+        }
+
         /* send response */
         ITT_PRINTF("Read 0x%x from register 0x%x \n", sensorRegRdWr[2], sensorRegRdWr[1]);
         IttCtrl_writeParams((uint8_t *)&sensorRegRdWr[2], sizeof(sensorRegRdWr[2]), 0);
@@ -190,23 +192,32 @@ void itt_ctrl_cmdHandlerIssWriteSensorReg(char *cmd, uint32_t prmSize)
         *ptr32 = sensorRegRdWr[2]; /*Register Value*/
         cmd_ptr += sizeof(uint32_t);
 
-        #ifdef ENABLE_EDGEAI
-        cmd_ptr -= sizeof(uint32_t);
-        status = i2c16BitRegWrite((uint16_t)sensorRegRdWr[1], *cmd_ptr);
-        #else
-        status = appRemoteServiceRun(
-            APP_IPC_CPU_MCU2_0 ,
-            IMAGE_SENSOR_REMOTE_SERVICE_NAME,
-            IM_SENSOR_CMD_CTL,
-            (void*)cmd_param_sensor_ctrl,
-            CMD_PARAM_SIZE,
-            0);
-        #endif
-
-        if(status != 0)
+        if(gEdgeAI)
         {
-            printf("Error : appRemoteServiceRun returned %d \n", status);
+            cmd_ptr -= sizeof(uint32_t);
+            status = i2c16BitRegWrite((uint16_t)sensorRegRdWr[1], *cmd_ptr);
+
+            if(status != 0)
+            {
+                printf("Error : i2c16BitRegWrite returned %d \n", status);
+            }
         }
+        else
+        {
+            status = appRemoteServiceRun(
+                APP_IPC_CPU_MCU2_0 ,
+                IMAGE_SENSOR_REMOTE_SERVICE_NAME,
+                IM_SENSOR_CMD_CTL,
+                (void*)cmd_param_sensor_ctrl,
+                CMD_PARAM_SIZE,
+                0);
+            
+            if(status != 0)
+            {
+                printf("Error : appRemoteServiceRun returned %d \n", status);
+            }
+        }
+
         
         /* send response */
         ptr32 = (uint32_t *)cmd_ptr;
@@ -223,7 +234,6 @@ void itt_ctrl_cmdHandlerIssWriteSensorReg(char *cmd, uint32_t prmSize)
     IttCtrl_writeParams(NULL, 0, 0);
 }
 
-#ifdef ENABLE_EDGEAI
 int i2cInit()
 {
 	int file;
@@ -288,4 +298,3 @@ int i2c16BitRegWrite(uint16_t regAddr, uint8_t regData)
 
 	return 0;
 }
-#endif /* ENABLE_EDGEAI */

@@ -70,8 +70,8 @@
 #define TIOVX_MODULES_MAX_FNAME (256u)
 
 static ITTServerEdgeAIObj g_ITTobj;
-uint8_t g_ITTinit = 0;
-pthread_mutex_t lock;
+static pthread_mutex_t lock;
+uint8_t gEdgeAI = 0;
 
 vx_status writeRawImage(char* file_name, tivx_raw_image image)
 {
@@ -405,8 +405,10 @@ int32_t itt_server_edge_ai_init()
     pthread_mutex_lock(&lock);
 
     int32_t status = 0;
+    static uint8_t ITTinit = 0;
+    gEdgeAI = 1;
 
-    if(!g_ITTinit)
+    if(!ITTinit)
     {        
         /* Initializes ITT server thread on A72/Linux */
         status = itt_server_init((void*)&g_ITTobj, (void*)save_debug_images, (void*)itt_handle_dcc);
@@ -431,7 +433,7 @@ int32_t itt_server_edge_ai_init()
             }
         }
 
-        g_ITTinit = 1;
+        ITTinit = 1;
     }
 
     pthread_mutex_unlock(&lock);

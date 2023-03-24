@@ -194,8 +194,6 @@ void itt_ctrl_cmdHandlerIssWriteSensorReg(char *cmd, uint32_t prmSize);
  */
 void itt_ctrl_cmdHandlerIssDevCtrl(char *cmd, uint32_t prmSize);
 
-#ifdef ENABLE_EDGEAI
-
 /**
  * \brief Function used to register needed objects for EdgeAI ISP Live Tuning
  * 
@@ -207,16 +205,6 @@ int32_t itt_register_object(vx_context context,
                             tivx_raw_image *raw_image_handle,
                             vx_image *yuv_image_handle, 
                             uint8_t object_name);
-
-/**
- * \brief Function used to initialize the ITT server for EdgeAI ISP tuning.
- * 
- * This must be called from any EdgeAI application which needs to control ISP tuning at runtime
- * 
- */
-int32_t itt_server_module_init();
-
-#endif /* ENABLE_EDGEAI */
 
 /* @} */
 
