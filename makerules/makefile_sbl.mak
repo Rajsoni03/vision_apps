@@ -243,11 +243,11 @@ sbl_vision_apps_bootimage_1:
 	mkdir -p $(SBL_BOOTFILES_PATH)/rprcs
 ifeq ($(BUILD_CPU_MCU2_0),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_0.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu2_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU2_1),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu2_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu2_1.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/lateapp1 $(REMOTE_CORE_LIST_LATEAPP1)
 
@@ -259,43 +259,43 @@ sbl_vision_apps_bootimage_2:
 	mkdir -p $(SBL_BOOTFILES_PATH)/rprcs
 ifeq ($(BUILD_CPU_MCU3_0),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_0.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu3_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU3_1),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu3_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu3_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU4_0),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_0.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_0.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu4_0.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_0.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu4_0.out.rprc
 endif
 ifeq ($(BUILD_CPU_MCU4_1),yes)
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_1.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu4_1.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu4_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_mcu4_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_1),yes)
 	$(CGT6X_ROOT)/bin/strip6x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c6x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C6x_2),yes)
 	$(CGT6X_ROOT)/bin/strip6x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/C66/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c6x_2.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c6x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_1),yes)
 	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_1.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_1.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_2.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_2.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_3),yes)
 	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_3.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_3.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_3.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_3.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_3.out.rprc
 endif
 ifeq ($(BUILD_CPU_C7x_4),yes)
 	$(CGT7X_ROOT)/bin/strip7x -p $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_4.out
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_4.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(C7X_TARGET)/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_c7x_4.out $(SBL_BOOTFILES_PATH)/rprcs/vx_app_rtos_qnx_c7x_4.out.rprc
 endif
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/lateapp2 $(REMOTE_CORE_LIST_LATEAPP2)
 
@@ -320,8 +320,8 @@ ifeq ($(USE_OPTEE),$(filter $(USE_OPTEE), 1))
 	cd $(QNX_BOOT_PATH) && \
 	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/ifs_qnx.lds -o $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf && \
 	cd $(curr_dir)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.elf $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.rprc
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.elf $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/atf_optee.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/atf_optee.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
 else
@@ -330,8 +330,8 @@ else
 	cd $(QNX_BOOT_PATH) && \
 	$(QNX_BASE)/host/linux/x86_64/usr/bin/$(QNX_CROSS_COMPILER_TOOL)ld -T $(LDS_PATH)/ifs_qnx.lds -o $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf && \
 	cd $(curr_dir)
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/atf_only.elf $(SBL_BOOTFILES_PATH)/rprcs/atf_only.rprc
-	$(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/atf_only.elf $(SBL_BOOTFILES_PATH)/rprcs/atf_only.rprc
+	mono $(SBL_OUT2RPRC_GEN_TOOL_PATH)/out2rprc.exe $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.elf $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/atf_optee.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/atf_only.rprc
 	$(MULTICORE_APPIMAGE_GEN_TOOL_PATH)/MulticoreImageGen LE $(DEV_ID) $(SBL_BOOTFILES_PATH)/ifs_qnx.appimage 0 $(SBL_BOOTFILES_PATH)/rprcs/ifs_qnx.rprc
 endif
