@@ -193,6 +193,16 @@ static int32_t appCommonInitLocal()
         ipc_init_prm.ipc_vring_mem =  (void *)  IPC_VRING_MEM_ADDR;
         ipc_init_prm.ipc_vring_mem_size = IPC_VRING_MEM_SIZE;
 
+        ipc_init_prm.tiovx_obj_desc_mem   = (void *) mmap_device_memory(0, TIOVX_OBJ_DESC_MEM_SIZE,
+                PROT_READ|PROT_WRITE|PROT_NOCACHE, 0,
+                TIOVX_OBJ_DESC_MEM_ADDR);
+        ipc_init_prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_MEM_SIZE;
+
+        ipc_init_prm.tiovx_log_rt_mem   = (void *) mmap_device_memory(0, TIOVX_LOG_RT_MEM_SIZE,
+                PROT_READ|PROT_WRITE|PROT_NOCACHE, 0,
+                TIOVX_LOG_RT_MEM_ADDR);
+        ipc_init_prm.tiovx_log_rt_mem_size = TIOVX_LOG_RT_MEM_SIZE;
+
         status = appIpcInit(&ipc_init_prm);
         if(status!=0)
         {

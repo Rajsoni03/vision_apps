@@ -65,7 +65,6 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <app_mem_map.h>
 #include <ipc.h>
 #include <stddef.h>
 #include <ti/osal/TaskP.h>
@@ -451,16 +450,6 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
     obj->spin_lock_ptr = mmap_device_memory(0, APP_IPC_HW_SPIN_LOCK_MMR_SIZE,
             PROT_READ|PROT_WRITE|PROT_NOCACHE, 0,
             APP_IPC_HW_SPIN_LOCK_MMR_BASE);
-
-    obj->prm.tiovx_obj_desc_mem   = (void *) mmap_device_memory(0, TIOVX_OBJ_DESC_MEM_SIZE,
-            PROT_READ|PROT_WRITE|PROT_NOCACHE, 0,
-            TIOVX_OBJ_DESC_MEM_ADDR);
-    obj->prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_MEM_SIZE;
-
-    obj->prm.tiovx_log_rt_mem   = (void *) mmap_device_memory(0, TIOVX_LOG_RT_MEM_SIZE,
-            PROT_READ|PROT_WRITE|PROT_NOCACHE, 0,
-            TIOVX_LOG_RT_MEM_ADDR);
-    obj->prm.tiovx_log_rt_mem_size = TIOVX_LOG_RT_MEM_SIZE;
 
     if(obj->spin_lock_ptr == MAP_FAILED)
     {

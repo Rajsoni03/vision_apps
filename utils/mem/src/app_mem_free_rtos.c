@@ -67,7 +67,6 @@
 #include <ti/osal/HwiP.h>
 #include <ti/osal/CacheP.h>
 #include <utils/console_io/include/app_log.h>
-#include <app_mem_map.h>
 
 #if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
 #include <ti/csl/csl_rat.h>
