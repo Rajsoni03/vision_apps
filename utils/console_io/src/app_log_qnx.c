@@ -67,7 +67,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <fcntl.h>
-#include <ti/drv/sciclient/sciclient.h>
+#include <sciclient/sciclient.h>
 #if _POSIX_C_SOURCE >= 199309L
 #include <time.h>   /* for nanosleep */
 int nanosleep(const struct timespec *req, struct timespec *rem);

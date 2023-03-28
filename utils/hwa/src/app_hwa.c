@@ -68,17 +68,17 @@
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/ipc/include/app_ipc.h>
 
-#include <ti/drv/vhwa/include/vhwa_m2mLdc.h>
-#include <ti/drv/vhwa/include/vhwa_m2mMsc.h>
-#include <ti/drv/vhwa/include/vhwa_m2mViss.h>
+#include <vhwa/include/vhwa_m2mLdc.h>
+#include <vhwa/include/vhwa_m2mMsc.h>
+#include <vhwa/include/vhwa_m2mViss.h>
 #include <TI/j7_viss_srvr_remote.h>
 
 #if !defined(SOC_AM62A)
-#include <ti/drv/vhwa/include/vhwa_m2mNf.h>
-#include <ti/drv/vhwa/include/vhwa_m2mSde.h>
-#include <ti/drv/vhwa/include/vhwa_m2mDof.h>
-#include <ti/drv/csirx/csirx.h>
-#include <ti/drv/csitx/csitx.h>
+#include <vhwa/include/vhwa_m2mNf.h>
+#include <vhwa/include/vhwa_m2mSde.h>
+#include <vhwa/include/vhwa_m2mDof.h>
+#include <csirx/csirx.h>
+#include <csitx/csitx.h>
 #endif
 
 #define APP_DEBUG_VHWA

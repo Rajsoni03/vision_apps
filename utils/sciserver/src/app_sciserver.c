@@ -61,14 +61,14 @@
  */
 
 #include <utils/console_io/include/app_log.h>
-#include <ti/drv/sciclient/sciclient.h>
-#include <ti/drv/sciclient/sciserver_tirtos.h>
+#include <sciclient/sciclient.h>
+#include <sciclient/sciserver_tirtos.h>
 #include <stdio.h>
 
 #if defined(SOC_AM62A)
 #include <ti/board/board.h>
-#include <ti/drv/uart/UART.h>
-#include <ti/drv/uart/UART_stdio.h>
+#include <uart/UART.h>
+#include <uart/UART_stdio.h>
 #endif
 
 /* High Priority for SCI Server - must be higher than Low priority task */

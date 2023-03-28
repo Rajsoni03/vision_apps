@@ -66,9 +66,9 @@
 #include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
-#include <ti/osal/osal.h>
-#include <ti/osal/HwiP.h>
-#include <ti/osal/CacheP.h>
+#include <osal.h>
+#include <HwiP.h>
+#include <CacheP.h>
 #include <app_mem_map.h>
 #include <app_ipc_rsctable.h>
 #include <ti/csl/soc.h>

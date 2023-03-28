@@ -63,7 +63,7 @@
 #include "app_remote_service_priv.h"
 #include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
-#include <ti/drv/ipc/ipc.h>
+#include <ipc/ipc.h>
 
 /* #define APP_REMOTE_SERVICE_DEBUG */
 

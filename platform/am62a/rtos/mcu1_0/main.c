@@ -67,7 +67,7 @@
 #include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
-#include <ti/osal/osal.h>
+#include <osal.h>
 #include <app_ipc_rsctable.h>
 
 /**< SCI Server Init Task stack size */

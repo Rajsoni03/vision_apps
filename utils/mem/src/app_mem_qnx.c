@@ -71,7 +71,7 @@
 #include <errno.h>
 #include <hw/inout.h>
 #include <string.h>
-#include <ti/osal/CacheP.h>
+#include <CacheP.h>
 #include <process.h>
 
 #include <utils/mem/include/app_mem.h>

@@ -68,7 +68,7 @@
 #include <utils/dss/include/app_dctrl.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/remote_service/include/app_remote_service.h>
-#include <ti/drv/dss/dss.h>
+#include <dss/dss.h>
 
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */

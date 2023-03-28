@@ -68,7 +68,7 @@
 #include <utils/rtos/include/app_rtos.h>
 #include <ti/sysbios/utils/Load.h>
 #include <ti/sysbios/knl/Task.h>
-#include <ti/osal/HwiP.h>
+#include <HwiP.h>
 #include "app_perf_stats_priv.h"
 
 #define APP_PERF_DDR_MHZ                (1866u)  /* DDR clock speed in MHZ */

@@ -384,7 +384,7 @@ static vx_status VX_CALLBACK tivxKernelSFMProcess
    Has flows which uses UDMA. So intilizing here Specific to TIDL Init.
    This flow is controlled via flowCtrl in create Params
 */
-#include <ti/drv/udma/udma.h>
+#include <udma/udma.h>
 static struct Udma_DrvObj  x86udmaDrvObj;
 
 uint64_t tiadalgVirtToPhyAddrConversion(const void *virtAddr,

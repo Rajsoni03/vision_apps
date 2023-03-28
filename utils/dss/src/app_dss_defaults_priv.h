@@ -69,7 +69,7 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <ti/drv/dss/dss.h>
+#include <dss/dss.h>
 
 typedef struct {
 

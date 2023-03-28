@@ -39,8 +39,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <ti/drv/ipc/ipc.h>
-#include <ti/osal/osal.h>
+#include <ipc/ipc.h>
+#include <osal.h>
 
 #include <utils/console_io/include/app_log.h>
 #include <utils/ipc/include/app_ipc.h>

@@ -66,9 +66,9 @@
 #include <utils/misc/include/app_misc.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/rtos/include/app_rtos.h>
-#include <ti/drv/ipc/ipc.h>
-#include <ti/osal/osal.h>
-#include <ti/osal/HwiP.h>
+#include <ipc/ipc.h>
+#include <osal.h>
+#include <HwiP.h>
 
 /* #define APP_IPC_DEBUG */
 

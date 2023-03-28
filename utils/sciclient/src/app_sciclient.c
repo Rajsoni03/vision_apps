@@ -61,7 +61,7 @@
  */
 
 #include <utils/console_io/include/app_log.h>
-#include <ti/drv/sciclient/sciclient.h>
+#include <sciclient/sciclient.h>
 #include <stdio.h>
 
 int32_t appSciclientDmscGetVersion(char *version_str, uint32_t version_str_size)

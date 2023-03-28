@@ -15,6 +15,7 @@ IDIRS       += $(IVISION_PATH)
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 IDIRS       += $(VXLIB_PATH)/packages
 IDIRS       += $(PDK_PATH)/packages
+IDIRS       += $(PDK_PATH)/packages/ti/drv
 
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C71 C7120))
 DEFS += CORE_DSP

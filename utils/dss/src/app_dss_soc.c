@@ -44,8 +44,8 @@
 #include "app_dss_defaults_priv.h"
 #include <utils/sciclient/include/app_sciclient_wrapper_api.h>
 
-#include <ti/drv/i2c/I2C.h>
-#include <ti/drv/i2c/soc/I2C_soc.h>
+#include <i2c/I2C.h>
+#include <i2c/soc/I2C_soc.h>
 
 #include <ti/board/src/devices/board_devices.h>
 #include <ti/board/board.h>

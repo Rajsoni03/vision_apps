@@ -71,11 +71,11 @@
 #include <stdint.h>
 
 /* PDK Driver Header files */
-#include <ti/drv/ipc/ipc.h>
-#include <ti/drv/udma/udma.h>
-#include <ti/drv/enet/include/per/cpsw.h>
-#include <ti/drv/enet/enet.h>
-#include <ti/drv/enet/examples/utils/include/enet_apputils.h>
+#include <ipc/ipc.h>
+#include <udma/udma.h>
+#include <enet/include/per/cpsw.h>
+#include <enet/enet.h>
+#include <enet/examples/utils/include/enet_apputils.h>
 
 /* EthFw header files */
 #include <utils/board/include/ethfw_board_utils.h>

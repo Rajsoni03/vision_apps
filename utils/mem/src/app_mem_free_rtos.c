@@ -62,10 +62,10 @@
 
 #include <string.h>
 #include <utils/mem/include/app_mem.h>
-#include <ti/osal/HeapP.h>
-#include <ti/osal/MemoryP.h>
-#include <ti/osal/HwiP.h>
-#include <ti/osal/CacheP.h>
+#include <HeapP.h>
+#include <MemoryP.h>
+#include <HwiP.h>
+#include <CacheP.h>
 #include <utils/console_io/include/app_log.h>
 
 #if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))

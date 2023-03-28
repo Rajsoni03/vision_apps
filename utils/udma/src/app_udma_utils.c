@@ -62,8 +62,8 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <ti/osal/CacheP.h>
-#include <ti/drv/udma/udma.h>
+#include <CacheP.h>
+#include <udma/udma.h>
 #include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>

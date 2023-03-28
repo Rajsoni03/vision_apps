@@ -62,11 +62,11 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <ti/osal/CacheP.h>
+#include <CacheP.h>
 #if defined(SOC_AM62A)
-#include <ti/drv/udma/dmautils/udma_standalone/udma.h>
+#include <udma/dmautils/udma_standalone/udma.h>
 #else
-#include <ti/drv/udma/udma.h>
+#include <udma/udma.h>
 #endif
 #include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>

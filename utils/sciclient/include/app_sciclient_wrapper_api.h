@@ -63,7 +63,7 @@
 #ifndef APP_SCICLIENT_WRAPPER_API_H_
 #define APP_SCICLIENT_WRAPPER_API_H_
 
-#include <ti/drv/sciclient/sciclient.h>
+#include <sciclient/sciclient.h>
 #include <utils/console_io/include/app_log.h>
 
 /* make below 0 to disable debug print's for these macro APIs */

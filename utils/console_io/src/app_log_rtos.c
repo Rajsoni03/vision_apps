@@ -61,11 +61,11 @@
  */
 
 #include "app_log_priv.h"
-#include <ti/osal/HwiP.h>
-#include <ti/osal/TimerP.h>
+#include <HwiP.h>
+#include <TimerP.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <string.h>
-#include <ti/drv/sciclient/sciclient.h>
+#include <sciclient/sciclient.h>
 #include "app_global_timer_priv.h"
 
 static uintptr_t GTC_BASE_ADDR = 0;

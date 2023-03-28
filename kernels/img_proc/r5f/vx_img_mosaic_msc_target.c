@@ -67,7 +67,7 @@
 
 #include <tivx_kernels_target_utils.h>
 #include <tivx_img_mosaic_host.h>
-#include <ti/drv/vhwa/include/vhwa_m2mMsc.h>
+#include <vhwa/include/vhwa_m2mMsc.h>
 #include <utils/mem/include/app_mem.h>
 
 #include <utils/perf_stats/include/app_perf_stats.h>

@@ -68,7 +68,7 @@
 #include <utils/rtos/include/app_rtos.h>
 #include <ipc.h>
 #include <stddef.h>
-#include <ti/osal/HwiP.h>
+#include <HwiP.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/mman.h>

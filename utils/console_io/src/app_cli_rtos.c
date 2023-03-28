@@ -65,8 +65,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include <ti/drv/uart/UART.h>
-#include <ti/drv/uart/UART_stdio.h>
+#include <uart/UART.h>
+#include <uart/UART_stdio.h>
 
 
 #define APP_CLI_MAX_SYSTEM_CMDS     (32u)

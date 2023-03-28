@@ -65,8 +65,8 @@
 #include <stdarg.h>
 #include <string.h>
 #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
-#include <ti/drv/uart/UART.h>
-#include <ti/drv/uart/UART_stdio.h>
+#include <uart/UART.h>
+#include <uart/UART_stdio.h>
 #endif
 
 char appGetChar()

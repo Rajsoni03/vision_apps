@@ -39,6 +39,8 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2 J784S4 AM62A))
                 SYSLDIRS += $(GCC_SYSBIOS_ARM_ROOT)/aarch64-elf/libc/usr/lib/
             else ifeq ($(TARGET_OS),QNX)
                 SYSIDIRS += $(PDK_QNX_PATH)/packages
+                SYSIDIRS += $(PDK_QNX_PATH)/packages/ti/osal
+                SYSIDIRS += $(PDK_QNX_PATH)/packages/ti/drv
                 SYSIDIRS += $(GCC_QNX_ARM_ROOT)/../usr/include
                 SYSLDIRS += $(GCC_QNX_ARM_ROOT)/../usr/lib
             else
@@ -67,6 +69,8 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2 J784S4 AM62A))
 
     ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS SAFERTOS))
         SYSIDIRS += $(PDK_PATH)/packages
+        SYSIDIRS += $(PDK_PATH)/packages/ti/osal
+        SYSIDIRS += $(PDK_PATH)/packages/ti/drv
     endif
 
     ifeq ($(TARGET_CPU),C66)

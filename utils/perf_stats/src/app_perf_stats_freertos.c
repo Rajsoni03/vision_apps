@@ -66,12 +66,12 @@
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/rtos/include/app_rtos.h>
-#include <ti/osal/HwiP.h>
+#include <HwiP.h>
 #include "app_perf_stats_priv.h"
 #include <inttypes.h>
 
 #if defined(FREERTOS)
-#include <ti/osal/LoadP.h>
+#include <LoadP.h>
 #endif
 
 #if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
