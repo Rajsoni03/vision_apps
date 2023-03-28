@@ -60,8 +60,6 @@
  *
  */
 
-#include <ti/osal/osal.h>
-
 void appUtilsSetDLFOBitInACTRLReg(void)
 {
 	asm(" MRC p15, #0, r12, c1, c0, #1 ;");
