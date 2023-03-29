@@ -75,7 +75,12 @@
 #include <ti/osal/LoadP.h>
 #endif
 
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
+#define APP_PERF_DDR_MHZ                (2133u)  /* DDR clock speed in MHZ */
+#elif defined(SOC_AM62A)
 #define APP_PERF_DDR_MHZ                (1866u)  /* DDR clock speed in MHZ */
+#endif
+
 #define APP_PERF_DDR_BUS_WIDTH          (  32u)  /* in units of bits */
 #define APP_PERF_DDR_BURST_SIZE_BYTES   (  64u)  /* in units of bytes */
 
@@ -820,7 +825,7 @@ void appPerfStatsResetDdrLoadCalcAll()
     ddrLoad->ddr_stats.write_bw_avg = 0;
     ddrLoad->ddr_stats.read_bw_peak = 0;
     ddrLoad->ddr_stats.write_bw_peak = 0;
-    ddrLoad->ddr_stats.total_available_bw = APP_PERF_DDR_MHZ*APP_PERF_DDR_BUS_WIDTH*2/8;
+    ddrLoad->ddr_stats.total_available_bw = APP_PERF_DDR_MHZ*APP_PERF_DDR_BUS_WIDTH*APP_PERF_NUM_DDR_INSTANCES*2/8;
     ddrLoad->total_time = 0;
     ddrLoad->total_read = 0;
     ddrLoad->total_write = 0;
