@@ -70,7 +70,6 @@
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <stdint.h>
-#include <TI/tivx.h>
 
 #include <app_mem_map.h>
 #include <app_cfg.h>
