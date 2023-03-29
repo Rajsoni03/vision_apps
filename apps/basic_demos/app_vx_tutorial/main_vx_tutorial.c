@@ -67,17 +67,35 @@
 #include <TI/tivx.h>
 #include <utils/app_init/include/app_init.h>
 
+void vx_tutorial_run_all();
 void vx_tutorial_run_interactive();
 
 int main(int argc, char *argv[])
 {
     int status = 0;
+    int i;
+    int set_test_mode = 0;
     
+    for(i=0; i<argc; i++)
+    {
+        if(strcmp(argv[i], "--test")==0)
+        {
+            set_test_mode = 1;
+        }
+    }
+
     status = appInit();
-    
+
     if(status==0)
     {
-        vx_tutorial_run_interactive();
+        if(set_test_mode == 1)
+        {
+            vx_tutorial_run_all();
+        }
+        else
+        {
+            vx_tutorial_run_interactive();
+        }
         appDeInit();
     }
     
