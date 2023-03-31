@@ -844,11 +844,17 @@ int32_t loadConfig(OmxilVideoEncDec_t *encH)
     WRAPPER_PRINTF("\n%s get config(%u) input buffer(encH->currPtr=%p, encH->large_input_buf_data_size=%d)", __func__,
             encH->config_size, encH->currPtr, encH->large_input_buf_data_size);
 
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
+    /* Return the read pointer back to beginning of the file */
+    lseek(encH->in_fd, 0, SEEK_SET);
+#endif /* SOC_J721S2 or SOC_J784S4 */
+
     return err;
 }
 
 int32_t readFrame(OmxilVideoEncDec_t *encH, OMX_BUFFERHEADERTYPE *bufHdr)
 {
+#if defined(SOC_J721E)
     static const uint8_t sc[] = {0x00, 0x00, 0x01};  /* start code */
     int initial_sc_offset = 0;
     int sps_pps_found = 0;
@@ -998,4 +1004,15 @@ int32_t readFrame(OmxilVideoEncDec_t *encH, OMX_BUFFERHEADERTYPE *bufHdr)
             bufHdr->nFilledLen, bufHdr, bufHdr->pBuffer, encH->large_input_buf_data_size);
 
     return err;
+#else
+    bufHdr->nFilledLen = read(encH->in_fd, bufHdr->pBuffer, encH->inputPortBufSize);
+    if(bufHdr->nFilledLen <= 0)
+    {
+        WRAPPER_PRINTF("\n%s:%d=> reach end of file %d", __func__, __LINE__, bufHdr->nFilledLen);
+        encH->eof_received = omxil_true_e;
+        encH->doneReadFrames = omxil_true_e;
+    }
+
+    return EOK;
+#endif /* SOC_J721E */
 }

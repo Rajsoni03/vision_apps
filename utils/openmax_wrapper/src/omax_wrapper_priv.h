@@ -75,19 +75,22 @@
 #endif
 
 #define OMAX_MAX_FILE_PATH               (256u)
-#define OMAX_DEFAULT_BUFFER_SIZE         (10*1024*1024)
 #define OMAX_CONFIG_DATA_BUFFER_SIZE     8096
 #define OMAX_SECOND_BYTE                 0x8000000
 #define OMAX_H264_CUSTOM_ASPECT_RATIO    255
-#define OMAX_DEC_EXTRA_OUT_BUFFERS       0
 #define OMAX_DEFAULT_BITRATE             10000000
 #define OMAX_DEFAULT_IDR_PERIOD          30
 #define OMAX_DEFAULT_FRAME_RATE          30
 
 #if defined(SOC_J721E)
 #define OMAX_DEFAULT_RATE_CONTROL_MODE   OMX_Video_ControlRateConstant  //Other option: OMX_Video_ControlRateVariable
+#define OMAX_DEFAULT_BUFFER_SIZE         (10*1024*1024)
+#define OMAX_DEC_EXTRA_OUT_BUFFERS       0
 #else
 #define OMAX_DEFAULT_RATE_CONTROL_MODE   OMX_Video_ControlRateVariable  //Other option: OMX_Video_ControlRateConstant
+#define OMAX_DEFAULT_BUFFER_SIZE         (2*1024*1024)
+#define OMAX_DEC_EXTRA_OUT_BUFFERS       4
+#define OMAX_DEC_CUSTOM_IN_BUFFERS       2
 #endif /* SOC_J721E */
 
 typedef struct {

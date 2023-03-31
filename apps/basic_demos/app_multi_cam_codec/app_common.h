@@ -86,7 +86,7 @@
 
 #include "multi_cam_codec_modules_common.h"
 
-//#define APP_DEBUG
+// #define APP_DEBUG
 #define APP_USE_FILEIO
 
 #define APP_MAX_FILE_PATH           (256u)

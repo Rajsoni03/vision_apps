@@ -1611,26 +1611,48 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
                 appPerfPointEnd(&obj->fileio_perf);
             }
         }
-    }
 
-    if(status==VX_SUCCESS && obj->decode==1)
-    {
-        status = assign_array_image_buffers(
-                        dec_pool->arr[obj->mosaic_enq_id],
-                        dec_pool->data_ptr[obj->appsink_pull_id],
-                        dec_pool->plane_sizes);
-    }
+        if(status==VX_SUCCESS && obj->decode==1)
+        {
+            status = assign_array_image_buffers(
+                            mosaic_input_arr,
+                            dec_pool->data_ptr[obj->appsink_pull_id],
+                            dec_pool->plane_sizes);
+        }
 
-    if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
-    {
+        if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
+        {
+            if (status == VX_SUCCESS)
+            {
+                status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->display_id], 1);
+            }
+        }
         if (status == VX_SUCCESS)
         {
-            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->display_id], 1);
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1);
         }
     }
-    if (status == VX_SUCCESS)
+    else
     {
-        status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&dec_pool->arr[obj->mosaic_enq_id], 1);
+        if(status==VX_SUCCESS && obj->decode==1)
+        {
+            status = assign_array_image_buffers(
+                            dec_pool->arr[obj->mosaic_enq_id],
+                            dec_pool->data_ptr[obj->appsink_pull_id],
+                            dec_pool->plane_sizes);
+        }
+
+        if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
+        {
+            if (status == VX_SUCCESS)
+            {
+                status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->output_graph_parameter_index, (vx_reference*)&imgMosaicObj->output_image[obj->display_id], 1);
+            }
+        }
+        if (status == VX_SUCCESS)
+        {
+            status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&dec_pool->arr[obj->mosaic_enq_id], 1);
+        }
     }
 
     obj->display_id++;
@@ -2292,6 +2314,13 @@ static void app_update_param_set(AppObj *obj)
     #endif /* QNX */
     }
 #endif /* SOC_J721E */
+#if defined(QNX) && !defined(SOC_J721E)
+    else
+    {
+        /* decoder outputs 16 byte alligned buffers */
+        obj->dec_pool.height = 1088;
+    }
+#endif /* QNX && !SOC_J721E */
     obj->enc_pool.plane_sizes[0] = obj->enc_pool.width * obj->enc_pool.height;
     obj->enc_pool.plane_sizes[1] = obj->enc_pool.width * obj->enc_pool.height/2;
     obj->dec_pool.plane_sizes[0] = obj->dec_pool.width * obj->dec_pool.height;
