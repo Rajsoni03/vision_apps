@@ -73,7 +73,7 @@ static ITTServerEdgeAIObj g_ITTobj;
 static pthread_mutex_t lock;
 uint8_t gEdgeAI = 0;
 
-vx_status writeRawImage(char* file_name, tivx_raw_image image)
+vx_status writeRawImageEdgeAI(char* file_name, tivx_raw_image image)
 {
     vx_status status;
 
@@ -183,7 +183,7 @@ vx_status writeRawImage(char* file_name, tivx_raw_image image)
     return(status);
 }
 
-vx_status writeImage(char* file_name, vx_image img)
+vx_status writeImageEdgeAI(char* file_name, vx_image img)
 {
     vx_status status;
 
@@ -276,7 +276,7 @@ static char *app_get_test_file_path()
     #endif
 }
 
-int32_t save_debug_images(ITTServerEdgeAIObj *obj)
+int32_t save_debug_images_edge_ai(ITTServerEdgeAIObj *obj)
 {
     int num_bytes_io = 0;
     static int file_index = 0;
@@ -301,7 +301,7 @@ int32_t save_debug_images(ITTServerEdgeAIObj *obj)
 
     snprintf(raw_image_fname, TIOVX_MODULES_MAX_FNAME, "%s/%s_%04d.raw", test_data_path, "img", file_index);
     printf("RAW file name %s \n", raw_image_fname);
-    num_bytes_io = writeRawImage(raw_image_fname, *(obj->obj_viss.raw_image_handle));
+    num_bytes_io = writeRawImageEdgeAI(raw_image_fname, *(obj->obj_viss.raw_image_handle));
     if(num_bytes_io < 0)
     {
         printf("Error writing to RAW file \n");
@@ -310,7 +310,7 @@ int32_t save_debug_images(ITTServerEdgeAIObj *obj)
 
     snprintf(yuv_image_fname, TIOVX_MODULES_MAX_FNAME, "%s/%s_%04d.yuv", test_data_path, "img_viss", file_index);
     printf("YUV file name %s \n", yuv_image_fname);
-    num_bytes_io = writeImage(yuv_image_fname, *(obj->obj_viss.yuv_image_handle));
+    num_bytes_io = writeImageEdgeAI(yuv_image_fname, *(obj->obj_viss.yuv_image_handle));
     if(num_bytes_io < 0)
     {
         printf("Error writing to VISS NV12 file \n");
@@ -411,7 +411,7 @@ int32_t itt_server_edge_ai_init()
     if(!ITTinit)
     {        
         /* Initializes ITT server thread on A72/Linux */
-        status = itt_server_init((void*)&g_ITTobj, (void*)save_debug_images, (void*)itt_handle_dcc);
+        status = itt_server_init((void*)&g_ITTobj, (void*)save_debug_images_edge_ai, (void*)itt_handle_dcc);
         if(status != 0)
         {
             printf("Warning : Failed to initialize ITT server. Live tuning will not work \n");
