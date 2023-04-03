@@ -75,5 +75,8 @@ void    appRun(void);
 void   *appGetIpcResourceTable(void);
 uint32_t appGetDdrSharedHeapSize(void);
 uint32_t appGetHostOSType(void);
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData);
 
 #endif /* APP_H_ */

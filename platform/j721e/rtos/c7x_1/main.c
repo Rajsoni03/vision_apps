@@ -371,3 +371,20 @@ void InitMmu(void)
 
     appCacheInit();
 }
+
+/* Offset to be added to convert virtual address to physical address */
+#define VIRT_PHY_ADDR_OFFSET (DDR_64BIT_BASE_PADDR - DDR_64BIT_BASE_VADDR)
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+  uint64_t phyAddr = (uint64_t)virtAddr;
+
+  if ((uint64_t)virtAddr >= DDR_64BIT_BASE_VADDR)
+  {
+    phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
+  }
+
+  return phyAddr;
+}

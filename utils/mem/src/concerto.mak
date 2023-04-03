@@ -4,10 +4,6 @@ include $(PRELUDE)
 TARGET      := app_utils_mem
 TARGETTYPE  := library
 
-ifeq ($(TARGET_OS),SYSBIOS)
-CSOURCES    := app_mem_tirtos.c
-endif
-
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),FREERTOS SAFERTOS))
 CSOURCES    := app_mem_free_rtos.c
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos

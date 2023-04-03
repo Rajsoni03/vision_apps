@@ -12,6 +12,8 @@ CSOURCES    += app_udma_utils.c
 CSOURCES    += app_udma_test.c
 endif
 
+IDIRS       += $(PDK_PATH)/packages
+
 ifeq ($(SOC),am62a)
 ifeq ($(TARGET_CPU),R5F)
 SKIPBUILD=1

@@ -88,40 +88,10 @@
 /** \brief Minmum number of bytes that will be used for alignment, MUST >= max CPU cache line size */
 #define APP_MEM_ALIGN_MIN_BYTES     (128u)
 
-#if defined(__C7100__) || defined(__C7120__)
-
-#if defined(SOC_J721S2) || defined(SOC_J721E)
-/* Offset to be added to convert virtual address to physical address */
-#define VIRT_PHY_ADDR_OFFSET (DDR_64BIT_BASE_PADDR - DDR_64BIT_BASE_VADDR)
-
-uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData)
-{
-  uint64_t phyAddr = (uint64_t)virtAddr;
-
-  if ((uint64_t)virtAddr >= DDR_64BIT_BASE_VADDR)
-  {
-    phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
-  }
-
-  return phyAddr;
-}
-#elif defined(SOC_J784S4)
+#if defined(__C7100__) || defined(__C7120__) || defined(__C7504__)
 extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
                                       void *appData);
-#endif
-#elif defined(__C7504__)
-/* For AM62A max DDR size assumed is 2GB which falls within the 32-bit range */
-/* This routine should be implemented if addition memory above 2GB is added */
-uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData)
-{
-
-  return (uint64_t)virtAddr;
-}
 #endif
 
 typedef struct {

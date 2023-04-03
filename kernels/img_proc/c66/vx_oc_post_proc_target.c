@@ -70,7 +70,6 @@
 
 #include <tivx_oc_post_proc_host.h>
 
-#include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>
 
 static vx_size getTensorDataType(vx_int32 tidl_type);

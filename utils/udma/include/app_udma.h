@@ -82,6 +82,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <ti/drv/udma/udma.h>
 
 #if !defined(SOC_AM62A)
 #include "app_udma_utils.h"
@@ -90,6 +91,23 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* ========================================================================== */
+/*                           Macros & Typedefs                                */
+/* ========================================================================== */
+
+/** \brief UDMA init parameters */
+typedef struct
+{
+    Udma_VirtToPhyFxn       virtToPhyFxn;
+    /**< If not NULL, this function will be called to convert virtual address
+     *   to physical address to be provided to UDMA.
+     *   If NULL, the driver will assume a one-one mapping.
+     *
+     *   Note: The init fxn will initialize this to the default one-one map
+     *   function #Udma_defaultVirtToPhyFxn
+     */
+} app_udma_init_prms_t;
 
 /* ========================================================================== */
 /*                          Function Declarations                             */
@@ -126,11 +144,21 @@ void *appUdmaCsirxCsitxGetObj(void);
 #endif
 
 /**
+ *  \brief Sets default UDMA init parameters
+ *
+ *  \param prms   [IN]   Pointer to UDMA init params
+ *
+ */
+void appUdmaInitPrmSetDefault(app_udma_init_prms_t *prm);
+
+/**
  *  \brief Performs initializations needed for UDMA
+ *
+ *  \param prms   [IN]   Pointer to UDMA init params
  *
  *  \return  0 incase of success else returns failure code
  */
-int32_t appUdmaInit(void);
+int32_t appUdmaInit(const app_udma_init_prms_t *prms);
 
 /**
  *  \brief Performs de-initializations needed for UDMA

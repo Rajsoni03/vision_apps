@@ -83,7 +83,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifndef x86_64
 #include "app_udma.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

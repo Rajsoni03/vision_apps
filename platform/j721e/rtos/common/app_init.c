@@ -461,8 +461,18 @@ int32_t appInit()
     #endif
 
     #ifdef ENABLE_UDMA
-    status = appUdmaInit();
-    APP_ASSERT_SUCCESS(status);
+    {
+        app_udma_init_prms_t udma_init_prm;
+
+        appUdmaInitPrmSetDefault(&udma_init_prm);
+
+        #ifdef C71
+        udma_init_prm.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
+        #endif
+
+        status = appUdmaInit(&udma_init_prm);
+        APP_ASSERT_SUCCESS(status);
+    }
     #endif
 
     status = appMemInit(&mem_init_prm);

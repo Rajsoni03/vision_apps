@@ -141,13 +141,20 @@ void appUdmaOsalMutexUnlock(void *mutexHandle)
 }
 #endif
 
-#if defined(__C7100__) || defined(__C7120__) || defined(__C7504__)
-extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+uint64_t appUdmaDefaultVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
-                                      void *appData);
-#endif
+                                      void *appData)
+{
 
-int32_t appUdmaInit(void)
+  return (uint64_t)virtAddr;
+}
+
+void appUdmaInitPrmSetDefault(app_udma_init_prms_t *prm)
+{
+    prm->virtToPhyFxn = NULL;
+}
+
+int32_t appUdmaInit(const app_udma_init_prms_t *prms)
 {
     int32_t         retVal = 0;
     uint32_t        udmaInstId;
@@ -159,13 +166,27 @@ int32_t appUdmaInit(void)
     UdmaInitPrms_init(udmaInstId, &udmaInitPrms);
     udmaInitPrms.printFxn = (Udma_PrintFxn)appLogPrintf;
     #if defined(SOC_AM62A)
-    udmaInitPrms.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
+    if (NULL != prms->virtToPhyFxn)
+    {
+        udmaInitPrms.virtToPhyFxn = prms->virtToPhyFxn;
+    }
+    else
+    {
+        udmaInitPrms.virtToPhyFxn = appUdmaDefaultVirtToPhyAddrConversion;
+    }
     #else
     udmaInitPrms.skipGlobalEventReg = FALSE;
     #if defined(__C7100__) || defined(__C7120__) || defined(__C7504__)
     udmaInitPrms.osalPrms.lockMutex = appUdmaOsalMutexLock;
     udmaInitPrms.osalPrms.unlockMutex = appUdmaOsalMutexUnlock;
-    udmaInitPrms.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
+    if (NULL != prms->virtToPhyFxn)
+    {
+        udmaInitPrms.virtToPhyFxn = prms->virtToPhyFxn;
+    }
+    else
+    {
+        udmaInitPrms.virtToPhyFxn = appUdmaDefaultVirtToPhyAddrConversion;
+    }
     #endif
     #endif
     retVal = Udma_init(&gAppUdmaDrvObj, &udmaInitPrms);

@@ -370,3 +370,11 @@ void InitMmu(void)
 
     appCacheInit();
 }
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+
+  return (uint64_t)virtAddr;
+}

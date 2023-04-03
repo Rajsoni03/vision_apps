@@ -93,11 +93,7 @@
 #include "VXLIB_add_i8u_i8u_o8u_cn.h"
 #include "stdio.h"
 
-#if defined(SOC_AM62A)
 #include <utils/udma/include/app_udma_utils.h>
-#else
-#include <utils/udma/include/app_udma.h>
-#endif
 
 /* #define ENABLE_DMA_KERNEL_PRINT_STATS */
 

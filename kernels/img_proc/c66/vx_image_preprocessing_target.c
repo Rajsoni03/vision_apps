@@ -69,7 +69,7 @@
 
 #include <tivx_img_preprocessing_host.h>
 #include "tiadalg_interface.h"
-#include <utils/udma/include/app_udma.h>
+#include <utils/udma/include/app_udma_utils.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
 

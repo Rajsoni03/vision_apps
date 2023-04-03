@@ -67,7 +67,6 @@
 
 #include <tivx_oc_pre_proc_host.h>
 
-#include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>
 
 static tivx_target_kernel vx_oc_pre_proc_target_kernel = NULL;

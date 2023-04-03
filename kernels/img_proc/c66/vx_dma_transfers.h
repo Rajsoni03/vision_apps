@@ -65,7 +65,7 @@
 
 #include <TI/tivx.h>
 
-#include <utils/udma/include/app_udma.h>
+#include <utils/udma/include/app_udma_utils.h>
 
 #define J721E_C66X_DRU_START_CHANNEL (8)
 #define DMA_MAX_NUM_TRANSFERS_PER_GROUP (8)

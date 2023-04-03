@@ -66,7 +66,6 @@
 #include <TI/tivx_img_proc.h>
 #include <TI/tivx_target_kernel.h>
 #include <tivx_kernels_target_utils.h>
-#include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>
 
 #include <tivx_dl_draw_box_host.h>
