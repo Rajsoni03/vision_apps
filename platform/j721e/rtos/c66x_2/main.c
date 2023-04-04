@@ -162,3 +162,10 @@ void appCacheMarInit(void)
 #endif
 }
 
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+
+  return (uint64_t)virtAddr;
+}

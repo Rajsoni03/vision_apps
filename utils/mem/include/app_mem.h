@@ -65,6 +65,10 @@
 
 #include <stdint.h>
 
+#if defined(FREERTOS) || defined(SAFERTOS)
+#include <ti/drv/udma/udma.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -160,6 +164,9 @@ typedef struct {
 typedef struct {
 
     app_mem_heap_prm_t heap_info[APP_MEM_HEAP_MAX]; /**< heap init parameters */
+    #if defined(FREERTOS) || defined(SAFERTOS)
+    Udma_VirtToPhyFxn       virtToPhyFxn;
+    #endif
 } app_mem_init_prm_t;
 
 

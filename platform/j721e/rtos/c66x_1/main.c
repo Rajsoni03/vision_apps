@@ -162,3 +162,11 @@ void appCacheMarInit(void)
     CacheP_setMar((void *)TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, CacheP_Mar_DISABLE);
 #endif
 }
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+
+  return (uint64_t)virtAddr;
+}

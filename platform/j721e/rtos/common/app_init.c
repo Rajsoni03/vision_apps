@@ -225,6 +225,8 @@ int32_t appInit()
     appLogInitPrmSetDefault(&log_init_prm);
     appIpcInitPrmSetDefault(&ipc_init_prm);
 
+    mem_init_prm.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
+
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR];
     heap_prm->base = g_ddr_local_mem;
     strncpy(heap_prm->name, "DDR_LOCAL_MEM", APP_MEM_HEAP_NAME_MAX);

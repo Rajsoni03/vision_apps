@@ -88,12 +88,6 @@
 /** \brief Minmum number of bytes that will be used for alignment, MUST >= max CPU cache line size */
 #define APP_MEM_ALIGN_MIN_BYTES     (128u)
 
-#if defined(__C7100__) || defined(__C7120__) || defined(__C7504__)
-extern uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData);
-#endif
-
 typedef struct {
 
     uint16_t is_valid;
@@ -106,7 +100,7 @@ typedef struct {
 typedef struct {
 
     app_mem_heap_obj_t heap_obj[APP_MEM_HEAP_MAX];
-
+    Udma_VirtToPhyFxn       virtToPhyFxn;
 } app_mem_obj_t;
 
 static app_mem_obj_t g_app_mem_obj;
@@ -114,6 +108,8 @@ static app_mem_obj_t g_app_mem_obj;
 void appMemInitPrmSetDefault(app_mem_init_prm_t *prm)
 {
     uint32_t heap_id;
+
+    prm->virtToPhyFxn = NULL;
 
     for(heap_id = 0; heap_id < APP_MEM_HEAP_MAX; heap_id++)
     {
@@ -135,6 +131,15 @@ int32_t appMemInit(app_mem_init_prm_t *prm)
     uint32_t heap_id;
 
     appLogPrintf("MEM: Init ... !!!\n");
+
+    if (NULL != prm->virtToPhyFxn)
+    {
+        g_app_mem_obj.virtToPhyFxn = prm->virtToPhyFxn;
+    }
+    else
+    {
+        g_app_mem_obj.virtToPhyFxn = NULL;
+    }
 
     for(heap_id = 0; heap_id < APP_MEM_HEAP_MAX; heap_id++)
     {
@@ -496,17 +501,21 @@ void  appMemCacheWbInv(void *ptr, uint32_t size)
 
 uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 {
-    /* For rtos implementation, virtual and shared pointers are same
-     */
-#if defined(__C7100__) || defined(__C7120__)
+#if defined(__C7100__) || defined(__C7120__) || defined(R5F)
     uint64_t physPtr;
 
-    physPtr = appUdmaVirtToPhyAddrConversion((void*)virtPtr, 0, NULL);
+    if (NULL != g_app_mem_obj.virtToPhyFxn)
+    {
+        physPtr = g_app_mem_obj.virtToPhyFxn((void*)virtPtr, 0, NULL);
+    }
+    else
+    {
+        physPtr = virtPtr;
+    }
 
     return physPtr;
 #else
     return virtPtr;
-
 #endif
 }
 
