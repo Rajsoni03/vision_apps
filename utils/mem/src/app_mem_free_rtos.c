@@ -501,7 +501,7 @@ void  appMemCacheWbInv(void *ptr, uint32_t size)
 
 uint64_t appMemGetVirt2PhyBufPtr(uint64_t virtPtr, uint32_t heap_id)
 {
-#if defined(__C7100__) || defined(__C7120__) || defined(R5F)
+#ifndef C66
     uint64_t physPtr;
 
     if (NULL != g_app_mem_obj.virtToPhyFxn)
