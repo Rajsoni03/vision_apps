@@ -409,9 +409,9 @@ linux_fs_install_nfs_test_data:
 linux_fs_install_tar: linux_fs_install_nfs linux_fs_install_nfs_test_data
 	# Creating bootfs tar - zipping with gzip (-z option in tar)
 	cd $(LINUX_BOOTFS_STAGE_PATH) && tar czf $(VISION_APPS_PATH)/bootfs.tar.gz .
-	# Creating rootfs tar - using lzma compression, but parallelized to increase performance (-I pxz)
+	# Creating rootfs tar - using lzma compression, but parallelized to increase performance (-I 'xz -T0')
 	# (-J would do lzma compression, but without parallelization)
-	cd $(LINUX_FS_PATH) && sudo tar -I pxz -cpf $(VISION_APPS_PATH)/rootfs.tar.xz .
+	cd $(LINUX_FS_PATH) && sudo tar -I 'xz -T0' -cpf $(VISION_APPS_PATH)/rootfs.tar.xz .
 
 linux_fs_install_from_custom_stage:
 	# Internal Testing
