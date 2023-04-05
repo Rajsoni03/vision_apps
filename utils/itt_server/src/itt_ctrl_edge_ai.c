@@ -73,7 +73,7 @@ static ITTServerEdgeAIObj g_ITTobj;
 static pthread_mutex_t lock;
 uint8_t gEdgeAI = 0;
 
-vx_status writeRawImageEdgeAI(char* file_name, tivx_raw_image image)
+static vx_status writeRawImageEdgeAI(char* file_name, tivx_raw_image image)
 {
     vx_status status;
 
@@ -183,7 +183,7 @@ vx_status writeRawImageEdgeAI(char* file_name, tivx_raw_image image)
     return(status);
 }
 
-vx_status writeImageEdgeAI(char* file_name, vx_image img)
+static vx_status writeImageEdgeAI(char* file_name, vx_image img)
 {
     vx_status status;
 
