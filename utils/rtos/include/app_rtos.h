@@ -76,23 +76,49 @@
  */
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif /* __cplusplus */
 
+/**
+ *  \anchor app_rtos_status_e
+ *  \name App Rtos status code
+ *  @{
+ */
+/*!
+ *  @brief    Status codes for App Rtos APIs
+ */
+typedef int32_t app_rtos_status_t;
+#define APP_RTOS_STATUS_SUCCESS                           (0)
+/*! API completed successfully */
+#define APP_RTOS_STATUS_FAILURE                      (-(int32_t)1)
+/*! API failed */
+#define APP_RTOS_STATUS_TIMEOUT                      (-(int32_t)2)
+/*! API failed because of a timeout */
+/* @} */
 
-/** \brief App RTOS status */
-#define APP_RTOS_STATUS_SUCCESS     (0)
-#define APP_RTOS_STATUS_FAILURE     (-1)
-#define APP_RTOS_STATUS_TIMEOUT     (-2)
+/**
+ *  \anchor app_rtos_semaphore_mode_e
+ *  \name Semaphore Modes
+ *  @{
+ */
+/*!
+ *  @brief    Mode of the semaphore
+ */
+typedef uint32_t app_rtos_semaphore_mode_t;
+#define APP_RTOS_SEMAPHORE_MODE_COUNTING                (0x0U)
+#define APP_RTOS_SEMAPHORE_MODE_BINARY                  (0x1U)
+#define APP_RTOS_SEMAPHORE_MODE_MUTEX                   (0x2U)
+/* @} */
 
+/*!
+ *  @brief    Wait forever define
+ */
+#define APP_RTOS_SEMAPHORE_WAIT_FOREVER (~((uint32_t)0U))
 
+/*!
+ *  @brief    No wait define
+ */
+#define APP_RTOS_SEMAPHORE_NO_WAIT       ((uint32_t)0U)
 
-/** \brief Semaphore Modes*/
-typedef enum {
-
-    APP_RTOS_SEMAPHORE_MODE_BINARY,
-    APP_RTOS_SEMAPHORE_MODE_COUNTING,
-    APP_RTOS_SEMAPHORE_MODE_MUTEX,
-} app_rtos_semaphore_mode_t;
 
 /**
  * \brief Semaphore parameters
@@ -100,9 +126,9 @@ typedef enum {
  */
 typedef struct {
 
-    app_rtos_semaphore_mode_t mode;   /**< Semaphore Mode */
-    uint32_t initValue;  /**< Initial value for the semaphore */
-    uint32_t maxValue;  /**< Maximum value of counting semaphore. Not used for binary semaphore */
+    app_rtos_semaphore_mode_t mode;  /**< Semaphore Mode */
+    uint32_t initValue;              /**< Initial value for the semaphore */
+    uint32_t maxValue;               /**< Maximum value of counting semaphore. Not used for binary semaphore */
 } app_rtos_semaphore_params_t;
 
 /**
@@ -112,12 +138,12 @@ typedef struct {
 typedef struct {
 
     const char   *name;         /**< Pointer to task name */
-    uint32_t      stackSize;    /**< Size of stack in units of bytes */
+    uint32_t      stacksize;    /**< Size of stack in units of bytes */
     uint8_t      *stack;        /**< Pointer to stack memory, MUST be aligned based on CPU architecture, typically atleast 32b on 32b systems */
     uint32_t      priority;     /**< Task priority */
     void         *arg0;         /**< User arguments that are passed back as parameter to task main */
-    void         *arg1;         /**< User arguments that are passed back as parameter to task main */   
-    void         *taskfxn;      /**< Entry point function to the task */ 
+    void         *arg1;         /**< User arguments that are passed back as parameter to task main */
+    void         *taskfxn;      /**< Entry point function to the task */
 } app_rtos_task_params_t;
 
 /*!
@@ -130,10 +156,21 @@ typedef  void *app_rtos_semaphore_handle_t;
  */
 typedef  void *app_rtos_task_handle_t;
 
+/*!
+ *  \brief  Initialize params structure to default values.
+ *
+ *  The default parameters are:
+ *   - mode:      APP_RTOS_SEMAPHORE_MODE_COUNTING
+ *   - maxValue:  255
+ *   - initValue: 0
+ *
+ *  \param params  Pointer to the instance configuration parameters.
+ */
+void appRtosSemaphoreParamsInit(app_rtos_semaphore_params_t *params);
 
 /**
- * \brief Creates a semaphore instance 
- * 
+ * \brief Creates a semaphore instance
+ *
  * \param params [in] parameters for semaphore creation
  *
  * \return app_rtos_semaphore_handle_t on success or a NULL on an error
@@ -149,7 +186,7 @@ app_rtos_semaphore_handle_t appRtosSemaphoreCreate(app_rtos_semaphore_params_t p
  *    - APP_RTOS_STATUS_SUCCESS: Deleted the semaphore instance
  *    - APP_RTOS_STATUS_FAILURE: Failed to delete the semaphore instance
  */
-int32_t appRtosSemaphoreDelete(app_rtos_semaphore_handle_t semhandle);
+app_rtos_status_t appRtosSemaphoreDelete(app_rtos_semaphore_handle_t *semhandle);
 
 /*!
  *  \brief  Function to pend (wait) on a semaphore.
@@ -157,14 +194,14 @@ int32_t appRtosSemaphoreDelete(app_rtos_semaphore_handle_t semhandle);
  *  \param  semhandle  A app_rtos_semaphore_handle_t returned from ::appRtosSemaphoreCreate
  *
  *  \param  timeout Timeout (in milliseconds) to wait for the semaphore to
- *                  be posted (signalled).
+ *                  be posted (signaled).
  *
  *  \return Status of the functions
  *    - APP_RTOS_STATUS_SUCCESS: Obtain the semaphore
  *    - APP_RTOS_STATUS_TIMEOUT: Timed out. Semaphore was not obtained.
  *    - APP_RTOS_STATUS_FAILURE: Non-time out failure.
  */
-int32_t appRtosSemaphorePend(app_rtos_semaphore_handle_t semhandle,
+app_rtos_status_t appRtosSemaphorePend(app_rtos_semaphore_handle_t semhandle,
                                          uint32_t timeout);
 
 /*!
@@ -176,8 +213,26 @@ int32_t appRtosSemaphorePend(app_rtos_semaphore_handle_t semhandle,
  *    - APP_RTOS_STATUS_SUCCESS: Released the semaphore
  *    - APP_RTOS_STATUS_FAILURE: Failed to post the semaphore
  */
-int32_t appRtosSemaphorePost(app_rtos_semaphore_handle_t semhandle);
+app_rtos_status_t appRtosSemaphorePost(app_rtos_semaphore_handle_t semhandle);
 
+/*!
+ *  \brief  Function to clear a semaphore for reuse.
+ *
+ *  \param  semhandle  A app_rtos_semaphore_handle_t returned from ::appRtosSemaphoreCreate
+ *
+ *  \return Status of the functions
+ *    - APP_RTOS_STATUS_SUCCESS: Reset the semaphore
+ *    - APP_RTOS_STATUS_FAILURE: Failed to reset the semaphore
+ */
+app_rtos_status_t appRtosSemaphoreReset(app_rtos_semaphore_handle_t semhandle);
+
+
+/*!
+ *  \brief  Initialize params structure to default values.
+ *
+ *  \param params  Pointer to the instance configuration parameters.
+ */
+void appRtosTaskParamsInit(app_rtos_task_params_t *params);
 
 /*!
  *  \brief  Function to create a task.
@@ -191,13 +246,27 @@ app_rtos_task_handle_t appRtosTaskCreate(const app_rtos_task_params_t *params);
 /*!
  *  \brief  Function to delete a task.
  *
- *  \param  handle  A app_rtos_task_handle_t returned from appRtosTaskCreate
+ *  \param  handle  A app_rtos_semaphore_handle_t returned from ::appRtosSemaphoreCreate
  *
  *  \return Status of the functions
  *    - APP_RTOS_STATUS_SUCCESS: Deleted the task
  *    - APP_RTOS_STATUS_FAILURE: Failed to delete the task
  */
-int32_t appRtosTaskDelete(app_rtos_task_handle_t* handle);
+app_rtos_status_t appRtosTaskDelete(app_rtos_task_handle_t *handle);
+
+/*!
+ *  \brief  Check if task is terminated.
+ *
+ * Typically a task MUST be terminated before it can be deleted.
+ *
+ *  \return 0: task is not terminated, 1: task is terminated
+ */
+uint32_t appRtosTaskIsTerminated(app_rtos_task_handle_t handle);
+
+/*!
+ *  \brief  Function for Task yield
+ */
+void appRtosTaskYield(void);
 
 /*!
  *  \brief  Function for Task sleep in units of OS tick
@@ -217,7 +286,7 @@ void appRtosTaskSleepInMsecs(uint32_t timeoutInMsecs);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif /* __cplusplus */
 
 /* \} */
 

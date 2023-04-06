@@ -204,7 +204,7 @@ ifeq ($(TARGET_OS),LINUX)
 STATIC_LIBS += app_rtos_linux_mpu1_common
 endif
 ifeq ($(TARGET_OS),QNX)
-STATIC_LIBS += app_rtos_qnx_mpu1_common
+STATIC_LIBS += app_rtos_qnx_mpu1_common app_utils_rtos
 endif
 
 ifeq ($(TARGET_OS),LINUX)

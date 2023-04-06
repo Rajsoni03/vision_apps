@@ -26,6 +26,7 @@ LDIRS += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 LDIRS += $(MATHLIB_PATH)/packages/ti/mathlib/lib
 
 STATIC_LIBS += app_utils_mem
+STATIC_LIBS += app_utils_rtos
 STATIC_LIBS += app_utils_console_io
 STATIC_LIBS += app_utils_ipc
 STATIC_LIBS += app_utils_remote_service

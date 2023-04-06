@@ -31,6 +31,7 @@ LDIRS += $(TIDL_PATH)/lib/$(SOC)/dsp/algo/$(TARGET_BUILD)
 LDIRS += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 
 STATIC_LIBS += app_utils_mem
+STATIC_LIBS += app_utils_rtos
 STATIC_LIBS += app_utils_console_io
 STATIC_LIBS += app_utils_ipc
 STATIC_LIBS += vx_app_c7x_target_kernel

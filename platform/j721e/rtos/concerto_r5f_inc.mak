@@ -33,6 +33,7 @@ LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGE
 LDIRS += $(IMAGING_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 STATIC_LIBS += app_utils_mem
+STATIC_LIBS += app_utils_rtos
 STATIC_LIBS += app_utils_console_io
 STATIC_LIBS += app_utils_ipc
 STATIC_LIBS += app_utils_remote_service
