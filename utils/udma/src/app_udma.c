@@ -62,7 +62,6 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <ti/osal/SemaphoreP.h>
 #include <ti/osal/CacheP.h>
 #include <ti/osal/TaskP.h>
 #if defined(SOC_AM62A)

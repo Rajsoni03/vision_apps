@@ -62,7 +62,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <ti/osal/SemaphoreP.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <ti/osal/CacheP.h>
 #include <ti/osal/TaskP.h>
 #include <ti/drv/udma/udma.h>
@@ -166,9 +166,9 @@ typedef struct
     uint64_t                trpd_mem_phy;
     /**< Allocated TRPD memory physical pointer */
 
-    SemaphoreP_Handle       transfer_done_sem;
+    app_rtos_semaphore_handle_t       transfer_done_sem;
     /**< Semaphore to indicate transfer completion */
-    SemaphoreP_Handle       lock_sem;
+    app_rtos_semaphore_handle_t       lock_sem;
     /**< Semaphore for mutual exclusion */
     uint32_t                init_done;
     /**< Flag to indicate init is done for the structure */
@@ -347,7 +347,7 @@ int32_t appUdmaCopyNDReleaseHandle(uint32_t ch_idx)
 app_udma_ch_handle_t appUdmaCopyCreate(const app_udma_create_prms_t *prms)
 {
     int32_t             retVal = UDMA_SOK;
-    SemaphoreP_Params   semPrms;
+    app_rtos_semaphore_params_t   semPrms;
     app_udma_ch_obj_t  *ch_obj = NULL;
 
     if(NULL == prms)
@@ -375,9 +375,12 @@ app_udma_ch_handle_t appUdmaCopyCreate(const app_udma_create_prms_t *prms)
         ch_obj->drv_handle = appUdmaGetObj();
 
         /* Alloc semaphore */
-        SemaphoreP_Params_init(&semPrms);
-        ch_obj->transfer_done_sem = SemaphoreP_create(0, &semPrms);
-        ch_obj->lock_sem = SemaphoreP_create(1, &semPrms);
+        appRtosSemaphoreParamsInit(&semPrms);
+
+        semPrms.initValue = 0U;
+        ch_obj->transfer_done_sem = appRtosSemaphoreCreate(semPrms);
+        semPrms.initValue = 1U;
+        ch_obj->lock_sem = appRtosSemaphoreCreate(semPrms);
         if((NULL == ch_obj->transfer_done_sem) || (NULL == ch_obj->lock_sem))
         {
             appLogPrintf("UDMA : ERROR: Semaphore alloc failed !!!\n");
@@ -507,12 +510,12 @@ int32_t appUdmaCopyDelete(app_udma_ch_handle_t ch_handle)
         }
         if(ch_obj->transfer_done_sem != NULL)
         {
-            SemaphoreP_delete(ch_obj->transfer_done_sem);
+            appRtosSemaphoreDelete(ch_obj->transfer_done_sem);
             ch_obj->transfer_done_sem = NULL;
         }
         if(ch_obj->lock_sem != NULL)
         {
-            SemaphoreP_delete(ch_obj->lock_sem);
+            appRtosSemaphoreDelete(ch_obj->lock_sem);
             ch_obj->lock_sem = NULL;
         }
         ch_obj->drv_handle = NULL;
@@ -555,12 +558,12 @@ int32_t appUdmaCopy1D(
 
         if(prms_1d->length <= APP_UDMA_1D_TX_MAX)
         {
-            SemaphoreP_pend(ch_obj->lock_sem, SemaphoreP_WAIT_FOREVER);
+            appRtosSemaphorePend(ch_obj->lock_sem, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
             appUdmaTrpdSet1D(ch_obj, prms_1d);
             retVal = appUdmaTransfer(ch_obj);
 
-            SemaphoreP_post(ch_obj->lock_sem);
+            appRtosSemaphorePost(ch_obj->lock_sem);
         }
         /* More than ICNT supported transfer - do split transfer */
         /* Caution: Semaphore lock is called inside 2D function - not called here */
@@ -957,7 +960,7 @@ static int32_t appUdmaCreateCh(app_udma_ch_obj_t *ch_obj)
         chPrms.tdCqRingPrms.ringMem = NULL;
         chPrms.fqRingPrms.elemCnt     = 0U;
         chPrms.cqRingPrms.elemCnt     = 0U;
-        chPrms.tdCqRingPrms.elemCnt  = 0U; 
+        chPrms.tdCqRingPrms.elemCnt  = 0U;
     }
     else
     {
@@ -1170,7 +1173,7 @@ static int32_t appUdmaCopy2DLocal(
             ch_obj = (app_udma_ch_obj_t *)gAppUdmaDefaultChHandle;
         }
 
-        SemaphoreP_pend(ch_obj->lock_sem, SemaphoreP_WAIT_FOREVER);
+        appRtosSemaphorePend(ch_obj->lock_sem, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
         for(i = 0U; i < num_transfers; i++)
         {
@@ -1183,7 +1186,7 @@ static int32_t appUdmaCopy2DLocal(
             prms_2d++;
         }
 
-        SemaphoreP_post(ch_obj->lock_sem);
+        appRtosSemaphorePost(ch_obj->lock_sem);
     }
 
     return (retVal);
@@ -1210,7 +1213,7 @@ static int32_t appUdmaTransfer(app_udma_ch_obj_t *ch_obj)
         {
             /* Wait for return descriptor in completion ring
              * This marks the entire transfer completion */
-            SemaphoreP_pend(ch_obj->transfer_done_sem, SemaphoreP_WAIT_FOREVER);
+            appRtosSemaphorePend(ch_obj->transfer_done_sem, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
             /* Response received in completion queue */
             retVal =
@@ -1281,7 +1284,7 @@ static void appUdmaEventDmaCb(
     {
         if(UDMA_EVENT_TYPE_DMA_COMPLETION == eventType)
         {
-            SemaphoreP_post(ch_obj->transfer_done_sem);
+            appRtosSemaphorePost(ch_obj->transfer_done_sem);
         }
     }
 

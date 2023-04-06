@@ -65,10 +65,10 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/mem/include/app_mem.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <ti/sysbios/utils/Load.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/osal/HwiP.h>
-#include <ti/osal/SemaphoreP.h>
 #include <ti/osal/TaskP.h>
 #include "app_perf_stats_priv.h"
 
@@ -108,7 +108,7 @@ typedef struct {
 
 typedef struct {
 
-    SemaphoreP_Handle lock;
+    app_rtos_semaphore_handle_t lock;
     app_perf_stats_load_t hwiLoad;
     app_perf_stats_load_t swiLoad;
     app_perf_stats_load_t idleLoad;
@@ -134,7 +134,7 @@ void appPerfStatsLock(app_perf_stats_obj_t *obj)
 {
     if(obj->lock!=NULL)
     {
-        SemaphoreP_pend(obj->lock, SemaphoreP_WAIT_FOREVER);
+        appRtosSemaphorePend(obj->lock, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
     }
 }
 
@@ -142,7 +142,7 @@ void appPerfStatsUnLock(app_perf_stats_obj_t *obj)
 {
     if(obj->lock!=NULL)
     {
-        SemaphoreP_post(obj->lock);
+        appRtosSemaphorePost(obj->lock);
     }
 }
 
@@ -354,13 +354,16 @@ int32_t appPerfStatsInit()
 {
     app_perf_stats_obj_t *obj = &g_app_perf_stats_obj;
     int32_t status = 0;
-    SemaphoreP_Params semParams;
+    app_rtos_semaphore_params_t semParams;
 
     memset(obj, 0, sizeof(app_perf_stats_obj_t));
 
-    SemaphoreP_Params_init(&semParams);
-    semParams.mode = SemaphoreP_Mode_BINARY;
-    obj->lock = SemaphoreP_create(1U, &semParams);
+    appRtosSemaphoreParamsInit(&semParams);
+
+    semParams.mode = APP_RTOS_SEMAPHORE_MODE_BINARY;
+    semParams.initValue = 1U;
+
+    obj->lock = appRtosSemaphoreCreate(semParams);
     if(obj->lock==NULL)
     {
         appLogPrintf("PERF STATS: Unable to create lock semaphore\n");
@@ -397,7 +400,7 @@ int32_t appPerfStatsRemoteServiceInit()
 int32_t appPerfStatsDeInit()
 {
     appRemoteServiceUnRegister(APP_PERF_STATS_SERVICE_NAME);
-    /* SemaphoreP_delete(obj->lock);  DO NOT delete since idle task will keep running even after deinit */
+    /* appRtosSemaphoreDelete(obj->lock);  DO NOT delete since idle task will keep running even after deinit */
     return 0;
 }
 

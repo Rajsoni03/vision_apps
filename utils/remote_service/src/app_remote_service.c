@@ -63,9 +63,9 @@
 #include "app_remote_service_priv.h"
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <ti/drv/ipc/ipc.h>
 #include <ti/osal/TaskP.h>
-#include <ti/osal/SemaphoreP.h>
 
 /* #define APP_REMOTE_SERVICE_DEBUG */
 
@@ -130,8 +130,8 @@ typedef struct {
     uint8_t rpmsg_rx_msg_buf[IPC_RPMESSAGE_MSG_SIZE] __attribute__ ((aligned(1024)));
     #endif
     uint8_t rpmsg_tx_msg_buf[IPC_RPMESSAGE_MSG_SIZE] __attribute__ ((aligned(1024)));
-    SemaphoreP_Handle tx_lock;
-    SemaphoreP_Handle rx_lock;
+    app_rtos_semaphore_handle_t tx_lock;
+    app_rtos_semaphore_handle_t rx_lock;
     app_remote_service_handler_t handlers[APP_REMOTE_SERVICE_HANDLERS_MAX];
     char service_name[APP_REMOTE_SERVICE_HANDLERS_MAX][APP_REMOTE_SERVICE_NAME_MAX];
     char task_name[APP_REMOTE_SERVICE_MAX_TASK_NAME];
@@ -145,7 +145,7 @@ static int32_t appRemoteServiceRunHandler(char *service_name, uint32_t cmd, void
     int32_t status = -1;
     uint32_t i, is_found = 0;
 
-    SemaphoreP_pend(obj->rx_lock, SemaphoreP_WAIT_FOREVER);
+    appRtosSemaphorePend(obj->rx_lock, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
     for(i=0; i<APP_REMOTE_SERVICE_HANDLERS_MAX; i++)
     {
         if(obj->handlers[i]!=NULL && (strcmp(obj->service_name[i], service_name)==0))
@@ -155,7 +155,7 @@ static int32_t appRemoteServiceRunHandler(char *service_name, uint32_t cmd, void
             break;
         }
     }
-    SemaphoreP_post(obj->rx_lock);
+    appRtosSemaphorePost(obj->rx_lock);
     if(!is_found)
     {
         appLogPrintf("REMOTE_SERVICE: ERROR: Unable to find handler for service [%s]\n", service_name);
@@ -181,7 +181,7 @@ static void appRemoteServiceRxTaskMain(void *arg0, void *arg1)
                         &len,
                         &reply_endpt,
                         &src_cpu_id,
-                        SemaphoreP_WAIT_FOREVER
+                        APP_RTOS_SEMAPHORE_WAIT_FOREVER
                         );
 
         if(status == IPC_E_UNBLOCKED)
@@ -287,7 +287,7 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, u
             dst_ipc_cpu_id = appIpcGetIpcCpuId(dst_app_cpu_id);
 
             /* take a lock since to make this call thread safe */
-            SemaphoreP_pend(obj->tx_lock, SemaphoreP_WAIT_FOREVER);
+            appRtosSemaphorePend(obj->tx_lock, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
             /* copy content to temp buffer */
             header = (app_service_msg_header_t *)&obj->rpmsg_tx_msg_buf[0];
@@ -348,7 +348,7 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, u
                                     &rx_payload_size,
                                     &rx_endpt,
                                     &rx_cpu_id,
-                                    SemaphoreP_WAIT_FOREVER
+                                    APP_RTOS_SEMAPHORE_WAIT_FOREVER
                                     );
                     if(status == IPC_SOK
                         && rx_payload_size == tx_payload_size
@@ -383,7 +383,7 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, u
                 }
             }
             /* take a lock since to make this call thread safe */
-            SemaphoreP_post(obj->tx_lock);
+            appRtosSemaphorePost(obj->tx_lock);
         }
     }
 
@@ -453,7 +453,7 @@ int32_t appRemoteServiceInit(app_remote_service_init_prms_t *prm)
 {
     app_remote_service_obj_t *obj = &g_app_remote_service_obj;
     int32_t status = 0;
-    SemaphoreP_Params semParams;
+    app_rtos_semaphore_params_t semParams;
     uint32_t i;
 
     appLogPrintf("REMOTE_SERVICE: Init ... !!!\n");
@@ -478,9 +478,12 @@ int32_t appRemoteServiceInit(app_remote_service_init_prms_t *prm)
         obj->service_name[i][0] = 0;
     }
 
-    SemaphoreP_Params_init(&semParams);
-    semParams.mode = SemaphoreP_Mode_BINARY;
-    obj->tx_lock = SemaphoreP_create(1U, &semParams);
+    appRtosSemaphoreParamsInit(&semParams);
+
+    semParams.mode = APP_RTOS_SEMAPHORE_MODE_BINARY;
+    semParams.initValue = 1U;
+
+    obj->tx_lock = appRtosSemaphoreCreate(semParams);
     if(obj->tx_lock==NULL)
     {
         appLogPrintf("REMOTE_SERVICE: Unable to create tx semaphore\n");
@@ -492,9 +495,7 @@ int32_t appRemoteServiceInit(app_remote_service_init_prms_t *prm)
     }
     if(status==0)
     {
-        SemaphoreP_Params_init(&semParams);
-        semParams.mode = SemaphoreP_Mode_BINARY;
-        obj->rx_lock = SemaphoreP_create(1U, &semParams);
+        obj->rx_lock = appRtosSemaphoreCreate(semParams);
         if(obj->rx_lock==NULL)
         {
             appLogPrintf("REMOTE_SERVICE: Unable to create rx semaphore\n");
@@ -657,8 +658,8 @@ int32_t appRemoteServiceDeInit()
         obj->rpmsg_rx_handle = NULL;
     }
     #endif
-    SemaphoreP_delete(obj->tx_lock);
-    SemaphoreP_delete(obj->rx_lock);
+    appRtosSemaphoreDelete(obj->tx_lock);
+    appRtosSemaphoreDelete(obj->rx_lock);
 
     appLogPrintf("REMOTE_SERVICE: Deinit ... Done !!!\n");
 

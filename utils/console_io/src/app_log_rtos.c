@@ -65,7 +65,7 @@
 #include <ti/osal/HwiP.h>
 #include <ti/osal/TimerP.h>
 #include <ti/osal/TaskP.h>
-#include <ti/osal/SemaphoreP.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <string.h>
 #include <ti/drv/sciclient/sciclient.h>
 #include "app_global_timer_priv.h"
@@ -78,11 +78,14 @@ static uint64_t mhzFreq = 0;
 int32_t appLogWrCreateLock(app_log_wr_obj_t *obj)
 {
     int32_t status = 0;
-    SemaphoreP_Params semParams;
+    app_rtos_semaphore_params_t semParams;
 
-    SemaphoreP_Params_init(&semParams);
-    semParams.mode = SemaphoreP_Mode_BINARY;
-    obj->lock = SemaphoreP_create(1U, &semParams);
+    appRtosSemaphoreParamsInit(&semParams);
+
+    semParams.mode = APP_RTOS_SEMAPHORE_MODE_BINARY;
+    semParams.initValue = 1U;
+
+    obj->lock = appRtosSemaphoreCreate(semParams);
     if(obj->lock==NULL)
     {
         status = -1;
@@ -94,7 +97,7 @@ uintptr_t appLogWrLock(app_log_wr_obj_t *obj)
 {
     if(obj->lock)
     {
-        SemaphoreP_pend(obj->lock, SemaphoreP_WAIT_FOREVER);
+        appRtosSemaphorePend(obj->lock, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
     }
     return (uintptr_t)0;
 }
@@ -103,7 +106,7 @@ void appLogWrUnLock(app_log_wr_obj_t *obj, uintptr_t key)
 {
     if(obj->lock)
     {
-        SemaphoreP_post(obj->lock);
+        appRtosSemaphorePost(obj->lock);
     }
 }
 

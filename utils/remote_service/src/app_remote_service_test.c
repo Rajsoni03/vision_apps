@@ -68,6 +68,7 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 
 #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 /* define this to enable load test */
@@ -87,7 +88,6 @@
 #ifdef ENABLE_LOAD_TEST
 
 #include <ti/osal/TaskP.h>
-#include <ti/osal/SemaphoreP.h>
 
 #define APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME  (64u)
 
@@ -115,7 +115,7 @@ __attribute__ ((aligned(APP_REMOTE_SERVICE_LOAD_TEST_TASK_ALIGNMENT)))
 typedef struct {
 
     TaskP_Handle task_handle;
-    SemaphoreP_Handle start;
+    app_rtos_semaphore_handle_t start;
     volatile uint32_t stop;
     char task_name[APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME];
     uint32_t ld;
@@ -169,7 +169,7 @@ static void appRemoteServiceLoadTestTaskMain(void *arg0, void *arg1)
 
     while(1)
     {
-        SemaphoreP_pend(obj->start, SemaphoreP_WAIT_FOREVER);
+        appRtosSemaphorePend(obj->start, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
         while(1)
         {
@@ -188,7 +188,7 @@ static int32_t appRemoteServiceTestLoadTestInit()
 {
     app_remote_service_load_test_obj_t *obj = &g_app_remote_service_load_test_obj;
     TaskP_Params task_prms;
-    SemaphoreP_Params semParams;
+    app_rtos_semaphore_params_t semParams;
     int32_t status = 0;
 
     TaskP_Params_init(&task_prms);
@@ -205,9 +205,12 @@ static int32_t appRemoteServiceTestLoadTestInit()
 
     obj->stop = 0;
 
-    SemaphoreP_Params_init(&semParams);
-    semParams.mode = SemaphoreP_Mode_BINARY;
-    obj->start = SemaphoreP_create(0U, &semParams);
+    appRtosSemaphoreParamsInit(&semParams);
+
+    semParams.mode = APP_RTOS_SEMAPHORE_MODE_BINARY;
+    semParams.initValue = 0U;
+
+    obj->start = appRtosSemaphoreCreate(semParams);
     if(obj->start==NULL)
     {
         appLogPrintf("REMOTE_SERVICE_TEST: Unable to create tx semaphore\n");
@@ -240,7 +243,7 @@ static void appRemoteServiceTestLoadTestStart(uint32_t load)
     obj->ld = load;
     obj->stop = 0;
 
-    SemaphoreP_post(obj->start);
+    appRtosSemaphorePost(obj->start);
 }
 
 static void appRemoteServiceTestLoadTestStop()

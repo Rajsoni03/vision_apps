@@ -65,10 +65,10 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/ipc/include/app_ipc.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <ipc.h>
 #include <stddef.h>
 #include <ti/osal/TaskP.h>
-#include <ti/osal/SemaphoreP.h>
 #include <ti/osal/HwiP.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -321,7 +321,7 @@ static void appIpcRpmsgRxTaskMain(void* arg0,
                         &len,
                         &reply_endpt,
                         &src_cpu_id,
-                        SemaphoreP_WAIT_FOREVER
+                        APP_RTOS_SEMAPHORE_WAIT_FOREVER
                         );
 
         if(status != IPC_E_UNBLOCKED)

@@ -294,7 +294,7 @@ bridgeif_initdata_t bridge_initdata;
 #endif /* ETHAPP_ENABLE_INTERCORE_ETH */
 void appEthFwEarlyInit()
 {
-    SemaphoreP_Params semParams;
+    app_rtos_semaphore_params_t semParams;
 
     /* Create semaphore used to synchronize EthFw and NDK init.
      * EthFw opens the CPSW driver which is required by NDK during NIMU
@@ -302,9 +302,12 @@ void appEthFwEarlyInit()
      * Currently, there is no control over NDK initialization time and its
      * task runs right away after BIOS_start() hence causing a race
      * condition with EthFw init */
-    SemaphoreP_Params_init(&semParams);
-    semParams.mode = SemaphoreP_Mode_BINARY;
-    gEthAppObj.hInitSem = SemaphoreP_create(0, &semParams);
+    appRtosSemaphoreParamsInit(&semParams);
+
+    semParams.mode = APP_RTOS_SEMAPHORE_MODE_BINARY;
+    semParams.initValue = 0U;
+
+    gEthAppObj.hInitSem = appRtosSemaphoreCreate(semParams);
 }
 
 int32_t appEthFwInit()
@@ -413,7 +416,7 @@ void LwipifEnetAppCb_getHandle(LwipifEnetAppIf_GetHandleInArgs *inArgs,
                                LwipifEnetAppIf_GetHandleOutArgs *outArgs)
 {
     /* Wait for EthFw to be initialized */
-    SemaphoreP_pend(gEthAppObj.hInitSem, SemaphoreP_WAIT_FOREVER);
+    appRtosSemaphorePend(gEthAppObj.hInitSem, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
     EthFwCallbacks_lwipifCpswGetHandle(inArgs, outArgs);
 
@@ -533,7 +536,7 @@ static int32_t EthApp_initEthFw(void)
     /* Post semaphore so that lwip or NIMU/NDK can continue with their initialization */
     if (status == ETHAPP_OK)
     {
-        SemaphoreP_post(gEthAppObj.hInitSem);
+        appRtosSemaphorePost(gEthAppObj.hInitSem);
     }
 
     return status;

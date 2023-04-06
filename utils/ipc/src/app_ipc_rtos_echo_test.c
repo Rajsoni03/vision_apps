@@ -41,13 +41,13 @@
 
 #include <ti/drv/ipc/ipc.h>
 #include <ti/osal/osal.h>
-#include <ti/osal/SemaphoreP.h>
 #include <ti/osal/TaskP.h>
 
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 
 /* #define APP_IPC_ECHO_TEST_DEBUG */
 
@@ -156,7 +156,7 @@ static uint8_t  g_rspBuf[RPMSG_DATA_SIZE]  __attribute__ ((aligned (APP_IPC_RSPB
 
 uint32_t g_ipc_echo_test_status[APP_IPC_CPU_MAX];
 
-static SemaphoreP_Handle g_ipc_echo_test_lock;
+static app_rtos_semaphore_handle_t g_ipc_echo_test_lock;
 
 #define APP_IPC_ECHO_TEST_MAX_TASK_NAME     (12u)
 static char g_rpmsg_responder_task_name[APP_IPC_ECHO_TEST_MAX_TASK_NAME];
@@ -166,7 +166,7 @@ static void appIpcEchoTestLock(void)
 {
     if(g_ipc_echo_test_lock!=NULL)
     {
-        SemaphoreP_pend(g_ipc_echo_test_lock, SemaphoreP_WAIT_FOREVER);
+        appRtosSemaphorePend(g_ipc_echo_test_lock, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
     }
 }
 
@@ -174,7 +174,7 @@ static void appIpcEchoTestUnLock(void)
 {
     if(g_ipc_echo_test_lock!=NULL)
     {
-        SemaphoreP_post(g_ipc_echo_test_lock);
+        appRtosSemaphorePost(g_ipc_echo_test_lock);
     }
 }
 
@@ -388,7 +388,7 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
     }
 
     status = RPMessage_getRemoteEndPt(dstProc, SERVICE, &remoteProcId,
-                             &remoteEndPt, SemaphoreP_WAIT_FOREVER);
+                             &remoteEndPt, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
     if(dstProc != remoteProcId)
     {
@@ -472,15 +472,18 @@ int32_t appIpcEchoTestStart(void)
     TaskP_Params      params;
     uint32_t          numProc = APP_IPC_CPU_MAX;
     int32_t status = 0;
-    SemaphoreP_Params semParams;
+    app_rtos_semaphore_params_t semParams;
     TaskP_Handle rx_task, tx_task[APP_IPC_CPU_MAX];
 
     appLogPrintf("IPC: Starting echo test ...\n");
 
     /* Default parameter initialization */
-    SemaphoreP_Params_init(&semParams);
-    semParams.mode = SemaphoreP_Mode_BINARY;
-    g_ipc_echo_test_lock = SemaphoreP_create(1U, &semParams);
+    appRtosSemaphoreParamsInit(&semParams);
+
+    semParams.mode = APP_RTOS_SEMAPHORE_MODE_BINARY;
+    semParams.initValue = 1U;
+
+    g_ipc_echo_test_lock = appRtosSemaphoreCreate(semParams);
     if(g_ipc_echo_test_lock==NULL)
     {
         appLogPrintf("IPC: ERROR: Failed to create lock !!!\n");

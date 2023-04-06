@@ -70,10 +70,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-/* OSAL Header files */
-#include <ti/osal/osal.h>
-#include <ti/osal/SemaphoreP.h>
-
 /* PDK Driver Header files */
 #include <ti/drv/ipc/ipc.h>
 #include <ti/drv/udma/udma.h>
@@ -91,6 +87,7 @@
 #include <utils/udma/include/app_udma.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 
 #if defined (SYSBIOS)
 
@@ -159,7 +156,7 @@ typedef struct
     Udma_DrvHandle hUdmaDrv;
 
     /* Semaphore for synchronizing EthFw and NDK initialization */
-    SemaphoreP_Handle hInitSem;
+    app_rtos_semaphore_handle_t hInitSem;
 
     /* Host MAC address */
     uint8_t hostMacAddr[ENET_MAC_ADDR_LEN];
