@@ -67,7 +67,6 @@
 #include <utils/mem/include/app_mem.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <ti/osal/HwiP.h>
-#include <ti/osal/TaskP.h>
 #include "app_perf_stats_priv.h"
 #include <inttypes.h>
 
@@ -190,7 +189,7 @@ void appPerfStatsResetLoadCalcAll(app_perf_stats_obj_t *obj)
     appPerfStatsUnLock(obj);
 }
 
-void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
+void appPerfStatsTaskLoadUpdate(app_rtos_task_handle_t task, app_perf_stats_load_t *load)
 {
     #if defined(FREERTOS)
     LoadP_Stats rtos_load_stat;
@@ -208,7 +207,7 @@ void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
 
     for(i=0; i< obj->num_tasks; i++)
     {
-        appPerfStatsTaskLoadUpdate((TaskP_Handle)obj->task_handle[i], &obj->taskLoad[i]);
+        appPerfStatsTaskLoadUpdate((app_rtos_task_handle_t)obj->task_handle[i], &obj->taskLoad[i]);
     }
 }
 

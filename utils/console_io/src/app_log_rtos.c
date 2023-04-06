@@ -61,10 +61,8 @@
  */
 
 #include "app_log_priv.h"
-#include <utils/perf_stats/include/app_perf_stats.h>
 #include <ti/osal/HwiP.h>
 #include <ti/osal/TimerP.h>
-#include <ti/osal/TaskP.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <string.h>
 #include <ti/drv/sciclient/sciclient.h>
@@ -194,15 +192,15 @@ int32_t appLogGlobalTimeDeInit()
 
 void appLogWaitMsecs(uint32_t time_in_msecs)
 {
-    TaskP_sleepInMsecs(time_in_msecs);
+    appRtosTaskSleepInMsecs(time_in_msecs);
 }
 
 int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm)
 {
-    TaskP_Params rtos_task_prms;
+    app_rtos_task_params_t rtos_task_prms;
     int32_t status = 0;
 
-    TaskP_Params_init(&rtos_task_prms);
+    appRtosTaskParamsInit(&rtos_task_prms);
 
     rtos_task_prms.stacksize = obj->task_stack_size;
     rtos_task_prms.stack = obj->task_stack;
@@ -210,20 +208,15 @@ int32_t   appLogRdCreateTask(app_log_rd_obj_t *obj, app_log_init_prm_t *prm)
     rtos_task_prms.arg0 = (void*)(obj);
     rtos_task_prms.arg1 = NULL;
     rtos_task_prms.name = (const char*)&obj->task_name[0];
+    rtos_task_prms.taskfxn   = &appLogRdRun;
 
     strncpy(obj->task_name, "LOG_RD", APP_LOG_MAX_TASK_NAME);
     obj->task_name[APP_LOG_MAX_TASK_NAME-1] = 0;
 
-    obj->task_handle = (void*)TaskP_create(
-                            &appLogRdRun,
-                            &rtos_task_prms);
+    obj->task_handle = (void*)appRtosTaskCreate(&rtos_task_prms);
     if(obj->task_handle==NULL)
     {
         status = -1;
-    }
-    else
-    {
-        appPerfStatsRegisterTask(obj->task_handle, obj->task_name);
     }
     return status;
 }

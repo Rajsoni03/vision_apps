@@ -41,9 +41,7 @@
 
 #include <ti/drv/ipc/ipc.h>
 #include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
 
-#include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/misc/include/app_misc.h>
@@ -469,11 +467,11 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
 int32_t appIpcEchoTestStart(void)
 {
     uint32_t          cpu_id;
-    TaskP_Params      params;
+    app_rtos_task_params_t      params;
     uint32_t          numProc = APP_IPC_CPU_MAX;
     int32_t status = 0;
     app_rtos_semaphore_params_t semParams;
-    TaskP_Handle rx_task, tx_task[APP_IPC_CPU_MAX];
+    app_rtos_task_handle_t rx_task, tx_task[APP_IPC_CPU_MAX];
 
     appLogPrintf("IPC: Starting echo test ...\n");
 
@@ -504,26 +502,24 @@ int32_t appIpcEchoTestStart(void)
         /* Respond to messages coming in to endPt ENDPT1 */
         cpu_id = appIpcGetSelfCpuId();
 
-        TaskP_Params_init(&params);
+        appRtosTaskParamsInit(&params);
         params.priority = 3;
         params.stack     = g_taskStackBuf[cpu_id];
         params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
         params.arg0 = 0;
         params.name = (const char*)&g_rpmsg_responder_task_name[0];
+        params.taskfxn   = &rpmsg_responderFxn;
 
         strncpy(g_rpmsg_responder_task_name, "IPC_TEST_RX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
         g_rpmsg_responder_task_name[APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
 
-        rx_task = TaskP_create(&rpmsg_responderFxn, &params);
+        rx_task = appRtosTaskCreate(&params);
         if(rx_task==NULL)
         {
             appLogPrintf("IPC: ERROR: Failed to create RX task !!!\n");
             status = -1;
         }
-        else
-        {
-            appPerfStatsRegisterTask(rx_task, g_rpmsg_responder_task_name);
-        }
+
         if(status==0)
         {
             for(cpu_id = 0; cpu_id < numProc; cpu_id++)
@@ -536,26 +532,23 @@ int32_t appIpcEchoTestStart(void)
                     appLogPrintf("IPC: SendTask%d: Creating ...\n", ipc_lld_cpu_id);
                     #endif
                     /* send messages to peer(s) on ENDPT1 */
-                    TaskP_Params_init(&params);
+                    appRtosTaskParamsInit(&params);
                     params.priority = 3;
                     params.stack     = g_taskStackBuf[cpu_id];
                     params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
                     params.arg0     = (void*)ipc_lld_cpu_id;
                     params.arg1     = (void*)cpu_id;
                     params.name     = (const char*)&g_rpmsg_sender_task_name[cpu_id][0];
+                    params.taskfxn   = &rpmsg_senderFxn;
 
                     strncpy(g_rpmsg_sender_task_name[cpu_id], "IPC_TEST_TX", APP_IPC_ECHO_TEST_MAX_TASK_NAME);
                     g_rpmsg_sender_task_name[cpu_id][APP_IPC_ECHO_TEST_MAX_TASK_NAME-1] = 0;
 
-                    tx_task[cpu_id] = TaskP_create(&rpmsg_senderFxn, &params);
+                    tx_task[cpu_id] = appRtosTaskCreate(&params);
                     if(tx_task[cpu_id]==NULL)
                     {
                         appLogPrintf("IPC: ERROR: Failed to create TX task %d !!!\n", cpu_id);
                         status = -1;
-                    }
-                    else
-                    {
-                        appPerfStatsRegisterTask(tx_task[cpu_id], g_rpmsg_sender_task_name[cpu_id]);
                     }
                 }
             }

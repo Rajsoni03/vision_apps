@@ -64,10 +64,10 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/sciserver/include/app_sciserver.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
 #include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
 #include <app_ipc_rsctable.h>
 
 /**< SCI Server Init Task stack size */
@@ -81,20 +81,21 @@ __attribute__ ((aligned(8192)));
 
 static void appMain(void* arg0, void* arg1)
 {
-    TaskP_Handle sciserverInitTask;
-    TaskP_Params sciserverInitTaskParams;
+    app_rtos_task_handle_t sciserverInitTask;
+    app_rtos_task_params_t sciserverInitTaskParams;
 
     appUtilsTaskInit();
 
     appSciserverSciclientInit();
 
     /* Initialize SCI Client Server */
-    TaskP_Params_init(&sciserverInitTaskParams);
+    appRtosTaskParamsInit(&sciserverInitTaskParams);
     sciserverInitTaskParams.priority     = INIT_SCISERVER_TASK_PRI;
     sciserverInitTaskParams.stack        = gSciserverInitTskStack;
     sciserverInitTaskParams.stacksize    = sizeof (gSciserverInitTskStack);
+    sciserverInitTaskParams.taskfxn = &appSciserverInit;
 
-    sciserverInitTask = TaskP_create(&appSciserverInit, &sciserverInitTaskParams);
+    sciserverInitTask = appRtosTaskCreate(&sciserverInitTaskParams);
     if(NULL == sciserverInitTask)
     {
         OS_stop();
@@ -127,8 +128,8 @@ __attribute__ ((aligned(8192)))
 
 int main(void)
 {
-    TaskP_Params tskParams;
-    TaskP_Handle task;
+    app_rtos_task_params_t tskParams;
+    app_rtos_task_handle_t task;
 
 #if defined FREERTOS
     /* Relocate FreeRTOS Reset Vectors from BTCM*/
@@ -142,13 +143,13 @@ int main(void)
     OS_init();
 
     /* Initialize the task params */
-    TaskP_Params_init(&tskParams);
+    appRtosTaskParamsInit(&tskParams);
     /* Set the task priority higher than the default priority (1) */
     tskParams.priority     = 2;
     tskParams.stack        = gTskStackMain;
     tskParams.stacksize    = sizeof (gTskStackMain);
-
-    task = TaskP_create(&appMain, &tskParams);
+    tskParams.taskfxn = &appMain;
+    task = appRtosTaskCreate(&tskParams);
     if(NULL == task)
     {
         OS_stop();

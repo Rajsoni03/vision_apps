@@ -66,7 +66,6 @@
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
 
@@ -86,8 +85,6 @@
 #define APP_REMOTE_SERVICE_TEST_CMD_LOAD_TEST_STOP   (0x0004)
 
 #ifdef ENABLE_LOAD_TEST
-
-#include <ti/osal/TaskP.h>
 
 #define APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME  (64u)
 
@@ -114,7 +111,7 @@ __attribute__ ((aligned(APP_REMOTE_SERVICE_LOAD_TEST_TASK_ALIGNMENT)))
 
 typedef struct {
 
-    TaskP_Handle task_handle;
+    app_rtos_task_handle_t task_handle;
     app_rtos_semaphore_handle_t start;
     volatile uint32_t stop;
     char task_name[APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME];
@@ -187,11 +184,11 @@ static void appRemoteServiceLoadTestTaskMain(void *arg0, void *arg1)
 static int32_t appRemoteServiceTestLoadTestInit()
 {
     app_remote_service_load_test_obj_t *obj = &g_app_remote_service_load_test_obj;
-    TaskP_Params task_prms;
+    app_rtos_task_params_t task_prms;
     app_rtos_semaphore_params_t semParams;
     int32_t status = 0;
 
-    TaskP_Params_init(&task_prms);
+    appRtosTaskParamsInit(&task_prms);
 
     task_prms.stacksize = APP_REMOTE_SERVICE_LOAD_TEST_TASK_STACK_SIZE;
     task_prms.stack = g_app_remote_service_rx_task_stack;
@@ -199,6 +196,7 @@ static int32_t appRemoteServiceTestLoadTestInit()
     task_prms.arg0 = NULL;
     task_prms.arg1 = NULL;
     task_prms.name = (const char*)&obj->task_name[0];
+    task_prms.taskfxn   = &appRemoteServiceLoadTestTaskMain;
 
     strncpy(obj->task_name, "LOAD_TEST", APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME);
     obj->task_name[APP_REMOTE_SERVICE_LOAD_TEST_MAX_TASK_NAME-1] = 0;
@@ -221,17 +219,11 @@ static int32_t appRemoteServiceTestLoadTestInit()
         status = -1;
     }
 
-    obj->task_handle = (void*)TaskP_create(
-                            &appRemoteServiceLoadTestTaskMain,
-                            &task_prms);
+    obj->task_handle = (void*)appRtosTaskCreate(&task_prms);
     if(obj->task_handle==NULL)
     {
         appLogPrintf("REMOTE_SERVICE_TEST: ERROR: Unable to create task \n");
         status = -1;
-    }
-    else
-    {
-        appPerfStatsRegisterTask(obj->task_handle, obj->task_name);
     }
     return status;
 }

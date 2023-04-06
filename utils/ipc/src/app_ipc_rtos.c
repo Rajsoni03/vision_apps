@@ -64,12 +64,10 @@
 #include <string.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/misc/include/app_misc.h>
-#include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <ti/drv/ipc/ipc.h>
 #include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
 #include <ti/osal/HwiP.h>
 
 /* #define APP_IPC_DEBUG */
@@ -173,7 +171,7 @@ typedef struct {
     uint32_t rpmsg_tx_endpt[APP_IPC_CPU_MAX];
     RPMessage_Handle rpmsg_rx_handle;
     app_ipc_notify_handler_f ipc_notify_handler;
-    TaskP_Handle task_handle;
+    app_rtos_task_handle_t task_handle;
     uint32_t task_stack_size;
     uint8_t *task_stack;
     uint32_t task_pri;
@@ -369,10 +367,10 @@ static void appIpcRpmsgRxTaskMain(void *arg0, void *arg1)
 
 static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
 {
-    TaskP_Params rtos_task_prms;
+    app_rtos_task_params_t rtos_task_prms;
     int32_t status = 0;
 
-    TaskP_Params_init(&rtos_task_prms);
+    appRtosTaskParamsInit(&rtos_task_prms);
 
     rtos_task_prms.stacksize = obj->task_stack_size;
     rtos_task_prms.stack = obj->task_stack;
@@ -380,21 +378,16 @@ static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
     rtos_task_prms.arg0 = NULL;
     rtos_task_prms.arg1 = NULL;
     rtos_task_prms.name = (const char*)&obj->task_name[0];
+    rtos_task_prms.taskfxn = &appIpcRpmsgRxTaskMain;
 
     strncpy(obj->task_name, "IPC_RX", APP_IPC_MAX_TASK_NAME);
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
 
-    obj->task_handle = (void*)TaskP_create(
-                            &appIpcRpmsgRxTaskMain,
-                            &rtos_task_prms);
+    obj->task_handle = (void*)appRtosTaskCreate(&rtos_task_prms);
     if(obj->task_handle==NULL)
     {
         appLogPrintf("IPC: ERROR: Unable to create RX task \n");
         status = -1;
-    }
-    else
-    {
-        appPerfStatsRegisterTask(obj->task_handle, obj->task_name);
     }
     return status;
 }
@@ -406,7 +399,7 @@ static void appIpcDeleteRpmsgRxTask(app_ipc_obj_t *obj)
     RPMessage_unblock(obj->rpmsg_rx_handle);
 
     /* confirm task termination */
-    while ( ! TaskP_isTerminated(obj->task_handle) )
+    while ( ! appRtosTaskIsTerminated(obj->task_handle) )
     {
         appLogWaitMsecs(sleep_time);
         sleep_time >>= 1U;
@@ -416,7 +409,7 @@ static void appIpcDeleteRpmsgRxTask(app_ipc_obj_t *obj)
             break;
         }
     }
-    TaskP_delete(&obj->task_handle);
+    appRtosTaskDelete(&obj->task_handle);
 }
 
 void appIpcInitPrmSetDefault(app_ipc_init_prm_t *prm)
@@ -546,7 +539,7 @@ int32_t appIpcInit(app_ipc_init_prm_t *prm)
             {
                 while(!Ipc_isRemoteReady(ipc_proc_list[cpu_id]))
                 {
-                    //TaskP_sleep(100);
+                    //appRtosTaskSleep(100);
                 }
             }
             appLogPrintf("IPC: HLOS is ready !!!\n");
@@ -856,7 +849,7 @@ int32_t appIpcHwLockAcquire(uint32_t hw_lock_id, uint32_t timeout)
         while( *reg_addr == 1u )
         {
             HwiP_restore(key);
-            TaskP_yield();
+            appRtosTaskYield();
             key = HwiP_disable();
             /* keep spining */
         }
@@ -930,7 +923,7 @@ static void traceBufFlush(void* arg0, void* arg1)
 
     while (1)
     {
-        TaskP_sleepInMsecs(IPC_TRACEBUF_FLUSH_PERIOD_IN_MSEC);
+        appRtosTaskSleepInMsecs(IPC_TRACEBUF_FLUSH_PERIOD_IN_MSEC);
         traceBufCacheWb();
     }
 }
@@ -957,20 +950,21 @@ static void traceBufCacheWb(void)
 int32_t appIpcCreateTraceBufFlushTask(void)
 {
     int32_t status = -1;
-    TaskP_Params taskParams;
+    app_rtos_task_params_t taskParams;
 
     gIpcObj.traceBufAddr = (uint8_t *)Ipc_traceBuffer;
     gIpcObj.traceBufSize = IPC_TRACEBUF_SIZE;
     gIpcObj.traceBufLastFlushTicksInUsecs = 0ULL;
 
     /* Task to flush IPC traceBuf */
-    TaskP_Params_init(&taskParams);
+    appRtosTaskParamsInit(&taskParams);
     taskParams.priority  = 0;
     taskParams.stack     = &gIpcTraceBufFlushBuf[0];
     taskParams.stacksize = sizeof(gIpcTraceBufFlushBuf);
     taskParams.name      = (const char*)"IPC tracebuf flush";
+    taskParams.taskfxn   = &traceBufFlush;
 
-    TaskP_create(&traceBufFlush, &taskParams);
+    appRtosTaskCreate(&taskParams);
 
     return status;
 }

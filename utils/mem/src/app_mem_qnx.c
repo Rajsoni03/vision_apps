@@ -71,7 +71,6 @@
 #include <errno.h>
 #include <hw/inout.h>
 #include <string.h>
-#include <ti/osal/TaskP.h>
 #include <ti/osal/CacheP.h>
 #include <process.h>
 

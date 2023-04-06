@@ -356,18 +356,19 @@ int32_t appEthFwInit()
     /* Initialize lwIP */
     if (status == ENET_SOK)
     {
-        TaskP_Params taskParams;
+        app_rtos_task_params_t taskParams;
 
-        TaskP_Params_init(&taskParams);
+        appRtosTaskParamsInit(&taskParams);
         taskParams.priority  = DEFAULT_THREAD_PRIO;
         taskParams.stack     = &gEthAppLwipStackBuf[0];
         taskParams.stacksize = sizeof(gEthAppLwipStackBuf);
         taskParams.name      = "lwIP main loop";
+        taskParams.taskfxn   = &EthApp_lwipMain;
 #if defined(SAFERTOS)
         taskParams.userData  = &gEthApp_lwipMainTaskSemObj;
 #endif
 
-        TaskP_create(&EthApp_lwipMain, &taskParams);
+        appRtosTaskCreate(&taskParams);
     }
 
     if (status == ETHAPP_OK)

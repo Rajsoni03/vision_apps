@@ -61,11 +61,9 @@
  */
 
 #include "app_remote_service_priv.h"
-#include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <ti/drv/ipc/ipc.h>
-#include <ti/osal/TaskP.h>
 
 /* #define APP_REMOTE_SERVICE_DEBUG */
 
@@ -123,7 +121,7 @@ typedef struct {
     uint32_t rpmsg_tx_endpt;
     #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
     RPMessage_Handle rpmsg_rx_handle;
-    TaskP_Handle task_handle;
+    app_rtos_task_handle_t task_handle;
     uint32_t task_stack_size;
     uint8_t *task_stack;
     uint32_t task_pri;
@@ -393,10 +391,10 @@ int32_t appRemoteServiceRun(uint32_t dst_app_cpu_id, const char *service_name, u
 #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
 static int32_t appRemoteServiceCreateRpmsgRxTask(app_remote_service_obj_t *obj)
 {
-    TaskP_Params task_prms;
+    app_rtos_task_params_t task_prms;
     int32_t status = 0;
 
-    TaskP_Params_init(&task_prms);
+    appRtosTaskParamsInit(&task_prms);
 
     task_prms.stacksize = obj->task_stack_size;
     task_prms.stack = obj->task_stack;
@@ -404,21 +402,16 @@ static int32_t appRemoteServiceCreateRpmsgRxTask(app_remote_service_obj_t *obj)
     task_prms.arg0 = NULL;
     task_prms.arg1 = NULL;
     task_prms.name = (const char*)&obj->task_name[0];
+    task_prms.taskfxn   = &appRemoteServiceRxTaskMain;
 
     strncpy(obj->task_name, "REMOTE_SRV", APP_REMOTE_SERVICE_MAX_TASK_NAME);
     obj->task_name[APP_REMOTE_SERVICE_MAX_TASK_NAME-1] = 0;
 
-    obj->task_handle = (void*)TaskP_create(
-                            &appRemoteServiceRxTaskMain,
-                            &task_prms);
+    obj->task_handle = (void*)appRtosTaskCreate(&task_prms);
     if(obj->task_handle==NULL)
     {
         appLogPrintf("REMOTE_SERVICE: ERROR: Unable to create RX task \n");
         status = -1;
-    }
-    else
-    {
-        appPerfStatsRegisterTask(obj->task_handle, obj->task_name);
     }
     return status;
 }
@@ -430,7 +423,7 @@ static void appRemoteServiceDeleteRpmsgRxTask(app_remote_service_obj_t *obj)
     RPMessage_unblock(obj->rpmsg_rx_handle);
 
     /* confirm task termination */
-    while ( ! TaskP_isTerminated(obj->task_handle) )
+    while ( ! appRtosTaskIsTerminated(obj->task_handle) )
     {
         appLogWaitMsecs(sleep_time);
         sleep_time >>= 1U;
@@ -440,7 +433,7 @@ static void appRemoteServiceDeleteRpmsgRxTask(app_remote_service_obj_t *obj)
             break;
         }
     }
-    TaskP_delete(&obj->task_handle);
+    appRtosTaskDelete(&obj->task_handle);
 }
 #endif
 

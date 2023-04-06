@@ -69,7 +69,6 @@
 #include <ti/sysbios/utils/Load.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/osal/HwiP.h>
-#include <ti/osal/TaskP.h>
 #include "app_perf_stats_priv.h"
 
 #define APP_PERF_DDR_MHZ                (1866u)  /* DDR clock speed in MHZ */
@@ -404,7 +403,7 @@ int32_t appPerfStatsDeInit()
     return 0;
 }
 
-void appPerfStatsTaskLoadUpdate(TaskP_Handle task, app_perf_stats_load_t *load)
+void appPerfStatsTaskLoadUpdate(app_rtos_task_handle_t task, app_perf_stats_load_t *load)
 {
     Load_Stat rtos_load_stat;
 
@@ -434,14 +433,14 @@ void appPerfStatsHwiSwiLoadUpdate(uint32_t is_hwi, app_perf_stats_load_t *load)
 void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
 {
     uint32_t i;
-    TaskP_Handle task;
+    app_rtos_task_handle_t task;
 
     task = Task_getIdleTaskHandle(0u);
     appPerfStatsTaskLoadUpdate(task, &obj->idleLoad);
 
     for(i=0; i< obj->num_tasks; i++)
     {
-        appPerfStatsTaskLoadUpdate((TaskP_Handle)obj->task_handle[i], &obj->taskLoad[i]);
+        appPerfStatsTaskLoadUpdate((app_rtos_task_handle_t)obj->task_handle[i], &obj->taskLoad[i]);
     }
 }
 

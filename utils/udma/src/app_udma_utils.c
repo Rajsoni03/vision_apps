@@ -62,13 +62,12 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <utils/rtos/include/app_rtos.h>
 #include <ti/osal/CacheP.h>
-#include <ti/osal/TaskP.h>
 #include <ti/drv/udma/udma.h>
 #include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/rtos/include/app_rtos.h>
 
 #if defined(__C7100__) || defined(__C7120__)
 #include <c7x.h>
@@ -738,7 +737,7 @@ int32_t appUdmaCopyNDWait(
 #endif
                 break;
             }
-            TaskP_yield();
+            appRtosTaskYield();
         }
     }
 
@@ -773,7 +772,7 @@ int32_t appUdmaCopyNDWait(
 #endif
             break;
         }
-        TaskP_yield();
+        appRtosTaskYield();
     }
 
     return (retVal);
@@ -801,7 +800,7 @@ int32_t appUdmaCopyNDDeinit(
             {
                 break;
             }
-            TaskP_yield();
+            appRtosTaskYield();
         }
 
         if(UDMA_SOK == retVal)
@@ -1235,7 +1234,7 @@ static int32_t appUdmaTransfer(app_udma_ch_obj_t *ch_obj)
                 {
                     break;
                 }
-                TaskP_yield();
+                appRtosTaskYield();
             }
         }
 

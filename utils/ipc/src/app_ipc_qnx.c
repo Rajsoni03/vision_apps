@@ -68,7 +68,6 @@
 #include <utils/rtos/include/app_rtos.h>
 #include <ipc.h>
 #include <stddef.h>
-#include <ti/osal/TaskP.h>
 #include <ti/osal/HwiP.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -139,7 +138,7 @@ typedef struct {
     uint32_t rpmsg_tx_endpt[APP_IPC_CPU_MAX];
     RPMessage_Handle rpmsg_rx_handle;
     app_ipc_notify_handler_f ipc_notify_handler;
-    TaskP_Handle task_handle;
+    app_rtos_task_handle_t task_handle;
     uint32_t task_stack_size;
     uint8_t *task_stack;
     uint32_t task_pri;
@@ -358,33 +357,29 @@ static void appIpcRpmsgRxTaskMain(void* arg0,
 
 static int32_t appIpcCreateRpmsgRxTask(app_ipc_obj_t *obj)
 {
-    TaskP_Params qnx_task_prms;
+    app_rtos_task_params_t qnx_task_prms;
     int32_t status = 0;
 
-    TaskP_Params_init(&qnx_task_prms);
+    appRtosTaskParamsInit(&qnx_task_prms);
     qnx_task_prms.stacksize = obj->task_stack_size;
     qnx_task_prms.stack = obj->task_stack;
     qnx_task_prms.priority = obj->task_pri;
     qnx_task_prms.arg0 = NULL;
     qnx_task_prms.arg1 = NULL;
     qnx_task_prms.name = (const char*)&obj->task_name[0];
+    qnx_task_prms.taskfxn = &appIpcRpmsgRxTaskMain;
 
     strncpy(obj->task_name, "IPC_RX", APP_IPC_MAX_TASK_NAME);
     obj->task_name[APP_IPC_MAX_TASK_NAME-1] = 0;
 
-    obj->task_handle = (void*)TaskP_create(
-                            &appIpcRpmsgRxTaskMain,
-                            &qnx_task_prms);
+    obj->task_handle = (void*)appRtosTaskCreate(&qnx_task_prms);
 
     if(obj->task_handle==NULL)
     {
         printf("IPC: ERROR: Unable to create RX task \n");
         status = -1;
     }
-    else
-    {
-        ;
-    }
+
     return status;
 }
 
@@ -395,7 +390,7 @@ static void appIpcDeleteRpmsgRxTask(app_ipc_obj_t *obj)
     RPMessage_unblock(obj->rpmsg_rx_handle);
 
     /* confirm task termination */
-    while ( ! TaskP_isTerminated(obj->task_handle) )
+    while ( ! appRtosTaskIsTerminated(obj->task_handle) )
     {
         appLogWaitMsecs(sleep_time);
         sleep_time >>= 1U;
@@ -405,7 +400,7 @@ static void appIpcDeleteRpmsgRxTask(app_ipc_obj_t *obj)
             break;
         }
     }
-    TaskP_delete(&obj->task_handle);
+    appRtosTaskDelete(&obj->task_handle);
 }
 
 void appIpcInitPrmSetDefault(app_ipc_init_prm_t *prm)

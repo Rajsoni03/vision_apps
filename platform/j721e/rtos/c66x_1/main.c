@@ -63,10 +63,10 @@
 #include <app.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
 #include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
 #include <ti/osal/CacheP.h>
 #include <app_mem_map.h>
 #include <ti/drv/sciclient/sciclient.h>
@@ -107,8 +107,8 @@ __attribute__ ((aligned(8192)))
 
 int main(void)
 {
-    TaskP_Params tskParams;
-    TaskP_Handle task;
+    app_rtos_task_params_t tskParams;
+    app_rtos_task_handle_t task;
 
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
@@ -118,11 +118,13 @@ int main(void)
 
     OS_init();
 
-    TaskP_Params_init(&tskParams);
+    appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;
     tskParams.stacksize = sizeof (gTskStackMain);
-    task = TaskP_create(&appMain, &tskParams);
+    tskParams.taskfxn = &appMain;
+
+    task = appRtosTaskCreate(&tskParams);
     if(NULL == task)
     {
         OS_stop();

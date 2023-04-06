@@ -63,10 +63,10 @@
 #include <app.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/misc/include/app_misc.h>
+#include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
 #include <ti/osal/osal.h>
-#include <ti/osal/TaskP.h>
 #include <ti/osal/HwiP.h>
 #include <ti/osal/CacheP.h>
 #include <app_mem_map.h>
@@ -171,8 +171,8 @@ static void appC7xClecInitDru(void)
 
 int main(void)
 {
-    TaskP_Params tskParams;
-    TaskP_Handle task;
+    app_rtos_task_params_t tskParams;
+    app_rtos_task_handle_t task;
 
     OS_init();
 
@@ -180,11 +180,12 @@ int main(void)
 
     setup_dru_qos();
 
-    TaskP_Params_init(&tskParams);
+    appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;
     tskParams.stack = gTskStackMain;
     tskParams.stacksize = sizeof (gTskStackMain);
-    task = TaskP_create(&appMain, &tskParams);
+    tskParams.taskfxn = &appMain;
+    task = appRtosTaskCreate(&tskParams);
     if(NULL == task)
     {
         OS_stop();
@@ -271,8 +272,8 @@ void appMmuMap(Bool is_secure)
 
     /*The region mapped by the MMU is intentionally set to 2MB for L2 SRAM since
       page sizes are a function of the region size and having smaller page sizes
-      negatively affects the performance of L2 SRAM as the table walks with the 
-      translation table in DDR are expensive, especially in context of high- 
+      negatively affects the performance of L2 SRAM as the table walks with the
+      translation table in DDR are expensive, especially in context of high-
       throughput, low-latency memory like L2 SRAM*/
     retVal = Mmu_map(L2RAM_C7x_1_ADDR, L2RAM_C7x_1_ADDR, 0x00200000, &attrs, is_secure); /* L2 sram 448KB   */
     if(retVal == FALSE)
