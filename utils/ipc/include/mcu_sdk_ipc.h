@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2022 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,19 +60,18 @@
  *
  */
 
-#ifndef APP_GLOBAL_TIMER_PRIV_H_
-#define APP_GLOBAL_TIMER_PRIV_H_
+#ifndef MCU_SDK_IPC_H_
+#define MCU_SDK_IPC_H_
 
-#if !defined(MCU_PLUS_SDK)
-#include <ti/csl/soc.h>
-#include <ti/csl/hw_types.h>
-#include <ti/csl/csl_rat.h>
-#else
-#include <drivers/hw_include/hw_types.h>
+#include <drivers/ipc_notify.h>
+#include <drivers/soc.h>
+
+/* functions */
+#define Ipc_mpGetSelfName()     SOC_getCoreName(IpcNotify_getSelfCoreId())
+#define Ipc_mpGetName(name)     SOC_getCoreName(name)
+
+/* #defines */
+#define IPC_SOK                 SystemP_SUCCESS 
+#define RPMESSAGE_LOCAL_ENDPT   15
+
 #endif
-
-
-#define GTC_TIMER_MAPPED_BASE_C66       (0x18000000)
-
-#endif
-

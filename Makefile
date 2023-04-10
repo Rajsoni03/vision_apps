@@ -36,6 +36,7 @@ DIRECTORIES += utils/mem
 DIRECTORIES += utils/misc
 DIRECTORIES += utils/perf_stats
 DIRECTORIES += utils/remote_service
+DIRECTORIES += utils/rtos
 DIRECTORIES += utils/sciclient
 DIRECTORIES += utils/sciserver
 DIRECTORIES += utils/udma
@@ -180,7 +181,11 @@ doxy_datasheet_docs:
 	$(DOXYGEN) internal_docs/doxy_cfg_datasheet/datasheet_$(SOC).cfg 2> internal_docs/doxy_cfg_datasheet/doxy_warnings.txt
 
 # Additional make targets to build various related components
+ifeq ($(RTOS_SDK),pdk)
 include makerules/makefile_pdk.mak
+else
+include makerules/makefile_mcu_plus_sdk.mak
+endif
 include makerules/makefile_tidl_mmalib.mak
 include makerules/makefile_tiovx_ptk_imaging_remote_device.mak
 include makerules/makefile_test_data.mak
@@ -230,18 +235,18 @@ SOC_VARIABLE_SCRUB += ptk_scrub
 SOC_VARIABLE_DOCS  += ptk_docs
 endif
 
-sdk: sdk_check_paths pdk imaging vxlib tiovx $(SOC_VARIABLE_RULES)
+sdk: sdk_check_paths rtos_sdk imaging vxlib tiovx $(SOC_VARIABLE_RULES)
 	$(MAKE) vision_apps
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot
 endif
 
-sdk_clean: sdk_check_paths pdk_clean imaging_clean vxlib_clean tiovx_clean vision_apps_clean sbl_bootimage_clean $(SOC_VARIABLE_CLEAN)
+sdk_clean: sdk_check_paths rtos_sdk_clean imaging_clean vxlib_clean tiovx_clean vision_apps_clean sbl_bootimage_clean $(SOC_VARIABLE_CLEAN)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
 
-sdk_scrub: sdk_check_paths pdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub $(SOC_VARIABLE_SCRUB)
+sdk_scrub: sdk_check_paths rtos_sdk_scrub imaging_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub $(SOC_VARIABLE_SCRUB)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
@@ -252,6 +257,18 @@ sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs $(SOC_VARIABLE_DOCS)
 #KW build: Split the build into two - components which need not be part of
 # SDK KW report as the report for these components are separately delivered
 # Build it first and the use "kw_build" target for KW inject
-kw_pre_build: pdk
+kw_pre_build: rtos_sdk
 
 kw_build: sdk
+
+#RTOS build: invokes pdk or mcu_plus_sdk
+
+ifeq ($(RTOS_SDK),pdk)
+rtos_sdk:pdk
+rtos_sdk_clean:pdk_clean
+rtos_sdk_scrub:pdk_scrub
+else
+rtos_sdk:mcu_plus_sdk
+rtos_sdk_clean:mcu_plus_sdk_clean
+rtos_sdk_scrub:mcu_plus_sdk_scrub
+endif

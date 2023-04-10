@@ -125,6 +125,13 @@ BUILD_APP_RTOS_QNX?=$(BUILD_QNX_MPU)
 # PDK board to build for, valid values: j721e_sim j721e_evm j721s2_evm j784s4_evm am62a_evm
 BUILD_PDK_BOARD=$(SOC)_evm
 
+ifeq ($(RTOS_SDK),mcu_plus_sdk)
+ifeq ($(SOC),am62a)
+# mcu plus sdk DEVICE to build for, valid values: am62ax
+BUILD_MCU_PLUS_SDK_DEVICE=am62ax
+endif
+endif
+
 # Flag to build for an HS device. Signs the built remote proc firmware binaries
 HS?=0
 

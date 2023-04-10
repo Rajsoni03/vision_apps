@@ -65,8 +65,14 @@
 #include <TimerP.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <string.h>
-#include <sciclient/sciclient.h>
 #include "app_global_timer_priv.h"
+
+#if !defined(MCU_PLUS_SDK)
+#include <sciclient/sciclient.h>
+#else
+#include <kernel/dpl/ClockP.h>
+#include <drivers/device_manager/sciclient.h>
+#endif
 
 static uintptr_t GTC_BASE_ADDR = 0;
 static uint64_t mhzFreq = 0;
@@ -123,7 +129,11 @@ uint64_t appLogGetGlobalTimeInUsec()
 
 uint64_t appLogGetLocalTimeInUsec()
 {
+    #if !defined(MCU_PLUS_SDK)
     return TimerP_getTimeInUsecs(); /* in units of usecs */
+    #else
+    return ClockP_getTimeUsec(); /* in units of usecs */
+    #endif
 }
 
 uint64_t appLogGetTimeInUsec()

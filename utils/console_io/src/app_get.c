@@ -65,8 +65,12 @@
 #include <stdarg.h>
 #include <string.h>
 #if defined(SYSBIOS) || defined(FREERTOS) || defined(SAFERTOS)
+#if !defined(MCU_PLUS_SDK)
 #include <uart/UART.h>
 #include <uart/UART_stdio.h>
+#else
+#include <DebugP.h>
+#endif
 #endif
 
 char appGetChar()
@@ -77,7 +81,13 @@ char appGetChar()
     while(1)
     {
         buf[0]=0;
+
+#if !defined(MCU_PLUS_SDK)
         UART_gets(buf, 8u);
+#else
+        DebugP_log(buf, 8u);
+#endif
+
         if(buf[0]!=0)
             break;
     }

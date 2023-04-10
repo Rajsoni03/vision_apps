@@ -12,7 +12,11 @@ CSOURCES += app_c7x_init.c
 endif
 
 ifeq ($(TARGET_OS),FREERTOS)
-IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include/
+ifeq ($(RTOS_SDK), mcu_plus_sdk)
+  IDIRS       += $(MCU_PLUS_SDK_PATH)/source/fs/freertos_fat/portable/nortos/
+else
+  IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include/
+endif
 endif
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),FREERTOS SAFERTOS))

@@ -59,20 +59,62 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+--ram_model
+-heap  0x20000
+-stack 0x100000
+--args 0x1000
+--diag_suppress=10068 /* "no matching section" */
+--cinit_compression=off
+-e _c_int00_secure
 
-#ifndef APP_GLOBAL_TIMER_PRIV_H_
-#define APP_GLOBAL_TIMER_PRIV_H_
+SECTIONS
+{
+    boot:
+    {
+      boot.*<boot.oe71>(.text)
+    } load > DDR_C7x_1_BOOT ALIGN(0x200000)
+    .vecs       >       DDR_C7x_1_VECS ALIGN(0x200000)
+    .text:_c_int00_secure > DDR_C7x_1_BOOT ALIGN(0x100000)
+    .text       >       DDR_C7x_1 ALIGN(0x10000)
 
-#if !defined(MCU_PLUS_SDK)
-#include <ti/csl/soc.h>
-#include <ti/csl/hw_types.h>
-#include <ti/csl/csl_rat.h>
-#else
-#include <drivers/hw_include/hw_types.h>
-#endif
+    .bss        >       DDR_C7x_1  /* Zero-initialized data */
+    .data       >       DDR_C7x_1  /* Initialized data */
 
+    .cinit      >       DDR_C7x_1  /* could be part of const */
+    .init_array >       DDR_C7x_1  /* C++ initializations */
+    .stack      >       DDR_C7x_1  ALIGN(0x20000) /* MUST be 128KB aligned to handle nested interrupts */
+    .args       >       DDR_C7x_1
+    .cio        >       DDR_C7x_1
+    .const      >       DDR_C7x_1
+    .switch     >       DDR_C7x_1
+    .sysmem     >       DDR_C7x_1 /* heap */
+    /* .bss:taskStackSection:tiovx (NOLOAD) : {} > L2RAM_MAIN_C7x_1 */
+    .bss:taskStackSection       > DDR_C7x_1
+    .bss:ddr_local_mem      (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP
+    .bss:ddr_scratch_mem    (NOLOAD) : {} > DDR_C7X_1_SCRATCH
 
-#define GTC_TIMER_MAPPED_BASE_C66       (0x18000000)
+    .bss:ddr_non_cache_mem      (NOLOAD) : {} > DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE
+    .bss:ddr_scratch_non_cache_mem    (NOLOAD) : {} > DDR_C7X_1_SCRATCH_NON_CACHEABLE
 
-#endif
+    .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
+    .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
+    .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
 
+    .bss:l1mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_1_AUX_AS_L1
+    .bss:l2mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_1_AUX
+    .bss:l3mem              (NOLOAD)(NOINIT) : {} > L2RAM_C7x_1_MAIN
+
+    ipc_data_buffer:       > DDR_C7x_1
+    .tracebuf                : {} align(1024)   > DDR_C7x_1
+    .resource_table > DDR_C7x_1_RESOURCE_TABLE
+
+    GROUP:              >  DDR_C7x_1
+    {
+        .data.Mmu_tableArray          : type=NOINIT
+        .data.Mmu_tableArraySlot      : type=NOINIT
+        .data.Mmu_level1Table         : type=NOINIT
+        .data.gMmu_tableArray_NS       : type=NOINIT
+        .data.Mmu_tableArraySlot_NS   : type=NOINIT
+        .data.Mmu_level1Table_NS      : type=NOINIT
+    }
+}

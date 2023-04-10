@@ -65,8 +65,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+#if !defined(MCU_PLUS_SDK)
 #include <uart/UART.h>
 #include <uart/UART_stdio.h>
+#else
+#include <DebugP.h>
+#endif
 
 
 #define APP_CLI_MAX_SYSTEM_CMDS     (32u)
@@ -102,14 +107,23 @@ app_cli_obj_t g_app_cli_obj;
 
 int appCliDeviceWriteDefault(char *string, uint32_t max_size)
 {
+    #if !defined(MCU_PLUS_SDK)
     UART_puts(string, max_size);
+    #else
+    DebugP_log(string);
+    #endif
     
     return 0;
 }
 
 int appCliDeviceReadDefault(char *string, uint32_t max_size, uint32_t *string_size)
 {
+    #if !defined(MCU_PLUS_SDK)
     UART_gets(string, max_size);
+    #else
+    DebugP_readLine(string, max_size);
+    #endif
+    
     string[max_size-1] = 0;
     *string_size = strlen(string);
     

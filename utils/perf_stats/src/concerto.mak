@@ -27,6 +27,12 @@ endif
 
 CSOURCES += app_perf_stats_api.c
 
+ifeq ($(SOC),am62a)
+ifeq ($(TARGET_CPU),C7504)
+DEFS+=CPU_c7504
+endif
+endif
+
 include $(FINALE)
 
 

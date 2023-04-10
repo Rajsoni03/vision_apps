@@ -66,7 +66,15 @@
 #include <stdint.h>
 
 #if defined(FREERTOS) || defined(SAFERTOS)
+#if defined(SOC_AM62A)
+#if !defined(MCU_PLUS_SDK)
+#include <ti/drv/udma/dmautils/udma_standalone/udma.h>
+#else
+#include <drivers/dmautils/udma_standalone/udma.h>
+#endif
+#else
 #include <ti/drv/udma/udma.h>
+#endif
 #endif
 
 #ifdef __cplusplus

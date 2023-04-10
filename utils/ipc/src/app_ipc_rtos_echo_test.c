@@ -39,8 +39,16 @@
 #include <stdint.h>
 #include <string.h>
 
+#if !defined(MCU_PLUS_SDK)
 #include <ipc/ipc.h>
 #include <osal.h>
+#else
+#include <ipc_rpmsg.h>
+#include <ipc_notify.h>
+#include <utils/ipc/include/mcu_sdk_ipc.h>
+static uint16_t grpmsg_endpt = 0;
+#endif
+
 
 #include <utils/console_io/include/app_log.h>
 #include <utils/ipc/include/app_ipc.h>
@@ -120,9 +128,15 @@ static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
 #if defined (SOC_AM62A)
 static uint32_t g_app_to_ipc_cpu_id[APP_IPC_CPU_MAX] =
 {
+#if !defined(MCU_PLUS_SDK)
     IPC_MPU1_0,
     IPC_MCU1_0,
     IPC_C7X_1
+#else
+    CSL_CORE_ID_A53SS0_0,
+    CSL_CORE_ID_R5FSS0_0,
+    CSL_CORE_ID_C75SS0_0
+#endif
 };
 #endif
 
@@ -149,8 +163,13 @@ __attribute__ ((aligned(APP_IPC_ECHO_TEST_TASK_ALIGNMENT)))
 #define APP_IPC_RSPBUF_TASK_ALIGNMENT    (128u)
 #endif
 
+#if !defined(MCU_PLUS_SDK)
 static uint8_t  g_sendBuf[RPMSG_DATA_SIZE * APP_IPC_CPU_MAX]  __attribute__ ((aligned (APP_IPC_SENDBUF_TASK_ALIGNMENT)));
 static uint8_t  g_rspBuf[RPMSG_DATA_SIZE]  __attribute__ ((aligned (APP_IPC_RSPBUF_TASK_ALIGNMENT)));
+#else
+RPMessage_Object    rpMsgRspObject;
+RPMessage_Object    rpMsgSendObject;
+#endif
 
 uint32_t g_ipc_echo_test_status[APP_IPC_CPU_MAX];
 
@@ -225,6 +244,7 @@ static void appIpcEchoTestStatusShow()
                     all_pass = 0;
                 }
             }
+#if !defined (MCU_PLUS_SDK)
             if (NULL != Ipc_mpGetName(g_app_to_ipc_cpu_id[cpu_id]))
             {
                 count += snprintf(&buf[count], BUF_SIZE-count, "%s[%c] ",
@@ -232,6 +252,15 @@ static void appIpcEchoTestStatusShow()
                     status_char
                     );
             }
+#else
+            if (NULL != SOC_getCoreName(g_app_to_ipc_cpu_id[cpu_id]))
+            {
+                count += snprintf(&buf[count], BUF_SIZE-count, "%s[%c] ",
+                    SOC_getCoreName(g_app_to_ipc_cpu_id[cpu_id]),
+                    status_char
+                    );
+            }          
+#endif
         }
     }
     if(all_pass)
@@ -251,6 +280,7 @@ static void appIpcEchoTestStatusShow()
  * This "Task" waits for a "ping" message from any processor
  * then replies with a "pong" message.
  */
+#if !defined(MCU_PLUS_SDK)  
 static void rpmsg_responderFxn(void* arg0, void* arg1)
 {
     RPMessage_Handle    handle;
@@ -258,12 +288,21 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
     uint32_t    myEndPt = 0;
     uint32_t    remoteEndPt;
     uint32_t    remoteProcId;
+    void        *buf;
+    uint32_t    bufSize = RPMSG_DATA_SIZE;
+#else   
+static void rpmsg_responderFxn(void* arg0)
+{  
+    RPMessage_Object*    handle;  
+    RPMessage_CreateParams params; 
+    uint32_t    myEndPt = 0;
+    uint16_t    remoteEndPt;
+    uint16_t    remoteProcId;
+#endif
     uint16_t    len;
     uint32_t    count;
     int32_t     n;
     int32_t     status = 0;
-    void        *buf;
-    uint32_t    bufSize = RPMSG_DATA_SIZE;
     char        str[MSGSIZE];
 
     appUtilsTaskInit();
@@ -272,6 +311,7 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
     appLogPrintf("IPC: RecvTask: Started ...\n");
     #endif
 
+#if !defined(MCU_PLUS_SDK) 
     buf = g_rspBuf;
     RPMessageParams_init(&params);
     params.requestedEndpt = ENDPT1;
@@ -285,15 +325,40 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
         status = -1;
     }
 
+#else
+    RPMessage_CreateParams_init(&params);
+    params.localEndPt = ENDPT1;
+    status = RPMessage_construct(&rpMsgRspObject, &params);
+    myEndPt = params.localEndPt;
+    if(status != SystemP_SUCCESS)
+    {
+        appLogPrintf("IPC: RecvTask: Failed to create endpoint\n");
+    }
+    else
+    {
+        handle = &rpMsgRspObject;
+    }    
+#endif
+
     if (status == 0)
     {
+#if !defined(MCU_PLUS_SDK)         
         status = RPMessage_announce(RPMESSAGE_ALL, myEndPt, SERVICE);
         if(status != 0)
         {
             appLogPrintf("IPC: RecvTask: RPMessage_announce() failed\n");
             status = -1;
         }
-
+#else 
+        status = RPMessage_announce(CSL_CORE_ID_A53SS0_0, myEndPt, SERVICE);
+        if(status != 0)
+        {
+            appLogPrintf("IPC: RecvTask: RPMessage_announce() failed\n");
+            status = -1;
+        }
+        /* wait for all cores to be ready */
+        IpcNotify_syncAll(SystemP_WAIT_FOREVER);
+#endif
         count = 0;
 
         #ifdef APP_IPC_ECHO_TEST_DEBUG
@@ -302,8 +367,14 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
 
         while(1)
         {
+#if !defined (MCU_PLUS_SDK)            
             status = RPMessage_recv(handle, (void*)str, &len, &remoteEndPt, &remoteProcId,
             IPC_RPMESSAGE_TIMEOUT_FOREVER);
+#else       
+            len = sizeof(str);
+            status = RPMessage_recv(handle, (void*)str, &len, &remoteProcId, &remoteEndPt,
+                                SystemP_WAIT_FOREVER);                              
+#endif              
             if(status != IPC_SOK)
             {
                 appLogPrintf("IPC: RecvTask: failed with code %d\n", status);
@@ -331,7 +402,12 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
                 Ipc_mpGetName(remoteProcId));
             #endif
 
+#if !defined (MCU_PLUS_SDK) 
             status = RPMessage_send(handle, remoteProcId, remoteEndPt, myEndPt, str, len);
+#else            
+            status = RPMessage_send(str, len, remoteProcId, remoteEndPt, myEndPt, SystemP_WAIT_FOREVER);   
+#endif 
+
             if (status != IPC_SOK)
             {
                 appLogPrintf("IPC: RecvTask: RPMessage_send "
@@ -342,8 +418,13 @@ static void rpmsg_responderFxn(void* arg0, void* arg1)
 
     /* Delete the RPMesg object now */
     //RPMessage_delete(&handle);
+#if defined(MCU_PLUS_SDK) 
+    void vTaskDelete( void* xTaskToDelete );
+    vTaskDelete(NULL);
+#endif 
 }
 
+#if !defined(MCU_PLUS_SDK) 
 static void rpmsg_senderFxn(void* arg0, void* arg1)
 {
     RPMessage_Handle    handle;
@@ -351,20 +432,34 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
     uint32_t            myEndPt = 0;
     uint32_t            remoteEndPt;
     uint32_t            remoteProcId;
+    uint8_t            *buf1;
+#else 
+static void rpmsg_senderFxn(void* arg0)
+{ 
+    RPMessage_Object*    handle;  
+    RPMessage_CreateParams params; 
+    uint32_t            myEndPt = 0;
+    uint16_t            remoteEndPt;
+    uint16_t            remoteProcId;
+#endif
     uint16_t            dstProc;
     uint32_t            appDstProcId;
     uint16_t            len;
     int32_t             i;
     int32_t             status = 0;
     char                buf[MSGSIZE];
-    uint8_t            *buf1;
 
     appUtilsTaskInit();
 
-    dstProc = (uint16_t)((uintptr_t)arg0);
-    appDstProcId = (uint32_t)((uintptr_t)arg1);
+#if !defined(MCU_PLUS_SDK)
+    dstProc = (uint16_t)((uintptr_t)arg1);     
+    appDstProcId = (uint32_t)((uintptr_t)arg0);
 
     buf1 = &g_sendBuf[RPMSG_DATA_SIZE * appDstProcId];
+#else
+    appDstProcId = (uint16_t)((uintptr_t)arg0);     
+    dstProc = g_app_to_ipc_cpu_id[appDstProcId];
+#endif
 
     /* appIpcEchoTestStatusShow(); */
 
@@ -373,6 +468,7 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
     #endif
 
     /* Create the endpoint for receiving. */
+#if !defined(MCU_PLUS_SDK) 
     RPMessageParams_init(&params);
     params.numBufs = 2;
     params.buf = buf1;
@@ -393,7 +489,35 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
         appLogPrintf("IPC: SendTask%d: RPMessage_getRemoteEndPt() malfunctioned, status %d\n",
              dstProc, status);
         status = -1;
+    }    
+#else
+    RPMessage_CreateParams_init(&params);
+    params.localEndPt = RPMESSAGE_LOCAL_ENDPT + grpmsg_endpt;
+    grpmsg_endpt ++;
+    status = RPMessage_construct(&rpMsgSendObject, &params);
+    myEndPt = params.localEndPt;
+    if(status != SystemP_SUCCESS)
+    {
+        appLogPrintf("IPC: SendTask: Failed to create endpoint\n");
     }
+    else
+    {
+        handle = &rpMsgSendObject;        
+    }
+
+    if (dstProc == 2)
+    {
+        while(1)
+        {
+            appLogWaitMsecs(100u);
+        }
+    }
+
+    /* wait for all cores to be ready */
+    IpcNotify_syncAll(SystemP_WAIT_FOREVER);
+
+#endif
+
 
     if (status == 0)
     {
@@ -414,7 +538,12 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
                     i, buf, Ipc_mpGetSelfName(),
                     Ipc_mpGetName(dstProc));
             #endif
+#if !defined (MCU_PLUS_SDK) 
             status = RPMessage_send(handle, dstProc, ENDPT1, myEndPt, (Ptr)buf, len);
+
+#else            
+            status = RPMessage_send(buf, len, dstProc, ENDPT1, myEndPt, SystemP_WAIT_FOREVER);  
+#endif 
             if (status != IPC_SOK)
             {
                 appLogPrintf("IPC: SendTask%d: rpmsg_senderFxn: RPMessage_send "
@@ -423,8 +552,16 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
             if (status == IPC_SOK)
             {
                 /* wait a for a response message: */
+#if !defined (MCU_PLUS_SDK)            
                 status = RPMessage_recv(handle, (void*)buf, &len, &remoteEndPt,
                                  &remoteProcId, IPC_RPMESSAGE_TIMEOUT_FOREVER);
+
+#else
+                len = sizeof(buf);
+                status = RPMessage_recv(handle, (void*)buf, &len, &remoteProcId, &remoteEndPt,
+                                    SystemP_WAIT_FOREVER);    
+
+#endif
 
                 if(status != IPC_SOK)
                 {
@@ -461,7 +598,13 @@ static void rpmsg_senderFxn(void* arg0, void* arg1)
 
 
     /* Delete the RPMesg object now */
+#if !defined(MCU_PLUS_SDK)    
     RPMessage_delete(&handle);
+#else
+    RPMessage_destruct(handle);
+    void vTaskDelete( void* xTaskToDelete );
+    vTaskDelete(NULL);
+#endif 
 }
 
 int32_t appIpcEchoTestStart(void)
@@ -536,8 +679,8 @@ int32_t appIpcEchoTestStart(void)
                     params.priority = 3;
                     params.stack     = g_taskStackBuf[cpu_id];
                     params.stacksize = APP_IPC_ECHO_TEST_TASK_STACKSIZE;
-                    params.arg0     = (void*)ipc_lld_cpu_id;
-                    params.arg1     = (void*)cpu_id;
+                    params.arg0     = (void*)cpu_id;
+                    params.arg1     = (void*)ipc_lld_cpu_id;
                     params.name     = (const char*)&g_rpmsg_sender_task_name[cpu_id][0];
                     params.taskfxn   = &rpmsg_senderFxn;
 

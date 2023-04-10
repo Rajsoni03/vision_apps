@@ -82,7 +82,15 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#if defined(SOC_AM62A)
+#if !defined(MCU_PLUS_SDK)
+#include <ti/drv/udma/dmautils/udma_standalone/udma.h>
+#else
+#include <drivers/dmautils/udma_standalone/udma.h>
+#endif
+#else
 #include <ti/drv/udma/udma.h>
+#endif
 
 #if !defined(SOC_AM62A)
 #include "app_udma_utils.h"

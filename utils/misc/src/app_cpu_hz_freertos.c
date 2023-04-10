@@ -70,9 +70,10 @@
 
 int32_t appUtilsPrintCpuHz(void)
 {
+#if !defined(MCU_PLUS_SDK)
     appLogPrintf("### CPU Frequency = %d Hz\n",
                 configCPU_CLOCK_HZ);
-
+#endif
     return 0;
 }
 

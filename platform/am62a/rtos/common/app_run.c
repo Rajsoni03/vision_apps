@@ -72,9 +72,11 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/console_io/include/app_cli.h>
 #include <TI/tivx.h>
+#if !defined(MCU_PLUS_SDK)
 #include <ti/board/board.h>
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
+#endif
 
 int app_single_cam_main(int argc, char* argv[]);
 

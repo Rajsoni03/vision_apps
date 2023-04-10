@@ -71,7 +71,14 @@
 #include <inttypes.h>
 
 #if defined(FREERTOS)
+#if !defined(MCU_PLUS_SDK)
 #include <LoadP.h>
+#else
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <device_manager/priv/osal/LoadP.h>
+#endif
 #endif
 
 #if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
@@ -191,6 +198,8 @@ void appPerfStatsResetLoadCalcAll(app_perf_stats_obj_t *obj)
 
 void appPerfStatsTaskLoadUpdate(app_rtos_task_handle_t task, app_perf_stats_load_t *load)
 {
+
+#if !defined(MCU_PLUS_SDK)
     #if defined(FREERTOS)
     LoadP_Stats rtos_load_stat;
 
@@ -199,6 +208,17 @@ void appPerfStatsTaskLoadUpdate(app_rtos_task_handle_t task, app_perf_stats_load
     load->total_time = rtos_load_stat.totalTime;
     load->thread_time = rtos_load_stat.threadTime;
     #endif
+#else
+    #if defined(FREERTOS)
+    TaskP_Load rtos_load_stat;
+
+    TaskP_loadGet(task, &rtos_load_stat);
+
+    load->total_time = rtos_load_stat.totalTime;
+    load->thread_time = rtos_load_stat.runTime;
+    #endif
+#endif
+
 }
 
 void appPerfStatsTaskLoadUpdateAll(app_perf_stats_obj_t *obj)
@@ -250,6 +270,7 @@ void appPerfStatsGetMemStatsAll(app_perf_stats_obj_t *obj, app_perf_stats_mem_st
 
 }
 
+#if !defined(MCU_PLUS_SDK)
 extern uint32_t  gOsalSemAllocCnt, gOsalSemPeak;
 extern uint32_t  gOsalMutexAllocCnt, gOsalMutexPeak;
 extern uint32_t  gOsalQueueAllocCnt, gOsalQueuePeak;
@@ -260,6 +281,23 @@ extern uint32_t  gOsalTaskAllocCnt, gOsalTaskPeak;
 extern uint32_t  gOsalClockAllocCnt, gOsalClockPeak;
 extern uint32_t  gOsalHwiAllocCnt, gOsalHwiPeak;
 extern uint32_t  gOsalTimerAllocCnt, gOsalTimerPeak;
+
+#else
+uint32_t  gOsalSemAllocCnt, gOsalSemPeak;
+uint32_t  gOsalMutexAllocCnt, gOsalMutexPeak;
+uint32_t  gOsalQueueAllocCnt, gOsalQueuePeak;
+uint32_t  gOsalEventAllocCnt, gOsalEventPeak;
+uint32_t  gOsalHeapAllocCnt, gOsalHeapPeak;
+uint32_t  gOsalMailboxAllocCnt, gOsalMailboxPeak;
+uint32_t  gOsalTaskAllocCnt, gOsalTaskPeak;
+uint32_t  gOsalClockAllocCnt, gOsalClockPeak;
+#if defined(CPU_c7504)
+extern uint32_t  gOsalHwiAllocCnt, gOsalHwiPeak;
+#else
+uint32_t  gOsalHwiAllocCnt, gOsalHwiPeak;
+#endif
+uint32_t  gOsalTimerAllocCnt, gOsalTimerPeak;
+#endif
 
 void appPerfStatsGetOsStatsAll(app_perf_stats_obj_t *obj, app_perf_stats_os_stats_t *os_stats)
 {
@@ -303,7 +341,11 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
             break;
         case APP_PERF_STATS_CMD_RESET_LOAD_CALC:
             #if defined(FREERTOS)
+            #if !defined(MCU_PLUS_SDK)
             LoadP_reset();
+            #else
+            TaskP_loadResetAll();
+            #endif
             #endif
             appPerfStatsResetLoadCalcAll(obj);
             break;
@@ -368,7 +410,11 @@ int32_t appPerfStatsHandler(char *service_name, uint32_t cmd, void *prm, uint32_
 
                 #if defined(FREERTOS)
                 /* Multiplying by 100 to show decimal points when printing */
+                #if !defined(MCU_PLUS_SDK)
                 cpu_load->cpu_load = 100 * LoadP_getCPULoad();
+                #else
+                cpu_load->cpu_load = 100 * TaskP_loadGetTotalCpuLoad();
+                #endif
                 #endif
 
                 cpu_load->hwi_load = 0U;
@@ -472,7 +518,11 @@ int32_t appPerfStatsInit()
     if(status==0)
     {
         #if defined(FREERTOS)
+        #if !defined(MCU_PLUS_SDK)
         LoadP_reset();
+        #else
+        TaskP_loadResetAll();
+        #endif
         #endif
         appPerfStatsResetLoadCalcAll(obj);
         appPerfStatsResetHwaLoadCalcAll();

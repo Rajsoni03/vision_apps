@@ -180,6 +180,9 @@
 #define APP_IPC_CPU_MAX     ( 3u)
 /** \brief Invalid CPU ID */
 #define APP_IPC_CPU_INVALID (0xFFu)
+#if defined(MCU_PLUS_SDK)
+#define    IPC_MAX_PROCS        (3U)    /**< Maximum Processors */
+#endif
 #endif
 
 /* @} */

@@ -45,7 +45,7 @@ vxlib_clean:
 	$(MAKE) -C $(VXLIB_PATH) clean
 
 tiovx:
-	$(MAKE) -C $(TIOVX_PATH)
+	$(MAKE) -C $(TIOVX_PATH) RTOS_SDK=$(RTOS_SDK)
 
 tiovx_clean:
 	$(MAKE) -C $(TIOVX_PATH) clean

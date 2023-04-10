@@ -61,14 +61,27 @@
  */
 
 #include <utils/console_io/include/app_log.h>
-#include <sciclient/sciclient.h>
-#include <sciclient/sciserver_tirtos.h>
 #include <stdio.h>
 
+#if !defined(MCU_PLUS_SDK)
+#include <sciclient/sciclient.h>
+#include <sciclient/sciserver_tirtos.h>
+#else
+#include <device_manager/sciclient.h>
+#include <device_manager/sciserver_tirtos.h>
+#include <SystemP.h>
+#endif
+
 #if defined(SOC_AM62A)
+#if !defined(MCU_PLUS_SDK)
 #include <ti/board/board.h>
 #include <uart/UART.h>
 #include <uart/UART_stdio.h>
+#else
+#include <kernel/dpl/DebugP.h>
+#include <drivers/hw_include/csl_types.h>
+extern     void vTaskDelete( void* xTaskToDelete );
+#endif
 #endif
 
 /* High Priority for SCI Server - must be higher than Low priority task */
@@ -85,6 +98,7 @@ int32_t appSciserverSciclientInit()
     int32_t retVal = CSL_PASS;
     Sciclient_ConfigPrms_t  clientParams;
 
+#if !defined(MCU_PLUS_SDK)
 #if defined(SOC_AM62A)
     Board_initCfg   boardCfg;
 #endif
@@ -110,6 +124,30 @@ int32_t appSciserverSciclientInit()
     {
         retVal = Sciclient_init(&clientParams);
     }
+#else
+#ifdef CPU_c7x_1
+/* Only for C7x sysconfig is not used now. 
+ * For R5, sci client init is done by sysconfig generated files
+ */
+    int32_t retVal = CSL_PASS;
+    Sciclient_ConfigPrms_t  clientParams;
+
+    retVal = Sciclient_configPrmsInit(&clientParams);
+
+    if(retVal==CSL_PASS)
+    {
+        retVal = Sciclient_boardCfgParseHeader(
+                (uint8_t *) SCISERVER_COMMON_X509_HEADER_ADDR,
+                &clientParams.inPmPrms, &clientParams.inRmPrms);
+    }
+
+    if(retVal==CSL_PASS)
+    {
+        retVal = Sciclient_init(&clientParams);
+    }
+
+#endif
+#endif
 
     return retVal;
 }
@@ -122,7 +160,13 @@ int32_t appSciserverSciclientDeInit()
     if(retVal!=0)
     {
         #if defined(SOC_AM62A)
+
+        #if !defined(MCU_PLUS_SDK)
         UART_printf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
+        #else
+        DebugP_log("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
+        #endif
+
         #else
         appLogPrintf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
         #endif
@@ -154,18 +198,37 @@ void appSciserverInit(void* arg0, void* arg1)
     #if defined(SOC_AM62A)
     version_str = Sciserver_getVersionStr();
     rmpmhal_version_str = Sciserver_getRmPmHalVersionStr();
-    UART_printf("##DM Built On: %s %s\n", __DATE__, __TIME__);
-    UART_printf("##Sciserver Version: %s\n", version_str);
-    UART_printf("##RM_PM_HAL Version: %s\n", rmpmhal_version_str);
+    #if !defined(MCU_PLUS_SDK)
+    UART_printf("##DM Built On: %s %s\r\n", __DATE__, __TIME__);
+    UART_printf("##Sciserver Version: %s\r\n", version_str);
+    UART_printf("##RM_PM_HAL Version: %s\r\n", rmpmhal_version_str);
+    #else
+    DebugP_log("##DM Built On: %s %s\r\n", __DATE__, __TIME__);
+    DebugP_log("##Sciserver Version: %s\r\n", version_str);
+    DebugP_log("##RM_PM_HAL Version: %s\r\n", rmpmhal_version_str);
+    #endif
 
     if (retVal == CSL_PASS)
     {
-        UART_printf("##Starting Sciserver..... PASSED\n");
+    #if !defined(MCU_PLUS_SDK)
+        UART_printf("##Starting Sciserver..... PASSED\r\n");
+    
+    #else
+        DebugP_log("##Starting Sciserver..... PASSED\r\n");
+    #endif
     }
     else
     {
-        UART_printf("Starting Sciserver..... FAILED\n");
+    #if !defined(MCU_PLUS_SDK)
+        UART_printf("Starting Sciserver..... FAILED\r\n");
+    #else
+        DebugP_log("Starting Sciserver..... FAILED\r\n");
+    #endif
     }
+    #endif
+
+    #if defined(MCU_PLUS_SDK)
+    vTaskDelete( NULL );
     #endif
 }
 

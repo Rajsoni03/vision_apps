@@ -63,9 +63,13 @@
 #include <string.h>
 #include <utils/mem/include/app_mem.h>
 #include <HeapP.h>
-#include <MemoryP.h>
 #include <HwiP.h>
 #include <CacheP.h>
+
+#if !defined(MCU_PLUS_SDK)
+#include <MemoryP.h>
+#endif
+
 #include <utils/console_io/include/app_log.h>
 
 #if defined(R5F) && (defined(SOC_J784S4) || defined(SOC_J721S2))
@@ -90,7 +94,13 @@
 typedef struct {
 
     uint16_t is_valid;
+
+#if !defined(MCU_PLUS_SDK)
     HeapP_Handle rtos_heap_handle;
+#else
+    HeapP_Object rtos_heap_handle;
+#endif
+
     uint32_t alloc_offset;
     app_mem_heap_prm_t heap_prm;
 
@@ -150,7 +160,11 @@ int32_t appMemInit(app_mem_init_prm_t *prm)
 
         heap_obj->is_valid = 0;
         heap_obj->alloc_offset = 0;
+
+#if !defined(MCU_PLUS_SDK)
         heap_obj->rtos_heap_handle = NULL;
+
+#endif
 
         if( (heap_prm->base == NULL) || (heap_prm->size == 0))
         {
@@ -173,6 +187,7 @@ int32_t appMemInit(app_mem_init_prm_t *prm)
             else
             {
                 /* create a rtos heap */
+#if !defined(MCU_PLUS_SDK)
                 HeapP_Params rtos_heap_prm;
 
                 HeapP_Params_init(&rtos_heap_prm);
@@ -185,13 +200,21 @@ int32_t appMemInit(app_mem_init_prm_t *prm)
 
                 heap_prm->base   = rtos_heap_prm.buf;
                 heap_prm->size   = rtos_heap_prm.size;
-            }
+#else
+                void *heap_buf = APP_MEM_ALIGNPTR(heap_prm->base, APP_MEM_ALIGN_MIN_BYTES);
+                uint32_t heap_size = APP_MEM_ALIGN32(heap_prm->size, APP_MEM_ALIGN_MIN_BYTES);
+
+                heap_prm->base   = heap_buf;
+                heap_prm->size   = heap_size;
+                HeapP_construct(&heap_obj->rtos_heap_handle, heap_buf, heap_size);
+#endif
             appLogPrintf("MEM: Created heap (%s, id=%d, flags=0x%08x) @ %p of size %d bytes !!!\n",
                 heap_prm->name,
                 heap_id,
                 heap_prm->flags,
                 heap_prm->base,
                 heap_prm->size);
+            }
         }
     }
     appLogPrintf("MEM: Init ... Done !!!\n");
@@ -214,14 +237,19 @@ int32_t appMemDeInit()
 
         if(heap_obj->is_valid)
         {
+
+#if !defined(MCU_PLUS_SDK)
             if(heap_obj->rtos_heap_handle != NULL)
             {
                 HeapP_delete(&heap_obj->rtos_heap_handle);
             }
+            heap_obj->rtos_heap_handle = NULL;
+#else
+            HeapP_destruct(&heap_obj->rtos_heap_handle);
+#endif
 
             heap_obj->is_valid = 0;
             heap_obj->alloc_offset = 0;
-            heap_obj->rtos_heap_handle = NULL;
         }
     }
 
@@ -270,6 +298,7 @@ void    *appMemAlloc(uint32_t heap_id, uint32_t size, uint32_t align)
             }
             else
             {
+#if !defined(MCU_PLUS_SDK)
                 if(heap_obj->rtos_heap_handle!=NULL)
                 {
                     size  = APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES);
@@ -292,6 +321,27 @@ void    *appMemAlloc(uint32_t heap_id, uint32_t size, uint32_t align)
                         #endif
                     }
                 }
+#else
+                size  = APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES);
+
+                ptr = HeapP_alloc(&heap_obj->rtos_heap_handle,
+                            size);
+
+                if(ptr!=NULL)
+                {
+                    if( (heap_prm->flags & APP_MEM_HEAP_FLAGS_DO_CLEAR_ON_ALLOC))
+                    {
+                        memset(ptr, 0, size);
+                    }
+                    if( (heap_prm->flags & APP_MEM_HEAP_FLAGS_IS_SHARED))
+                    {
+                        appMemCacheWbInv(ptr, size);
+                    }
+                    #ifdef APP_MEM_DEBUG
+                    appLogPrintf("MEM: Allocated %d bytes @ 0x%08x\n", size, (uint32_t)(uintptr_t)ptr);
+                    #endif
+                }
+#endif
             }
         }
     }
@@ -363,7 +413,11 @@ int32_t appMemFree(uint32_t heap_id, void *ptr, uint32_t size)
             }
             else
             {
+#if !defined(MCU_PLUS_SDK)
                 if(heap_obj->rtos_heap_handle!=NULL && ptr != NULL && size != 0)
+#else
+                if(ptr != NULL && size != 0)
+#endif
                 {
                     size  = APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES);
 
@@ -376,9 +430,14 @@ int32_t appMemFree(uint32_t heap_id, void *ptr, uint32_t size)
                     appLogPrintf("MEM: Freeing %d bytes @ 0x%08x\n", size, (uint32_t)(uintptr_t)ptr);
                     #endif
 
+#if !defined(MCU_PLUS_SDK)
                     HeapP_free(heap_obj->rtos_heap_handle,
                         ptr,
                         size);
+#else
+                    HeapP_free(&heap_obj->rtos_heap_handle,
+                        ptr);
+#endif
 
                     status = 0;
                 }
@@ -427,6 +486,7 @@ int32_t appMemStats(uint32_t heap_id, app_mem_stats_t *stats)
             }
             else
             {
+#if !defined(MCU_PLUS_SDK)
                 if(heap_obj->rtos_heap_handle!=NULL)
                 {
                     HeapP_MemStats rtos_heap_stats;
@@ -437,6 +497,15 @@ int32_t appMemStats(uint32_t heap_id, app_mem_stats_t *stats)
 
                     status = 0;
                 }
+#else
+                HeapP_MemStats rtos_heap_stats;
+
+                HeapP_getHeapStats(&heap_obj->rtos_heap_handle, &rtos_heap_stats);
+
+                stats->free_size = rtos_heap_stats.availableHeapSpaceInBytes;
+
+                status = 0;
+#endif
             }
         }
     }
@@ -470,9 +539,16 @@ void appMemFence()
 void  appMemCacheInv(void *ptr, uint32_t size)
 {
     #ifdef ENABLE_CACHE_OPS
+#if !defined(MCU_PLUS_SDK)
     CacheP_Inv(
         ptr,
         APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES));
+#else
+    CacheP_inv(
+        ptr,
+        APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES),
+        CacheP_TYPE_L1D);  
+#endif
     #endif
     appMemFence();
 }
@@ -480,9 +556,16 @@ void  appMemCacheInv(void *ptr, uint32_t size)
 void  appMemCacheWb(void *ptr, uint32_t size)
 {
     #ifdef ENABLE_CACHE_OPS
+#if !defined(MCU_PLUS_SDK)
     CacheP_wb(
         ptr,
         APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES));
+#else
+    CacheP_wb(
+        ptr,
+        APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES),
+        CacheP_TYPE_L1D);
+#endif
     #endif
     appMemFence();
 
@@ -491,9 +574,16 @@ void  appMemCacheWb(void *ptr, uint32_t size)
 void  appMemCacheWbInv(void *ptr, uint32_t size)
 {
     #ifdef ENABLE_CACHE_OPS
+#if !defined(MCU_PLUS_SDK)
     CacheP_wbInv(
         ptr,
         APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES));
+#else
+    CacheP_wbInv(
+        ptr,
+        APP_MEM_ALIGN32(size, APP_MEM_ALIGN_MIN_BYTES),
+        CacheP_TYPE_L1D);
+#endif
     #endif
     appMemFence();
 }

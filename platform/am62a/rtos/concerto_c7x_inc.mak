@@ -8,18 +8,27 @@ IDIRS+=$(VISION_APPS_PATH)/kernels/park_assist/include
 IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 
-ifeq ($(RTOS),SYSBIOS)
-	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c7x/$(TARGET_BUILD)/
+ifeq ($(RTOS_SDK),pdk)
+	ifeq ($(RTOS),SYSBIOS)
+		LDIRS += $(PDK_PATH)/packages/ti/osal/lib/tirtos/$(SOC)/c7x/$(TARGET_BUILD)/
+	endif
+	ifeq ($(RTOS),FREERTOS)
+		LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/c75x/$(TARGET_BUILD)/
+	endif
+	LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c75x/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/c75x/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/drv/mailbox/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
+else
+	ifeq ($(RTOS),FREERTOS)
+		LDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/freertos/lib/
+	endif
+	LDIRS += $(MCU_PLUS_SDK_PATH)/source/board/lib/
+	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/lib/
+	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/dmautils/lib/
 endif
-ifeq ($(RTOS),FREERTOS)
-	LDIRS += $(PDK_PATH)/packages/ti/osal/lib/freertos/$(SOC)/c75x/$(TARGET_BUILD)/
-endif
-LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c75x/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/uart/lib/$(SOC)/c75x/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/mailbox/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
-LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
 LDIRS += $(VXLIB_PATH)/lib/$(TARGET_PLATFORM)/C7504/NO_OS/$(TARGET_BUILD)
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(VISION_APPS_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -59,20 +68,27 @@ TIDL_LIBS += tidl_custom
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS) $(TIDL_LIBS)
 
-ADDITIONAL_STATIC_LIBS += ti.osal.ae71
-ADDITIONAL_STATIC_LIBS += ipc.ae71
-ADDITIONAL_STATIC_LIBS += mailbox.ae71
-ADDITIONAL_STATIC_LIBS += dmautils.ae71
-ADDITIONAL_STATIC_LIBS += sciclient.ae71
-ADDITIONAL_STATIC_LIBS += ti.drv.uart.ae71
+ifeq ($(RTOS_SDK),pdk)
+	ADDITIONAL_STATIC_LIBS += ti.osal.ae71
+	ADDITIONAL_STATIC_LIBS += ipc.ae71
+	ADDITIONAL_STATIC_LIBS += mailbox.ae71
+	ADDITIONAL_STATIC_LIBS += dmautils.ae71
+	ADDITIONAL_STATIC_LIBS += sciclient.ae71
+	ADDITIONAL_STATIC_LIBS += ti.drv.uart.ae71
 
-ADDITIONAL_STATIC_LIBS += vxlib_C7504.lib
+	ifeq ($(RTOS),FREERTOS)
+		ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.ae71
+	endif
+	ADDITIONAL_STATIC_LIBS += ti.csl.ae71
+else
+	ADDITIONAL_STATIC_LIBS += board.am62ax.c75x.ti-c7000.${TARGET_BUILD}.lib
+	ADDITIONAL_STATIC_LIBS += drivers.am62ax.c75x.ti-c7000.${TARGET_BUILD}.lib
+	ADDITIONAL_STATIC_LIBS += dmautils.am62ax.c75x.ti-c7000.${TARGET_BUILD}.lib
 
-ifeq ($(RTOS),FREERTOS)
-	ADDITIONAL_STATIC_LIBS += ti.kernel.freertos.ae71
+	ifeq ($(RTOS),FREERTOS)
+		ADDITIONAL_STATIC_LIBS += freertos.am62ax.c75x.ti-c7000.${TARGET_BUILD}.lib
+	endif
 endif
-ADDITIONAL_STATIC_LIBS += ti.csl.ae71
-
+ADDITIONAL_STATIC_LIBS += vxlib_C7504.lib
 ADDITIONAL_STATIC_LIBS += libc.a
-
 endif

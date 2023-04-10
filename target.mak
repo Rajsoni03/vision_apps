@@ -68,9 +68,15 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2 J784S4 AM62A))
     endif
 
     ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS SAFERTOS))
-        SYSIDIRS += $(PDK_PATH)/packages
-        SYSIDIRS += $(PDK_PATH)/packages/ti/osal
-        SYSIDIRS += $(PDK_PATH)/packages/ti/drv
+        ifeq ($(RTOS_SDK),pdk)
+            SYSIDIRS += $(PDK_PATH)/packages
+            SYSIDIRS += $(PDK_PATH)/packages/ti/osal
+            SYSIDIRS += $(PDK_PATH)/packages/ti/drv
+        else
+            SYSIDIRS += $(MCU_PLUS_SDK_PATH)/source
+            SYSIDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers
+            SYSIDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/dpl
+        endif
     endif
 
     ifeq ($(TARGET_CPU),C66)

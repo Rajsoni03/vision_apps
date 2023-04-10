@@ -63,7 +63,13 @@
 #ifndef APP_SCICLIENT_WRAPPER_API_H_
 #define APP_SCICLIENT_WRAPPER_API_H_
 
+#if !defined(MCU_PLUS_SDK)
 #include <sciclient/sciclient.h>
+#else
+#include <SystemP.h>
+#define SCICLIENT_SERVICE_WAIT_FOREVER SystemP_WAIT_FOREVER
+#endif
+
 #include <utils/console_io/include/app_log.h>
 
 /* make below 0 to disable debug print's for these macro APIs */

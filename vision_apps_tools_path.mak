@@ -59,7 +59,7 @@ else ifeq ($(SOC),j721s2)
 else ifeq ($(SOC),j784s4)
   export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-j784s4-evm-08_06_00_12
 else ifeq ($(SOC),am62a)
-  export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-am62axx-evm-08.05.00.24
+  export PSDK_LINUX_PATH ?= $(HOME)/ti-processor-sdk-linux-am62axx-evm-08.06.00.45
 endif
 
 export QNX_SDP_VERSION ?= 710

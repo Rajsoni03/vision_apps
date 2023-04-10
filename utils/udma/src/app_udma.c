@@ -64,9 +64,9 @@
 #include <string.h>
 #include <CacheP.h>
 #if defined(SOC_AM62A)
-#include <udma/dmautils/udma_standalone/udma.h>
+#include <dmautils/udma_standalone/udma.h>
 #else
-#include <udma/udma.h>
+#include <udma.h>
 #endif
 #include <utils/udma/include/app_udma.h>
 #include <utils/mem/include/app_mem.h>

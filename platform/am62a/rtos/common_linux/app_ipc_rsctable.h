@@ -51,7 +51,25 @@ extern "C" {
 #define BUILD_C7X
 #endif
 
+#if !defined(MCU_PLUS_SDK)
 #include <ti/drv/ipc/include/ipc_rsctypes.h>
+#include <stddef.h>
+#else
+#include <drivers/ipc_rpmsg/include/ipc_rpmsg_linux_resource_table.h>
+#define NUM_ENTRIES      2
+#define TYPE_VDEV        RPMESSAGE_RSC_TYPE_VDEV
+#define VIRTIO_ID_RPMSG  RPMESSAGE_RSC_VIRTIO_ID_RPMSG
+#define TRACE_INTS_VER0  RPMESSAGE_RSC_TRACE_INTS_VER0
+#define TRACE_INTS_VER1  RPMESSAGE_RSC_TRACE_INTS_VER0
+#define TYPE_TRACE       RPMESSAGE_RSC_TYPE_TRACE
+
+typedef RPMessage_ResourceTable Ipc_ResourceTable;
+
+#define rpmsg_vdev  vdev
+#if defined(BUILD_C7X_1)
+#pragma diag_suppress 70
+#endif
+#endif
 #include <app_mem_map.h>
 
 #ifdef SYSBIOS

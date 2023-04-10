@@ -66,18 +66,37 @@
 #include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
-#include <osal.h>
 #include <HwiP.h>
 #include <CacheP.h>
 #include <app_mem_map.h>
 #include <app_ipc_rsctable.h>
+
+#if !defined(MCU_PLUS_SDK)
+#include <osal.h>
 #include <ti/csl/soc.h>
 #include <ti/csl/csl_clec.h>
+#else
+#include <DebugP.h>
+#include <hw_include/cslr_soc.h>
+#include <hw_include/csl_clec.h>
+#include <hw_include/am62ax/cslr_soc_baseaddress.h>
+#endif
 
 #if (defined (FREERTOS))
+#if !defined(MCU_PLUS_SDK)
 #include <ti/kernel/freertos/portable/TI_CGT/c7x/Cache.h>
 #include <ti/kernel/freertos/portable/TI_CGT/c7x/Hwi.h>
 #include <ti/kernel/freertos/portable/TI_CGT/c7x/Mmu.h>
+#else
+#include <kernel/nortos/dpl/c75/CacheP_c75.h>
+#include <kernel/nortos/dpl/c75/HwiP_c75.h>
+#include <kernel/nortos/dpl/c75/MmuP_c75.h>
+#include <ipc_notify.h>
+#include <ipc_notify/v0/ipc_notify_v0.h>
+#include <soc.h>
+#include <ClockP.h>
+#include <SystemP.h>
+#endif
 #else
 #include <ti/sysbios/family/c7x/Cache.h>
 #include <ti/sysbios/family/c7x/Hwi.h>
@@ -85,6 +104,40 @@
 #endif
 
 #define ENABLE_C7X_CACHE_WRITE_THROUGH
+
+#if (defined (MCU_PLUS_SDK))
+
+extern void vTaskStartScheduler( void );
+
+#define TIMER2_CLOCK_SRC_MUX_ADDR (0x1081B8u)
+#define TIMER2_CLOCK_SRC_MCU_HFOSC0 (0x0u)
+#define TIMER2_BASE_ADDR     (0x2420000u)
+
+void IpcNotify_getConfig(IpcNotify_InterruptConfig **interruptConfig, uint32_t *interruptConfigNum)
+{
+    /* extern globals that are specific to this core */
+    extern IpcNotify_InterruptConfig gIpcNotifyInterruptConfig_c75ss0_0[];
+    extern uint32_t gIpcNotifyInterruptConfigNum_c75ss0_0;
+
+    *interruptConfig = &gIpcNotifyInterruptConfig_c75ss0_0[0];
+    *interruptConfigNum = gIpcNotifyInterruptConfigNum_c75ss0_0;
+}
+ClockP_Config gClockConfig = {
+    .timerBaseAddr = TIMER2_BASE_ADDR,
+    .timerHwiIntNum = 18,
+    .eventId = 122,
+    .timerInputClkHz = 25000000,
+    .timerInputPreScaler = 1,
+    .usecPerTick = 1000,
+};
+
+/* ----------- DebugP ----------- */
+void putchar_(char character)
+{
+    /* Output to CCS console */
+    putchar(character);    
+}
+#endif 
 
 #define C7x_EL2_SNOOP_CFG_REG (0x7C00000Cu)
 
@@ -100,12 +153,7 @@ static void setC7xSnoopCfgReg()
     volatile uint32_t *pReg = (uint32_t *)C7x_EL2_SNOOP_CFG_REG;
 
     /* This operation overrides the existing value of snoop config!*/
-    *pReg = (uint32_t)((DISABLE_C7X_SNOOP_FILTER    << 31) |
-                       (ENABLE_C7X_MMU_TO_DMC_SNOOP << 18) |
-                       (ENABLE_C7X_PMC_TO_DMC_SNOOP << 17) |
-                       (ENABLE_C7X_SE_TO_DMC_SNOOP  << 16) |
-                       (ENABLE_C7X_DRU_TO_DMC_SNOOP << 1)  |
-                       (ENABLE_C7X_SOC_TO_DMC_SNOOP << 0));
+    *pReg = (uint32_t)(0u);
 }
 
 
@@ -163,7 +211,11 @@ __asm__ __volatile__("temp_CSL_c7xSetL1DCFG: \n"
 static void configureC7xL1DCacheAsWriteThrough()
 {
     volatile uint64_t l1dcfg = 0x1U;
+#if !defined(MCU_PLUS_SDK)
     Cache_wbInvL1dAll();
+#else
+    CacheP_wbInvAll(CacheP_TYPE_L1D);
+#endif
     temp_CSL_c7xSetL1DCFG(l1dcfg);
 }
 #endif
@@ -175,7 +227,9 @@ int main(void)
 
     StartupEmulatorWaitFxn();
 
+#if !defined(MCU_PLUS_SDK)
     OS_init();
+#endif
 
     appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;
@@ -183,11 +237,22 @@ int main(void)
     tskParams.stacksize = sizeof (gTskStackMain);
     tskParams.taskfxn = &appMain;
     task = appRtosTaskCreate(&tskParams);
+
+#if !defined(MCU_PLUS_SDK)
     if(NULL == task)
     {
         OS_stop();
     }
     OS_start();
+#else
+    DebugP_assert(task != NULL);
+    vTaskStartScheduler();
+    /* The following line should never be reached because vTaskStartScheduler()
+    will only return if there was not enough FreeRTOS heap memory available to
+    create the Idle and (if configured) Timer tasks.  Heap management, and
+    techniques for trapping heap exhaustion, are described in the book text. */
+    DebugP_assertNoLog(0);
+#endif
 
     return 0;
 }
@@ -196,6 +261,8 @@ uint32_t g_app_rtos_c7x_mmu_map_error = 0;
 
 void appMmuMap(Bool is_secure)
 {
+
+#if !defined(MCU_PLUS_SDK)
     Bool            retVal;
     Mmu_MapAttrs    attrs;
 
@@ -345,6 +412,148 @@ mmu_exit:
     {
         g_app_rtos_c7x_mmu_map_error++;
     }
+#else
+
+    int32_t retVal;
+    MmuP_MapAttrs    attrs;
+
+    MmuP_MapAttrs_init(&attrs);
+
+    attrs.attrIndx = MMUP_ATTRINDX_MAIR0;
+
+    retVal = MmuP_map(0x00000000, 0x00000000, 0x20000000, &attrs);
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(0x20000000, 0x20000000, 0x20000000, &attrs);
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(0x40000000, 0x40000000, 0x20000000, &attrs);
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(0x60000000, 0x60000000, 0x10000000, &attrs);
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(0x70000000, 0x70000000, 0x10000000, &attrs);
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(0x7C200000U, 0x7C200000U, 0x00100000U, &attrs); /* CLEC */
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(0x7C400000U, 0x7C400000U, 0x00100000U, &attrs); /* DRU */
+    if(retVal==SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    MmuP_MapAttrs_init(&attrs);
+    attrs.attrIndx = MMUP_ATTRINDX_MAIR7;
+
+    retVal = MmuP_map(L2RAM_C7x_1_MAIN_ADDR, L2RAM_C7x_1_MAIN_ADDR, 0x01000000, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(L2RAM_C7x_1_AUX_ADDR, L2RAM_C7x_1_AUX_ADDR, 0x01000000, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    MmuP_MapAttrs_init(&attrs);
+
+    attrs.attrIndx = MMUP_ATTRINDX_MAIR4;
+
+    retVal = MmuP_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(IPC_VRING_MEM_ADDR, IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+	retVal = MmuP_map(DDR_C7x_1_IPC_ADDR, DDR_C7x_1_IPC_ADDR, 2*DDR_C7x_1_IPC_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = MmuP_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs);
+    if(retVal == SystemP_FAILURE)
+    {
+        goto mmu_exit;
+    }
+
+mmu_exit:
+    if(retVal == SystemP_FAILURE)
+    {
+        g_app_rtos_c7x_mmu_map_error++;
+    }
+#endif
 
     return;
 }
@@ -361,7 +570,11 @@ void appCacheInit()
 
 }
 
+#if !defined(MCU_PLUS_SDK)
 void InitMmu(void)
+#else
+void MmuP_setConfig(void)
+#endif
 {
     /* This is for debug purpose - see the description of function header */
     g_app_rtos_c7x_mmu_map_error = 0;

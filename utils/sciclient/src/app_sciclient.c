@@ -61,8 +61,14 @@
  */
 
 #include <utils/console_io/include/app_log.h>
-#include <sciclient/sciclient.h>
 #include <stdio.h>
+
+#if !defined(MCU_PLUS_SDK)
+#include <sciclient/sciclient.h>
+#else
+#include <sciclient.h>
+#include <SystemP.h>
+#endif
 
 int32_t appSciclientDmscGetVersion(char *version_str, uint32_t version_str_size)
 {
@@ -75,7 +81,11 @@ int32_t appSciclientDmscGetVersion(char *version_str, uint32_t version_str_size)
         TISCI_MSG_FLAG_AOP,
         (uint8_t *)&request,
         sizeof(request),
+#if !defined(MCU_PLUS_SDK)
         SCICLIENT_SERVICE_WAIT_FOREVER
+#else
+        SystemP_WAIT_FOREVER
+#endif
     };
 
     struct tisci_msg_version_resp response;
@@ -123,13 +133,25 @@ int32_t appSciclientDmscGetVersion(char *version_str, uint32_t version_str_size)
 int32_t appSciclientInit()
 {
     int32_t retVal = 0;
-    Sciclient_ConfigPrms_t  sciClientCfg;
 
     appLogPrintf("SCICLIENT: Init ... !!!\n");
 
+#if !defined(MCU_PLUS_SDK)
+    Sciclient_ConfigPrms_t  sciClientCfg;
     Sciclient_configPrmsInit(&sciClientCfg);
 
     retVal = Sciclient_init(&sciClientCfg);
+#else
+    {
+
+        int32_t retVal = SystemP_SUCCESS;
+
+        retVal = Sciclient_init(CSL_CORE_ID_C75SS0_0);
+        DebugP_assertNoLog(SystemP_SUCCESS == retVal);
+
+    }
+#endif
+
     if(retVal!=0)
     {
         appLogPrintf("SCICLIENT: ERROR: Sciclient init failed !!!\n");

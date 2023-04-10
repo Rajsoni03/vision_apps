@@ -96,8 +96,10 @@
 
 /* PDK header files */
 #ifdef ENABLE_UART
+#if !defined(MCU_PLUS_SDK)
 #include <ti/drv/uart/UART.h>
 #include <ti/drv/uart/UART_stdio.h>
+#endif
 #endif
 
 app_log_shared_mem_t g_app_log_shared_mem

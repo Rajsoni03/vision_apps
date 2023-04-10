@@ -68,6 +68,11 @@
 
 /* Semaphore */
 
+//To be deleted after PDK support removed for AM62A
+#if defined(SOC_AM62A)
+typedef void ( * TaskP_Fxn )( void *arg0, void *arg1);
+#endif
+
 void appRtosSemaphoreParamsInit(app_rtos_semaphore_params_t *params)
 {
     if(params != NULL)

@@ -1,5 +1,9 @@
 ifeq ($(RTOS),FREERTOS)
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
+	ifeq ($(RTOS_SDK),pdk)
+		LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
+	else
+		LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos_mcuplus.cmd
+	endif
 endif
 
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd

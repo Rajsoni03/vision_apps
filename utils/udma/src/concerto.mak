@@ -12,7 +12,10 @@ CSOURCES    += app_udma_utils.c
 CSOURCES    += app_udma_test.c
 endif
 
-IDIRS       += $(PDK_PATH)/packages
+ifeq ($(RTOS_SDK),pdk)
+IDIRS       += $(PDK_PATH)/packages/ti/drv/udma
+endif
+
 
 ifeq ($(SOC),am62a)
 ifeq ($(TARGET_CPU),R5F)
