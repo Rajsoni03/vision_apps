@@ -11,10 +11,6 @@ ASSEMBLY += app_c7x_init_asm.asm
 CSOURCES += app_c7x_init.c
 endif
 
-ifeq ($(TARGET_OS),SYSBIOS)
-CSOURCES += app_cpu_hz_tirtos.c
-endif
-
 ifeq ($(TARGET_OS),FREERTOS)
 IDIRS    += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include/
 endif

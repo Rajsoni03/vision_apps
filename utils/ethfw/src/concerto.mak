@@ -11,11 +11,7 @@ IDIRS       += $(VISION_APPS_PATH)
 TARGET      := app_utils_ethfw
 TARGETTYPE  := library
 
-ifeq ($(TARGET_OS),SYSBIOS)
-
-CSOURCES    := app_ethfw_tirtos.c
-
-else ifeq ($(TARGET_OS),FREERTOS)
+ifeq ($(TARGET_OS),FREERTOS)
 
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/src/include
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/freertos/include
