@@ -7,8 +7,8 @@ TEST_IDIRS += $(TIOVX_PATH)/conformance_tests
 IMAGING_IDIRS  =
 IMAGING_IDIRS += $(IMAGING_PATH)/kernels/include
 IMAGING_IDIRS += $(IMAGING_PATH)/sensor_drv/include
-IMAGING_IDIRS += $(VISION_APPS_PATH)/utils/itt_server/include
-IMAGING_IDIRS += $(VISION_APPS_PATH)/utils/network_api/include
+IMAGING_IDIRS += $(IMAGING_PATH)/utils/itt_server/include
+IMAGING_IDIRS += $(IMAGING_PATH)/utils/network_api/include
 
 VISION_APPS_KERNELS_IDIRS =
 VISION_APPS_KERNELS_IDIRS += $(VISION_APPS_PATH)/kernels

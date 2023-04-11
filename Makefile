@@ -29,9 +29,7 @@ DIRECTORIES :=
 ifeq ($(SOC),am62a)
 DIRECTORIES += utils/app_init
 DIRECTORIES += utils/console_io
-DIRECTORIES += utils/hwa
 DIRECTORIES += utils/ipc
-DIRECTORIES += utils/iss
 DIRECTORIES += utils/mem
 DIRECTORIES += utils/misc
 DIRECTORIES += utils/perf_stats

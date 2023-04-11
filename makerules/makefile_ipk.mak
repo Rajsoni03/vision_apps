@@ -43,6 +43,7 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					imaging/kernels/include \
 					imaging/ti_2a_wrapper/include \
 					imaging/sensor_drv/include \
+					imaging/utils \
 					ivision \
 					$(tidl_dir)/ti_dl/inc \
 					tiovx/conformance_tests/test_engine \
