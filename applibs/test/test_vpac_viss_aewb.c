@@ -275,6 +275,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
     vx_user_data_object aewb_config;
     vx_user_data_object dcc_param_2a;
     vx_user_data_object dcc_param_viss;
+    vx_user_data_object ae_aewb_delay_1;
 
     vx_size dcc_buff_size;
     char dcc_viss_file_path[APP_MAX_FILE_PATH];
@@ -352,14 +353,19 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
         memset(&ae_awb_params, 0, sizeof(tivx_ae_awb_params_t));
         ASSERT_VX_OBJECT(ae_awb_result =
             vxCreateUserDataObject(context, "tivx_ae_awb_params_t",
-            sizeof(tivx_ae_awb_params_t), NULL), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
+            sizeof(tivx_ae_awb_params_t), &ae_awb_params), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
 
         delay_2a_res = vxCreateDelay(context, (vx_reference)(ae_awb_result), 2);
+
+        ASSERT_VX_OBJECT(ae_aewb_delay_1 =
+            (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, -1), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
+
+        VX_CALL(vxCopyUserDataObject(ae_aewb_delay_1, 0, sizeof(tivx_ae_awb_params_t), &ae_awb_params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
 
         ASSERT_VX_OBJECT(graph = vxCreateGraph(context), VX_TYPE_GRAPH);
 
         ASSERT_VX_OBJECT(vissNode = tivxVpacVissNode(graph, configuration,
-                                                (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, -1), NULL,
+                                                ae_aewb_delay_1, NULL,
                                                 raw[0], NULL, NULL, viss_nv12_out_img, NULL, NULL,
                                                 h3a_aew_af, NULL, NULL, NULL), VX_TYPE_NODE);
         tivxSetNodeParameterNumBufByIndex(vissNode, 6u, NUM_BUFS);
@@ -415,7 +421,7 @@ TEST(tivxHwaVpacVissAewb, testSingleChannel)
                                  aewb_config,
                                  NULL,
                                  h3a_aew_af,
-                                 (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, -1),
+                                 ae_aewb_delay_1,
                                  (vx_user_data_object)vxGetReferenceFromDelay(delay_2a_res, 0),
                                  dcc_param_2a), VX_TYPE_NODE);
         VX_CALL(vxSetNodeTarget(node_aewb, VX_TARGET_STRING, TIVX_TARGET_MCU2_0));
@@ -541,6 +547,7 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
     vx_user_data_object aewb_config;
     vx_user_data_object dcc_param_2a;
     vx_user_data_object dcc_param_viss;
+    vx_user_data_object ae_aewb_delay_1;
 
     vx_size dcc_buff_size;
     char dcc_viss_file_path[APP_MAX_FILE_PATH];
@@ -673,6 +680,8 @@ TEST(tivxHwaVpacVissAewb, testMultiChannel)
 
         ASSERT_VX_OBJECT(tmp_user_data_object_1 = (vx_user_data_object)vxGetObjectArrayItem(tmp_obj_arr_1, 0), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
         ASSERT_VX_OBJECT(tmp_user_data_object_0 = (vx_user_data_object)vxGetObjectArrayItem(tmp_obj_arr_0, 0), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
+
+        VX_CALL(vxCopyUserDataObject(tmp_user_data_object_1, 0, sizeof(tivx_aewb_config_t), &ae_awb_params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
 
         ASSERT_VX_OBJECT(vissNode = tivxVpacVissNode(graph, configuration,
                                                 (vx_user_data_object)tmp_user_data_object_1, NULL,
@@ -1024,6 +1033,8 @@ TEST(tivxHwaVpacVissAewb, testMultiChannelNullH3A)
 
         ASSERT_VX_OBJECT(tmp_user_data_object_1 = (vx_user_data_object)vxGetObjectArrayItem(tmp_obj_arr_1, 0), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
         ASSERT_VX_OBJECT(tmp_user_data_object_0 = (vx_user_data_object)vxGetObjectArrayItem(tmp_obj_arr_0, 0), (enum vx_type_e)VX_TYPE_USER_DATA_OBJECT);
+
+        VX_CALL(vxCopyUserDataObject(tmp_user_data_object_1, 0, sizeof(tivx_aewb_config_t), &ae_awb_params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST));
 
         ASSERT_VX_OBJECT(vissNode = tivxVpacVissNode(graph, configuration,
                                                 (vx_user_data_object)tmp_user_data_object_1, NULL,
