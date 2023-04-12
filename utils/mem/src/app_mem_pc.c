@@ -726,3 +726,8 @@ uint64_t appMemShared2PhysPtr(uint64_t shared_ptr, uint32_t heap_id)
 {
     return shared_ptr;
 }
+
+int32_t appMemResetScratchHeap(uint32_t heap_id)
+{
+    return 0;
+}
