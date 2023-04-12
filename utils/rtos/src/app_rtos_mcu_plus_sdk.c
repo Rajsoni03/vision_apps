@@ -233,6 +233,7 @@ void appRtosTaskParamsInit(app_rtos_task_params_t *params)
         params->priority    = rtos_task_prms.priority;
         params->arg0        = rtos_task_prms.args;
         params->taskfxn     = NULL;
+        params->userData    = NULL;
     }
 } 
 

@@ -214,6 +214,7 @@ void appRtosTaskParamsInit(app_rtos_task_params_t *params)
         params->arg0        = rtos_task_prms.arg0;
         params->arg1        = rtos_task_prms.arg1;
         params->taskfxn     = NULL;
+        params->userData    = NULL;
     }
 }
 
@@ -233,6 +234,7 @@ app_rtos_task_handle_t appRtosTaskCreate(const app_rtos_task_params_t *params)
         rtos_task_prms.arg0      = params->arg0;
         rtos_task_prms.arg1      = params->arg1;
         rtos_task_prms.name      = (const char*)&params->name[0];
+        rtos_task_prms.userData  = params->userData;
 
         tskHndl = (void*)TaskP_create(
                             (TaskP_Fxn)params->taskfxn,

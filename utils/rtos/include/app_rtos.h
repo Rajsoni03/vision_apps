@@ -144,6 +144,7 @@ typedef struct {
     void         *arg0;         /**< User arguments that are passed back as parameter to task main */
     void         *arg1;         /**< User arguments that are passed back as parameter to task main */
     void         *taskfxn;      /**< Entry point function to the task */
+    void         *userData;     /**< User-defined data */
 } app_rtos_task_params_t;
 
 /*!
