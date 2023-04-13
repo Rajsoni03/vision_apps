@@ -67,8 +67,8 @@ ifeq ($(RTOS),FREERTOS)
 	STATIC_LIBS += app_rtos
 endif
 
-STATIC_LIBS += app_utils_hwa
-STATIC_LIBS += app_utils_sciserver
+SYS_STATIC_LIBS += app_utils_hwa
+SYS_STATIC_LIBS += app_utils_sciserver
 
 ifeq ($(RTOS_SDK),pdk)
 	ADDITIONAL_STATIC_LIBS += vhwa.aer5f

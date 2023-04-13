@@ -4,6 +4,15 @@
 # Edit this file to suit your specific build needs
 #
 
+app_utils:
+	$(MAKE) -C $(APP_UTILS_PATH)
+
+app_utils_clean:
+	$(MAKE) -C $(APP_UTILS_PATH) clean
+
+app_utils_scrub:
+	$(MAKE) -C $(APP_UTILS_PATH) scrub
+
 vxlib:
 ifeq ($(BUILD_EMULATION_MODE),yesDISABLE)
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))

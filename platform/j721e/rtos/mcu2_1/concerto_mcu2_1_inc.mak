@@ -52,8 +52,8 @@ STATIC_LIBS += app_rtos_common_mcu2_1
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
-STATIC_LIBS += app_utils_hwa
-STATIC_LIBS += app_utils_sciclient
+SYS_STATIC_LIBS += app_utils_hwa
+SYS_STATIC_LIBS += app_utils_sciclient
 
 ADDITIONAL_STATIC_LIBS += vhwa.aer5f
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f

@@ -50,7 +50,7 @@ STATIC_LIBS += app_rtos_common_mcu4_1
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
-STATIC_LIBS += app_utils_sciclient
+SYS_STATIC_LIBS += app_utils_sciclient
 
 ADDITIONAL_STATIC_LIBS += sciclient.aer5f
 

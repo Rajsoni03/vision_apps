@@ -32,18 +32,21 @@ LDIRS += $(PDK_PATH)/packages/ti/transport/timeSync/lib/r5f/$(TARGET_BUILD)/
 
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(IMAGING_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS += $(APP_UTILS_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
-STATIC_LIBS += app_utils_mem
-STATIC_LIBS += app_utils_rtos
-STATIC_LIBS += app_utils_console_io
-STATIC_LIBS += app_utils_ipc
-STATIC_LIBS += app_utils_remote_service
-STATIC_LIBS += app_utils_udma
-STATIC_LIBS += app_utils_misc
-STATIC_LIBS += app_utils_sensors
-STATIC_LIBS += app_utils_perf_stats
-STATIC_LIBS += app_utils_iss
 STATIC_LIBS += vx_target_kernels_img_proc_r5f
+
+APP_UTILS_LIBS =
+APP_UTILS_LIBS += app_utils_mem
+APP_UTILS_LIBS += app_utils_rtos
+APP_UTILS_LIBS += app_utils_console_io
+APP_UTILS_LIBS += app_utils_ipc
+APP_UTILS_LIBS += app_utils_remote_service
+APP_UTILS_LIBS += app_utils_udma
+APP_UTILS_LIBS += app_utils_misc
+APP_UTILS_LIBS += app_utils_perf_stats
+
+SYS_STATIC_LIBS += $(APP_UTILS_LIBS)
 
 TIOVX_LIBS =
 TIOVX_LIBS += vx_conformance_engine vx_conformance_tests vx_conformance_tests_testmodule
@@ -61,6 +64,8 @@ TIOVX_LIBS += vx_target_kernels_capture
 TIOVX_LIBS += vx_target_kernels_csitx
 TIOVX_LIBS += vx_target_kernels_j7_arm
 
+SYS_STATIC_LIBS += $(TIOVX_LIBS)
+
 IMAGING_LIBS  = ti_imaging_awbalg
 IMAGING_LIBS += ti_imaging_dcc
 IMAGING_LIBS += vx_kernels_imaging
@@ -68,8 +73,9 @@ IMAGING_LIBS += vx_target_kernels_imaging_aewb
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_sensordrv
 IMAGING_LIBS += ti_imaging_ittsrvr
+IMAGING_LIBS += app_utils_sensors
+IMAGING_LIBS += app_utils_iss
 
-SYS_STATIC_LIBS += $(TIOVX_LIBS)
 SYS_STATIC_LIBS += $(IMAGING_LIBS)
 
 ADDITIONAL_STATIC_LIBS += ti.board.aer5f

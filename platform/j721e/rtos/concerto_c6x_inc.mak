@@ -20,23 +20,28 @@ ifeq ($(RTOS),SAFERTOS)
 endif
 LDIRS += $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c66/$(TARGET_BUILD)/
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS += $(APP_UTILS_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(VXLIB_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/NO_OS/$(TARGET_BUILD)
 LDIRS += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 LDIRS += $(MATHLIB_PATH)/packages/ti/mathlib/lib
 
-STATIC_LIBS += app_utils_mem
-STATIC_LIBS += app_utils_rtos
-STATIC_LIBS += app_utils_console_io
-STATIC_LIBS += app_utils_ipc
-STATIC_LIBS += app_utils_remote_service
-STATIC_LIBS += app_utils_udma
-STATIC_LIBS += app_utils_sciclient
-STATIC_LIBS += app_utils_misc
-STATIC_LIBS += app_utils_perf_stats
 STATIC_LIBS += vx_target_kernels_img_proc_c66
 STATIC_LIBS += vx_kernels_common
 STATIC_LIBS += vx_target_kernels_stereo
+
+APP_UTILS_LIBS =
+APP_UTILS_LIBS += app_utils_mem
+APP_UTILS_LIBS += app_utils_rtos
+APP_UTILS_LIBS += app_utils_console_io
+APP_UTILS_LIBS += app_utils_ipc
+APP_UTILS_LIBS += app_utils_remote_service
+APP_UTILS_LIBS += app_utils_udma
+APP_UTILS_LIBS += app_utils_sciclient
+APP_UTILS_LIBS += app_utils_misc
+APP_UTILS_LIBS += app_utils_perf_stats
+
+SYS_STATIC_LIBS += $(APP_UTILS_LIBS)
 
 PTK_LIBS =
 PTK_LIBS += ptk_algos

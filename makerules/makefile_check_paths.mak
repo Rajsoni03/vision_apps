@@ -21,13 +21,14 @@ endif
 	@if [ ! -d $(IVISION_PATH) ]; then echo 'ERROR: $(IVISION_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(IMAGING_PATH) ]; then echo 'ERROR: $(IMAGING_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(MMALIB_PATH) ]; then echo 'ERROR: $(MMALIB_PATH) not found !!!'; exit 1; fi
-ifeq ($(RTOS_SDK),pdk)	
+ifeq ($(RTOS_SDK),pdk)
 	@if [ ! -d $(PDK_PATH) ]; then echo 'ERROR: $(PDK_PATH) not found !!!'; exit 1; fi
-else	
+else
 	@if [ ! -d $(MCU_PLUS_SDK_PATH) ]; then echo 'ERROR: $(MCU_PLUS_SDK_PATH) not found !!!'; exit 1; fi
 endif
 	@if [ ! -d $(VISION_APPS_PATH) ]; then echo 'ERROR: $(VISION_APPS_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(TIOVX_PATH) ]; then echo 'ERROR: $(TIOVX_PATH) not found !!!'; exit 1; fi
+	@if [ ! -d $(APP_UTILS_PATH) ]; then echo 'ERROR: $(APP_UTILS_PATH) not found !!!'; exit 1; fi
 ifneq ($(SOC), am62a)
 	@if [ ! -d $(TIADALG_PATH) ]; then echo 'ERROR: $(TIADALG_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(PTK_PATH) ]; then echo 'ERROR: $(PTK_PATH) not found !!!'; exit 1; fi

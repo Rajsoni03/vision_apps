@@ -38,14 +38,20 @@ endif
 
 LDIRS += $(TIOVX_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS += $(IMAGING_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
-STATIC_LIBS += app_utils_mem
-STATIC_LIBS += app_utils_rtos
-STATIC_LIBS += app_utils_console_io
-STATIC_LIBS += app_utils_ipc
-STATIC_LIBS += app_utils_remote_service
-STATIC_LIBS += app_utils_misc
-STATIC_LIBS += app_utils_perf_stats
+LDIRS += $(APP_UTILS_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+
 STATIC_LIBS += vx_target_kernels_img_proc_r5f
+
+APP_UTILS_LIBS =
+APP_UTILS_LIBS += app_utils_mem
+APP_UTILS_LIBS += app_utils_rtos
+APP_UTILS_LIBS += app_utils_console_io
+APP_UTILS_LIBS += app_utils_ipc
+APP_UTILS_LIBS += app_utils_remote_service
+APP_UTILS_LIBS += app_utils_misc
+APP_UTILS_LIBS += app_utils_perf_stats
+
+SYS_STATIC_LIBS += $(APP_UTILS_LIBS)
 
 TIOVX_LIBS =
 TIOVX_LIBS += vx_conformance_engine vx_conformance_tests vx_conformance_tests_testmodule
