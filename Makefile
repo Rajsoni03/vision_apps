@@ -203,8 +203,7 @@ include makerules/makefile_edgeai.mak
 vision_apps: sdk_check_paths
 	$(MAKE) all
 vision_apps_clean: sdk_check_paths pdk_emu_clean clean
-vision_apps_scrub: sdk_check_paths
-	rm -rf out/
+vision_apps_scrub: sdk_check_paths scrub
 
 vision_apps_docs: sdk_check_paths doxy_docs
 
