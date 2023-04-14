@@ -7,7 +7,7 @@ TARGET      := tivision_apps
 TARGETTYPE  := dsmo
 VERSION     := $(PSDK_VERSION)
 
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 STATIC_LIBS     += $(IMAGING_LIBS)
 STATIC_LIBS     += $(PTK_LIBS)

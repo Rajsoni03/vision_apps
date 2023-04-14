@@ -440,7 +440,7 @@ vx_status app_create_graph_scaler_write_output(vx_graph graph, ScalerObj *scaler
     if(status == VX_SUCCESS)
     {
         vxSetReferenceName((vx_reference)scalerObj->write_node[idx], "scaler_write_node");
-        vxSetNodeTarget(scalerObj->write_node[idx], VX_TARGET_STRING, TIVX_TARGET_A72_0);
+        vxSetNodeTarget(scalerObj->write_node[idx], VX_TARGET_STRING, TIVX_TARGET_MPU_0);
 
         vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};
         vxReplicateNode(graph, scalerObj->write_node[idx], replicate, 3);

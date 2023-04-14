@@ -69,12 +69,12 @@
 #include "tivx_img_hist_host.h"
 
 #if defined(SOC_AM62A)
-#define NUM_A72_TARGETS (1)
+#define NUM_MPU_TARGETS (1)
 #else
-#define NUM_A72_TARGETS (4)
+#define NUM_MPU_TARGETS (4)
 #endif
 
-static tivx_target_kernel vx_img_hist_target_kernel[NUM_A72_TARGETS];
+static tivx_target_kernel vx_img_hist_target_kernel[NUM_MPU_TARGETS];
 
 static vx_status VX_CALLBACK tivxKernelImgHistProcess(
     tivx_target_kernel_instance kernel, tivx_obj_desc_t *obj_desc[],
@@ -165,23 +165,23 @@ static vx_status VX_CALLBACK tivxKernelImgHistDelete(
 
 void tivxAddTargetKernelImgHist(void)
 {
-    char target_name[NUM_A72_TARGETS][TIVX_TARGET_MAX_NAME];
+    char target_name[NUM_MPU_TARGETS][TIVX_TARGET_MAX_NAME];
     vx_enum self_cpu;
     int32_t i;
 
     self_cpu = tivxGetSelfCpuId();
 
-    if ( self_cpu == TIVX_CPU_ID_A72_0 )
+    if ( self_cpu == TIVX_CPU_ID_MPU_0 )
     {
-        strncpy(target_name[0], TIVX_TARGET_A72_0, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[0], TIVX_TARGET_MPU_0, TIVX_TARGET_MAX_NAME);
         #if !defined(SOC_AM62A)
-        strncpy(target_name[1], TIVX_TARGET_A72_1, TIVX_TARGET_MAX_NAME);
-        strncpy(target_name[2], TIVX_TARGET_A72_2, TIVX_TARGET_MAX_NAME);
-        strncpy(target_name[3], TIVX_TARGET_A72_3, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[1], TIVX_TARGET_MPU_1, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[2], TIVX_TARGET_MPU_2, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name[3], TIVX_TARGET_MPU_3, TIVX_TARGET_MAX_NAME);
         #endif
     }
 
-    for(i = 0; i < NUM_A72_TARGETS; i++)
+    for(i = 0; i < NUM_MPU_TARGETS; i++)
     {
         vx_img_hist_target_kernel[i] = tivxAddTargetKernelByName(
                                         TIVX_KERNEL_IMG_HIST_NAME,
@@ -199,7 +199,7 @@ void tivxRemoveTargetKernelImgHist(void)
 {
     int32_t i;
 
-    for(i = 0; i < NUM_A72_TARGETS; i++)
+    for(i = 0; i < NUM_MPU_TARGETS; i++)
     {
         tivxRemoveTargetKernel(vx_img_hist_target_kernel[i]);
     }

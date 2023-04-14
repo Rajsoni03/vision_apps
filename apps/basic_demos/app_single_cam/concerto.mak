@@ -18,7 +18,7 @@ ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 CSOURCES    += app_single_cam_main.c
 CSOURCES    += main_linux_arm.c
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 STATIC_LIBS += $(IMAGING_LIBS)
 endif
 endif
@@ -28,7 +28,7 @@ ifeq ($(TARGET_OS),SYSBIOS)
 
 TARGETTYPE  := library
 
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 endif
 endif

@@ -24,7 +24,7 @@ ifeq ($(TARGET_OS),QNX)
 SYS_SHARED_LIBS += screen
 endif
 
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 STATIC_LIBS += $(IMAGING_LIBS)
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)

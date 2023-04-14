@@ -622,7 +622,7 @@ TEST(tivxGlSrv, testGraph1MP)
     ASSERT_VX_OBJECT(graph = vxCreateGraph(context), VX_TYPE_GRAPH);
 
     ASSERT_VX_OBJECT(node = tivxGlSrvNode(graph, param_obj, input_array, srv_views_array, NULL, output_image), VX_TYPE_NODE);
-    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
 
     VX_CALL(vxVerifyGraph(graph));
     VX_CALL(vxProcessGraph(graph));
@@ -725,7 +725,7 @@ TEST(tivxGlSrv, testGraph1MPViewChange)
     ASSERT_VX_OBJECT(graph = vxCreateGraph(context), VX_TYPE_GRAPH);
 
     ASSERT_VX_OBJECT(node = tivxGlSrvNode(graph, param_obj, input_array, srv_views_array, NULL, output_image), VX_TYPE_NODE);
-    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
 
     VX_CALL(vxVerifyGraph(graph));
     VX_CALL(vxProcessGraph(graph));
@@ -879,7 +879,7 @@ TEST(tivxGlSrv, testGraph2MP)
     ASSERT_VX_OBJECT(graph = vxCreateGraph(context), VX_TYPE_GRAPH);
 
     ASSERT_VX_OBJECT(node = tivxGlSrvNode(graph, param_obj, input_array, srv_views_array, NULL, output_image), VX_TYPE_NODE);
-    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
 
     VX_CALL(vxVerifyGraph(graph));
     VX_CALL(vxProcessGraph(graph));
@@ -953,7 +953,7 @@ TEST(tivxGlSrv, testNullSrvViews)
     ASSERT_VX_OBJECT(graph = vxCreateGraph(context), VX_TYPE_GRAPH);
 
     ASSERT_VX_OBJECT(node = tivxGlSrvNode(graph, param_obj, input_array, NULL, NULL, output_image), VX_TYPE_NODE);
-    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
 
     VX_CALL(vxVerifyGraph(graph));
     VX_CALL(vxProcessGraph(graph));

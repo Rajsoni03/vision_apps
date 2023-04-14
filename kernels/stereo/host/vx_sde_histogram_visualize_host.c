@@ -190,10 +190,10 @@ vx_status tivxAddKernelSdeHistogramVisualize(vx_context context)
             /* add supported target's */
             tivxAddKernelTarget(kernel, TIVX_TARGET_MCU2_0);
             tivxKernelsHostUtilsAddKernelTargetDsp(kernel);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_0);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_1);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_2);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_3);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_0);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_1);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_2);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_3);
         }
         if (status == VX_SUCCESS)
         {

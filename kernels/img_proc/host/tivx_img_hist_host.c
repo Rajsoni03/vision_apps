@@ -230,11 +230,11 @@ vx_status tivxAddKernelImgHist(vx_context context)
         if (status == (vx_status)VX_SUCCESS)
         {
             /* add supported target's */
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_0);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_0);
             #if !defined(SOC_AM62A)
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_1);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_2);
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_3);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_1);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_2);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_3);
             #endif
         }
         if (status == (vx_status)VX_SUCCESS)

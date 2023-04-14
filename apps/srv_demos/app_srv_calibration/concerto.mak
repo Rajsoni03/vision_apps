@@ -6,7 +6,7 @@ TARGET      := vx_app_srv_calibration
 TARGETTYPE  := exe
 CSOURCES    := $(call all-c-files)
 
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 IDIRS += $(IMAGING_IDIRS)
 IDIRS += $(VISION_APPS_APPLIBS_IDIRS)

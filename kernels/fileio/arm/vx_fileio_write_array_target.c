@@ -233,9 +233,9 @@ void tivxAddTargetKernelWriteArray()
 
     self_cpu = tivxGetSelfCpuId();
 
-    if ((self_cpu == TIVX_CPU_ID_A72_0))
+    if ((self_cpu == TIVX_CPU_ID_MPU_0))
     {
-        strncpy(target_name, TIVX_TARGET_A72_0, TIVX_TARGET_MAX_NAME);
+        strncpy(target_name, TIVX_TARGET_MPU_0, TIVX_TARGET_MAX_NAME);
 
         vx_write_array_target_kernel = tivxAddTargetKernelByName
                                        (

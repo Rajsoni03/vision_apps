@@ -172,7 +172,7 @@ void tivxImgProcLoadKernels(vx_context context)
         #endif
         tivxRegisterImgProcTargetR5FKernels();
 
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MPU_0);
         #endif
         tivxRegisterImgProcTargetA72Kernels();
         #endif

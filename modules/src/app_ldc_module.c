@@ -492,7 +492,7 @@ vx_status app_create_graph_ldc_write_output(vx_graph graph, LDCObj *ldcObj)
     if(status == VX_SUCCESS)
     {
         vxSetReferenceName((vx_reference)ldcObj->write_node, "ldc_write_node");
-        vxSetNodeTarget(ldcObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+        vxSetNodeTarget(ldcObj->write_node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
 
         vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};
         vxReplicateNode(graph, ldcObj->write_node, replicate, 3);

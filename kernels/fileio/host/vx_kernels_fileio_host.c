@@ -120,7 +120,7 @@ void tivxFileIOLoadKernels(vx_context context)
         vxLoadKernels(context, TIVX_MODULE_NAME_FILEIO);
         #if defined(LINUX) || defined(x86_64) || defined(QNX)
         #ifdef x86_64
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MPU_0);
         #endif
         tivxRegisterFileIOTargetArmKernels();
 

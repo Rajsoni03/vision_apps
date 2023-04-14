@@ -101,7 +101,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
             case APP_IPC_CPU_MPU1_0:
                 snprintf(string1, APP_GRPX_STRING_MAX,
                           "%3s",
-                          "A72"
+                          "MPU"
                           );
                 snprintf(string2, APP_GRPX_STRING_MAX,
                           "%3s",

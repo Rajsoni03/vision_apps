@@ -112,7 +112,7 @@ vx_status app_create_graph_img_hist(vx_graph graph, ImgHistObj *imgHistObj, vx_o
                                        input,
                                        histogram);
 
-    status = vxSetNodeTarget(imgHistObj->node, VX_TARGET_STRING, TIVX_TARGET_A72_1);
+    status = vxSetNodeTarget(imgHistObj->node, VX_TARGET_STRING, TIVX_TARGET_MPU_1);
     vxSetReferenceName((vx_reference)imgHistObj->node, "ImgHistNode");
 
     vx_bool replicate[] = {vx_true_e, vx_true_e};

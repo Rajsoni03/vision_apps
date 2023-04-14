@@ -15,7 +15,7 @@ kernel.setParameter(Type.OBJECT_ARRAY, Direction.INPUT, ParamState.OPTIONAL, "SR
 kernel.setParameter(Type.ARRAY, Direction.INPUT, ParamState.OPTIONAL, "GALIGN_LUT")
 kernel.setParameter(Type.IMAGE, Direction.OUTPUT, ParamState.REQUIRED, "OUTPUT", ['VX_DF_IMAGE_RGBX'])
 
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 
 code.export(kernel)
 code.exportDiagram(kernel)

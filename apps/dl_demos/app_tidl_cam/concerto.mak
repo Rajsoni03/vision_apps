@@ -19,7 +19,7 @@ endif
 
 ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 CSOURCES    += main_linux_arm.c
 endif
 endif

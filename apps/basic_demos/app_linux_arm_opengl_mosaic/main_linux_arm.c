@@ -375,7 +375,7 @@ int main(int argc, char *argv[])
     }
     if(status == VX_SUCCESS)
     {
-        status = vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+        status = vxSetNodeTarget(node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     }
     if(status == VX_SUCCESS)
     {

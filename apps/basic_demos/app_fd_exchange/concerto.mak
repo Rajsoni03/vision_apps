@@ -14,7 +14,7 @@ SYS_SHARED_LIBS += socket
 endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 endif
 
 ifeq ($(TARGET_CPU), x86_64)
@@ -36,7 +36,7 @@ SYS_SHARED_LIBS += socket
 endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 endif
 
 ifeq ($(TARGET_CPU), x86_64)

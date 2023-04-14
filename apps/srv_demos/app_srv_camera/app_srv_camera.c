@@ -1802,7 +1802,7 @@ static int app_create_graph_gpu_lut(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
-        status = vxSetNodeTarget(obj->srv_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+        status = vxSetNodeTarget(obj->srv_node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     }
     if(status == VX_SUCCESS)
     {

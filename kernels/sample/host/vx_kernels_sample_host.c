@@ -113,7 +113,7 @@ void tivxSampleLoadKernels(vx_context context)
          * this will need to be updated when moving to target */
         #ifdef x86_64
         void tivxSetSelfCpuId(vx_enum cpu_id);
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MPU_0);
         #endif
 
         gIsSampleKernelsLoad = 1U;
@@ -131,7 +131,7 @@ void tivxSampleUnLoadKernels(vx_context context)
          * this will need to be updated when moving to target */
         #ifdef x86_64
         void tivxSetSelfCpuId(vx_enum cpu_id);
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MPU_0);
         #endif
 
         gIsSampleKernelsLoad = 0U;

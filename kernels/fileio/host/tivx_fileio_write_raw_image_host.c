@@ -222,7 +222,7 @@ vx_status tivxAddKernelWriteRawImage(vx_context context)
         if (status == VX_SUCCESS)
         {
             /* add supported target's */
-            tivxAddKernelTarget(kernel, TIVX_TARGET_A72_0);
+            tivxAddKernelTarget(kernel, TIVX_TARGET_MPU_0);
         }
         if (status == VX_SUCCESS)
         {

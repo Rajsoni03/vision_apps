@@ -8,7 +8,7 @@ TARGETTYPE  := exe
 CSOURCES    := $(call all-c-files)
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 ifeq ($(TARGET_OS),LINUX)
 CFLAGS += -DEGL_NO_X11

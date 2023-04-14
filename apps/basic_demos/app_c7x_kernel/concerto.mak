@@ -22,7 +22,7 @@ TARGETTYPE  := exe
 
 CSOURCES    += main_linux_arm.c
 
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 endif
 endif

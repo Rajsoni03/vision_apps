@@ -206,7 +206,7 @@ vx_status app_create_graph_pre_proc_write_output(vx_graph graph, PreProcObj *pre
 
     preProcObj->write_node = tivxWriteTensorNode(graph, output, preProcObj->file_path, preProcObj->file_prefix);
     status = vxGetStatus((vx_reference)preProcObj->write_node);
-    vxSetNodeTarget(preProcObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(preProcObj->write_node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     vxSetReferenceName((vx_reference)preProcObj->write_node, "pre_proc_write_node");
 
     vx_bool replicate[] = { vx_true_e, vx_false_e, vx_false_e};

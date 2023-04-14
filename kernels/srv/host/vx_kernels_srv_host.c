@@ -134,7 +134,7 @@ void tivxSrvLoadKernels(vx_context context)
             tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
             tivxRegisterSrvTargetC66Kernels();
         #endif
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MPU_0);
         #endif
         #if defined(LINUX) || defined(x86_64) || defined(QNX)
         tivxRegisterSrvTargetGpuKernels();
@@ -155,7 +155,7 @@ void tivxSrvUnLoadKernels(vx_context context)
         #ifdef x86_64
         tivxUnRegisterSrvTargetC66Kernels();
         void tivxSetSelfCpuId(vx_enum cpu_id);
-        tivxSetSelfCpuId(TIVX_CPU_ID_A72_0);
+        tivxSetSelfCpuId(TIVX_CPU_ID_MPU_0);
         #endif
         #if defined(LINUX) || defined(x86_64) || defined(QNX)
         tivxUnRegisterSrvTargetGpuKernels();

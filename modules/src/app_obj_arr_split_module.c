@@ -244,7 +244,7 @@ vx_status app_create_graph_obj_arr_split(vx_graph graph, ObjArrSplitObj *objArrS
     if(status == VX_SUCCESS)
     {
         vxSetReferenceName((vx_reference)objArrSplitObj->node, "obj_arr_split_node");
-        vxSetNodeTarget(objArrSplitObj->node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+        vxSetNodeTarget(objArrSplitObj->node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     }
     else
     {

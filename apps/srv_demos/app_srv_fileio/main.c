@@ -1175,7 +1175,7 @@ static int app_create_graph(AppObj *obj)
         obj->srv_handle = srv_bowl_lut_gen_create(&obj->create_params);
 
         obj->srv_node = tivxGlSrvNode(obj->graph2, obj->param_obj, obj->input_array, obj->srv_views_array, obj->out_gpulut_array, obj->output_image);
-        status = vxSetNodeTarget(obj->srv_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+        status = vxSetNodeTarget(obj->srv_node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     }
     if(status == VX_SUCCESS)
     {

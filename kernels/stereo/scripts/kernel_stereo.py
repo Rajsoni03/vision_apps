@@ -19,10 +19,10 @@ kernel.setParameter(Type.USER_DATA_OBJECT, Direction.OUTPUT, ParamState.REQUIRED
 
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
-kernel.setTarget(Target.A72_1)
-kernel.setTarget(Target.A72_2)
-kernel.setTarget(Target.A72_3)
+kernel.setTarget(Target.MPU_0)
+kernel.setTarget(Target.MPU_1)
+kernel.setTarget(Target.MPU_2)
+kernel.setTarget(Target.MPU_3)
 code.export(kernel)
 
 # occupancy grid detection node
@@ -35,10 +35,10 @@ kernel.setParameter(Type.USER_DATA_OBJECT, Direction.OUTPUT, ParamState.REQUIRED
 
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
-kernel.setTarget(Target.A72_1)
-kernel.setTarget(Target.A72_2)
-kernel.setTarget(Target.A72_3)
+kernel.setTarget(Target.MPU_0)
+kernel.setTarget(Target.MPU_1)
+kernel.setTarget(Target.MPU_2)
+kernel.setTarget(Target.MPU_3)
 code.export(kernel)
 
 
@@ -53,7 +53,7 @@ kernel.setParameter(Type.IMAGE,            Direction.OUTPUT, ParamState.REQUIRED
        
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 # median filter node
@@ -66,7 +66,7 @@ kernel.setParameter(Type.IMAGE,            Direction.OUTPUT, ParamState.REQUIRED
        
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 
@@ -79,7 +79,7 @@ kernel.setParameter(Type.IMAGE,            Direction.INPUT,  ParamState.REQUIRED
        
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 
@@ -93,7 +93,7 @@ kernel.setParameter(Type.ARRAY,            Direction.OUTPUT, ParamState.REQUIRED
        
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 
@@ -109,7 +109,7 @@ kernel.setParameter(Type.USER_DATA_OBJECT, Direction.OUTPUT, ParamState.REQUIRED
        
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 
@@ -128,7 +128,7 @@ kernel.setParameter(Type.USER_DATA_OBJECT, Direction.OUTPUT, ParamState.REQUIRED
 
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 
@@ -142,7 +142,7 @@ kernel.setParameter(Type.IMAGE,            Direction.OUTPUT, ParamState.REQUIRED
 
 kernel.setTarget(Target.DSP1)
 kernel.setTarget(Target.DSP2)
-kernel.setTarget(Target.A72_0)
+kernel.setTarget(Target.MPU_0)
 code.export(kernel)
 
 

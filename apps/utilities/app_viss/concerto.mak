@@ -8,7 +8,7 @@ CSOURCES    := main.c
 
 TARGETTYPE  := exe
 
-include $(VISION_APPS_PATH)/apps/concerto_a72_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 IDIRS += $(IMAGING_IDIRS)
 IDIRS += $(VISION_APPS_KERNELS_IDIRS)

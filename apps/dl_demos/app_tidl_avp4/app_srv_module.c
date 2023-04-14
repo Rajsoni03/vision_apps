@@ -311,7 +311,7 @@ vx_status app_create_graph_srv(vx_context context, vx_graph graph, SRVObj *srvOb
     {
         APP_PRINTF("srv_node create failed\n");
     }
-    vxSetNodeTarget(srvObj->node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(srvObj->node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     vxSetReferenceName((vx_reference)srvObj->node, "OpenGL_SRV_Node");
 
     if(status == VX_SUCCESS)
@@ -333,7 +333,7 @@ vx_status app_create_graph_srv_write_output(vx_graph graph, SRVObj *srvObj)
 
     srvObj->write_node = tivxWriteImageNode(graph, srvObj->output_img, srvObj->file_path, srvObj->file_prefix);
     status = vxGetStatus((vx_reference)srvObj->write_node);
-    vxSetNodeTarget(srvObj->write_node, VX_TARGET_STRING, TIVX_TARGET_A72_0);
+    vxSetNodeTarget(srvObj->write_node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
     vxSetReferenceName((vx_reference)srvObj->write_node, "srv_write_node");
 
     return (status);
