@@ -50,11 +50,11 @@ TIOVX_LIBS += vx_vxu vx_framework
 TIOVX_LIBS += vx_kernels_host_utils vx_kernels_target_utils
 TIOVX_LIBS += vx_platform_pc
 TIOVX_LIBS += vx_kernels_openvx_core vx_target_kernels_openvx_core
+TIOVX_LIBS += vx_kernels_openvx_ext vx_target_kernels_openvx_ext
 TIOVX_LIBS += vx_target_kernels_dsp
 TIOVX_LIBS += vx_target_kernels_tutorial
 TIOVX_LIBS += vx_app_c7x_target_kernel
 TIOVX_LIBS += vx_utils
-TIOVX_LIBS += vx_hwa_target_kernels
 
 IMAGING_LIBS = vx_kernels_imaging
 IMAGING_LIBS += app_utils_iss
@@ -120,6 +120,7 @@ VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 
 TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
+TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tidl_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink
