@@ -774,6 +774,7 @@ static vx_status app_init(AppObj *obj)
     if (status == VX_SUCCESS)
     {
         tivxHwaLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
         tivxImagingLoadKernels(obj->context);
         tivxFileIOLoadKernels(obj->context);
         APP_PRINTF("Kernel loading done!\n");
@@ -829,7 +830,7 @@ static vx_status app_init(AppObj *obj)
         {
             status = app_init_ldc(obj->context, &obj->ldcObj1, &obj->sensorObj, "ldc_obj",obj->objArrSplitObj.output1_num_elements);
             APP_PRINTF("LDC init done!\n");
-        }        
+        }
     }
 
     if((obj->enable_mosaic == 1) && (status == VX_SUCCESS))
@@ -913,6 +914,7 @@ static void app_deinit(AppObj *obj)
     appGrpxDeInit();
 
     tivxHwaUnLoadKernels(obj->context);
+    tivxVideoIOUnLoadKernels(obj->context);
     tivxImagingUnLoadKernels(obj->context);
     tivxFileIOUnLoadKernels(obj->context);
     APP_PRINTF("Kernels unload done!\n");
@@ -944,7 +946,7 @@ static void app_delete_graph(AppObj *obj)
         APP_PRINTF("VISS delete done!\n");
 
         app_delete_aewb(&obj->aewbObj1);
-        APP_PRINTF("AEWB delete done!\n");  
+        APP_PRINTF("AEWB delete done!\n");
     }
 
     if(obj->sensorObj.enable_ldc == 1)
@@ -1584,7 +1586,7 @@ static void app_update_param_set(AppObj *obj)
 {
     vx_uint16 resized_width, resized_height;
     appIssGetResizeParams(obj->sensorObj.image_width, obj->sensorObj.image_height, DISPLAY_WIDTH, DISPLAY_HEIGHT, &resized_width, &resized_height);
-    
+
     if ( (obj->sensorObj.num_cameras_enabled == 1))
     {
         obj->objArrSplitObj.output0_num_elements = 1;

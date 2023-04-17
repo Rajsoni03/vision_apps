@@ -934,6 +934,7 @@ static vx_int32 app_init(AppObj *obj)
     APP_ASSERT_VALID_REF(obj->context);
 
     tivxHwaLoadKernels(obj->context);
+    tivxVideoIOLoadKernels(obj->context);
     tivxImgProcLoadKernels(obj->context);
     tivxTIDLLoadKernels(obj->context);
 
@@ -1075,6 +1076,7 @@ static void app_deinit(AppObj *obj)
 #endif
     tivxTIDLUnLoadKernels(obj->context);
     tivxImgProcUnLoadKernels(obj->context);
+    tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
 
     vxReleaseContext(&obj->context);

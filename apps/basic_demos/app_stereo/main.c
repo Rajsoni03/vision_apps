@@ -225,6 +225,7 @@ static vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         tivxStereoLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
         tivxHwaLoadKernels(obj->context);
     }
 
@@ -251,6 +252,7 @@ static vx_status app_init(AppObj *obj)
 static void app_deinit(AppObj *obj)
 {
     tivxStereoUnLoadKernels(obj->context);
+    tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
 #ifndef x86_64
     if (1 == obj->display_option)

@@ -850,6 +850,7 @@ static vx_status app_init(AppObj *obj)
     if (status == VX_SUCCESS)
     {
         tivxHwaLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
         tivxImagingLoadKernels(obj->context);
         tivxFileIOLoadKernels(obj->context);
         APP_PRINTF("Kernel loading done!\n");
@@ -1061,6 +1062,7 @@ static void app_deinit(AppObj *obj)
     APP_PRINTF("Display deinit done!\n");
 
     tivxHwaUnLoadKernels(obj->context);
+    tivxVideoIOUnLoadKernels(obj->context);
     tivxImagingUnLoadKernels(obj->context);
     tivxFileIOUnLoadKernels(obj->context);
     APP_PRINTF("Kernels unload done!\n");
@@ -1096,7 +1098,7 @@ static void app_delete_graph(AppObj *obj)
     vxReleaseGraph(&obj->display_graph);
     APP_PRINTF("Graph delete done!\n");
 
-    if ( obj->encode || obj->decode ) 
+    if ( obj->encode || obj->decode )
     {
         appCodecDeInit();
         APP_PRINTF("Codec Pipeline delete done!\n");
@@ -1119,7 +1121,7 @@ static vx_status app_create_graph(AppObj *obj)
         APP_PRINTF("capture_graph create done!\n");
     }
 
-    
+
     if (status == VX_SUCCESS)
     {
         obj->display_graph = vxCreateGraph(obj->context);
@@ -1316,8 +1318,8 @@ static vx_status app_create_graph(AppObj *obj)
 
     obj->codec_pipe_params.appEncode = obj->encode;
     obj->codec_pipe_params.appDecode = obj->decode;
-    
-    if ( obj->encode || obj->decode ) 
+
+    if ( obj->encode || obj->decode )
     {
         if(status == VX_SUCCESS)
         {
@@ -1359,7 +1361,7 @@ static vx_status app_verify_graph(AppObj *obj)
         status = app_send_error_frame(&obj->captureObj);
     }
 
-    if ( obj->encode ) 
+    if ( obj->encode )
     {
         for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++)
         {
@@ -1381,7 +1383,7 @@ static vx_status app_verify_graph(AppObj *obj)
                 APP_ERROR("\nappCodecSrcInit Failed!\n");
             }
         }
-        
+
         for (vx_int8 buf_id=0; buf_id<obj->enc_pool.bufq_depth; buf_id++)
         {
             if(VX_SUCCESS == status)
@@ -1391,7 +1393,7 @@ static vx_status app_verify_graph(AppObj *obj)
         }
     }
 
-    if ( obj->decode ) 
+    if ( obj->decode )
     {
         for (vx_int8 buf_id=0; buf_id<obj->dec_pool.bufq_depth; buf_id++)
         {
@@ -1405,7 +1407,7 @@ static vx_status app_verify_graph(AppObj *obj)
 #endif
             }
         }
-        
+
         if(VX_SUCCESS == status)
         {
             status = appCodecSinkInit(obj->dec_pool.data_ptr);
@@ -1418,7 +1420,7 @@ static vx_status app_verify_graph(AppObj *obj)
                 APP_ERROR("\nappCodecSinkInit Failed!\n");
             }
         }
-    #if defined(QNX)        
+    #if defined(QNX)
         for (vx_int8 buf_id=0; buf_id<obj->dec_pool.bufq_depth; buf_id++)
         {
             if(VX_SUCCESS == status)
@@ -1613,7 +1615,7 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
     if(status==VX_SUCCESS && obj->decode==1)
     {
         status = assign_array_image_buffers(
-                        dec_pool->arr[obj->mosaic_enq_id], 
+                        dec_pool->arr[obj->mosaic_enq_id],
                         dec_pool->data_ptr[obj->appsink_pull_id],
                         dec_pool->plane_sizes);
     }
@@ -1658,7 +1660,7 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
     for (vx_uint32 ch = 0; status==VX_SUCCESS && ch<num_ch; ch++)
     {
         vx_image image = (vx_image)vxGetObjectArrayItem(arr, ch);
-        
+
         if (status == VX_SUCCESS)
         {
             status = vxQueryImage(image, VX_IMAGE_SIZE, &img_size, sizeof(img_size));
@@ -1692,7 +1694,7 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
                                                 (const uint32_t *)sizes,
                                                 num_planes);
         }
-        
+
         vxReleaseReference((vx_reference*)&image);
     }
     return status;
@@ -1729,8 +1731,8 @@ static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[
                             (const uint32_t *)sizes,
                             num_planes);
             }
-        }   
-        
+        }
+
         vxReleaseReference((vx_reference*)&image);
     }
     return status;
@@ -1778,7 +1780,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     if (status == VX_SUCCESS)
     {
-        if ( obj->encode || obj->decode ) 
+        if ( obj->encode || obj->decode )
         {
             status = appCodecStart();
             APP_PRINTF("appCodecStart Done!\n");
@@ -1815,18 +1817,18 @@ static vx_status app_run_graph(AppObj *obj)
     }
 
     for(uint8_t x=0; x<CODEC_ENC_BUFQ_DEPTH; x++){
-        if ( obj->encode==1 ) 
+        if ( obj->encode==1 )
         {
             appCodecDeqAppSrc(obj->ldc_enq_id);
         }
-        if ( obj->encode==1 || obj->decode==0 ) 
+        if ( obj->encode==1 || obj->decode==0 )
         {
             unmap_vx_object_arr(obj->enc_pool.arr[obj->ldc_enq_id], obj->enc_pool.map_id[obj->ldc_enq_id], obj->sensorObj.num_cameras_enabled);
             obj->ldc_enq_id++;
             obj->ldc_enq_id         = (obj->ldc_enq_id  >= obj->enc_pool.bufq_depth)? 0 : obj->ldc_enq_id;
         }
     }
-    if ( obj->encode==1 ) 
+    if ( obj->encode==1 )
     {
         APP_PRINTF("Pushing EoS to Codec Pipeline.\n");
         status = appCodecEnqEosAppSrc();
@@ -1840,21 +1842,21 @@ static vx_status app_run_graph(AppObj *obj)
             uint32_t num_refs;
 
             vxGraphParameterDequeueDoneRef(obj->display_graph, obj->imgMosaicObj.inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
-        
+
             status = assign_array_image_buffers(
-                        obj->dec_pool.arr[obj->mosaic_enq_id], 
+                        obj->dec_pool.arr[obj->mosaic_enq_id],
                         NULL,
                         obj->dec_pool.plane_sizes);
-        
+
             obj->mosaic_enq_id++;
             obj->mosaic_enq_id      = (obj->mosaic_enq_id  >= obj->dec_pool.bufq_depth)? 0 : obj->mosaic_enq_id;
             obj->appsink_pull_id++;
             obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_codec_bufs)? 0 : obj->appsink_pull_id;
-        
+
             appCodecEnqAppSink(obj->appsink_pull_id);
         }
     }
-    if ( obj->encode==1 || obj->decode==1 ) 
+    if ( obj->encode==1 || obj->decode==1 )
     {
         appCodecStop();
         APP_PRINTF("appCodecStop Done!\n");
@@ -2223,7 +2225,7 @@ static void set_codec_pipe_params(AppObj *obj)
     uint8_t sinkType    = 0;
 
     /* DMABUF-IMPORT feature not currently supported by decoder on J721S2/J784S4.
-       This will necessarily cause data copy from decoder to tivx-allocated memory 
+       This will necessarily cause data copy from decoder to tivx-allocated memory
        for respective devices. */
     #if defined(SOC_J721E)
     sinkType    = 0;

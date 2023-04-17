@@ -517,6 +517,9 @@ static vx_status app_init(SrvCalibAppObj *obj)
     tivxHwaLoadKernels(obj->context);
     APP_PRINTF("tivxHwaLoadKernels done\n");
 
+    tivxVideoIOLoadKernels(obj->context);
+    APP_PRINTF("tivxVideoIOLoadKernels done\n");
+
     tivxImagingLoadKernels(obj->context);
     APP_PRINTF("tivxImagingLoadKernels done\n");
 
@@ -569,6 +572,9 @@ static void app_deinit(SrvCalibAppObj *obj)
 
     tivxHwaUnLoadKernels(obj->context);
     APP_PRINTF("tivxHwaUnLoadKernels done\n");
+
+    tivxVideoIOUnLoadKernels(obj->context);
+    APP_PRINTF("tivxVideoIOUnLoadKernels done\n");
 
     tivxImagingUnLoadKernels(obj->context);
     APP_PRINTF("tivxImagingUnLoadKernels done\n");

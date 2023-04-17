@@ -129,7 +129,7 @@ TIOVX_LIBS += vx_platform_psdk_j7
 TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_kernels_openvx_ext vx_target_kernels_openvx_ext
 TIOVX_LIBS += vx_utils
-TIOVX_LIBS += vx_kernels_hwa vx_kernels_tidl vx_kernels_tvm
+TIOVX_LIBS += vx_kernels_hwa vx_kernels_video_io vx_kernels_tidl vx_kernels_tvm
 TIOVX_LIBS += vx_tutorial
 
 IMAGING_LIBS += app_utils_iss
@@ -193,7 +193,7 @@ TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_confor
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink
-TEST_LIBS += vx_kernels_hwa_tests vx_tiovx_tvm_tests
+TEST_LIBS += vx_kernels_hwa_tests vx_kernels_video_io_tests vx_tiovx_tvm_tests
 
 ifneq ($(TARGET_PLATFORM), AM62A)
 TEST_LIBS += vx_kernels_srv_tests

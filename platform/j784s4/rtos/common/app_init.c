@@ -872,13 +872,13 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetDmpacDofKernels();
         #endif
         #ifdef ENABLE_CSI2RX
-        tivxRegisterHwaTargetCaptureKernels();
+        tivxRegisterVideoIOTargetCaptureKernels();
         #endif
         #ifdef ENABLE_CSI2TX
-        tivxRegisterHwaTargetCsitxKernels();
+        tivxRegisterVideoIOTargetCsitxKernels();
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
-        tivxRegisterHwaTargetDisplayKernels();
+        tivxRegisterVideoIOTargetDisplayKernels();
         #endif
         #ifdef C7120
         #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
@@ -926,13 +926,13 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterHwaTargetDmpacDofKernels();
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
-        tivxUnRegisterHwaTargetDisplayKernels();
+        tivxUnRegisterVideoIOTargetDisplayKernels();
         #endif
         #ifdef ENABLE_CSI2RX
-        tivxUnRegisterHwaTargetCaptureKernels();
+        tivxUnRegisterVideoIOTargetCaptureKernels();
         #endif
         #ifdef ENABLE_CSI2TX
-        tivxUnRegisterHwaTargetCsitxKernels();
+        tivxUnRegisterVideoIOTargetCsitxKernels();
         #endif
         #ifdef C7120
         #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)

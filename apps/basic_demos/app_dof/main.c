@@ -288,6 +288,8 @@ static vx_status app_init(AppObj *obj)
 
     tivxHwaLoadKernels(obj->context);
 
+    tivxVideoIOLoadKernels(obj->context);
+
     /* Initialize modules */
     if(status == VX_SUCCESS)
     {
@@ -331,6 +333,7 @@ static void app_deinit(AppObj *obj)
         appGrpxDeInit();
     }
 
+    tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
     vxReleaseContext(&obj->context);
 }

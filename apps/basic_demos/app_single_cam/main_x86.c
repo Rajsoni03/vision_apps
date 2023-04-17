@@ -124,6 +124,7 @@ static void x86_app_init(AppObj *obj)
     APP_ASSERT_VALID_REF(obj->context);
 
     tivxHwaLoadKernels(obj->context);
+    tivxVideoIOLoadKernels(obj->context);
     tivxImagingLoadKernels(obj->context);
     APP_PRINTF("tivxImagingLoadKernels done\n");
 }
@@ -131,10 +132,13 @@ static void x86_app_deinit(AppObj *obj)
 {
     tivxHwaUnLoadKernels(obj->context);
     APP_PRINTF("tivxHwaUnLoadKernels done\n");
-    
+
+    tivxVideoIOUnLoadKernels(obj->context);
+    APP_PRINTF("tivxVideoIOUnLoadKernels done\n");
+
     tivxImagingUnLoadKernels(obj->context);
     APP_PRINTF("tivxImagingUnLoadKernels done\n");
-    
+
     vxReleaseContext(&obj->context);
     APP_PRINTF("vxReleaseContext done\n");
 
@@ -304,7 +308,7 @@ static vx_status x86_app_run_graph(AppObj *obj)
     char dir_name[APP_MAX_FILE_PATH];
     FILE* fp_aewb_res = NULL;
     char aewb_csv_file_name[APP_MAX_FILE_PATH];
-    FILE* fp_aewb_dbg = NULL; 
+    FILE* fp_aewb_dbg = NULL;
     char aewb_dbg_csv_file_name[APP_MAX_FILE_PATH];
 
     /* create output directory if not already existing */
@@ -337,40 +341,40 @@ static vx_status x86_app_run_graph(AppObj *obj)
 
     if(obj->ae_awb_result)
     {
-        snprintf(aewb_csv_file_name, APP_MAX_FILE_PATH, 
+        snprintf(aewb_csv_file_name, APP_MAX_FILE_PATH,
         "%s/output/aewb/aewb_res.csv", obj->test_folder_root);
 
         fp_aewb_res = fopen(aewb_csv_file_name, "w");
         fprintf(fp_aewb_res, "frame_num,expTime,analog_gain,colorTemp,wb_gain0,wb_gain1,wb_gain2,wb_gain3 \n");
 
-        snprintf(aewb_dbg_csv_file_name, APP_MAX_FILE_PATH, 
+        snprintf(aewb_dbg_csv_file_name, APP_MAX_FILE_PATH,
         "%s/output/aewb/aewb_dbg.csv", obj->test_folder_root);
 
         fp_aewb_dbg = fopen(aewb_dbg_csv_file_name, "w");
         fprintf(fp_aewb_dbg, "frame_num,ae_valid,ae_converged,awb_valid,awb_converged \n");
     }
 
-    appUpdateVpacDcc(obj->fs_dcc_buf_viss, obj->fs_dcc_numbytes_viss, obj->context, 
-        obj->node_viss, 0, 
+    appUpdateVpacDcc(obj->fs_dcc_buf_viss, obj->fs_dcc_numbytes_viss, obj->context,
+        obj->node_viss, 0,
         NULL, 0,
         NULL, 0
     );
 
-    appUpdateVpacDcc(obj->fs_dcc_buf_2a, obj->fs_dcc_numbytes_2a, obj->context, 
-        NULL, 0, 
+    appUpdateVpacDcc(obj->fs_dcc_buf_2a, obj->fs_dcc_numbytes_2a, obj->context,
+        NULL, 0,
         obj->node_aewb, 0,
         NULL, 0
     );
 
-    appUpdateVpacDcc(obj->fs_dcc_buf_ldc, obj->fs_dcc_numbytes_ldc, obj->context, 
-        NULL, 0, 
+    appUpdateVpacDcc(obj->fs_dcc_buf_ldc, obj->fs_dcc_numbytes_ldc, obj->context,
+        NULL, 0,
         NULL, 0,
         obj->node_ldc, 0
     );
 
-/*The application reads and  processes NUM_FRAMES_TO_PROCESS images 
+/*The application reads and  processes NUM_FRAMES_TO_PROCESS images
 AEWB result is available after 1 frame and is applied after 2 frames
-Therefore, first 2 output images will have wrong colors 
+Therefore, first 2 output images will have wrong colors
 */
     char output_file_path[3] = ".";
 
@@ -505,7 +509,7 @@ static void x86_app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
     FILE *fp = fopen(cfg_file_name, "r");
     char line_str[1024];
     char *token;
-    struct stat s;   
+    struct stat s;
 
     if(fp==NULL)
     {
@@ -537,7 +541,7 @@ static void x86_app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                 printf("Test root path %s does not exist. \n Please update cfg file and try again. Exiting program \n", obj->test_folder_root);
                 exit(-1);
             }
-            
+
         }
         else if(strcmp(token, "raw_width")==0)
         {

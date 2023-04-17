@@ -318,7 +318,7 @@ static int app_init(AppObj *obj)
         obj->disp_params_obj = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->disp_params);
         APP_ASSERT_VALID_REF(obj->disp_params_obj)
 
-        tivxHwaLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
     }
 
     tivxTIDLLoadKernels(obj->context);
@@ -409,7 +409,7 @@ static void app_deinit(AppObj *obj)
 
     if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1) && (obj->display_option == 1))
     {
-        tivxHwaUnLoadKernels(obj->context);
+        tivxVideoIOUnLoadKernels(obj->context);
     }
 
     vxRemoveKernel(obj->kernel);

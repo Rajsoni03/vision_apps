@@ -670,6 +670,7 @@ static int app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         tivxHwaLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
         tivxImgProcLoadKernels(obj->context);
     }
 
@@ -799,6 +800,7 @@ static void app_deinit(AppObj *obj)
     #endif
 
     tivxImgProcUnLoadKernels(obj->context);
+    tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
 
     vxReleaseContext(&obj->context);

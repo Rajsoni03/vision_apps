@@ -676,6 +676,7 @@ static vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         tivxHwaLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
         tivxImgProcLoadKernels(obj->context);
         tivxTIDLLoadKernels(obj->context);
     }
@@ -795,6 +796,9 @@ static void app_deinit(AppObj *obj)
 
     tivxImgProcUnLoadKernels(obj->context);
     APP_PRINTF("ImgProc unload Done! \n");
+
+    tivxVideoIOUnLoadKernels(obj->context);
+    APP_PRINTF("VideoIO unload Done! \n");
 
     tivxHwaUnLoadKernels(obj->context);
     APP_PRINTF("HWA unload Done! \n");

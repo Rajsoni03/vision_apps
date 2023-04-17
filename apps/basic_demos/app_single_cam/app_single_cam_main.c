@@ -143,6 +143,7 @@ vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         tivxHwaLoadKernels(obj->context);
+        tivxVideoIOLoadKernels(obj->context);
         tivxImagingLoadKernels(obj->context);
         APP_PRINTF("tivxImagingLoadKernels done\n");
     }
@@ -270,6 +271,9 @@ vx_status app_deinit(AppObj *obj)
     vx_status status = VX_FAILURE;
     tivxHwaUnLoadKernels(obj->context);
     APP_PRINTF("tivxHwaUnLoadKernels done\n");
+
+    tivxVideoIOUnLoadKernels(obj->context);
+    APP_PRINTF("tivxVideoIOUnLoadKernels done\n");
 
     tivxImagingUnLoadKernels(obj->context);
     APP_PRINTF("tivxImagingUnLoadKernels done\n");
