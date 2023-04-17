@@ -62,6 +62,8 @@
 #include "app_stereo_main.h"
 #include "tivx_utils_checksum.h"
 #include "app_test.h"
+#include <TI/hwa_kernels.h>
+#include <TI/video_io_kernels.h>
 
 AppObj gAppObj;
 

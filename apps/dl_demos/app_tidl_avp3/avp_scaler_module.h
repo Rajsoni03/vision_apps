@@ -59,10 +59,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
- #ifndef _AVP_SCALER_MODULE
- #define _AVP_SCALER_MODULE
+#ifndef _AVP_SCALER_MODULE
+#define _AVP_SCALER_MODULE
 
- #include "avp_common.h"
+#include "avp_common.h"
+#include <TI/hwa_vpac_msc.h>
 
  typedef struct {
     vx_object_array arr[APP_MAX_BUFQ_DEPTH];

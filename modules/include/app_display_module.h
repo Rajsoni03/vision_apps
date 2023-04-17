@@ -73,6 +73,7 @@
  */
 
 #include "app_modules.h"
+#include <TI/video_io_display.h>
 
 /** \brief Display width value, can be modified as needed
  *

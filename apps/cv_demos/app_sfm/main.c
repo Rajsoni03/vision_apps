@@ -68,6 +68,7 @@
 #include "app_img_mosaic_module.h"
 #include "app_display_module.h"
 #include "app_test.h"
+#include <TI/video_io_kernels.h>
 
 typedef struct {
     vx_object_array input_image_arr[APP_MAX_BUFQ_DEPTH];

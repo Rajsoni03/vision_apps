@@ -61,6 +61,7 @@
  */
 
 #include "app_grpx_priv.h"
+#include <TI/video_io_display.h>
 
 #define ENABLE_GRPX
 

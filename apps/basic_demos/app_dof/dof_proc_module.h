@@ -59,10 +59,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
- #ifndef _DOF_PROC_MODULE
- #define _DOF_PROC_MODULE
+#ifndef _DOF_PROC_MODULE
+#define _DOF_PROC_MODULE
 
- #include "dof_common.h"
+#include "dof_common.h"
+#include <TI/hwa_dmpac_dof.h>
 
  typedef struct {
    vx_node  node;

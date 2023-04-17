@@ -59,10 +59,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
- #ifndef _AVP_DISPLAY_MODULE
- #define _AVP_DISPLAY_MODULE
+#ifndef _AVP_DISPLAY_MODULE
+#define _AVP_DISPLAY_MODULE
 
- #include "avp_common.h"
+#include "avp_common.h"
+#include <TI/video_io_display.h>
 
  #define DISPLAY_WIDTH  (1920)
  #define DISPLAY_HEIGHT (1080)

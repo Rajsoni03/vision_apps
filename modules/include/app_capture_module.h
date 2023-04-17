@@ -74,6 +74,7 @@
 
 #include "app_modules.h"
 #include "app_sensor_module.h"
+#include <TI/video_io_capture.h>
 
 /** \brief Number of capture channels that are used by this module.  Can be modified as needed
  *

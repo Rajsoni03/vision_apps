@@ -63,6 +63,8 @@
 #include <TI/tivx.h>
 #include <TI/tivx_task.h>
 #include <TI/j7_imaging_aewb.h>
+#include <TI/hwa_vpac_ldc.h>
+#include <TI/video_io_display.h>
 #include <tivx_utils_graph_perf.h>
 #include <stdio.h>
 #include <stdint.h>

@@ -112,9 +112,43 @@
 #endif
 
 /* Imaging header files */
-#if defined(ENABLE_TIOVX) && defined(ENABLE_VHWA_VPAC)
+#if defined(ENABLE_TIOVX)
+
+#if defined(ENABLE_VHWA_VPAC)
 #include <TI/j7_imaging_aewb.h>
+#include <TI/hwa_vpac_viss.h>
+#include <TI/hwa_vpac_ldc.h>
+#include <TI/hwa_vpac_msc.h>
+#include <TI/hwa_vpac_nf.h>
 #endif
+
+#if defined(ENABLE_VHWA_DMPAC)
+#include <TI/hwa_dmpac_sde.h>
+#endif
+
+#if defined(ENABLE_VHWA_DMPAC) || defined(C66)
+#include <TI/hwa_dmpac_dof.h>
+#endif
+
+#if defined(ENABLE_CSI2RX)
+#include <TI/video_io_capture.h>
+#endif
+
+#if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
+#include <TI/video_io_display.h>
+#include <TI/video_io_display_m2m.h>
+#endif
+
+#if defined(ENABLE_CSI2TX)
+#include <TI/video_io_csitx.h>
+#endif
+
+#ifdef C71
+#include <TI/dl_kernels.h>
+#endif
+
+#endif /* #if defined(ENABLE_TIOVX) */
+
 
 /* PDK header files */
 #ifdef ENABLE_BOARD
@@ -780,11 +814,11 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetVpacLdcKernels();
         tivxRegisterHwaTargetVpacVissKernels();
         tivxRegisterHwaTargetVpacNfKernels();
-        tivxRegisterHwaTargetArmKernels();
         #endif
         #ifdef ENABLE_VHWA_DMPAC
         tivxRegisterHwaTargetDmpacSdeKernels();
         tivxRegisterHwaTargetDmpacDofKernels();
+        tivxRegisterHwaTargetArmKernels();
         #endif
         #ifdef ENABLE_CSI2RX
         tivxRegisterVideoIOTargetCaptureKernels();
@@ -830,11 +864,11 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterHwaTargetVpacLdcKernels();
         tivxUnRegisterHwaTargetVpacNfKernels();
         tivxUnRegisterHwaTargetVpacVissKernels();
-        tivxUnRegisterHwaTargetArmKernels();
         #endif
         #ifdef ENABLE_VHWA_DMPAC
         tivxUnRegisterHwaTargetDmpacSdeKernels();
         tivxUnRegisterHwaTargetDmpacDofKernels();
+        tivxUnRegisterHwaTargetArmKernels();
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxUnRegisterVideoIOTargetDisplayKernels();

@@ -66,6 +66,8 @@
 #include "dof_viz_module.h"
 #include "dof_display_module.h"
 #include "dof_test.h"
+#include <TI/hwa_kernels.h>
+#include <TI/video_io_kernels.h>
 
 typedef struct {
 

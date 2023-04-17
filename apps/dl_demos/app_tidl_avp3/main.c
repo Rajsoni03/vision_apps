@@ -65,6 +65,9 @@
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
 #include <VX/vx_khr_pipelining.h>
+#include <TI/hwa_kernels.h>
+#include <TI/video_io_kernels.h>
+#include <TI/dl_kernels.h>
 
 #include "fisheye_angle_table.h"
 

@@ -59,15 +59,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
- #ifndef _DOF_DISPLAY_MODULE
- #define _DOF_DISPLAY_MODULE
+#ifndef _DOF_DISPLAY_MODULE
+#define _DOF_DISPLAY_MODULE
 
- #include "dof_common.h"
+#include "dof_common.h"
+#include <TI/video_io_display.h>
 
  typedef struct {
     vx_node node1; //output
-    vx_node node2; //input 
-    
+    vx_node node2; //input
+
     vx_user_data_object output_display_config;
     tivx_display_params_t output_display_params;
     vx_user_data_object input_display_config;

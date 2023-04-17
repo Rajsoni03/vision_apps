@@ -94,6 +94,22 @@
 /* Vision_apps custom kernel header files */
 #include <TI/tivx_img_proc.h>
 
+/* Imaging header files */
+#if defined(ENABLE_TIOVX)
+
+#if defined(ENABLE_VHWA_VPAC)
+#include <TI/hwa_vpac_viss.h>
+#include <TI/hwa_vpac_ldc.h>
+#include <TI/hwa_vpac_msc.h>
+#endif
+
+#ifdef C7504
+#include <TI/dl_kernels.h>
+#endif
+
+#endif /* #if defined(ENABLE_TIOVX) */
+
+
 /* PDK header files */
 #ifdef ENABLE_UART
 #if !defined(MCU_PLUS_SDK)

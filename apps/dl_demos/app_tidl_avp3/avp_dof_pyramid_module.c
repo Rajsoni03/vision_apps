@@ -60,6 +60,7 @@
  *
  */
 #include "avp_dof_pyramid_module.h"
+#include <TI/hwa_vpac_msc.h>
 
 vx_status app_init_pyramid(vx_context context, PyramidObj *pyramidObj, char *objName)
 {

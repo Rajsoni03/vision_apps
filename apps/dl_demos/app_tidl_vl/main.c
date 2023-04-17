@@ -75,6 +75,8 @@
 #include <TI/tivx_target_kernel.h>
 #include "tivx_kernels_host_utils.h"
 #include <TI/tivx_img_proc.h>
+#include <TI/video_io_kernels.h>
+#include <TI/dl_kernels.h>
 
 #include <TI/j7_tidl.h>
 #include <tivx_utils_file_rd_wr.h>

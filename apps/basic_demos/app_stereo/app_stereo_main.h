@@ -66,6 +66,8 @@
 #include <tivx_utils_file_rd_wr.h>
 #include <tivx_utils_graph_perf.h>
 #include <TI/tivx_img_proc.h>
+#include <TI/hwa_dmpac_sde.h>
+#include <TI/video_io_display.h>
 
 #include <stdio.h>
 #include <stdint.h>

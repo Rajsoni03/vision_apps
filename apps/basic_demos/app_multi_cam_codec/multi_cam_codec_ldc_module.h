@@ -74,6 +74,7 @@
 
 #include "app_modules.h"
 #include "app_sensor_module.h"
+#include <TI/hwa_vpac_ldc.h>
 
 /** \brief Default LDC table width.  Can be modified as needed for use case
  *

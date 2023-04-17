@@ -67,6 +67,7 @@
 #include <utils/hwa/include/app_hwa_api.h>
 #include <utils/codec_wrapper/include/codec_wrapper.h>
 #include <VX/vx_khr_pipelining.h>
+#include <TI/video_io_kernels.h>
 
 #include "app_common.h"
 #include "app_sensor_module.h"

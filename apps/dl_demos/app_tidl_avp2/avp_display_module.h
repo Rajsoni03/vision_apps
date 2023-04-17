@@ -63,6 +63,7 @@
 #define _AVP_DISPLAY_MODULE
 
 #include "avp_common.h"
+#include <TI/video_io_display.h>
 
 #define DISPLAY_WIDTH  (1920)
 #define DISPLAY_HEIGHT (1080)

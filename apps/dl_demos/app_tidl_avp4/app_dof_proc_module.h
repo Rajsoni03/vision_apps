@@ -59,10 +59,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
- #ifndef _DOF_PROC_MODULE
- #define _DOF_PROC_MODULE
+#ifndef _DOF_PROC_MODULE
+#define _DOF_PROC_MODULE
 
- #include "app_common.h"
+#include "app_common.h"
+#include <TI/hwa_dmpac_dof.h>
 
  typedef struct {
     vx_node  node;
@@ -79,7 +80,7 @@
     vx_delay flow_vector_field_delay;
 
     uint32_t enable_temporal_predicton_flow_vector;
-    
+
     /* Default input */
     uint32_t dof_levels;
     vx_df_image vx_df_pyramid;

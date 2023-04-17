@@ -63,6 +63,9 @@
 #include "app_single_cam_main.h"
 #include <utils/iss/include/app_iss.h>
 #include "app_test.h"
+#include <TI/hwa_vpac_msc.h>
+#include <TI/video_io_kernels.h>
+#include <TI/video_io_capture.h>
 
 #if defined(A72) || defined(A53)
 #if defined(LINUX)

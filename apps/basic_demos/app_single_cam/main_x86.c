@@ -62,6 +62,7 @@
 
 #include "app_test.h"
 #include <utils/app_init/include/app_init.h>
+#include <TI/video_io_kernels.h>
 
 static AppObj g_AppObj;
 IssAeDynamicParams g_ae_dynPrms=

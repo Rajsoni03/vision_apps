@@ -65,6 +65,9 @@
 #include <TI/j7_imaging_aewb.h>
 #include <TI/tivx_task.h>
 #include <tivx_utils_graph_perf.h>
+#include <TI/video_io_capture.h>
+#include <TI/video_io_display.h>
+#include <TI/video_io_kernels.h>
 
 #include <utils/sensors/include/app_sensors.h>
 #include <utils/remote_service/include/app_remote_service.h>

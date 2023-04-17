@@ -63,6 +63,7 @@
 #define _DOF_PROC_MODULE
 
 #include "avp_common.h"
+#include <TI/hwa_dmpac_dof.h>
 
 typedef struct {
     vx_node  node;

@@ -73,6 +73,7 @@
  */
 
 #include "app_modules.h"
+#include <TI/hwa_vpac_msc.h>
 
 /** \brief Maximum amount of values allowed from scaler node
  *

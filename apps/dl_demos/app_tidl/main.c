@@ -65,6 +65,10 @@
 #include "itidl_ti.h"
 #include "app_common.h"
 #include "app_test.h"
+#include <TI/hwa_kernels.h>
+#include <TI/dl_kernels.h>
+#include <TI/video_io_kernels.h>
+#include <TI/video_io_display.h>
 
 /*
  * define this macro to enable TIDL intermediate layer traces on target

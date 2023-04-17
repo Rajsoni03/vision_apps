@@ -60,6 +60,7 @@
  *
  */
 #include "avp_dof_viz_module.h"
+#include "TI/hwa_dmpac_dof.h"
 
 vx_status app_init_dof_viz(vx_context context, DofVizObj *dofVizObj, char *objName)
 {

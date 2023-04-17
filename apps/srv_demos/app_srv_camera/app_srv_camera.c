@@ -40,6 +40,9 @@
 
 #include <TI/tivx.h>
 #include <TI/j7_imaging_aewb.h>
+#include <TI/video_io_kernels.h>
+#include <TI/video_io_capture.h>
+#include <TI/video_io_display.h>
 
 #include <VX/vxu.h>
 #include <VX/vx_khr_pipelining.h>

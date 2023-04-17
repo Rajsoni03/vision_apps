@@ -64,6 +64,7 @@
 #include <TI/tivx_event.h>
 #include <TI/tivx_img_proc.h>
 #include <TI/tivx_target_kernel.h>
+#include <TI/hwa_vpac_msc.h>
 
 #include <tivx_kernels_target_utils.h>
 #include <tivx_img_mosaic_host.h>

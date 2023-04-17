@@ -65,6 +65,8 @@
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
 #include <VX/vx_khr_pipelining.h>
+#include <TI/video_io_kernels.h>
+#include <TI/dl_kernels.h>
 
 #ifdef APP_TIDL_TRACE_DUMP
 #include <tivx_utils_tidl_trace.h>

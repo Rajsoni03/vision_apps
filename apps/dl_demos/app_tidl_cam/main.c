@@ -65,6 +65,8 @@
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
 #include <VX/vx_khr_pipelining.h>
+#include <TI/video_io_kernels.h>
+#include <TI/dl_kernels.h>
 
 #include "app_common.h"
 #include "app_sensor_module.h"
