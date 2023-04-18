@@ -95,12 +95,12 @@
 
 #undef CT_TESTCASE
 #define CT_TESTCASE(testcase) struct CT_TestCaseEntry* testcase##_register();
-#include "kernels_j7/hwa/test/test_main.h"
+#include "kernels/hwa/test/test_main.h"
 
 #undef CT_TESTCASE
 #define CT_TESTCASE(testcase) testcase##_register,
 CT_RegisterTestCaseFN g_testcase_register_fns[] = {
-    #include "kernels_j7/hwa/test/test_main.h"
+    #include "kernels/hwa/test/test_main.h"
     NULL
 };
 

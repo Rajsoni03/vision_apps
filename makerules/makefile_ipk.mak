@@ -36,7 +36,8 @@ tidl_dir = $(notdir $(call dirname,$(TIDL_PATH)))
 #IPK_INCLUDE_FOLDERS=imaging $(tidl_dir) ivision vision_apps perception tiadalg
 
 # Use this to use a subset of the interface headers in the component folders
-IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
+IPK_INCLUDE_FOLDERS=app_utils/utils \
+					imaging/algos/dcc/include \
 					imaging/algos/ae/include \
 					imaging/algos/awb/include \
 					imaging/itt_server_remote/include \
@@ -56,6 +57,7 @@ IPK_INCLUDE_FOLDERS=imaging/algos/dcc/include \
 					vision_apps/kernels \
 					vision_apps/modules \
 					vision_apps/utils \
+					video_io/kernels/include \
 					vxlib/packages/ti/vxlib/src/common
 
 ifeq ($(BUILD_PTK),yes)

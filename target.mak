@@ -21,9 +21,11 @@ endif
 # DEP_PROJECTS does not need to be set as the dependencies are contained in the build.
 
 TIOVX_INC  = $(TIOVX_PATH)/include $(TIOVX_PATH)/kernels/include $(TIOVX_PATH)/utils/include
-TIOVX_INC += $(TIOVX_CUSTOM_KERNEL_PATH)/include
 
 SYSIDIRS := $(TIOVX_INC)
+SYSIDIRS += $(TIOVX_PATH)/kernels_j7/include
+SYSIDIRS += $(IMAGING_PATH)/kernels/include
+SYSIDIRS += $(VIDEO_IO_PATH)/kernels/include
 
 SYSLDIRS :=
 SYSDEFS  :=

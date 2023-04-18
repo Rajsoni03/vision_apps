@@ -12,7 +12,7 @@ ifeq ($(TARGET_CPU), R5F)
 else
   CSOURCES    += vx_img_mosaic_msc_target_sim.c
   IDIRS       += $(J7_C_MODELS_PATH)/include
-  IDIRS       += $(TIOVX_PATH)/kernels_j7/hwa/include
+  IDIRS       += $(IMAGING_PATH)/kernels/hwa/include
 endif
 
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include

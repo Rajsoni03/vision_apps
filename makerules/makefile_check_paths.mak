@@ -20,6 +20,7 @@ endif
 endif
 	@if [ ! -d $(IVISION_PATH) ]; then echo 'ERROR: $(IVISION_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(IMAGING_PATH) ]; then echo 'ERROR: $(IMAGING_PATH) not found !!!'; exit 1; fi
+	@if [ ! -d $(VIDEO_IO_PATH) ]; then echo 'ERROR: $(VIDEO_IO_PATH) not found !!!'; exit 1; fi
 	@if [ ! -d $(MMALIB_PATH) ]; then echo 'ERROR: $(MMALIB_PATH) not found !!!'; exit 1; fi
 ifeq ($(RTOS_SDK),pdk)
 	@if [ ! -d $(PDK_PATH) ]; then echo 'ERROR: $(PDK_PATH) not found !!!'; exit 1; fi

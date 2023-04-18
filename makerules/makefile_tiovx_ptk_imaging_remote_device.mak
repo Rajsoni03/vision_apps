@@ -106,6 +106,15 @@ imaging_clean:
 imaging_scrub:
 	$(MAKE) -C $(IMAGING_PATH) scrub
 
+video_io:
+	$(MAKE) -C $(VIDEO_IO_PATH)
+
+video_io_clean:
+	$(MAKE) -C $(VIDEO_IO_PATH) clean
+
+video_io_scrub:
+	$(MAKE) -C $(VIDEO_IO_PATH) scrub
+
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
 ifeq ($(TARGET_SOC),J7)
@@ -123,4 +132,4 @@ remote_device_clean:
 remote_device_scrub:
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=$(TARGET_SOC) RTOS=$(RTOS) scrub
 
-.PHONY: tiovx tiovx_clean ptk ptk_clean imaging imaging_clean remote_device remote_device_clean
+.PHONY: tiovx tiovx_clean ptk ptk_clean imaging imaging_clean remote_device remote_device_clean video_io video_io_clean video_io_scrub app_utils app_utils_clean app_utils_scrub
