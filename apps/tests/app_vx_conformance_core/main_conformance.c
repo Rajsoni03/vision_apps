@@ -1,20 +1,4 @@
 /*
-
- * Copyright (c) 2012-2017 The Khronos Group Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/*
  *
  * Copyright (c) 2018 Texas Instruments Incorporated
  *
@@ -76,61 +60,54 @@
  *
  */
 
-#include <tivx_utils_file_rd_wr.h>
-
 #include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
-#include <stdarg.h>
-
-#include "test_engine/test.h"
+#include <stdint.h>
+#include <TI/tivx.h>
 #include <utils/app_init/include/app_init.h>
 
-#ifdef HAVE_VERSION_INC
-#include "openvx_cts_version.inc"
-#else
-#define VERSION_STR "unknown"
+#ifdef QNX
+#include <hw/inout.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/neutrino.h>
+#include <unistd.h>
 #endif
 
-#undef CT_TESTCASE
-#define CT_TESTCASE(testcase) struct CT_TestCaseEntry* testcase##_register();
-#include "kernels/test_kernels/test/test_main.h"
-#include "test_conformance/test_main.h"
-#include "test_tiovx/test_main.h"
-
-#undef CT_TESTCASE
-#define CT_TESTCASE(testcase) testcase##_register,
-CT_RegisterTestCaseFN g_testcase_register_fns[] = {
-    #include "kernels/test_kernels/test/test_main.h"
-    #include "test_conformance/test_main.h"
-    #include "test_tiovx/test_main.h"
-    NULL
-};
-
+int vx_conformance_test_main(int argc, char* argv[]);
 void TestModuleRegister();
 void TestModuleUnRegister();
-int vision_apps_test_main(int argc, char* argv[]);
-int CT_main(int argc, char* argv[], const char* version_str);
 
-#ifdef SYSBIOS
-
-
-#else
-int main(int argc, char* argv[])
+int appRunTiovxConformance(int argc, char *argv[])
 {
-    int status;
-    appInit();
+    int status = 0;
+
     TestModuleRegister();
-    status = vision_apps_test_main(argc, argv);
+    status = vx_conformance_test_main(argc, argv);
     TestModuleUnRegister();
-    appDeInit();
     return status;
 }
-#endif
 
-int vision_apps_test_main(int argc, char* argv[])
+
+int main(int argc, char *argv[])
 {
-    return CT_main(argc, argv, VERSION_STR);
-}
+    int status = 0;
 
+#ifdef QNX
+    /* Get IO priveleges */
+    if (ThreadCtl(_NTO_TCTL_IO, NULL) == -1) {
+        perror("ThreadCtl(_NTO_TCTL_IO");
+        return 1;
+    }
+#endif
+    status = appInit();
+
+    if(status==0)
+    {
+        status = appRunTiovxConformance(argc, argv);
+        appDeInit();
+    }
+
+    return status;
+}
