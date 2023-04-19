@@ -122,7 +122,7 @@
 #include <TI/hwa_dmpac_sde.h>
 #endif
 
-#if defined(ENABLE_VHWA_DMPAC) || defined(C66)
+#if defined(ENABLE_VHWA_DMPAC) || defined(C7120)
 #include <TI/hwa_dmpac_dof.h>
 #endif
 
