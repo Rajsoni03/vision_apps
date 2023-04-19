@@ -137,9 +137,9 @@ IMAGING_LIBS += app_utils_iss
 
 ifneq ($(TARGET_PLATFORM), AM62A)
 IMAGING_LIBS += vx_kernels_imaging
-IMAGING_LIBS += app_utils_network_api
 
 ifeq ($(TARGET_OS), LINUX)
+IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_itt_server
 endif
 endif
