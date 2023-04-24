@@ -16,6 +16,9 @@ endif
 
 IDIRS += ${TIOVX_PATH}
 IDIRS += ${TIOVX_PATH}/conformance_tests
+IDIRS += ${TIDL_PATH}
+IDIRS += ${TIDL_PATH}/ti_dl
+IDIRS += $(TIDL_PATH)/arm-tidl
 STATIC_LIBS += $(IMAGING_LIBS)
 STATIC_LIBS += $(TEST_LIBS)
 

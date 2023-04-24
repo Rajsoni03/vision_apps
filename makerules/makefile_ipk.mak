@@ -22,15 +22,9 @@ OPKG_UTILS_PATH     ?= $(PSDK_PATH)/opkg-utils-master
 IPK_VERSION_STRING  ?= $(PSDK_VERSION)
 J7_IP_ADDRESS       ?= 192.168.999.999
 
-# Function to return everything but the final dir/file
-# ex: a path a/b/c/d will return a/b/c (i.e. d is eliminated)
-# ex: <some_dir_path>/REPO/tidl_j7_xx_yy_zz_ww/ti_dl will give
-#     <some_dir_path>/REPO/tidl_j7_xx_yy_zz_ww
-dirname = $(patsubst %/,%,$(dir $1))
-
 # Return the last word after a '/'.
 # ex: <some_dir_path>/REPO/tidl_j7_xx_yy_zz_ww will give tidl_j7_xx_yy_zz_ww
-tidl_dir = $(notdir $(call dirname,$(TIDL_PATH)))
+tidl_dir = $(notdir $(call dir,$(TIDL_PATH)))
 
 # Use this to use ALL headers in the component folders
 #IPK_INCLUDE_FOLDERS=imaging $(tidl_dir) ivision vision_apps perception tiadalg

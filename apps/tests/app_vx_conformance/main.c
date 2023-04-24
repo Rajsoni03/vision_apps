@@ -98,8 +98,8 @@
 #include "kernels/test_kernels/test/test_main.h"
 #include "test_conformance/test_main.h"
 #include "test_tiovx/test_main.h"
-#include "kernels_j7/tidl/test/test_main.h"
-#include "kernels_j7/tvm/test/test_main.h"
+#include "tiovx_kernels/tidl/test/test_main.h"
+#include "tiovx_kernels/tvm/test/test_main.h"
 #include "kernels/hwa/test/test_main.h"
 
 #undef CT_TESTCASE
@@ -108,8 +108,8 @@ CT_RegisterTestCaseFN g_testcase_register_fns[] = {
     #include "kernels/test_kernels/test/test_main.h"
     #include "test_conformance/test_main.h"
     #include "test_tiovx/test_main.h"
-    #include "kernels_j7/tidl/test/test_main.h"
-    #include "kernels_j7/tvm/test/test_main.h"
+    #include "tiovx_kernels/tidl/test/test_main.h"
+    #include "tiovx_kernels/tvm/test/test_main.h"
     #include "kernels/hwa/test/test_main.h"
     NULL
 };

@@ -202,14 +202,14 @@ ifeq ($(HS),1)
 endif
 
 	#Build TIDL test case and copy binaries
-	#$(MAKE) -C $(TIDL_PATH)/../ run
+	#$(MAKE) -C $(TIDL_PATH) run
 	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/tidl_test
 	#J721E, J721S2, J784S4, AM62A use the new arm-tidl paths
-	cp -P $(TIDL_PATH)/../arm-tidl/tfl_delegate/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp -P $(TIDL_PATH)/../arm-tidl/onnxrt_ep/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp -P $(TIDL_PATH)/../arm-tidl/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp $(TIDL_PATH)/../arm-tidl/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out     $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
-	cp -r $(TIDL_PATH)/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
+	cp -P $(TIDL_PATH)/arm-tidl/tfl_delegate/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp -P $(TIDL_PATH)/arm-tidl/onnxrt_ep/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp -P $(TIDL_PATH)/arm-tidl/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp $(TIDL_PATH)/arm-tidl/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out     $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
+	cp -r $(TIDL_PATH)/ti_dl/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	# copy remote firmware files for c7x_2
@@ -308,7 +308,7 @@ YOCTO_VARS = PROFILE=release \
 	BUILD_EMULATION_MODE=no \
 	TARGET_CPU=$(MPU_CPU) \
 	TARGET_OS=LINUX \
-	TIDL_PATH=$(PSDK_PATH)/tidl_j7/ti_dl
+	TIDL_PATH=$(PSDK_PATH)/tidl_j7
 
 yocto_build:
 	$(COPYDIR) $(PSDK_PATH)/psdk_include/* $(PSDK_PATH)/.

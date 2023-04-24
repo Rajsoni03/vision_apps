@@ -22,7 +22,7 @@ CSOURCES    += app_obj_arr_split_module.c
 IDIRS       += $(IMAGING_IDIRS)
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(VISION_APPS_PATH)/kernels/fileio/include
-IDIRS       += $(TIDL_PATH)/inc
+IDIRS       += $(TIDL_PATH)/ti_dl/inc
 IDIRS       += $(VISION_APPS_PATH)/modules/include
 
 include $(FINALE)

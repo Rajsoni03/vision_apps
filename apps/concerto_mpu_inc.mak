@@ -117,12 +117,14 @@ LDIRS       += $(TIOVX_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARG
 LDIRS       += $(IMAGING_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(ETHFW_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 ifeq ($(TARGET_OS), LINUX)
 LDIRS       += $(LINUX_FS_PATH)/usr/lib
 endif
 ifeq ($(TARGET_OS), QNX)
 LDIRS       += $(QNX_HOST)/usr/lib
 endif
+
 
 TIOVX_LIBS += vx_vxu vx_framework
 TIOVX_LIBS += vx_kernels_host_utils vx_kernels_target_utils

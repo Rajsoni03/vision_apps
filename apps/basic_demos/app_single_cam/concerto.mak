@@ -35,8 +35,6 @@ endif
 
 IDIRS += $(IMAGING_IDIRS)
 
-
-
 include $(FINALE)
 
 endif

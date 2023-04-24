@@ -39,6 +39,7 @@ LDIRS       += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 LDIRS       += $(CGT7X_ROOT)/host_emulation
 LDIRS       += $(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unused-variable
@@ -55,6 +56,7 @@ TIOVX_LIBS += vx_target_kernels_dsp
 TIOVX_LIBS += vx_target_kernels_tutorial
 TIOVX_LIBS += vx_app_c7x_target_kernel
 TIOVX_LIBS += vx_utils
+TIOVX_LIBS += vx_kernels_tidl
 
 IMAGING_LIBS = vx_kernels_imaging
 IMAGING_LIBS += app_utils_iss
@@ -151,8 +153,7 @@ STATIC_LIBS += C7100-host-emulation
 
 include $(TIOVX_PATH)/conformance_tests/kernels/concerto_inc.mak
 
-include $(TIOVX_PATH)/build_flags.mak
-include $(TIOVX_PATH)/kernels_j7/concerto_inc.mak
+include $(VISION_APPS_PATH)/apps/concerto_inc.mak
 include $(IMAGING_PATH)/build_flags.mak
 include $(IMAGING_PATH)/kernels/concerto_inc.mak
 include $(VIDEO_IO_PATH)/build_flags.mak

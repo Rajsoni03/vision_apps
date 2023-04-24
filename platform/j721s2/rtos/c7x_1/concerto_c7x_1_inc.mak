@@ -47,7 +47,7 @@ endif
 LDIRS += $(PDK_PATH)/packages/ti/drv/ipc/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
 LDIRS += $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)/c7x_1/$(TARGET_BUILD)/
-LDIRS += $(TIDL_PATH)/lib/$(SOC)/dsp/algo/$(TARGET_BUILD)
+LDIRS += $(TIDL_PATH)/ti_dl/lib/$(SOC)/dsp/algo/$(TARGET_BUILD)
 
 STATIC_LIBS += vx_target_kernels_img_proc_c71
 

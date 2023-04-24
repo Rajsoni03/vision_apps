@@ -26,6 +26,13 @@ SYSIDIRS := $(TIOVX_INC)
 SYSIDIRS += $(TIOVX_PATH)/kernels_j7/include
 SYSIDIRS += $(IMAGING_PATH)/kernels/include
 SYSIDIRS += $(VIDEO_IO_PATH)/kernels/include
+SYSIDIRS += $(TIDL_PATH)/arm-tidl/tiovx_kernels/include
+SYSIDIRS += $(TIDL_PATH)/ti_dl/inc
+SYSIDIRS += $(VXLIB_PATH)/packages
+SYSIDIRS += $(IVISION_PATH)
+SYSIDIRS += $(TIADALG_PATH)/include
+SYSIDIRS += $(VISION_APPS_PATH)
+SYSIDIRS += $(IMAGING_PATH)
 
 SYSLDIRS :=
 SYSDEFS  :=
@@ -85,15 +92,6 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J721S2 J784S4 AM62A))
         SYSIDIRS += $(MATHLIB_PATH)/packages
     endif
 
-    SYSIDIRS += $(VXLIB_PATH)/packages
-    #This is for utils/mem/include/linux/dma_buf...
-    SYSIDIRS += $(VISION_APPS_PATH)
-    #These 2 are for kernels/img_proc/include/TI/tivx_img_proc_kernels.h
-    SYSIDIRS += $(TIDL_PATH)/inc
-    SYSIDIRS += $(IVISION_PATH)
-    SYSIDIRS += $(TIADALG_PATH)/include
-    #This is for utils/iss/include/app_iss.h
-    SYSIDIRS += $(IMAGING_PATH)
 endif
 
 ifeq ($(TARGET_PLATFORM),PC)
@@ -101,12 +99,6 @@ ifeq ($(TARGET_PLATFORM),PC)
 
     SYSIDIRS += $(GCC_WINDOWS_ROOT)/include
     SYSLDIRS += $(GCC_WINDOWS_ROOT)/lib
-    SYSIDIRS += $(VXLIB_PATH)/packages
-    SYSIDIRS += $(TIDL_PATH)/inc
-    SYSIDIRS += $(IVISION_PATH)
-    SYSIDIRS += $(TIADALG_PATH)/include
-    SYSIDIRS += $(VISION_APPS_PATH)
-    SYSIDIRS += $(IMAGING_PATH)
 endif
 
 SYSIDIRS += $(APP_UTILS_PATH)
