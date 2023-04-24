@@ -1,12 +1,12 @@
 
 PSDK_PATH = $(abspath ..)
-TIOVX_PATH = $(PSDK_PATH)/tiovx
+APP_UTILS_PATH = $(PSDK_PATH)/app_utils
 MCUSW_PATH=$(PSDK_PATH)/mcusw
 
 # paths for components shared between tiovx and vision_apps are specified in below
 # file in tiovx, ex, bios, tidl, pdk, cgtools, ...
-include $(TIOVX_PATH)/psdkra_tools_path.mak
-include $(TIOVX_PATH)/build_flags.mak
+include $(APP_UTILS_PATH)/tools_path.mak
+include $(APP_UTILS_PATH)/build_flags.mak
 
 # This is required to be set when pulling in the safertos_version
 BOARD=$(SOC)_evm

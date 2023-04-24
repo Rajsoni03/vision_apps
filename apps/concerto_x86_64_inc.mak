@@ -151,11 +151,11 @@ STATIC_LIBS += C7100-host-emulation
 
 include $(TIOVX_PATH)/conformance_tests/kernels/concerto_inc.mak
 
-include $(TIOVX_PATH)/kernels_j7/custom_tools_path.mak
+include $(TIOVX_PATH)/build_flags.mak
 include $(TIOVX_PATH)/kernels_j7/concerto_inc.mak
-include $(IMAGING_PATH)/kernels/hwa/custom_tools_path.mak
+include $(IMAGING_PATH)/build_flags.mak
 include $(IMAGING_PATH)/kernels/concerto_inc.mak
-include $(VIDEO_IO_PATH)/kernels/video_io/custom_tools_path.mak
+include $(VIDEO_IO_PATH)/build_flags.mak
 include $(VIDEO_IO_PATH)/kernels/concerto_inc.mak
 
 SYS_SHARED_LIBS += stdc++ m rt

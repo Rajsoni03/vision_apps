@@ -25,16 +25,7 @@ BUILD_DEFS += $(VPAC_VERSION)
 DIRECTORIES :=
 ifeq ($(SOC),am62a)
 DIRECTORIES += utils/app_init
-DIRECTORIES += utils/console_io
-DIRECTORIES += utils/ipc
-DIRECTORIES += utils/mem
-DIRECTORIES += utils/misc
-DIRECTORIES += utils/perf_stats
-DIRECTORIES += utils/remote_service
-DIRECTORIES += utils/rtos
-DIRECTORIES += utils/sciclient
 DIRECTORIES += utils/sciserver
-DIRECTORIES += utils/udma
 
 DIRECTORIES += platform/$(SOC)
 
