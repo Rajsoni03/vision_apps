@@ -1108,8 +1108,8 @@ vx_status app_run_graph(AppObj *obj)
 #if defined(LINUX)
 
     appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode,
-                        obj->node_aewb, 0,
                         obj->node_viss, 0,
+                        obj->node_aewb, 0,
                         obj->node_ldc, 0,
                         obj->context);
 #endif
@@ -1301,8 +1301,8 @@ static vx_status app_run_graph_interactive(AppObj *obj)
 #if defined(LINUX)
                 case 'u':
                     appDccUpdatefromFS(obj->sensor_name, obj->sensor_wdr_mode,
-                        obj->node_aewb, 0,
                         obj->node_viss, 0,
+                        obj->node_aewb, 0,
                         obj->node_ldc, 0,
                         obj->context);
                     break;
