@@ -62,6 +62,17 @@ Limited License.
 #ifndef _APP_GL_EGL_UTILS_H_
 #define _APP_GL_EGL_UTILS_H_
 
+/**
+ * \defgroup group_vision_apps_utils_opengl OpenGL APIs
+ *
+ * \brief This section contains APIs to use OpenGL within Apps
+ *
+ * \ingroup group_vision_apps_utils
+ *
+ * @{
+ */
+
+
 #ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES 1
 #endif
@@ -120,4 +131,5 @@ int32_t  appEglWindowClose(void *eglWindow);
 }
 #endif /* __cplusplus */
 
+/* @} */
 #endif

@@ -38,6 +38,16 @@
 
 
 /**
+ * \defgroup group_vision_apps_utils_gst_wrapper GStreamer Wrapper APIs
+ *
+ * \brief This section contains APIs to use GStreamer CODEC Pipelines within demos
+ *
+ * \ingroup group_vision_apps_utils
+ *
+ * @{
+ */
+
+/**
  * \brief 
  * 
  * Launches the GstPipeline described by user defined parameters.

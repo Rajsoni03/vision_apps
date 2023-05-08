@@ -36,6 +36,16 @@
 #include <utils/codec_wrapper/include/codec_wrapper.h>
 
 /**
+ * \defgroup group_vision_apps_utils_omax_wrapper OpenMAX Codec Wrapper APIs
+ *
+ * \brief This section contains APIs to use OpenMAX CODEC Pipelines within demos
+ *
+ * \ingroup group_vision_apps_utils
+ *
+ * @{
+ */
+
+/**
  * \brief 
  * 
  * Launches the OMXPipeline described by user defined parameters.

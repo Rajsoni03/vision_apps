@@ -63,6 +63,17 @@
 #ifndef APP_ETHFW_H
 #define APP_ETHFW_H
 
+
+/**
+ * \defgroup group_vision_apps_utils_ethfw Ethfw APIs (TI-RTOS only)
+ *
+ * \brief This section contains APIs to initialize Ethfw within MCU Image firmware
+ *
+ * \ingroup group_vision_apps_utils
+ *
+ * @{
+ */
+
 #include <stdint.h>
 
 void appEthFwEarlyInit();
@@ -70,5 +81,7 @@ int32_t appEthFwInit();
 int32_t appEthFwRemoteServerInit();
 
 int32_t appEthFwDeInit();
+
+/* @} */
 
 #endif //APP_ETHFW_H

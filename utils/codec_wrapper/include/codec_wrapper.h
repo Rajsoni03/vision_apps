@@ -39,7 +39,7 @@
 
 
 /**
- * \defgroup group_vision_apps_utils_codec_wrapper utility APIs
+ * \defgroup group_vision_apps_utils_codec_wrapper Codec Wrapper APIs
  *
  * \brief This section contains APIs to use CODEC Pipelines within demos
  *
@@ -59,7 +59,7 @@
 /**
  * \brief Init parameters
  */
-typedef struct 
+typedef struct
 {
     char        m_AppSrcNameArr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_LEN_ELEM_NAME];/* Name of the AppSrc element */
     int32_t     in_width;/* Width of the buffers input to the CodecPipeline */
@@ -84,111 +84,111 @@ typedef struct
 } app_codec_wrapper_params_t;
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Launches the CODECPipeline described by user defined parameters.
  * Initializes the codec_wrapper and calls gst_parse_launch() on the command string.
- * 
+ *
  * \param [in]      prm         Init parameters
  */
 int32_t appCodecInit(app_codec_wrapper_params_t *prm);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Initializes the AppSrc elements to be able to push buffers to the CODECPipeline.
- * Wraps the given allocated memory as CODECBuffers to push. 
+ * Wraps the given allocated memory as CODECBuffers to push.
  * The input parameters (in_*) must be properly initialised.
- * 
+ *
  * \param [in]      data_ptr        memory that the CODECBuffers will map to
  */
 int32_t appCodecSrcInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES]);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Initializes the AppSink elements to be able to pull buffers from the CODECPipeline.
  * Registers the data_pointers that will map to the bufferpool of pulled CODECBuffers.
  * The output parameters (out_*) must be properly initialised.
- * 
+ *
  * \param [in]      data_ptr        memory that the CODECBuffers will map to
  */
 int32_t appCodecSinkInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES]);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Starts the CODECPipeline that was launched previously.
  */
 int32_t appCodecStart();
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Push a buffer from the bufferpool to the AppSrc element.
- * 
+ *
  * \param [in]     idx             the buffer id, from the bufferpool, to be pushed to the CODECPipeline
  */
 int32_t appCodecEnqAppSrc(uint8_t idx);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Wait for a previously pushed buffer to be consumed by the CODECPipeline.
- * 
+ *
  * \param [in]     idx             the buffer id, from the bufferpool, to wait on
  */
 int32_t appCodecDeqAppSrc(uint8_t idx);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Push EOS (End Of Stream) to the AppSrc element.
  * Signals the elements to stop processing buffers after this.
  */
 int32_t appCodecEnqEosAppSrc();
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Pull a buffer from the AppSink element into the bufferpool.
- * 
- * \param [in]     idx             the slot into which the pulled data is stored  
- *                                 in the pulled_data_ptr array, while maintaining 
+ *
+ * \param [in]     idx             the slot into which the pulled data is stored
+ *                                 in the pulled_data_ptr array, while maintaining
  *                                 a reference to the pulled CODECBuffer
  */
 int32_t appCodecDeqAppSink(uint8_t idx);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Release a previously pulled CODECBuffer back to GStreamer and cleanup.
- * 
- * \param [in]     idx             the slot from which the buffer is released 
+ *
+ * \param [in]     idx             the slot from which the buffer is released
  *                                 back to CODECreamer. The data pointer for this
  *                                 slot is no longer valid
  */
 int32_t appCodecEnqAppSink(uint8_t idx);
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Stops the CODECPipeline that was in playing state.
  * If there is no AppSink element, waits to recieve EOS before cleaning up.
  */
-int32_t appCodecStop(); 
+int32_t appCodecStop();
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Unmaps all buffers that were mapped and destroys all GStreamer or OpenMAX objects.
  */
 void    appCodecDeInit();
 
 
 /**
- * \brief 
- * 
+ * \brief
+ *
  * Prints the current count of the numbers of buffers pushed/pulled to/from the CODECPipeline.
  * Not multi-thread safe.
  */
