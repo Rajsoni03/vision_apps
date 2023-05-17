@@ -24,7 +24,7 @@ J7_IP_ADDRESS       ?= 192.168.999.999
 
 # Return the last word after a '/'.
 # ex: <some_dir_path>/REPO/tidl_j7_xx_yy_zz_ww will give tidl_j7_xx_yy_zz_ww
-tidl_dir = $(notdir $(call dir,$(TIDL_PATH)))
+tidl_dir = $(notdir $(TIDL_PATH))
 
 # Use this to use ALL headers in the component folders
 #IPK_INCLUDE_FOLDERS=imaging $(tidl_dir) ivision vision_apps perception tiadalg
@@ -41,10 +41,10 @@ IPK_INCLUDE_FOLDERS=app_utils/utils \
 					imaging/utils \
 					ivision \
 					$(tidl_dir)/ti_dl/inc \
+					$(tidl_dir)/arm-tidl/tiovx_kernels/include \
 					tiovx/conformance_tests/test_engine \
 					tiovx/include \
 					tiovx/kernels/include \
-					tiovx/kernels_j7/include \
 					tiovx/utils/include \
 					vision_apps/platform/$(SOC) \
 					vision_apps/applibs \
