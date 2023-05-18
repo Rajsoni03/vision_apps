@@ -332,7 +332,7 @@ int32_t appInit()
      * in Linux+RTOS mode
      */
     ipc_init_prm.ipc_resource_tbl = ipc_resource_table;
-    if((host_os_type == APP_HOST_TYPE_LINUX))
+    if(host_os_type == APP_HOST_TYPE_LINUX)
     {
         ipc_init_prm.enable_tiovx_ipc_announce = 1;
     }
