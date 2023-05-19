@@ -53,7 +53,7 @@ SECTIONS
     .data               : {} palign(128)    > DDR_DM_R5F
     .sysmem             : {}                > DDR_DM_R5F
     .data_buffer        : {} palign(128)    > DDR_DM_R5F
-    .const.devgroup*    : {} align(4)       > DDR_DM_R5F
+    .const.devgroup     : {*(.const.devgroup*)} align(4)       > DDR_DM_R5F
     .boardcfg_data      : {} align(4)       > DDR_DM_R5F
     .resource_table          :
     {
@@ -71,7 +71,7 @@ SECTIONS
     GROUP {
         .bss:    {} palign(4)   /* This is where uninitialized globals go */
         RUN_START(__BSS_START)
-	.bss.devgroup*         : {} align(4)  
+	.bss.devgroup     : {*(.bss.devgroup*)} align(4)  
 	.bss:taskStackSection  : {} align(4)  
         RUN_END(__BSS_END)
     } > DDR_DM_R5F
