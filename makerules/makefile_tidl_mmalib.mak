@@ -14,7 +14,7 @@ ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(MAKE) -C $(MMALIB_PATH) mmalib mmalib_cn common SRC_DIR=cnn TARGET_CPU=x86_64 TARGET_SCPU=$(C7X_TARGET) TARGET_PLATFORM=PC TARGET_BUILD=release
 endif
 
-mmalib_clean:
+mmalib_clean mmalib_scrub:
 	rm -rf $(MMALIB_PATH)/out
 
 tidl:
@@ -37,9 +37,38 @@ ifeq ($(BUILD_TARGET_MODE),yes)
     )
 endif
 
-tidl_scrub tidl_clean:
+tidl_rt:
 ifeq ($(BUILD_LINUX_MPU),yes)
-	rm -rf $(TIDL_PATH)/out
+	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) rt PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+    )
 endif
 
-.PHONY: tidl tidl_clean mmalib mmalib_clean tidl_tiovx_kernels tidl_tiovx_kernels_clean tidl_tiovx_kernels_scrub
+tidl_scrub tidl_clean:
+ifeq ($(BUILD_LINUX_MPU),yes)
+ifeq ($(BUILD_EMULATION_MODE),yes)
+	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+    )
+	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+    )
+endif
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+    )
+	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+    )
+endif
+
+tidl_rt_scrub tidl_rt_clean:
+ifeq ($(BUILD_LINUX_MPU),yes)
+	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) rt_clean PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+    )
+endif
+
+.PHONY: tidl tidl_clean tidl_scrub tidl_rt tidl_rt_clean tidl_rt_scrub mmalib mmalib_clean mmalib_scrub
