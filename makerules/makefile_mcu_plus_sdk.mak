@@ -4,7 +4,7 @@
 # Edit this file to suit your specific build needs
 #
 
-include $(MCU_PLUS_SDK_PATH)/imports.mak
+-include $(MCU_PLUS_SDK_PATH)/imports.mak
 
 mcu_plus_sdk_build:
 	$(MAKE) -C $(MCU_PLUS_SDK_PATH) libs DEVICE=$(BUILD_MCU_PLUS_SDK_DEVICE) PROFILE=release -s
