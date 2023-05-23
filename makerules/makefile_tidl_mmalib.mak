@@ -20,19 +20,19 @@ mmalib_clean mmalib_scrub:
 tidl:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH) tidl_lib PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
     )
-	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
-	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH) tidl_lib PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
     )
-	$(foreach current_profile, $(PDK_BUILD_PROFILE_LIST_ALL),\
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
     )
 endif

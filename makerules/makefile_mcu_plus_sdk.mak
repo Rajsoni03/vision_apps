@@ -4,6 +4,13 @@
 # Edit this file to suit your specific build needs
 #
 
+ifeq ($(PROFILE), $(filter $(PROFILE),release all))
+BUILD_PROFILE_LIST_ALL+=release
+endif
+ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
+BUILD_PROFILE_LIST_ALL+=debug
+endif
+
 -include $(MCU_PLUS_SDK_PATH)/imports.mak
 
 mcu_plus_sdk_build:

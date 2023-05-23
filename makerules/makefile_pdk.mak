@@ -5,10 +5,10 @@
 #
 
 ifeq ($(PROFILE), $(filter $(PROFILE),release all))
-PDK_BUILD_PROFILE_LIST_ALL+=release
+BUILD_PROFILE_LIST_ALL+=release
 endif
 ifeq ($(PROFILE), $(filter $(PROFILE),debug all))
-PDK_BUILD_PROFILE_LIST_ALL+=debug
+BUILD_PROFILE_LIST_ALL+=debug
 endif
 
 # vision_apps does not use A72 SysBIOS
@@ -59,7 +59,7 @@ PDK_CORE_LIST_ALL+=c7x_4
 endif
 
 pdk_build:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build BOARD=$(BUILD_PDK_BOARD) custom_target BUILD_PROFILE_LIST_ALL="$(PDK_BUILD_PROFILE_LIST_ALL)" CORE_LIST_ALL="$(PDK_CORE_LIST_ALL)" BUILD_TARGET_LIST_ALL="$(PDK_BUILD_TARGET_LIST_ALL)" -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build BOARD=$(BUILD_PDK_BOARD) custom_target BUILD_PROFILE_LIST_ALL="$(BUILD_PROFILE_LIST_ALL)" CORE_LIST_ALL="$(PDK_CORE_LIST_ALL)" BUILD_TARGET_LIST_ALL="$(PDK_BUILD_TARGET_LIST_ALL)" -s
 
 pdk: pdk_emu
 ifeq ($(BUILD_TARGET_MODE),yes)
