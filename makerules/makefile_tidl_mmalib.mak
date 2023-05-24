@@ -17,7 +17,7 @@ endif
 mmalib_clean mmalib_scrub:
 	rm -rf $(MMALIB_PATH)/out
 
-tidl_lib:
+dsp_tidl:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
@@ -31,35 +31,26 @@ ifeq ($(BUILD_TARGET_MODE),yes)
     )
 endif
 
-tidl_tiovx_kernels:
+arm_tidl:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl all TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
+    )
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl all TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
-ifeq ($(BUILD_TARGET_MODE),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels TARGET_BUILD=$(current_profile); \
     )
 endif
 
-tidl_rt:
-ifeq ($(BUILD_LINUX_MPU),yes)
-ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
-    )
-endif
-ifeq ($(BUILD_TARGET_MODE),yes)
-	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt TARGET_BUILD=$(current_profile); \
-    )
-endif
-endif
-
-tidl_lib_scrub tidl_lib_clean:
+dsp_tidl_scrub dsp_tidl_clean:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
@@ -73,32 +64,29 @@ ifeq ($(BUILD_TARGET_MODE),yes)
     )
 endif
 
-tidl_tiovx_kernels_scrub tidl_tiovx_kernels_clean:
+arm_tidl_scrub arm_tidl_clean:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels_clean TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl clean TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
+    )
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl clean TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
-ifeq ($(BUILD_TARGET_MODE),yes)
+ifeq ($(BUILD_QNX_MPU),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels_clean TARGET_BUILD=$(current_profile); \
     )
 endif
 
-tidl_rt_scrub tidl_rt_clean:
-ifeq ($(BUILD_LINUX_MPU),yes)
-ifeq ($(BUILD_EMULATION_MODE),yes)
-	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt_clean TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
-    )
-endif
-ifeq ($(BUILD_TARGET_MODE),yes)
-	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt_clean TARGET_BUILD=$(current_profile); \
-    )
-endif
-endif
+tidl: dsp_tidl arm_tidl
 
-.PHONY: tidl tidl_clean tidl_scrub tidl_rt tidl_rt_clean tidl_rt_scrub mmalib mmalib_clean mmalib_scrub
+tidl_clean: dsp_tidl_clean arm_tidl_clean
+
+tidl_scrub: dsp_tidl_scrub arm_tidl_scrub
+
+.PHONY: tidl tidl_clean tidl_scrub dsp_tidl dsp_tidl_clean dsp_tidl_scrub arm_tidl arm_tidl_clean arm_tidl_scrub mmalib mmalib_clean mmalib_scrub

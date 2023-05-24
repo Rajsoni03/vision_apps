@@ -220,27 +220,18 @@ SOC_VARIABLE_SCRUB += ptk_scrub
 SOC_VARIABLE_DOCS  += ptk_docs
 endif
 
-sdk: sdk_check_paths rtos_sdk app_utils imaging video_io vxlib tiovx $(SOC_VARIABLE_RULES)
-	$(MAKE) tidl_lib
-	$(MAKE) tidl_tiovx_kernels
-	$(MAKE) tidl_rt
+sdk: sdk_check_paths rtos_sdk app_utils imaging video_io vxlib tiovx tidl $(SOC_VARIABLE_RULES)
 	$(MAKE) vision_apps
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot
 endif
 
-sdk_clean: sdk_check_paths rtos_sdk_clean app_utils_clean imaging_clean video_io_clean vxlib_clean tiovx_clean vision_apps_clean sbl_bootimage_clean $(SOC_VARIABLE_CLEAN)
-	$(MAKE) tidl_lib_clean
-	$(MAKE) tidl_tiovx_kernels_clean
-	$(MAKE) tidl_rt_clean
+sdk_clean: sdk_check_paths rtos_sdk_clean app_utils_clean imaging_clean video_io_clean vxlib_clean tiovx_clean tidl_clean vision_apps_clean sbl_bootimage_clean $(SOC_VARIABLE_CLEAN)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
 
-sdk_scrub: sdk_check_paths rtos_sdk_scrub app_utils_scrub imaging_scrub video_io_scrub vxlib_scrub tiovx_scrub vision_apps_scrub sbl_bootimage_scrub $(SOC_VARIABLE_SCRUB)
-	$(MAKE) tidl_lib_scrub
-	$(MAKE) tidl_tiovx_kernels_scrub
-	$(MAKE) tidl_rt_scrub
+sdk_scrub: sdk_check_paths rtos_sdk_scrub app_utils_scrub imaging_scrub video_io_scrub vxlib_scrub tiovx_scrub tidl_scrub vision_apps_scrub sbl_bootimage_scrub $(SOC_VARIABLE_SCRUB)
 ifeq ($(BUILD_CPU_MCU1_0),yes)
 	$(MAKE) uboot_clean
 endif
