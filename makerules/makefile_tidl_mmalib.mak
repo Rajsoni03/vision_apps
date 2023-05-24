@@ -41,15 +41,22 @@ endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
     )
 endif
 
 tidl_rt:
 ifeq ($(BUILD_LINUX_MPU),yes)
+ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) rt TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) rt TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
     )
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) rt TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+    )
+endif
 endif
 
 tidl_lib_scrub tidl_lib_clean:
@@ -62,7 +69,7 @@ endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE; \
+		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
     )
 endif
 
@@ -76,15 +83,22 @@ endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean; \
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
     )
 endif
 
 tidl_rt_scrub tidl_rt_clean:
 ifeq ($(BUILD_LINUX_MPU),yes)
+ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) rt_clean; \
+		$(MAKE) -C $(TIDL_PATH) rt_clean TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
     )
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) rt_clean TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+    )
+endif
 endif
 
 .PHONY: tidl tidl_clean tidl_scrub tidl_rt tidl_rt_clean tidl_rt_scrub mmalib mmalib_clean mmalib_scrub
