@@ -316,13 +316,14 @@ yocto_build:
 	$(YOCTO_VARS) $(MAKE) imaging
 	$(YOCTO_VARS) BUILD_CSITX=no $(MAKE) video_io
 	$(YOCTO_VARS) $(MAKE) tiovx
+	$(YOCTO_VARS) $(MAKE) tidl_tiovx_kernels
 	$(YOCTO_VARS) $(MAKE) ptk
 	$(YOCTO_VARS) $(MAKE) tivision_apps
 	$(YOCTO_VARS) $(MAKE) vx_app_conformance vx_app_arm_remote_log vx_app_arm_ipc \
 		vx_app_arm_mem vx_app_arm_fd_exchange_consumer vx_app_arm_fd_exchange_producer \
 		vx_app_c7x_kernel vx_app_heap_stats vx_app_load_test vx_app_viss
 
-yocto_clean: app_utils_scrub imaging_scrub video_io_scrub tiovx_scrub ptk_scrub scrub
+yocto_clean: app_utils_scrub imaging_scrub video_io_scrub tiovx_scrub tidl_tiovx_kernels_scrub ptk_scrub scrub
 	$(CLEANDIR) $(PSDK_PATH)/tidl_j7
 	$(CLEANDIR) $(VXLIB_PATH)
 	$(CLEANDIR) $(IVISION_PATH)
