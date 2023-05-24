@@ -41,7 +41,7 @@ endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels TARGET_BUILD=$(current_profile); \
     )
 endif
 
@@ -54,7 +54,7 @@ ifeq ($(BUILD_EMULATION_MODE),yes)
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
@@ -69,7 +69,7 @@ endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean DSP_TOOLS=$(CGT7X_ROOT) TARGET_BUILD=$(current_profile); \
     )
 endif
 
@@ -83,7 +83,7 @@ endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels_clean TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl tidl_tiovx_kernels_clean TARGET_BUILD=$(current_profile); \
     )
 endif
 
@@ -96,7 +96,7 @@ ifeq ($(BUILD_EMULATION_MODE),yes)
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt_clean TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH)/arm-tidl rt_clean TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
