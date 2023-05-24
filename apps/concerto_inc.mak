@@ -20,7 +20,7 @@ SYS_SHARED_LIBS += rt dl png z
 
 LDIRS+=$(CGT7X_ROOT)/host_emulation
 LDIRS+=$(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
-LDIRS+=$(TIDL_PATH)/ti_dl/lib/$(SOC)/PC/algo/$(TARGET_BUILD)
+LDIRS+=$(TIDL_PATH)/ti_dl/lib/$(TARGET_PLATFORM)/PC/algo/$(TARGET_BUILD)
 
 ifeq ($(RTOS_SDK), mcu_plus_sdk)
 LDIRS+= $(MCU_PLUS_SDK_PATH)/source/drivers/dmautils/lib/

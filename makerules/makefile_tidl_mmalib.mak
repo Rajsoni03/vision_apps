@@ -17,57 +17,73 @@ endif
 mmalib_clean mmalib_scrub:
 	rm -rf $(MMALIB_PATH)/out
 
-tidl:
+tidl_lib:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_lib PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
-    )
-	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_lib DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_lib PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_lib DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_BUILD=$(current_profile); \
     )
+endif
+
+tidl_tiovx_kernels:
+ifeq ($(BUILD_LINUX_MPU),yes)
+ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
+    )
+endif
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels TARGET_BUILD=$(current_profile); \
     )
 endif
 
 tidl_rt:
 ifeq ($(BUILD_LINUX_MPU),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) rt PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) rt TARGET_BUILD=$(current_profile); \
     )
 endif
 
-tidl_scrub tidl_clean:
+tidl_lib_scrub tidl_lib_clean:
 ifeq ($(BUILD_LINUX_MPU),yes)
 ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
-    )
-	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_PLATFORM=PC TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
     )
 endif
 endif
 ifeq ($(BUILD_TARGET_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean PSDK_INSTALL_PATH=$(PSDK_PATH) DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_lib_clean DSP_TOOLS=$(CGT7X_ROOT) TARGET_PLATFORM=TI_DEVICE; \
     )
+endif
+
+tidl_tiovx_kernels_scrub tidl_tiovx_kernels_clean:
+ifeq ($(BUILD_LINUX_MPU),yes)
+ifeq ($(BUILD_EMULATION_MODE),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean TARGET_PLATFORM=PC TARGET_BUILD=$(current_profile); \
+    )
+endif
+endif
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(TIDL_PATH) tidl_tiovx_kernels_clean; \
     )
 endif
 
 tidl_rt_scrub tidl_rt_clean:
 ifeq ($(BUILD_LINUX_MPU),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
-		$(MAKE) -C $(TIDL_PATH) rt_clean PSDK_INSTALL_PATH=$(PSDK_PATH) TARGET_SOC=$(SOC) TARGET_BUILD=$(current_profile); \
+		$(MAKE) -C $(TIDL_PATH) rt_clean; \
     )
 endif
 
