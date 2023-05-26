@@ -32,7 +32,7 @@ ifeq ($(YOCTO_STAGE),)
 	@rm -rf $(LINUX_BOOTFS_STAGE_PATH)
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	install -m 775 -d $(LINUX_BOOTFS_STAGE_PATH)
-	cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/
+	if [ -d $(LINUX_FS_BOOT_PATH) ]; then cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/; fi
 endif
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/usr/lib
 
