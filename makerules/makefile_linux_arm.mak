@@ -32,7 +32,7 @@ ifeq ($(YOCTO_STAGE),)
 	@rm -rf $(LINUX_BOOTFS_STAGE_PATH)
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	install -m 775 -d $(LINUX_BOOTFS_STAGE_PATH)
-	if [ -d $(LINUX_FS_BOOT_PATH) ]; then cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/; fi
+	if [ -f $(LINUX_FS_BOOT_PATH)/version ]; then cp -rf $(LINUX_FS_BOOT_PATH)/* $(LINUX_BOOTFS_STAGE_PATH)/; fi
 endif
 	install -m 775 -d $(LINUX_FS_STAGE_PATH)/usr/lib
 
@@ -48,6 +48,15 @@ ifeq ($(BUILD_CPU_MPU1),yes)
 ifeq ($(YOCTO_STAGE),)
 	cp -r $(VISION_APPS_PATH)/apps/basic_demos/app_linux_fs_files/vision_apps_evm/* $(LINUX_FS_STAGE_PATH)/opt/vision_apps/.
 	chmod +x $(LINUX_FS_STAGE_PATH)/opt/vision_apps/*.sh
+
+	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/tidl_test
+	#J721E, J721S2, J784S4, AM62A use the new arm-tidl paths
+	cp -P $(TIDL_PATH)/arm-tidl/tfl_delegate/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp -P $(TIDL_PATH)/arm-tidl/onnxrt_ep/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp -P $(TIDL_PATH)/arm-tidl/rt/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
+	cp $(TIDL_PATH)/arm-tidl/rt/out/$(TARGET_SOC)/$(MPU_CPU)/LINUX/$(LINUX_APP_PROFILE)/*.out     $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
+	cp -r $(TIDL_PATH)/ti_dl/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
+
 endif
 
 	# copy imaging sensor dcc binaries
@@ -200,16 +209,6 @@ ifeq ($(HS),1)
 	$(TI_SECURE_DEV_PKG)/scripts/secure-binary-image.sh $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME) $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME).signed
 	ln -sr $(LINUX_FS_STAGE_PATH)/lib/firmware/$(FIRMWARE_SUBFOLDER)/$(IMAGE_NAME).signed $(LINUX_FS_STAGE_PATH)/lib/firmware/$(LINUX_FIRMWARE_PREFIX)-c71_0-fw-sec
 endif
-
-	#Build TIDL test case and copy binaries
-	#$(MAKE) -C $(TIDL_PATH) run
-	mkdir -p $(LINUX_FS_STAGE_PATH)/opt/tidl_test
-	#J721E, J721S2, J784S4, AM62A use the new arm-tidl paths
-	cp -P $(TIDL_PATH)/arm-tidl/tfl_delegate/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp -P $(TIDL_PATH)/arm-tidl/onnxrt_ep/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp -P $(TIDL_PATH)/arm-tidl/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.so*  $(LINUX_FS_STAGE_PATH)/usr/lib
-	cp $(TIDL_PATH)/arm-tidl/rt/out/$(TARGET_SOC)/A72/LINUX/$(LINUX_APP_PROFILE)/*.out     $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
-	cp -r $(TIDL_PATH)/ti_dl/test/testvecs/ $(LINUX_FS_STAGE_PATH)/opt/tidl_test/
 endif
 ifeq ($(BUILD_CPU_C7x_2),yes)
 	# copy remote firmware files for c7x_2
