@@ -125,7 +125,7 @@ TIOVX_LIBS += vx_platform_psdk_j7
 TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_kernels_openvx_ext vx_target_kernels_openvx_ext
 TIOVX_LIBS += vx_utils
-TIOVX_LIBS += vx_kernels_hwa vx_kernels_video_io vx_kernels_tidl vx_kernels_tvm
+TIOVX_LIBS += vx_kernels_hwa vx_kernels_video_io vx_kernels_tidl vx_kernels_tvm vx_nested_kernels_tidl
 TIOVX_LIBS += vx_tutorial
 
 IMAGING_LIBS += app_utils_iss

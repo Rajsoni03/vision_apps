@@ -69,7 +69,7 @@ TIOVX_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TIOVX_LIBS += vx_target_kernels_source_sink
 TIOVX_LIBS += vx_kernels_host_utils vx_kernels_openvx_core
 TIOVX_LIBS += vx_kernels_hwa_tests vx_kernels_hwa
-TIOVX_LIBS += vx_kernels_tidl
+TIOVX_LIBS += vx_kernels_tidl vx_nested_kernels_tidl
 TIOVX_LIBS += vx_tiovx_tidl_tests
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS)

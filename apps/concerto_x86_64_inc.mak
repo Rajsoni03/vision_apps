@@ -56,7 +56,7 @@ TIOVX_LIBS += vx_target_kernels_dsp
 TIOVX_LIBS += vx_target_kernels_tutorial
 TIOVX_LIBS += vx_app_c7x_target_kernel
 TIOVX_LIBS += vx_utils
-TIOVX_LIBS += vx_kernels_tidl
+TIOVX_LIBS += vx_kernels_tidl vx_nested_kernels_tidl
 
 IMAGING_LIBS = vx_kernels_imaging
 IMAGING_LIBS += app_utils_iss
