@@ -250,9 +250,9 @@ kw_build: sdk
 #RTOS build: invokes pdk or mcu_plus_sdk
 
 ifeq ($(RTOS_SDK),pdk)
-rtos_sdk:pdk
-rtos_sdk_clean:pdk_clean
-rtos_sdk_scrub:pdk_scrub
+rtos_sdk:pdk vhwa
+rtos_sdk_clean:pdk_clean vhwa_clean
+rtos_sdk_scrub:pdk_scrub vhwa_clean
 else
 rtos_sdk:mcu_plus_sdk
 rtos_sdk_clean:mcu_plus_sdk_clean

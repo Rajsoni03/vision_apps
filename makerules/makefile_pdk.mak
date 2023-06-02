@@ -100,4 +100,22 @@ pdk_scrub:
 	rm -rf $(PDK_PATH)/packages/ti/binary
 	rm -rf $(PDK_PATH)/packages/ti/boot/sbl/binary
 
-.PHONY: pdk pdk_clean pdk_build
+vhwa:
+ifneq ($(SOC), am62a)
+ifeq ($(BUILD_TARGET_MODE),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa vhwa BOARD=$(BUILD_PDK_BOARD) SOC=$(SOC) CORE=mcu2_0 BUILD_PROFILE=$(current_profile) -s; \
+		$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa vhwa BOARD=$(BUILD_PDK_BOARD) SOC=$(SOC) CORE=mcu2_1 BUILD_PROFILE=$(current_profile) -s; \
+    )
+ifeq ($(SOC),j784s4)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
+		$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa vhwa BOARD=$(BUILD_PDK_BOARD) SOC=$(SOC) CORE=mcu4_0 BUILD_PROFILE=$(current_profile) -s; \
+    )
+endif
+endif
+endif
+
+vhwa_clean:
+	$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa allclean
+
+.PHONY: pdk pdk_clean pdk_build vhwa vhwa_clean
