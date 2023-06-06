@@ -61,16 +61,9 @@ CFLAGS+=-Wno-format-truncation
 
 ifeq ($(TARGET_OS), QNX)
 
-ifeq ($(TARGET_BUILD), release)
-    BUILD_PROFILE_QNX_SO = so.le
-    BUILD_PROFILE_QNX_A = a.le
-    BUILD_PROFILE_QNX_SUFFIX =
-endif
-ifeq ($(TARGET_BUILD), debug)
-    BUILD_PROFILE_QNX_SO = so.le.g
-    BUILD_PROFILE_QNX_A = a.le.g
-    BUILD_PROFILE_QNX_SUFFIX = _g
-endif
+BUILD_PROFILE_QNX_SO = so.le
+BUILD_PROFILE_QNX_A = a.le
+BUILD_PROFILE_QNX_SUFFIX =
 
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/pdk/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/sciclient/aarch64/$(BUILD_PROFILE_QNX_SO)
