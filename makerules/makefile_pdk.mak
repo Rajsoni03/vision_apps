@@ -103,14 +103,22 @@ pdk_scrub:
 vhwa:
 ifneq ($(SOC), am62a)
 ifeq ($(BUILD_TARGET_MODE),yes)
+ifeq ($(BUILD_CPU_MCU2_0),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa vhwa BOARD=$(BUILD_PDK_BOARD) SOC=$(SOC) CORE=mcu2_0 BUILD_PROFILE=$(current_profile) -s; \
+	)
+endif
+ifeq ($(BUILD_CPU_MCU2_1),yes)
+	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa vhwa BOARD=$(BUILD_PDK_BOARD) SOC=$(SOC) CORE=mcu2_1 BUILD_PROFILE=$(current_profile) -s; \
-    )
+	)
+endif
 ifeq ($(SOC),j784s4)
+ifeq ($(BUILD_CPU_MCU4_0),yes)
 	$(foreach current_profile, $(BUILD_PROFILE_LIST_ALL),\
 		$(MAKE) -C $(PDK_PATH)/packages/ti/drv/vhwa vhwa BOARD=$(BUILD_PDK_BOARD) SOC=$(SOC) CORE=mcu4_0 BUILD_PROFILE=$(current_profile) -s; \
-    )
+	)
+endif
 endif
 endif
 endif
