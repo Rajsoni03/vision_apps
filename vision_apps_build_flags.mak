@@ -49,6 +49,11 @@ endif
 
 BUILD_PTK?=yes
 
+# PTK is not deployed on AM62A
+ifeq ($(SOC),am62a)
+BUILD_PTK=no
+endif
+
 BUILD_ENABLE_ETHFW?=yes
 
 # ETHFW is not supported in J721S2
