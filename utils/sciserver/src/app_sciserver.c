@@ -181,8 +181,8 @@ void appSciserverInit(void* arg0, void* arg1)
     Sciserver_TirtosCfgPrms_t serverParams;
 
     #if defined(SOC_AM62A)
-    char *version_str = NULL;
-    char *rmpmhal_version_str = NULL;
+    const char *version_str = NULL;
+    const char *rmpmhal_version_str = NULL;
     #endif
 
     retVal = Sciserver_tirtosInitPrms_Init(&serverParams);

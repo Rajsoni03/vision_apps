@@ -78,6 +78,9 @@ SECTIONS
     .text       >       DDR_C7x_1 ALIGN(0x10000)
 
     .bss        >       DDR_C7x_1  /* Zero-initialized data */
+    RUN_START(__BSS_START)
+    RUN_END(__BSS_END)
+
     .data       >       DDR_C7x_1  /* Initialized data */
 
     .cinit      >       DDR_C7x_1  /* could be part of const */

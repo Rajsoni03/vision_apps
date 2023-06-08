@@ -33,6 +33,9 @@ DIRECTORIES += modules
 DIRECTORIES += apps/basic_demos/app_c7x_kernel
 DIRECTORIES += apps/basic_demos/app_fd_exchange
 DIRECTORIES += apps/tests/app_vx_conformance
+DIRECTORIES += apps/tests/app_vx_conformance_core
+DIRECTORIES += apps/tests/app_vx_conformance_hwa
+DIRECTORIES += apps/tests/app_vx_conformance_tidl
 DIRECTORIES += apps/utilities
 
 DIRECTORIES += kernels/fileio
