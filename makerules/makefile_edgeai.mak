@@ -7,11 +7,11 @@
 # 4. edgeai-gst-plugins
 #
 
-EDGEAI_APPS_UTILS_PATH ?= $(PSDK_PATH)/edgeai-apps-utils/
-EDGEAI_KERNELS_PATH    ?= $(PSDK_PATH)/edgeai-tiovx-kernels/
-EDGEAI_MODULES_PATH    ?= $(PSDK_PATH)/edgeai-tiovx-modules/
-EDGEAI_PLUGINS_PATH    ?= $(PSDK_PATH)/edgeai-gst-plugins/
-CROSS_COMPILER_PATH     = $(PSDK_PATH)/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu
+EDGEAI_APPS_UTILS_PATH ?= $(PSDK_PATH)/edgeai/edgeai-apps-utils/
+EDGEAI_KERNELS_PATH    ?= $(PSDK_PATH)/edgeai/edgeai-tiovx-kernels/
+EDGEAI_MODULES_PATH    ?= $(PSDK_PATH)/edgeai/edgeai-tiovx-modules/
+EDGEAI_PLUGINS_PATH    ?= $(PSDK_PATH)/edgeai/edgeai-gst-plugins/
+CROSS_COMPILER_PATH     = $(PSDK_TOOLS_PATH)/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu
 CROSS_COMPILER_PREFIX   = aarch64-none-linux-gnu-
 TARGET_FS               = $(PSDK_PATH)/targetfs
 EDGEAI_INSTALL_PATH    ?= $(TARGET_FS)
