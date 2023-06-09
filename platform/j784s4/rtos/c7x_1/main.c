@@ -323,7 +323,7 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
+    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_PHYS_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
@@ -414,10 +414,49 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
 {
   uint64_t phyAddr = (uint64_t)virtAddr;
 
-  if ((uint64_t)virtAddr >= DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR)
+  /* Note: I think this is correct but needs review */
+  if ( ((uint64_t)virtAddr >= DDR_SHARED_MEM_ADDR) &&
+       ((uint64_t)virtAddr < (DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
+  {
+        if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
+        {
+            phyAddr = (uint64_t)virtAddr + (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
+        }
+        else
+        {
+            phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+        }
+  }
+  else if ( ((uint64_t)virtAddr >= DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR) )
   {
     phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
   }
 
   return phyAddr;
 }
+
+uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
+{
+    uint64_t target_ptr;
+
+    /* Note: I think this is correct but needs review */
+    if ( ((uint64_t)shared_ptr >= DDR_SHARED_MEM_PHYS_ADDR) &&
+         ((uint64_t)shared_ptr < (DDR_SHARED_MEM_PHYS_ADDR+DDR_SHARED_MEM_PHYS_SIZE)) )
+    {
+        if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
+        {
+            target_ptr = (uint64_t)shared_ptr - (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
+        }
+        else
+        {
+            target_ptr = (uint64_t)shared_ptr + (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+        }
+    }
+    else
+    {
+        target_ptr = (uint64_t)shared_ptr;
+    }
+
+    return target_ptr;
+}
+

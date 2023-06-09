@@ -88,10 +88,10 @@ MEMORY
     DDR_C7x_1_VECS           ( RWIX ) : ORIGIN = 0xB4400000 , LENGTH = 0x00004000
     /* DDR for C7x_1 for secure vecs section [ size 16.00 KB ] */
     DDR_C7x_1_SECURE_VECS    ( RWIX ) : ORIGIN = 0xB4600000 , LENGTH = 0x00004000
-    /* DDR for C7x_1 for code/data [ size 45.98 MB ] */
-    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xB4604000 , LENGTH = 0x02DFC000
+    /* DDR for C7x_1 for code/data [ size 41.98 MB ] */
+    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xB4604000 , LENGTH = 0x029FC000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* Virtual address of non-cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */
     DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */

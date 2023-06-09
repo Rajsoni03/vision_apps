@@ -79,13 +79,13 @@ MEMORY
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
     /* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xB7400000 , LENGTH = 0x00100000
+    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xB7000000 , LENGTH = 0x00100000
     /* DDR for C7x_2 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB7500000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for code/data [ size 50.00 MB ] */
-    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xB7600000 , LENGTH = 0x03200000
+    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB7100000 , LENGTH = 0x00000400
+    /* DDR for C7x_2 for code/data [ size 46.00 MB ] */
+    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xB7200000 , LENGTH = 0x02E00000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* Virtual address of Non-cacheable DDR for c7x_2 for local heap [ size 128.00 MB ] */
     DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of Cacheable DDR for c7x_2 for local heap [ size 128.00 MB ] */

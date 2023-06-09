@@ -79,19 +79,19 @@ MEMORY
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
     /* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_3_IPC            ( RWIX ) : ORIGIN = 0xBA800000 , LENGTH = 0x00100000
+    DDR_C7x_3_IPC            ( RWIX ) : ORIGIN = 0xBA000000 , LENGTH = 0x00100000
     /* DDR for C7x_3 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_3_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xBA900000 , LENGTH = 0x00000400
+    DDR_C7x_3_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xBA100000 , LENGTH = 0x00000400
     /* DDR for C7x_3 for boot section [ size 1024 B ] */
-    DDR_C7x_3_BOOT           ( RWIX ) : ORIGIN = 0xBAA00000 , LENGTH = 0x00000400
+    DDR_C7x_3_BOOT           ( RWIX ) : ORIGIN = 0xBA200000 , LENGTH = 0x00000400
     /* DDR for C7x_3 for vecs section [ size 16.00 KB ] */
-    DDR_C7x_3_VECS           ( RWIX ) : ORIGIN = 0xBAC00000 , LENGTH = 0x00004000
+    DDR_C7x_3_VECS           ( RWIX ) : ORIGIN = 0xBA400000 , LENGTH = 0x00004000
     /* DDR for C7x_3 for secure vecs section [ size 16.00 KB ] */
-    DDR_C7x_3_SECURE_VECS    ( RWIX ) : ORIGIN = 0xBAE00000 , LENGTH = 0x00004000
-    /* DDR for C7x_3 for code/data [ size 45.98 MB ] */
-    DDR_C7x_3                ( RWIX ) : ORIGIN = 0xBAE04000 , LENGTH = 0x02DFC000
+    DDR_C7x_3_SECURE_VECS    ( RWIX ) : ORIGIN = 0xBA600000 , LENGTH = 0x00004000
+    /* DDR for C7x_3 for code/data [ size 41.98 MB ] */
+    DDR_C7x_3                ( RWIX ) : ORIGIN = 0xBA604000 , LENGTH = 0x029FC000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* Virtual address of Non-cacheable DDR for c7x_3 for local heap [ size 128.00 MB ] */
     DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of Cacheable DDR for c7x_3 for local heap [ size 128.00 MB ] */

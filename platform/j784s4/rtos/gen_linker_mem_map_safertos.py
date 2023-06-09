@@ -124,6 +124,8 @@ msmc_mem_addr = 0x70000000;
 main_ocram_mem_addr = 0x60000000; # Note: uses RAT to translate to proper address
 main_ocram_mem_addr_phys = 0x4F02000000;
 
+codec_carveout_size = 2*GB;
+
 #
 # Other constant sizes
 #
@@ -258,30 +260,30 @@ tiovx_log_rt_mem_size   = 16*MB;
 c7x_1_ddr_ipc_addr = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
 c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_1_ddr_addr = c7x_1_ddr_resource_table_addr + 1*MB;
-c7x_1_ddr_size = 52*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
+c7x_1_ddr_size = 48*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
 
 c7x_2_ddr_ipc_addr = c7x_1_ddr_addr + c7x_1_ddr_size;
 c7x_2_ddr_resource_table_addr = c7x_2_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_2_ddr_addr = c7x_2_ddr_resource_table_addr + 1*MB;
-c7x_2_ddr_size = 52*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
+c7x_2_ddr_size = 48*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
 
 c7x_3_ddr_ipc_addr = c7x_2_ddr_addr + c7x_2_ddr_size;
 c7x_3_ddr_resource_table_addr = c7x_3_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_3_ddr_addr = c7x_3_ddr_resource_table_addr + 1*MB;
-c7x_3_ddr_size = 52*MB - (c7x_3_ddr_addr-c7x_3_ddr_ipc_addr);
+c7x_3_ddr_size = 48*MB - (c7x_3_ddr_addr-c7x_3_ddr_ipc_addr);
 
 c7x_4_ddr_ipc_addr =c7x_3_ddr_addr + c7x_3_ddr_size;
 c7x_4_ddr_resource_table_addr = c7x_4_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_4_ddr_addr = c7x_4_ddr_resource_table_addr + 1*MB;
-c7x_4_ddr_size = 52*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
-
-#
-# DDR memory allocation for various shared memories
-#
+c7x_4_ddr_size = 48*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
 
 # Shared memory for DMA Buf FD carveout
 ddr_shared_mem_addr     = c7x_4_ddr_addr + c7x_4_ddr_size;
 ddr_shared_mem_size     = 512*MB;
+
+#
+# DDR memory allocation for various shared memories
+#
 
 mcu1_0_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
 mcu1_0_ddr_local_heap_size  = 8*MB;
@@ -305,7 +307,6 @@ ddr_intercore_eth_desc_size = 8*MB;
 
 ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_desc_size;
 ddr_intercore_eth_data_size = 24*MB;
-
 
 # C7x 1 Persistent DDR
 c7x_1_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
@@ -386,6 +387,10 @@ total_c7x_4_scratch_ddr = c7x_4_ddr_scratch_non_cacheable_size + c7x_4_ddr_scrat
 total_c7x_4_ddr = total_c7x_4_local_ddr + total_c7x_4_scratch_ddr
 
 total_c7x_ddr = total_c7x_1_ddr + total_c7x_2_ddr + total_c7x_3_ddr + total_c7x_4_ddr
+
+# Shared memory for DMA Buf FD carveout (located in high mem)
+ddr_shared_mem_addr_phys  = c7x_4_ddr_scratch_addr_phys + c7x_4_ddr_scratch_size;
+ddr_shared_mem_size       = 512*MB;
 
 #
 # Create memory section based on addr and size defined above, including
@@ -594,13 +599,6 @@ vision_apps_ddr_total.concat(tiovx_obj_desc_mem);
 vision_apps_ddr_total.concat(tiovx_log_rt_mem);
 vision_apps_ddr_total.setDtsName("vision_apps_memory_region", "vision-apps-dma-memory");
 
-# this region should NOT have the "no-map" flag since we want ION to map this memory and do cache ops on it as needed
-ddr_shared_mem     = MemSection("DDR_SHARED_MEM"    , "", ddr_shared_mem_addr    , ddr_shared_mem_size    , "Memory for shared memory buffers in DDR");
-ddr_shared_mem.setDtsName("vision_apps_shared_region", "vision_apps_shared-memories");
-ddr_shared_mem.setCompatibility("dma-heap-carveout");
-ddr_shared_mem.setNoMap(False);
-ddr_shared_mem.setOriginTag(False);
-
 vision_apps_core_heaps_lo = MemSection("DDR_VISION_APPS_CORE_HEAPS_LO_DTS", "", 0, 0, "Vision Apps Core Heaps in 32bit address range of DDR");
 vision_apps_core_heaps_lo.concat(mcu1_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu2_0_ddr_local_heap);
@@ -611,12 +609,21 @@ vision_apps_core_heaps_lo.concat(mcu4_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu4_1_ddr_local_heap);
 vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-core-heap-memory-lo");
 
-c7x_ddr_local_heap_phy  = MemSection("DDR_C7X_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr_phys, total_c7x_ddr, "DDR for c7x-1 thru c7x-4 for local heap and scratch");
+c7x_ddr_local_heap_phy  = MemSection("DDR_C7X_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr_phys, total_c7x_ddr, "High mem regions including shared mem and DDR for c7x-1 thru c7x-4 for local heap and scratch");
 
-vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
-vision_apps_core_heaps_hi.concat(c7x_ddr_local_heap_phy);
-vision_apps_core_heaps_hi.setDtsName("vision_apps_core_heaps_hi", "vision-apps-core-heap-memory-hi");
-vision_apps_core_heaps_hi.splitOrigin(True)
+c7x_ddr_heaps_hi = MemSection("DDR_C7X_DDR_HEAPS_DTS", "", 0, 0, "C7X DDR Heaps in 40bit address range of DDR");
+c7x_ddr_heaps_hi.concat(c7x_ddr_local_heap_phy);
+c7x_ddr_heaps_hi.setDtsName("c7x_ddr_heaps_hi", "c7x-ddr-heaps-hi");
+c7x_ddr_heaps_hi.splitOrigin(True)
+
+# this region should NOT have the "no-map" flag since we want ION to map this memory and do cache ops on it as needed
+ddr_shared_mem     = MemSection("DDR_SHARED_MEM"    , "", ddr_shared_mem_addr    , ddr_shared_mem_size    , "Memory for shared memory buffers in DDR");
+ddr_shared_mem_phys  = MemSection("DDR_SHARED_MEM_PHYS"    , "", ddr_shared_mem_addr_phys  , ddr_shared_mem_size    , "Physical address of memory for shared memory buffers in DDR");
+ddr_shared_mem_phys.setDtsName("vision_apps_shared_region", "vision_apps_shared-memories");
+ddr_shared_mem_phys.setCompatibility("dma-heap-carveout");
+ddr_shared_mem_phys.setNoMap(False)
+ddr_shared_mem_phys.setOriginTag(False)
+ddr_shared_mem_phys.splitOrigin(True)
 
 # This region is for ethernet firmware, multi-core, multi-cast feature
 intercore_eth_desc_mem = MemSection("INTERCORE_ETH_DESC_MEM", "", ddr_intercore_eth_desc_addr, ddr_intercore_eth_desc_size, "Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent");
@@ -902,6 +909,7 @@ html_mmap.addMemSection( mcu2_1_main_ocram );
 html_mmap.addMemSection( mcu4_0_main_ocram );
 html_mmap.addMemSection( intercore_eth_desc_mem );
 html_mmap.addMemSection( intercore_eth_data_mem );
+html_mmap.addMemSection( ddr_shared_mem_phys     );
 html_mmap.checkOverlap();
 
 c_header_mmap = MemoryMap("Memory Map for C header file");
@@ -987,6 +995,7 @@ c_header_mmap.addMemSection( app_log_mem        );
 c_header_mmap.addMemSection( tiovx_obj_desc_mem );
 c_header_mmap.addMemSection( ipc_vring_mem      );
 c_header_mmap.addMemSection( ddr_shared_mem     );
+c_header_mmap.addMemSection( ddr_shared_mem_phys     );
 c_header_mmap.addMemSection( c7x_1_msmc         );
 c_header_mmap.addMemSection( c7x_2_msmc         );
 c_header_mmap.addMemSection( c7x_3_msmc         );
@@ -1028,9 +1037,9 @@ dts_mmap.addMemSection( c7x_4_ddr_ipc      );
 dts_mmap.addMemSection( c7x_4_ddr_total    );
 dts_mmap.addMemSection( vision_apps_ddr_total );
 dts_mmap.addMemSection( ipc_vring_mem      );
-dts_mmap.addMemSection( ddr_shared_mem     );
 dts_mmap.addMemSection( vision_apps_core_heaps_lo );
-dts_mmap.addMemSection( vision_apps_core_heaps_hi );
+dts_mmap.addMemSection( c7x_ddr_heaps_hi );
+dts_mmap.addMemSection( ddr_shared_mem_phys );
 dts_mmap.addMemSection( intercore_eth_desc_mem );
 dts_mmap.addMemSection( intercore_eth_data_mem );
 dts_mmap.checkOverlap();

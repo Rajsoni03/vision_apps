@@ -82,10 +82,10 @@ MEMORY
     DDR_C7x_1_IPC            ( RWIX ) : ORIGIN = 0xB4000000 , LENGTH = 0x00100000
     /* DDR for C7x_1 for Linux resource table [ size 1024 B ] */
     DDR_C7x_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB4100000 , LENGTH = 0x00000400
-    /* DDR for C7x_1 for code/data [ size 50.00 MB ] */
-    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xB4200000 , LENGTH = 0x03200000
+    /* DDR for C7x_1 for code/data [ size 46.00 MB ] */
+    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xB4200000 , LENGTH = 0x02E00000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* Virtual address of non-cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */
     DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */

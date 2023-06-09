@@ -87,11 +87,11 @@ MEMORY
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC1000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
-    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE2000000 , LENGTH = 0x01000000
+    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE1000000 , LENGTH = 0x01000000
     /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xE6000000 , LENGTH = 0x00800000
+    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xE5000000 , LENGTH = 0x00800000
     /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xE6800000 , LENGTH = 0x01800000
+    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xE5800000 , LENGTH = 0x01800000
 }

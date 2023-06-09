@@ -211,76 +211,76 @@
 #define DDR_C7x_1_IPC_ADDR (0xB4000000u)
 #define DDR_C7x_1_IPC_SIZE (0x00100000u)
 
-/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
+/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 47.00 MB ] */
 #define DDR_C7x_1_DTS_ADDR (0xB4100000u)
-#define DDR_C7x_1_DTS_SIZE (0x03300000u)
+#define DDR_C7x_1_DTS_SIZE (0x02F00000u)
 
 /* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_2_IPC_ADDR (0xB7400000u)
+#define DDR_C7x_2_IPC_ADDR (0xB7000000u)
 #define DDR_C7x_2_IPC_SIZE (0x00100000u)
 
-/* DDR for C7x_2 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_2_DTS_ADDR (0xB7500000u)
-#define DDR_C7x_2_DTS_SIZE (0x03300000u)
+/* DDR for C7x_2 for all sections, used for reserving memory in DTS file [ size 47.00 MB ] */
+#define DDR_C7x_2_DTS_ADDR (0xB7100000u)
+#define DDR_C7x_2_DTS_SIZE (0x02F00000u)
 
 /* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_3_IPC_ADDR (0xBA800000u)
+#define DDR_C7x_3_IPC_ADDR (0xBA000000u)
 #define DDR_C7x_3_IPC_SIZE (0x00100000u)
 
-/* DDR for C7x_3 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_3_DTS_ADDR (0xBA900000u)
-#define DDR_C7x_3_DTS_SIZE (0x03300000u)
+/* DDR for C7x_3 for all sections, used for reserving memory in DTS file [ size 47.00 MB ] */
+#define DDR_C7x_3_DTS_ADDR (0xBA100000u)
+#define DDR_C7x_3_DTS_SIZE (0x02F00000u)
 
 /* DDR for C7x_4 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_4_IPC_ADDR (0xBDC00000u)
+#define DDR_C7x_4_IPC_ADDR (0xBD000000u)
 #define DDR_C7x_4_IPC_SIZE (0x00100000u)
 
-/* DDR for C7x_4 for all sections, used for reserving memory in DTS file [ size 51.00 MB ] */
-#define DDR_C7x_4_DTS_ADDR (0xBDD00000u)
-#define DDR_C7x_4_DTS_SIZE (0x03300000u)
+/* DDR for C7x_4 for all sections, used for reserving memory in DTS file [ size 47.00 MB ] */
+#define DDR_C7x_4_DTS_ADDR (0xBD100000u)
+#define DDR_C7x_4_DTS_SIZE (0x02F00000u)
 
 /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-#define DDR_SHARED_MEM_ADDR (0xC1000000u)
+#define DDR_SHARED_MEM_ADDR (0xC0000000u)
 #define DDR_SHARED_MEM_SIZE (0x20000000u)
 
 /* DDR for MCU1_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xE1000000u)
+#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xE0000000u)
 #define DDR_MCU1_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU1_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xE1800000u)
+#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xE0800000u)
 #define DDR_MCU1_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
-#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xE2000000u)
+#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xE1000000u)
 #define DDR_MCU2_0_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for MCU2_1 for local heap [ size 16.00 MB ] */
-#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xE3000000u)
+#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xE2000000u)
 #define DDR_MCU2_1_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for MCU3_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xE4000000u)
+#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xE3000000u)
 #define DDR_MCU3_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU3_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xE4800000u)
+#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xE3800000u)
 #define DDR_MCU3_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU4_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU4_0_LOCAL_HEAP_ADDR (0xE5000000u)
+#define DDR_MCU4_0_LOCAL_HEAP_ADDR (0xE4000000u)
 #define DDR_MCU4_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU4_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU4_1_LOCAL_HEAP_ADDR (0xE5800000u)
+#define DDR_MCU4_1_LOCAL_HEAP_ADDR (0xE4800000u)
 #define DDR_MCU4_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-#define INTERCORE_ETH_DESC_MEM_ADDR (0xE6000000u)
+#define INTERCORE_ETH_DESC_MEM_ADDR (0xE5000000u)
 #define INTERCORE_ETH_DESC_MEM_SIZE (0x00800000u)
 
 /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-#define INTERCORE_ETH_DATA_MEM_ADDR (0xE6800000u)
+#define INTERCORE_ETH_DATA_MEM_ADDR (0xE5800000u)
 #define INTERCORE_ETH_DATA_MEM_SIZE (0x01800000u)
 
 /* Virtual address of non-cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */
@@ -410,6 +410,10 @@
 /* Physical address of cacheable DDR for c7x_4 for Scratch Memory [ size 128.00 MB ] */
 #define DDR_C7X_4_SCRATCH_PHYS_ADDR (0x8F8000000u)
 #define DDR_C7X_4_SCRATCH_PHYS_SIZE (0x08000000u)
+
+/* Physical address of memory for shared memory buffers in DDR [ size 512.00 MB ] */
+#define DDR_SHARED_MEM_PHYS_ADDR (0x900000000u)
+#define DDR_SHARED_MEM_PHYS_SIZE (0x20000000u)
 
 /* Main OCRAM Physical Address for MCU2_0 [ size 256.00 KB ] */
 #define MAIN_OCRAM_MCU2_0_PHYS_ADDR (0x4F02000000u)
