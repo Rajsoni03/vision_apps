@@ -175,33 +175,33 @@
 #define DDR_C7x_2_DTS_ADDR (0xB6100000u)
 #define DDR_C7x_2_DTS_SIZE (0x01F00000u)
 
-/* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-#define DDR_SHARED_MEM_ADDR (0xB8000000u)
-#define DDR_SHARED_MEM_SIZE (0x20000000u)
-
 /* DDR for MCU1_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xD8000000u)
+#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xB8000000u)
 #define DDR_MCU1_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU1_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xD8800000u)
+#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xB8800000u)
 #define DDR_MCU1_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
-#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xD9000000u)
+#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xB9000000u)
 #define DDR_MCU2_0_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for MCU2_1 for local heap [ size 16.00 MB ] */
-#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xDA000000u)
+#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xBA000000u)
 #define DDR_MCU2_1_LOCAL_HEAP_SIZE (0x01000000u)
 
 /* DDR for MCU3_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xDB000000u)
+#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xBB000000u)
 #define DDR_MCU3_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU3_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xDB800000u)
+#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xBB800000u)
 #define DDR_MCU3_1_LOCAL_HEAP_SIZE (0x00800000u)
+
+/* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
+#define DDR_SHARED_MEM_ADDR (0xC0000000u)
+#define DDR_SHARED_MEM_SIZE (0x20000000u)
 
 /* DDR for c7x_1 for Scratch Memory [ size 368.00 MB ] */
 #define DDR_C7X_1_SCRATCH_ADDR (0x100000000u)
@@ -218,6 +218,10 @@
 /* DDR for c7x_2 for Scratch Memory [ size 64.00 MB ] */
 #define DDR_C7X_2_SCRATCH_ADDR (0x128000000u)
 #define DDR_C7X_2_SCRATCH_SIZE (0x04000000u)
+
+/* Physical address of memory for shared memory buffers in DDR [ size 512.00 MB ] */
+#define DDR_SHARED_MEM_PHYS_ADDR (0x900000000u)
+#define DDR_SHARED_MEM_PHYS_SIZE (0x20000000u)
 
 /* Main OCRAM Physical Address for MCU2_0 [ size 512.00 KB ] */
 #define MAIN_OCRAM_MCU2_0_PHYS_ADDR (0x4F02000000u)

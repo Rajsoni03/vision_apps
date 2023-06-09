@@ -105,18 +105,18 @@
 		reg = <0x00 0xb6100000 0x00 0x01f00000>;
 		no-map;
 	};
-	vision_apps_shared_region: vision_apps_shared-memories {
-		compatible = "dma-heap-carveout";
-		reg = <0x00 0xb8000000 0x00 0x20000000>;
-	};
-	vision_apps_core_heaps_lo: vision-apps-core-heap-memory-lo@d8000000 {
+	vision_apps_core_heaps_lo: vision-apps-core-heap-memory-lo@b8000000 {
 		compatible = "shared-dma-pool";
-		reg = <0x00 0xd8000000 0x00 0x04000000>;
+		reg = <0x00 0xb8000000 0x00 0x04000000>;
 		no-map;
 	};
-	vision_apps_core_heaps_hi: vision-apps-core-heap-memory-hi@880000000 {
+	c7x_ddr_heaps_hi: c7x_ddr_heaps_hi-apps-core-heap-memory-hi@880000000 {
 		compatible = "shared-dma-pool";
 		reg = <0x08 0x80000000 0x00 0x2c000000>;
 		no-map;
+	};
+	vision_apps_shared_region: vision_apps_shared-memories {
+		compatible = "dma-heap-carveout";
+		reg = <0x09 0x00000000 0x00 0x20000000>;
 	};
 

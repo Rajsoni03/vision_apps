@@ -240,7 +240,11 @@ int32_t appInit()
     #endif
 
     #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1)
-    app_mem_rat_prm_t mem_rat_prm;
+    app_mem_rat_prm_t l3_mem_rat_prm;
+    #endif
+
+    #if defined(R5F)
+    app_mem_rat_prm_t ddr_mem_rat_prm;
     #endif
 
     /* Init and start GTC timer */
@@ -259,7 +263,8 @@ int32_t appInit()
     appLogInitPrmSetDefault(&log_init_prm);
     appIpcInitPrmSetDefault(&ipc_init_prm);
 
-    mem_init_prm.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
+    mem_init_prm.virtToPhyFxn     = appUdmaVirtToPhyAddrConversion;
+    mem_init_prm.shared2TargetFxn = appShared2TargetConversion;
 
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR];
     heap_prm->base = g_ddr_local_mem;
@@ -470,6 +475,35 @@ int32_t appInit()
 
     appLogPrintf("APP: Init ... !!!\n");
 
+    #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1)
+    #ifdef L3_MEM_SIZE
+
+    l3_mem_rat_prm.size        = L3_MEM_SIZE;
+
+    #if defined(CPU_mcu2_0)
+    l3_mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU2_0_ADDR;
+    l3_mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU2_0_PHYS_ADDR;
+    #elif defined(CPU_mcu2_1)
+    l3_mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU2_1_ADDR;
+    l3_mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU2_1_PHYS_ADDR;
+    #endif
+
+    status = appMemAddrTranslate(&l3_mem_rat_prm);
+    APP_ASSERT_SUCCESS(status);
+    #endif
+    #endif
+
+    #if defined(R5F)
+
+    ddr_mem_rat_prm.size        = DDR_SHARED_MEM_SIZE;
+
+    ddr_mem_rat_prm.baseAddress       = DDR_SHARED_MEM_ADDR;
+    ddr_mem_rat_prm.translatedAddress = DDR_SHARED_MEM_PHYS_ADDR;
+
+    status = appMemAddrTranslate(&ddr_mem_rat_prm);
+    APP_ASSERT_SUCCESS(status);
+    #endif
+
     #ifdef ENABLE_UART
     {
         app_cli_init_prm_t cli_init_prm;
@@ -501,24 +535,6 @@ int32_t appInit()
 
     #ifdef CPU_mcu2_0
     status = appUdmaCsirxCsitxInit();
-    APP_ASSERT_SUCCESS(status);
-    #endif
-    #endif
-
-    #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1)
-    #ifdef L3_MEM_SIZE
-
-    mem_rat_prm.size        = L3_MEM_SIZE;
-
-    #if defined(CPU_mcu2_0)
-    mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU2_0_ADDR;
-    mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU2_0_PHYS_ADDR;
-    #elif defined(CPU_mcu2_1)
-    mem_rat_prm.baseAddress       = MAIN_OCRAM_MCU2_1_ADDR;
-    mem_rat_prm.translatedAddress = MAIN_OCRAM_MCU2_1_PHYS_ADDR;
-    #endif
-
-    status = appMemAddrTranslate(&mem_rat_prm);
     APP_ASSERT_SUCCESS(status);
     #endif
     #endif

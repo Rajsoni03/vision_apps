@@ -233,7 +233,7 @@ c7x_2_ddr_size = 32*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
 ddr_shared_mem_addr     = c7x_2_ddr_addr + c7x_2_ddr_size;
 ddr_shared_mem_size     = 512*MB;
 
-mcu1_0_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
+mcu1_0_ddr_local_heap_addr  = c7x_2_ddr_addr + c7x_2_ddr_size;
 mcu1_0_ddr_local_heap_size  = 8*MB;
 mcu1_1_ddr_local_heap_addr  = mcu1_0_ddr_local_heap_addr + mcu1_0_ddr_local_heap_size;
 mcu1_1_ddr_local_heap_size  = 8*MB;
@@ -246,6 +246,10 @@ mcu3_0_ddr_local_heap_size  = 8*MB;
 mcu3_1_ddr_local_heap_addr  = mcu3_0_ddr_local_heap_addr + mcu3_0_ddr_local_heap_size;
 mcu3_1_ddr_local_heap_size  = 8*MB;
 
+# Shared memory for DMA Buf FD carveout
+ddr_shared_mem_addr     = 0xC0000000; # This will be the virtual address used for R5F's / C7X's
+ddr_shared_mem_size     = 512*MB;
+
 c7x_1_ddr_scratch_addr     = ddr_mem_addr_hi;
 c7x_1_ddr_scratch_size     = 368*MB;
 
@@ -256,6 +260,10 @@ c7x_2_ddr_local_heap_addr = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_siz
 c7x_2_ddr_local_heap_size = 16*MB;
 c7x_2_ddr_scratch_addr    = c7x_2_ddr_local_heap_addr + c7x_2_ddr_local_heap_size;
 c7x_2_ddr_scratch_size    = 64*MB;
+
+# Shared memory for DMA Buf FD carveout (located in high mem)
+ddr_shared_mem_addr_phys  = 0x900000000; # TODO: Clean this up
+ddr_shared_mem_size       = 512*MB;
 
 #
 # Create memory section based on addr and size defined above, including
@@ -387,13 +395,6 @@ vision_apps_ddr_total.concat(tiovx_obj_desc_mem);
 vision_apps_ddr_total.concat(tiovx_log_rt_mem);
 vision_apps_ddr_total.setDtsName("vision_apps_memory_region", "vision-apps-dma-memory");
 
-# this region should NOT have the "no-map" flag since we want ION to map this memory and do cache ops on it as needed
-ddr_shared_mem     = MemSection("DDR_SHARED_MEM"    , "", ddr_shared_mem_addr    , ddr_shared_mem_size    , "Memory for shared memory buffers in DDR");
-ddr_shared_mem.setDtsName("vision_apps_shared_region", "vision_apps_shared-memories");
-ddr_shared_mem.setCompatibility("dma-heap-carveout");
-ddr_shared_mem.setNoMap(False);
-ddr_shared_mem.setOriginTag(False);
-
 vision_apps_core_heaps_lo = MemSection("DDR_VISION_APPS_CORE_HEAPS_LO_DTS", "", 0, 0, "Vision Apps Core Heaps in 32bit address range of DDR");
 vision_apps_core_heaps_lo.concat(mcu1_0_ddr_local_heap);
 vision_apps_core_heaps_lo.concat(mcu2_0_ddr_local_heap);
@@ -404,10 +405,19 @@ vision_apps_core_heaps_lo.setDtsName("vision_apps_core_heaps_lo", "vision-apps-c
 
 c7x_1_ddr_local_heap_phy  = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", ddr_mem_addr_hi_phy, (c7x_1_ddr_scratch_size + c7x_1_ddr_local_heap_size + c7x_2_ddr_scratch_size + c7x_2_ddr_local_heap_size), "DDR for c7x_1, c7x_2 for scratch memory and local heap");
 
-vision_apps_core_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
-vision_apps_core_heaps_hi.concat(c7x_1_ddr_local_heap_phy);
-vision_apps_core_heaps_hi.setDtsName("vision_apps_core_heaps_hi", "vision-apps-core-heap-memory-hi");
-vision_apps_core_heaps_hi.splitOrigin(True)
+c7x_ddr_heaps_hi = MemSection("DDR_VISION_APPS_CORE_HEAPS_HI_DTS", "", 0, 0, "Vision Apps Core Heaps in 40bit address range of DDR");
+c7x_ddr_heaps_hi.concat(c7x_1_ddr_local_heap_phy);
+c7x_ddr_heaps_hi.setDtsName("c7x_ddr_heaps_hi", "c7x_ddr_heaps_hi-apps-core-heap-memory-hi");
+c7x_ddr_heaps_hi.splitOrigin(True)
+
+# this region should NOT have the "no-map" flag since we want ION to map this memory and do cache ops on it as needed
+ddr_shared_mem     = MemSection("DDR_SHARED_MEM"    , "", ddr_shared_mem_addr    , ddr_shared_mem_size    , "Memory for shared memory buffers in DDR");
+ddr_shared_mem_phys  = MemSection("DDR_SHARED_MEM_PHYS"    , "", ddr_shared_mem_addr_phys  , ddr_shared_mem_size    , "Physical address of memory for shared memory buffers in DDR");
+ddr_shared_mem_phys.setDtsName("vision_apps_shared_region", "vision_apps_shared-memories");
+ddr_shared_mem_phys.setCompatibility("dma-heap-carveout");
+ddr_shared_mem_phys.setNoMap(False);
+ddr_shared_mem_phys.setOriginTag(False);
+ddr_shared_mem_phys.splitOrigin(True)
 
 #
 # Create CPU specific memory maps using memory sections created above
@@ -620,6 +630,7 @@ c_header_mmap.addMemSection( app_log_mem        );
 c_header_mmap.addMemSection( tiovx_obj_desc_mem );
 c_header_mmap.addMemSection( ipc_vring_mem      );
 c_header_mmap.addMemSection( ddr_shared_mem     );
+c_header_mmap.addMemSection( ddr_shared_mem_phys     );
 c_header_mmap.addMemSection( c7x_1_msmc         );
 c_header_mmap.addMemSection( mcu2_0_main_ocram  );
 c_header_mmap.addMemSection( mcu2_1_main_ocram  );
@@ -646,9 +657,9 @@ dts_mmap.addMemSection( c7x_2_ddr_ipc      );
 dts_mmap.addMemSection( c7x_2_ddr_total    );
 dts_mmap.addMemSection( vision_apps_ddr_total );
 dts_mmap.addMemSection( ipc_vring_mem      );
-dts_mmap.addMemSection( ddr_shared_mem     );
 dts_mmap.addMemSection( vision_apps_core_heaps_lo );
-dts_mmap.addMemSection( vision_apps_core_heaps_hi );
+dts_mmap.addMemSection( c7x_ddr_heaps_hi );
+dts_mmap.addMemSection( ddr_shared_mem_phys );
 dts_mmap.checkOverlap();
 
 #
