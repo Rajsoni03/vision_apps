@@ -86,7 +86,6 @@ endif
 
 ifeq ($(YOCTO_STAGE),)
 	ln -sr $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/$(tidl_dir) $(LINUX_FS_STAGE_PATH)/$(IPK_TARGET_INC_PATH)/tidl_j7
-	$(MAKE) EDGEAI_INSTALL_PATH=$(LINUX_FS_STAGE_PATH) edgeai_install
 endif
 
 endif
@@ -398,7 +397,6 @@ linux_fs_install_sd_ip: ip_addr_check linux_fs_install
 	sshfs -o nonempty root@$(J7_IP_ADDRESS):/ /tmp/j7-evm
 	#(call CLEAN_COPY_FROM_STAGE,/tmp/j7-evm)
 	$(call CLEAN_COPY_FROM_STAGE_FAST,/tmp/j7-evm)
-	$(MAKE) EDGEAI_INSTALL_PATH=/tmp/j7-evm edgeai_install
 	chmod 777 -R /tmp/j7-evm/lib/firmware/$(FIRMWARE_SUBFOLDER)
 	fusermount -u /tmp/j7-evm/
 
