@@ -45,12 +45,12 @@ load_c7x_1=1
 
 do_run_after_load=1
 
-image_mcu2_0 = psdk_rtos_workarea + "/vision_apps/out/J7/R5F/FREERTOS/debug/vx_app_rtos_mcu2_0.out"
-image_mcu2_1 = psdk_rtos_workarea + "/vision_apps/out/J7/R5F/FREERTOS/debug/vx_app_rtos_mcu2_1.out"
-image_c6x_1 = psdk_rtos_workarea + "/vision_apps/out/J7/C66/FREERTOS/debug/vx_app_rtos_c6x_1.out"
-image_c6x_2 = psdk_rtos_workarea + "/vision_apps/out/J7/C66/FREERTOS/debug/vx_app_rtos_c6x_2.out"
-image_c7x_1 = psdk_rtos_workarea + "/vision_apps/out/J7/C71/FREERTOS/debug/vx_app_rtos_c7x_1.out"
-image_mpu1 = psdk_rtos_workarea + "/vision_apps/out/J7/A72/FREERTOS/debug/vx_app_rtos_mpu1.out"
+image_mcu2_0 = psdk_rtos_workarea + "/vision_apps/out/J721E/R5F/FREERTOS/debug/vx_app_rtos_mcu2_0.out"
+image_mcu2_1 = psdk_rtos_workarea + "/vision_apps/out/J721E/R5F/FREERTOS/debug/vx_app_rtos_mcu2_1.out"
+image_c6x_1 = psdk_rtos_workarea + "/vision_apps/out/J721E/C66/FREERTOS/debug/vx_app_rtos_c6x_1.out"
+image_c6x_2 = psdk_rtos_workarea + "/vision_apps/out/J721E/C66/FREERTOS/debug/vx_app_rtos_c6x_2.out"
+image_c7x_1 = psdk_rtos_workarea + "/vision_apps/out/J721E/C71/FREERTOS/debug/vx_app_rtos_c7x_1.out"
+image_mpu1 = psdk_rtos_workarea + "/vision_apps/out/J721E/A72/FREERTOS/debug/vx_app_rtos_mpu1.out"
 
 
 // Import the DSS packages into our namespace to save on typing

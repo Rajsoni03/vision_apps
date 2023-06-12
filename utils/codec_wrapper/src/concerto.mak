@@ -21,7 +21,7 @@ endif
 ifeq ($(TARGET_OS),QNX)
 CSOURCES    := codec_wrapper_qnx.c
 
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/khronos/openmaxil/
 endif
 

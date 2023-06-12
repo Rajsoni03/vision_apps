@@ -1,4 +1,4 @@
-ifeq ($(TARGET_PLATFORM),$(filter $(TARGET_PLATFORM), J7 J721S2 J784S4))
+ifeq ($(TARGET_PLATFORM),$(filter $(TARGET_PLATFORM), J721E J721S2 J784S4))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 

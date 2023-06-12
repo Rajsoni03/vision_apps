@@ -1,7 +1,7 @@
 ifneq ($(TARGET_PLATFORM),PC)
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7 J784S4 J721S2))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J784S4 J721S2))
 include $(PRELUDE)
 
 TARGET      := app_utils_omax_wrapper
@@ -25,7 +25,7 @@ IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/resmgrlib
 
 CFLAGS      += -DCODEC_USE_HIGHMEM
 endif
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J7))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/khronos/openmaxil/
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/core/public/khronos/openmaxil
 endif

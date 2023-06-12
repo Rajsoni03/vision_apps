@@ -117,7 +117,7 @@ video_io_scrub:
 
 remote_device:
 ifeq ($(BUILD_TARGET_MODE),yes)
-ifeq ($(TARGET_SOC),J7)
+ifeq ($(TARGET_SOC),J721E)
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=J721E RTOS=$(RTOS) lib_remote_device
 	$(MAKE) -C $(REMOTE_DEVICE_PATH) TARGET_SOC=J721E RTOS=$(RTOS) cp_to_lib
 else
