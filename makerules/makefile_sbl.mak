@@ -151,13 +151,13 @@ sbl_atf_optee_scrub:
 	rm -rf $(VISION_APPS_PATH)/../optee_os/out/arm-plat-k3
 
 sbl_pdk_sd:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/binary/$(BOARD)/mmcsd/bin/sbl_mmcsd_img_$(SBL_CORE)_release.tiimage $(SBL_BOOTFILES_PATH)/tiboot3.bin
 	cp $(PDK_PATH)/packages/ti/drv/sciclient/soc/$(SCICLIENT_VERSION)/tifs.bin $(SBL_BOOTFILES_PATH)/tifs.bin
 
 sbl_pdk_sd_hs:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img_hs DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img_hs TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/binary/$(BOARD)_hs/mmcsd/bin/sbl_mmcsd_img_$(SBL_CORE)_release.tiimage $(SBL_BOOTFILES_PATH)/tiboot3.bin.signed
 ifeq ($(HS_SR), 2_0)
@@ -169,12 +169,12 @@ else
 endif
 
 sbl_pdk_ospi:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_cust_img DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_cust_img TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/binary/$(BOARD)/cust/bin/sbl_cust_img_$(SBL_CORE)_release.tiimage $(SBL_BOOTFILES_PATH)/
 
 sbl_pdk_ospi_hs:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_cust_img_hs DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_cust_img_hs TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/binary/$(BOARD)_hs/cust/bin/sbl_cust_img_$(SBL_CORE)_release.tiimage $(SBL_BOOTFILES_PATH)/sbl_cust_img_$(SBL_CORE)_release.tiimage.signed
 
@@ -221,21 +221,21 @@ sbl_mcusw_bootimage_ospi_hs:
 ## PDK BootApp
 #################
 pdk_bootapp_sd:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)/mmcsd/sbl_boot_app_mmcsd_qnx_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage $(SBL_BOOTFILES_PATH)/app
 
 pdk_bootapp_sd_hs: pdk_bootapp_sd
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx_hs DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_mmcsd_qnx_hs TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/mmcsd/sbl_boot_app_mmcsd_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage.signed $(SBL_BOOTFILES_PATH)/app.signed
 
 pdk_bootapp_ospi: pdk_bootapp_sd
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	mkdir -p $(SBL_BOOTFILES_PATH)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)/ospi/sbl_boot_app_ospi_qnx_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage $(SBL_BOOTFILES_PATH)/app_ospi
 
 pdk_bootapp_ospi_hs: pdk_bootapp_ospi
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx_hs DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build boot_app_ospi_qnx_hs TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no -s BOARD=$(BOARD) CORE=$(SBL_CORE)
 	cp $(PDK_PATH)/packages/ti/boot/sbl/example/boot_app/binary/$(BOARD)_hs/ospi/sbl_boot_app_ospi_qnx_hs_$(BOARD)_$(SBL_CORE)_freertos_TestApp_release.appimage.signed $(SBL_BOOTFILES_PATH)/app_ospi.signed
 
 

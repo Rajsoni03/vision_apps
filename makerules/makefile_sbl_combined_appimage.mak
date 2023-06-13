@@ -32,7 +32,7 @@ sbl_combined_bootimage_install_sd: sbl_combined_bootimage
 ### SBL
 ##############
 sbl_sd:
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build sbl_mmcsd_img TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) DISABLE_RECURSE_DEPS=no BOARD=$(BOARD) CORE=$(SBL_CORE) -s
 	mkdir -p $(VISION_APPS_PATH)/out/sbl_combined_bootfiles
 	cp $(PDK_PATH)/packages/ti/boot/sbl/binary/$(BOARD)/mmcsd/bin/sbl_mmcsd_img_$(SBL_CORE)_release.tiimage $(VISION_APPS_PATH)/out/sbl_combined_bootfiles/tiboot3.bin
 	cp $(PDK_PATH)/packages/ti/drv/sciclient/soc/V1/tifs.bin $(VISION_APPS_PATH)/out/sbl_combined_bootfiles/tifs.bin
@@ -66,7 +66,7 @@ ifeq ($(BUILD_CPU_MCU1_0),yes)
 	cp $(VISION_APPS_PATH)/out/$(TARGET_SOC)/R5F/$(RTOS)/$(QNX_APP_PROFILE)/vx_app_rtos_qnx_mcu1_0.out $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
 	$(TIARMCGT_LLVM_ROOT)/bin/tiarmstrip -p $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
 else
-	$(MAKE) -C $(PDK_PATH)/packages/ti/build   ipc_qnx_echo_testb_freertos CORE=mcu1_0 BOARD=$(BOARD) SOC=$(SOC) BUILD_PROFILE=release -s
+	$(MAKE) -C $(PDK_PATH)/packages/ti/build   ipc_qnx_echo_testb_freertos TOOLS_INSTALL_PATH=$(PSDK_TOOLS_PATH) CORE=mcu1_0 BOARD=$(BOARD) SOC=$(SOC) BUILD_PROFILE=release -s
 	cp $(PDK_PATH)/packages/ti/binary/ipc_qnx_echo_testb_freertos/bin/$(BOARD)/ipc_qnx_echo_testb_freertos_mcu1_0_release_strip.xer5f $(INPUT_IMG_PATH)/vx_app_rtos_qnx_mcu1_0.xer5f
 endif
 ifeq ($(BUILD_CPU_MCU2_0),yes)
