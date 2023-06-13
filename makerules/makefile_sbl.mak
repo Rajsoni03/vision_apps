@@ -101,6 +101,10 @@ endif
 
 USE_OPTEE ?= 1
 
+ifeq ($(BUILD_QNX_MPU), yes)
+USE_OPTEE=0
+endif
+
 ifeq ($(BUILD_LINUX_MPU), yes)
 	SBL_SD_FS_PATH=$(LINUX_SD_FS_BOOT_PATH)
 	LDS_PATH=$(VISION_APPS_PATH)/platform/$(SOC)/linux/linux_lds
