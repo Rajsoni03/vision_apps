@@ -691,7 +691,7 @@ int32_t appInit()
         prm.display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_EDP;
         #endif
 
-        prm.enableM2m            = false;
+        prm.enableM2m            = true;
         /* Do not rely on "init". Always provide known good tmings */
         prm.timings.width        = 1920U;
         prm.timings.height       = 1080U;
@@ -729,7 +729,7 @@ int32_t appInit()
         /* default parameters are enough to enable both EDP and HDMI */
         appDssDualDisplayDefaultSetDefaultPrm(&prm);
 
-        prm.enableM2m                           = false;
+        prm.enableM2m                           = true;
         /* Do not rely on "init". Always provide known good tmings */
         for(i=0; i<2; i++)
         {
@@ -929,6 +929,7 @@ static void appRegisterOpenVXTargetKernels()
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxRegisterVideoIOTargetDisplayKernels();
+        tivxRegisterVideoIOTargetDisplayM2MKernels();
         #endif
         #ifdef C7120
         #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
@@ -977,6 +978,7 @@ static void appUnRegisterOpenVXTargetKernels()
         #endif
         #if defined(ENABLE_DSS_SINGLE) || defined(ENABLE_DSS_DUAL)
         tivxUnRegisterVideoIOTargetDisplayKernels();
+        tivxUnRegisterVideoIOTargetDisplayM2MKernels();
         #endif
         #ifdef ENABLE_CSI2RX
         tivxUnRegisterVideoIOTargetCaptureKernels();

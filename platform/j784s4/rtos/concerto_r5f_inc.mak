@@ -64,6 +64,7 @@ TIOVX_LIBS += vx_target_kernels_display
 TIOVX_LIBS += vx_target_kernels_capture
 TIOVX_LIBS += vx_target_kernels_csitx
 TIOVX_LIBS += vx_target_kernels_j7_arm
+TIOVX_LIBS += vx_target_kernels_display_m2m
 
 SYS_STATIC_LIBS += $(TIOVX_LIBS)
 
