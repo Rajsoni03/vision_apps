@@ -1,26 +1,26 @@
 
-include vision_apps_tools_path.mak
+include tools_path.mak
 
 # Edit below file to change default build options
-include vision_apps_build_flags.mak
+include build_flags.mak
 
 # Project specific build defs (don't change across different combos):
 BUILD_DEFS :=
-ifeq ($(BUILD_IVISION_KERNELS),yes)
-BUILD_DEFS += BUILD_IVISION_KERNELS
-endif
 ifneq ($(APP_CONFIG_BASE_PATH),)
 BUILD_DEFS += APP_CONFIG_BASE_PATH
 endif
-ifeq ($(BUILD_TUTORIAL),yes)
-BUILD_DEFS += BUILD_TUTORIAL
-endif
-ifeq ($(BUILD_CONFORMANCE_TEST),yes)
-BUILD_DEFS += BUILD_CONFORMANCE_TEST
-endif
 
-BUILD_DEFS += $(SOC_DEF)
-BUILD_DEFS += $(VPAC_VERSION)
+ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), J721E j721e))
+BUILD_DEFS += SOC_J721E
+else ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), J721S2 j721s2))
+BUILD_DEFS += SOC_J721S2
+else ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), J784S4 j784s4))
+BUILD_DEFS += SOC_J784S4
+else ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), AM62A am62a))
+BUILD_DEFS += SOC_AM62A
+else
+BUILD_DEFS += SOC_J721E
+endif
 
 DIRECTORIES :=
 ifeq ($(SOC),am62a)
@@ -142,7 +142,7 @@ ifeq ($(BUILD_EMULATION_MODE),yes)
   endif
 endif
 
-CONCERTO_ROOT ?= concerto
+CONCERTO_ROOT ?= $(PSDK_BUILDER_PATH)/concerto
 BUILD_MULTI_PROJECT := 1
 BUILD_TARGET := target.mak
 BUILD_PLATFORM :=
@@ -151,7 +151,7 @@ include $(CONCERTO_ROOT)/rules.mak
 
 # Project specific rules
 
-.PHONY: all vision_apps sdk
+.PHONY: all
 all:
 
 doxy_docs:
@@ -168,95 +168,3 @@ doxy_design_docs:
 doxy_datasheet_docs:
 	-$(Q)$(MKDIR) docs/datasheet/ $(QUIET) || true
 	$(DOXYGEN) internal_docs/doxy_cfg_datasheet/datasheet_$(SOC).cfg 2> internal_docs/doxy_cfg_datasheet/doxy_warnings.txt
-
-# Additional make targets to build various related components
-ifeq ($(RTOS_SDK),pdk)
-include makerules/makefile_pdk.mak
-else
-include makerules/makefile_mcu_plus_sdk.mak
-endif
-include makerules/makefile_tidl_mmalib.mak
-include makerules/makefile_tiovx_ptk_imaging_remote_device.mak
-include makerules/makefile_test_data.mak
-include makerules/makefile_linux_arm.mak
-include makerules/makefile_help.mak
-include makerules/makefile_config.mak
-include makerules/makefile_tiadalg.mak
-include makerules/makefile_check_paths.mak
-include makerules/makefile_qnx.mak
-include makerules/makefile_sbl.mak
-include makerules/makefile_ethfw.mak
-include makerules/makefile_ipk.mak
-include makerules/makefile_uboot.mak
-include makerules/makefile_sbl_combined_appimage.mak
-
-vision_apps: sdk_check_paths
-	$(MAKE) all
-vision_apps_clean: sdk_check_paths pdk_emu_clean clean
-vision_apps_scrub: sdk_check_paths scrub
-
-vision_apps_docs: sdk_check_paths doxy_docs
-
-# Set Variables for SOC specific rule dependencies used in make rules below
-ifeq ($(SOC), $(filter $(SOC), j721e j784s4))
-SOC_VARIABLE_RULES=ethfw remote_device tiadalg qnx
-SOC_VARIABLE_CLEAN=ethfw_clean remote_device_clean tiadalg_clean qnx_clean
-SOC_VARIABLE_SCRUB=ethfw_scrub remote_device_scrub tiadalg_scrub qnx_scrub
-SOC_VARIABLE_DOCS=tiadalg_docs
-else ifeq ($(SOC),j721s2)
-SOC_VARIABLE_RULES=tiadalg qnx
-SOC_VARIABLE_CLEAN=tiadalg_clean qnx_clean
-SOC_VARIABLE_SCRUB=tiadalg_scrub qnx_scrub
-SOC_VARIABLE_DOCS=tiadalg_docs
-else ifeq ($(SOC),am62a)
-SOC_VARIABLE_RULES=
-SOC_VARIABLE_CLEAN=
-SOC_VARIABLE_SCRUB=
-SOC_VARIABLE_DOCS=
-endif
-
-ifeq ($(BUILD_PTK),yes)
-SOC_VARIABLE_RULES += ptk
-SOC_VARIABLE_CLEAN += ptk_clean
-SOC_VARIABLE_SCRUB += ptk_scrub
-SOC_VARIABLE_DOCS  += ptk_docs
-endif
-
-sdk: sdk_check_paths rtos_sdk app_utils imaging video_io vxlib tiovx tidl_lib tidl_tiovx_kernels $(SOC_VARIABLE_RULES)
-	$(MAKE) vision_apps
-	$(MAKE) tidl_rt
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot
-endif
-
-sdk_clean: sdk_check_paths rtos_sdk_clean app_utils_clean imaging_clean video_io_clean vxlib_clean tiovx_clean tidl_lib_clean tidl_tiovx_kernels_clean tidl_rt_clean vision_apps_clean sbl_bootimage_clean $(SOC_VARIABLE_CLEAN)
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
-
-sdk_scrub: sdk_check_paths rtos_sdk_scrub app_utils_scrub imaging_scrub video_io_scrub vxlib_scrub tiovx_scrub tidl_lib_scrub tidl_tiovx_kernels_scrub tidl_rt_scrub vision_apps_scrub sbl_bootimage_scrub $(SOC_VARIABLE_SCRUB)
-ifeq ($(BUILD_CPU_MCU1_0),yes)
-	$(MAKE) uboot_clean
-endif
-
-sdk_docs: sdk_check_paths tiovx_docs vision_apps_docs $(SOC_VARIABLE_DOCS)
-	$(MAKE) -C $(PSDK_PATH)/psdk_rtos sphinx_docs
-
-#KW build: Split the build into two - components which need not be part of
-# SDK KW report as the report for these components are separately delivered
-# Build it first and the use "kw_build" target for KW inject
-kw_pre_build: rtos_sdk
-
-kw_build: sdk
-
-#RTOS build: invokes pdk or mcu_plus_sdk
-
-ifeq ($(RTOS_SDK),pdk)
-rtos_sdk:pdk vhwa
-rtos_sdk_clean:pdk_clean vhwa_clean
-rtos_sdk_scrub:pdk_scrub vhwa_clean
-else
-rtos_sdk:mcu_plus_sdk
-rtos_sdk_clean:mcu_plus_sdk_clean
-rtos_sdk_scrub:mcu_plus_sdk_scrub
-endif
