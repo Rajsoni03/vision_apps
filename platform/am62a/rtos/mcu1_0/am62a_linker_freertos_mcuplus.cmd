@@ -33,7 +33,7 @@ __SVC_STACK_SIZE   = 0x0100;
 /*--------------------------------------------------------------*/
 SECTIONS
 {
-    .vectors            : align = 8, load = R5F_TCMB0, run = R5F_TCMA
+    .vectors            : {} palign(8)      > DDR_DM_R5F
     .bootCode           : align = 8, load = R5F_TCMB0, run = R5F_TCMA
     .startupCode        : align = 8, load = R5F_TCMB0 , run = R5F_TCMA
     .startupData        : align = 8, load = R5F_TCMB0 , run = R5F_TCMA, type = NOINIT
