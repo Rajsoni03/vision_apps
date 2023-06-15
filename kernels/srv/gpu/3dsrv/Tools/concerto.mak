@@ -23,6 +23,7 @@ CFLAGS      += -Wno-int-to-pointer-cast
 CFLAGS      += -Wno-class-memaccess
 CFLAGS      += -Wno-int-in-bool-context
 CFLAGS      += -Wno-array-bounds
+CFLAGS      += -Wno-maybe-uninitialized
 
 CSOURCES    := $(call all-c-files)
 CPPSOURCES  := $(filter-out PVRTPrint3D.cpp, $(call all-cpp-files))
