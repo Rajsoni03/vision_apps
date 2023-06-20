@@ -255,13 +255,51 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    /* DDR Local heap non cacheable */
     retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(DDR_C7X_1_2_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+    
+    /* DDR Scratch non cacheable */
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_2_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_3_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
@@ -313,19 +351,59 @@ void appMmuMap(Bool is_secure)
     {
         goto mmu_exit;
     }
-
+    
+    /* DDR Local heap */
     retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_1_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(DDR_C7X_1_2_LOCAL_HEAP_ADDR, DDR_C7X_2_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_2_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_3_LOCAL_HEAP_ADDR, DDR_C7X_3_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_3_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_4_LOCAL_HEAP_ADDR, DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_4_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+
+    /* DDR scratch */
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_PHYS_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(DDR_C7X_1_2_SCRATCH_ADDR, DDR_C7X_2_SCRATCH_PHYS_ADDR, DDR_C7X_2_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_3_SCRATCH_ADDR, DDR_C7X_3_SCRATCH_PHYS_ADDR, DDR_C7X_3_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    retVal = Mmu_map(DDR_C7X_1_4_SCRATCH_ADDR, DDR_C7X_4_SCRATCH_PHYS_ADDR, DDR_C7X_4_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
+    /* DDR Shared mem */
     retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_PHYS_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
     {
@@ -438,9 +516,35 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
   return phyAddr;
 }
 
+/** Description : This function converts a physical memory region address to virtual memory region address given the base addresses of both memory regions 
+ *  which are mapped using MMU in appMmuMap
+ *  Arguments:
+ *      - shared_ptr : Physical pointer
+ *      - virtBase   : Base address of virtual memory space
+ *      - physBase   : Base address of physical memory space
+ *      - size       : Size of memory space
+ *      - target_ptr : Virtual pointer to be returned after conversion if shared_ptr belongs to memory space with base address physBase
+ *                     else, target_ptr is returned as it is without any modification
+ */
+static void convertPhys2Virt(uint64_t shared_ptr, uint64_t virtBase, uint64_t physBase, uint64_t size, uint64_t * target_ptr)
+{
+    if ( ((uint64_t)shared_ptr >= physBase) &&
+         ((uint64_t)shared_ptr < (physBase + size)) )
+    {
+        if (physBase >= virtBase)
+        {
+            *target_ptr = shared_ptr - (physBase - virtBase);
+        }
+        else
+        {
+            *target_ptr = (uint64_t)shared_ptr + (virtBase - physBase);
+        }
+    }
+}
+
 uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
 {
-    uint64_t target_ptr;
+    uint64_t target_ptr = shared_ptr; /* Default : Return shared_ptr without any modification */
 
     /* Note: I think this is correct but needs review */
     if ( ((uint64_t)shared_ptr >= DDR_SHARED_MEM_PHYS_ADDR) &&
@@ -457,9 +561,46 @@ uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
     }
     else
     {
-        target_ptr = (uint64_t)shared_ptr;
-    }
+        /* Below code converts C7x DDR physical addresses of all cores to c7x_1 virtual addresses 
+           If shared_ptr does not belong to any of the below defined physical memory regions, it will be returned without any modification.
+           A shared_ptr would belong to any one of the below memory spaces, so convertPhys2Virt call for that particular space would be executed
+           All other function calls would just pass through the target_ptr */
+        convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
 
+        convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_1_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_2_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_3_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
+
+        convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
+        
+        convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_1_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_2_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_3_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_PHYS_SIZE, &target_ptr);
+        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_4_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_PHYS_SIZE, &target_ptr);
+    }
     return target_ptr;
 }
 
