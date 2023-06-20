@@ -10,17 +10,7 @@ ifneq ($(APP_CONFIG_BASE_PATH),)
 BUILD_DEFS += APP_CONFIG_BASE_PATH
 endif
 
-ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), J721E j721e))
-BUILD_DEFS += SOC_J721E
-else ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), J721S2 j721s2))
-BUILD_DEFS += SOC_J721S2
-else ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), J784S4 j784s4))
-BUILD_DEFS += SOC_J784S4
-else ifeq ($(TARGET_SOC),$(filter $(TARGET_SOC), AM62A am62a))
-BUILD_DEFS += SOC_AM62A
-else
-BUILD_DEFS += SOC_J721E
-endif
+BUILD_DEFS += $(SOC_DEF)
 
 DIRECTORIES :=
 ifeq ($(SOC),am62a)
