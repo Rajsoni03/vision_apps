@@ -76,6 +76,7 @@
 #include <ti/csl/arch/c7x/Cache.h>
 #include <ti/csl/arch/c7x/Hwi.h>
 #include <ti/csl/arch/c7x/Mmu.h>
+#include <utils/perf_stats/include/app_perf_stats.h>
 
 #if (defined (SAFERTOS))
 #include "SafeRTOS_API.h"
@@ -178,6 +179,8 @@ int main(void)
     appC7xClecInitDru();
 
     setup_dru_qos();
+
+    appPerfStatsInit();
 
     appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;

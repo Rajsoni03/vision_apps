@@ -74,6 +74,7 @@
 #ifdef SYSBIOS
 #include <ti/sysbios/family/c66/Cache.h>
 #endif
+#include <utils/perf_stats/include/app_perf_stats.h>
 
 void appCacheMarInit(void);
 
@@ -117,6 +118,8 @@ int main(void)
     appCacheMarInit();
 
     OS_init();
+
+    appPerfStatsInit();
 
     appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;

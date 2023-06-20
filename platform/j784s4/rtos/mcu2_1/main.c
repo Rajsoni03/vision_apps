@@ -67,6 +67,7 @@
 #include <string.h>
 #include <ti/osal/osal.h>
 #include <app_ipc_rsctable.h>
+#include <utils/perf_stats/include/app_perf_stats.h>
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -104,6 +105,8 @@ int main(void)
     StartupEmulatorWaitFxn();
 
     OS_init();
+
+    appPerfStatsInit();
 
     appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;
