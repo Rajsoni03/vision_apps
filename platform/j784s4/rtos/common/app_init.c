@@ -539,6 +539,15 @@ int32_t appInit()
 
     appLogPrintf("APP: Init ... !!!\n");
 
+    #if defined(R5F)
+    #if defined(CPU_mcu1_0)
+    status = appMemSetRatRegs((CSL_ratRegs *)(CSL_MCU_R5FSS0_RAT_CFG_BASE));
+    #else
+    status = appMemSetRatRegs((CSL_ratRegs *)(CSL_R5FSS0_RAT_CFG_BASE));
+    #endif
+    APP_ASSERT_SUCCESS(status);
+    #endif
+
     #if defined(CPU_mcu2_0) || defined(CPU_mcu2_1) || defined(CPU_mcu4_0)
     #ifdef L3_MEM_SIZE
 
@@ -562,8 +571,7 @@ int32_t appInit()
 
     #if defined(R5F)
 
-    ddr_mem_rat_prm.size        = DDR_SHARED_MEM_SIZE;
-
+    ddr_mem_rat_prm.size              = DDR_SHARED_MEM_SIZE;
     ddr_mem_rat_prm.baseAddress       = DDR_SHARED_MEM_ADDR;
     ddr_mem_rat_prm.translatedAddress = DDR_SHARED_MEM_PHYS_ADDR;
 
