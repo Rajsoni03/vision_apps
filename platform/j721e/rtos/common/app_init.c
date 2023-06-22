@@ -435,6 +435,8 @@ int32_t appInit()
     log_init_prm.device_write = appLogDeviceWrite;
     #endif
 
+    appPerfStatsInit();
+
     #ifdef ENABLE_BOARD
     {
         app_pinmux_cfg_t pinmux_cfg;
