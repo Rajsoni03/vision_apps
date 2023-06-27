@@ -40,6 +40,9 @@ SHARED_LIBS += gstapp-1.0
 SHARED_LIBS += gstbase-1.0
 SHARED_LIBS += gobject-2.0
 SHARED_LIBS += glib-2.0
+
+CFLAGS += -Wno-restrict
+CFLAGS += -Wno-stringop-overflow
 endif
 
 ifeq ($(TARGET_OS), QNX)
