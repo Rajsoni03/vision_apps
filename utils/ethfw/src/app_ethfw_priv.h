@@ -89,6 +89,11 @@
 #include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
 
+#if defined(ETHFW_GPTP_SUPPORT)
+/* Timesync header files */
+#include <tsn_gptp/gptp_config.h>
+#endif
+
 #if defined (SYSBIOS)
 
 #include <utils/ethfw_callbacks/include/ethfw_callbacks_nimu.h>
@@ -161,11 +166,9 @@ typedef struct
     /* Host MAC address */
     uint8_t hostMacAddr[ENET_MAC_ADDR_LEN];
 
-#if defined(FREERTOS) || defined(SAFERTOS)
-    /* Host IP address */
-    uint32_t hostIpAddr;
-#elif (SYSBIOS)
-    uint8_t hostIpAddr[ENET_IPv4_ADDR_LEN];
+#if defined(ETHFW_GPTP_SUPPORT)
+    /* Semaphore used to indicate when host port MAC address has been allocated */
+    SemaphoreP_Handle hHostMacAllocSem;
 #endif
 
     /* Enet instance id */

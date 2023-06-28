@@ -62,6 +62,9 @@ ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
 	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/lib/$(RTOS_LC)/${SOC}/r5f/$(TARGET_BUILD)/
 	LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
+ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
+	LDIRS += $(PDK_PATH)/packages/ti/transport/tsn/lib/r5f/$(TARGET_BUILD)/
+endif
 endif
 
 include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
@@ -105,8 +108,11 @@ ifeq ($(BUILD_ENABLE_ETHFW),yes)
 ADDITIONAL_STATIC_LIBS += enetsoc.aer5f
 ADDITIONAL_STATIC_LIBS += enet.aer5f
 ADDITIONAL_STATIC_LIBS += enetphy.aer5f
-ADDITIONAL_STATIC_LIBS += enet_timesync_ptp.aer5f
-ADDITIONAL_STATIC_LIBS += enet_timesync_hal.aer5f
+ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
+ADDITIONAL_STATIC_LIBS += tsn_gptp.aer5f
+ADDITIONAL_STATIC_LIBS += tsn_combase.aer5f
+ADDITIONAL_STATIC_LIBS += tsn_unibase.aer5f
+endif
 
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	ADDITIONAL_STATIC_LIBS += lwipstack_$(RTOS_LC).aer5f

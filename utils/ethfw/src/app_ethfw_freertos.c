@@ -206,6 +206,12 @@ static void EthApp_startSwInterVlan(char *recvBuff,
 static void EthApp_startHwInterVlan(char *recvBuff,
                                     char *sendBuff);
 
+#if defined(ETHFW_GPTP_SUPPORT)
+static void EthApp_configPtpCb(void *arg);
+
+static void EthApp_initPtp(void);
+#endif
+
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH)
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
                                         const uint8_t hostId);
@@ -319,6 +325,10 @@ int32_t appEthFwInit()
 
     gEthAppObj.coreId = EnetSoc_getCoreId();
 
+#if defined(ETHFW_GPTP_SUPPORT)
+    SemaphoreP_Params semParams;
+#endif
+
     /* Board related initialization */
 #if defined(SOC_J721E)
     flags |= ETHFW_BOARD_GESI_ENABLE;
@@ -347,6 +357,23 @@ int32_t appEthFwInit()
         }
     }
 
+#if defined(ETHFW_GPTP_SUPPORT)
+    /* Create semaphore used to synchronize MAC alloc by lwIP which is required and
+     * shared with the gPTP stack */
+    if (status == ETHAPP_OK)
+    {
+        SemaphoreP_Params_init(&semParams);
+        semParams.mode = SemaphoreP_Mode_BINARY;
+
+        gEthAppObj.hHostMacAllocSem = SemaphoreP_create(0, &semParams);
+
+        if (gEthAppObj.hHostMacAllocSem == NULL)
+        {
+            appLogPrintf("ETHFW: failed to create hostport MAC addr semaphore\n");
+            status = ETHAPP_ERROR;
+        }
+    }
+#endif
     /* Initialize Ethernet Firmware */
     if (status == ETHAPP_OK)
     {
@@ -379,8 +406,10 @@ int32_t appEthFwInit()
     {
         appLogPrintf("ETHFW: Init ... ERROR !!!\n");
     }
-
-
+#if defined(ETHFW_GPTP_SUPPORT)
+    /* Initialize gPTP stack */
+    EthApp_initPtp();
+#endif
     return status;
 }
 
@@ -424,6 +453,9 @@ void LwipifEnetAppCb_getHandle(LwipifEnetAppIf_GetHandleInArgs *inArgs,
     /* Save host port MAC address */
     EnetUtils_copyMacAddr(&gEthAppObj.hostMacAddr[0U],
                           &outArgs->rxInfo[0U].macAddr[0U]);
+#if defined(ETHFW_GPTP_SUPPORT)
+    SemaphoreP_post(gEthAppObj.hHostMacAllocSem);
+#endif
 }
 
 void LwipifEnetAppCb_releaseHandle(LwipifEnetAppIf_ReleaseHandleInfo *releaseInfo)
@@ -468,6 +500,12 @@ static int32_t EthApp_initEthFw(void)
 
     /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
     cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
+
+#if defined(ETHFW_GPTP_SUPPORT)
+    /* gPTP stack config parameters */
+    ethFwCfg.configPtpCb    = EthApp_configPtpCb;
+    ethFwCfg.configPtpCbArg = NULL;
+#endif
 
     /* Overwrite config params with those for hardware interVLAN */
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
@@ -698,16 +736,6 @@ static void EthApp_netifStatusCb(struct netif *netif)
 
         if (ipAddr->addr != 0)
         {
-            gEthAppObj.hostIpAddr = lwip_ntohl(ip_addr_get_ip4_u32(ipAddr));
-
-            /* MAC port used for PTP */
-            macPort = ENET_MAC_PORT_3;
-
-            /* Initialize and enable PTP stack */
-            EthFw_initTimeSyncPtp(gEthAppObj.hostIpAddr,
-                                  &gEthAppObj.hostMacAddr[0U],
-                                  ENET_BIT(ENET_MACPORT_NORM(macPort)));
-
             /* Assign functions that are to be called based on actions in GUI.
              * These cannot be dynamically pushed to function pointer array, as the
              * index is used in GUI as command */
@@ -755,6 +783,31 @@ static void EthApp_startHwInterVlan(char *recvBuff,
         EthHwInterVlan_setupRouting(gEthAppObj.enetType, pInterVlanCfg);
     }
 }
+
+#if defined(ETHFW_GPTP_SUPPORT)
+static void EthApp_configPtpCb(void *arg)
+{
+    int32_t useHwPhase = 1;
+
+    /* Apply phase adjustment directly to the HW */
+    gptpconf_set_item(CONF_USE_HW_PHASE_ADJUSTMENT, &useHwPhase);
+}
+
+static void EthApp_initPtp(void)
+{
+    Enet_MacPort macPort;
+    uint32_t portMask;
+
+    /* MAC port used for PTP */
+    macPort = ENET_MAC_PORT_3;
+    portMask = ENET_MACPORT_MASK(macPort);
+
+    /* Wait for host port MAC address to be allocated during lwIP getHandle */
+    SemaphoreP_pend(gEthAppObj.hHostMacAllocSem, SemaphoreP_WAIT_FOREVER);
+    EthFw_initTimeSyncPtp(&gEthAppObj.hostMacAddr[0U], portMask);
+}
+
+#endif
 
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH)
 /* Application callback function to handle addition of a shared mcast

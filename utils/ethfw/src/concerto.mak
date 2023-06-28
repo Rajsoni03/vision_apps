@@ -18,6 +18,9 @@ IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/freertos/include
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/r5f
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include
+ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
+    IDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack
+endif
 
 CSOURCES    := app_ethfw_freertos.c
 
@@ -42,6 +45,13 @@ ifeq ($(TARGET_OS),FREERTOS SAFERTOS)
     DEFS += ETHAPP_ENABLE_INTERCORE_ETH
   endif
   DEFS += ENABLE_QSGMII_PORTS
+endif
+
+# ETHFW gPTP stack - for now, supported in FreeRTOS only
+ifeq ($(ETHFW_GPTP_SUPPORT),yes)
+  ifeq ($(TARGET_OS),FREERTOS)
+    DEFS += ETHFW_GPTP_SUPPORT
+  endif
 endif
 
 include $(FINALE)
