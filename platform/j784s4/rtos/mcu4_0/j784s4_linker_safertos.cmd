@@ -81,6 +81,7 @@ SECTIONS
 
     .bss:ddr_local_mem     (NOLOAD) : {} > DDR_MCU4_0_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
+    .bss:app_fileio_mem     (NOLOAD) : {} > APP_FILEIO_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
 
