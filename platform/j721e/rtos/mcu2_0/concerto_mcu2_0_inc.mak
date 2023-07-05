@@ -94,9 +94,8 @@ ETHFW_LIBS += lib_remoteswitchcfg_server
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	ETHFW_LIBS += ethfw_lwip
 endif
-endif
-
 REMOTE_DEVICE_LIBS = lib_remote_device
+endif
 
 SYS_STATIC_LIBS += $(ETHFW_LIBS)
 SYS_STATIC_LIBS += $(REMOTE_DEVICE_LIBS)
