@@ -79,8 +79,10 @@
 
 /* EthFw header files */
 #include <utils/board/include/ethfw_board_utils.h>
+#if defined(ETHFW_DEMO_SUPPORT)
 #include <utils/intervlan/include/eth_hwintervlan.h>
 #include <utils/intervlan/include/eth_swintervlan.h>
+#endif
 #include <ethfw/ethfw.h>
 
 /* Vision Apps utils */

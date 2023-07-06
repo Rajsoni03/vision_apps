@@ -54,6 +54,11 @@ ifeq ($(ETHFW_GPTP_SUPPORT),yes)
   endif
 endif
 
+# Ethfw Intervlan demo
+ifeq ($(ETHFW_DEMO_SUPPORT),yes)
+  DEFS += ETHFW_DEMO_SUPPORT
+endif
+
 include $(FINALE)
 
 endif
