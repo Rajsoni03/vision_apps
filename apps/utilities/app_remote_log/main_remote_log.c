@@ -63,6 +63,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/file_io/include/app_fileio.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <stdint.h>
 #include <app_mem_map.h>
@@ -138,7 +139,7 @@ int main(void)
     #ifdef ENABLE_IPC_C7x_4
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
     #endif
-
+    
     log_init_prm.shared_mem = (app_log_shared_mem_t *)APP_LOG_MEM_ADDR;
     log_init_prm.self_cpu_index = APP_IPC_CPU_MPU1_0;
     strncpy(log_init_prm.self_cpu_name, "MPU1_0", APP_LOG_MAX_CPU_NAME);
@@ -146,6 +147,33 @@ int main(void)
     log_init_prm.device_write = app_log_device_send_string;
 
     appLogRdInit(&log_init_prm);
+
+#if defined(ENABLE_IPC_C7x_1) || defined(ENABLE_IPC_C7x_2) || defined(ENABLE_IPC_C7x_3) || defined(ENABLE_IPC_C7x_4)
+    /*******************  Create task for file io ***************/
+    app_fileio_init_prm_t fileio_init_prm;
+
+    appFileIOInitPrmSetDefault(&fileio_init_prm);
+
+    #ifdef ENABLE_IPC_C7x_1
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
+    #endif
+    #ifdef ENABLE_IPC_C7x_2
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_2] = 1;
+    #endif
+    #ifdef ENABLE_IPC_C7x_3
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
+    #endif
+    #ifdef ENABLE_IPC_C7x_4
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
+    #endif
+
+    fileio_init_prm.shared_mem = (app_fileio_shared_mem_t *)APP_FILEIO_MEM_ADDR;
+    fileio_init_prm.self_cpu_index = APP_IPC_CPU_MPU1_0;
+    strncpy(fileio_init_prm.self_cpu_name, "MPU1_0", APP_FILEIO_MAX_CPU_NAME);
+    fileio_init_prm.fileio_rd_max_cpus = APP_IPC_CPU_MAX;
+    
+    appFileIORdInit(&fileio_init_prm);
+#endif     
     while(1)
     {
         appLogWaitMsecs(1000);

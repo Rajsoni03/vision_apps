@@ -85,6 +85,7 @@ VISION_APPS_UTILS_LIBS += app_utils_draw2d
 VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 VISION_APPS_UTILS_LIBS += app_utils_console_io
+VISION_APPS_UTILS_LIBS += app_utils_file_io
 VISION_APPS_UTILS_LIBS += app_utils_grpx
 VISION_APPS_UTILS_LIBS += app_utils_hwa
 VISION_APPS_UTILS_LIBS += app_utils_init

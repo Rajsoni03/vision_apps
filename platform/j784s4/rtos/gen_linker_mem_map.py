@@ -252,14 +252,14 @@ ipc_vring_mem_size      = 48*MB;
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
 app_log_mem_size        = 256*KB;
 
-app_fileio_mem_addr     =  app_log_mem_addr + app_log_mem_size;
+tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
+tiovx_obj_desc_mem_size = 64*MB - app_log_mem_size;
+
+app_fileio_mem_addr     =  tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
 app_fileio_mem_size     = 4*MB;
 
-tiovx_obj_desc_mem_addr = app_fileio_mem_addr + app_fileio_mem_size;
-tiovx_obj_desc_mem_size = 64*MB - (app_log_mem_size + app_fileio_mem_size);
-
-tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
-tiovx_log_rt_mem_size   = 16*MB;
+tiovx_log_rt_mem_addr   = app_fileio_mem_addr + app_fileio_mem_size;
+tiovx_log_rt_mem_size   = 16*MB - app_fileio_mem_size;
 
 c7x_1_ddr_ipc_addr = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
 c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
