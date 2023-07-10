@@ -470,19 +470,21 @@ mmu_exit:
     }
 
     MmuP_MapAttrs_init(&attrs);
-    attrs.attrIndx = MMUP_ATTRINDX_MAIR7;
+    attrs.attrIndx = MMUP_ATTRINDX_MAIR0;
 
     retVal = MmuP_map(L2RAM_C7x_1_MAIN_ADDR, L2RAM_C7x_1_MAIN_ADDR, 0x01000000, &attrs);
     if(retVal == SystemP_FAILURE)
     {
         goto mmu_exit;
     }
-
+    attrs.attrIndx = MMUP_ATTRINDX_MAIR0;
     retVal = MmuP_map(L2RAM_C7x_1_AUX_ADDR, L2RAM_C7x_1_AUX_ADDR, 0x01000000, &attrs);
     if(retVal == SystemP_FAILURE)
     {
         goto mmu_exit;
     }
+    attrs.attrIndx = MMUP_ATTRINDX_MAIR7;
+
 
     retVal = MmuP_map(DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_SIZE, &attrs);
     if(retVal == SystemP_FAILURE)
