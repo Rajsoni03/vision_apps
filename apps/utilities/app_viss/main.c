@@ -299,6 +299,12 @@ void TestGraProcessingDcc(int32_t load, int32_t time)
     raw_params.line_interleaved = vx_false_e;
     raw_params.format[0].pixel_container = TIVX_RAW_IMAGE_16_BIT;
     raw_params.format[0].msb = 11;
+    /* Note: these are don't care's given num_exposures = 1, but
+     * fixing to satisfy static analysis issues */
+    raw_params.format[1].pixel_container = TIVX_RAW_IMAGE_16_BIT;
+    raw_params.format[1].msb = 11;
+    raw_params.format[2].pixel_container = TIVX_RAW_IMAGE_16_BIT;
+    raw_params.format[2].msb = 11;
     raw_params.meta_height_before = 0;
 
     if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_VPAC_VISS1))

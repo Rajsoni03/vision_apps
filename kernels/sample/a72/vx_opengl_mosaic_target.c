@@ -184,7 +184,7 @@ static vx_status VX_CALLBACK tivxOpenglMosaicProcess(
         /* call kernel processing function */
         {
             GLuint texYuv[8] = {0};
-            app_egl_tex_prop_t texProp[4], renderTexProp;
+            app_egl_tex_prop_t texProp[4] = {0}, renderTexProp;
             void *pEglWindowObj = mosaicParams->eglWindowObj;
             unsigned int i, numWindows;
 

@@ -897,7 +897,7 @@ static vx_status app_prime_pyramid_output(AppObj *obj)
 static vx_status app_create_graph(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
-    vx_graph_parameter_queue_params_t graph_parameters_queue_params_list[3];
+    vx_graph_parameter_queue_params_t graph_parameters_queue_params_list[3] = {0};
     vx_int32 graph_parameter_index;
 
     obj->graph = vxCreateGraph(obj->context);
