@@ -1109,8 +1109,8 @@ static void app_delete_graph(AppObj *obj)
 static vx_status app_create_graph(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
-    vx_graph_parameter_queue_params_t capt_graph_parameters_queue_params_list[2];
-    vx_graph_parameter_queue_params_t disp_graph_parameters_queue_params_list[2];
+    vx_graph_parameter_queue_params_t capt_graph_parameters_queue_params_list[2] = {0};
+    vx_graph_parameter_queue_params_t disp_graph_parameters_queue_params_list[2] = {0};
     vx_int32 capt_graph_parameter_index;
     vx_int32 disp_graph_parameter_index;
 

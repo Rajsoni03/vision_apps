@@ -364,7 +364,7 @@ static void app_deinit(AppObj *obj)
 static vx_status app_create_graph(AppObj *obj)
 {
     uint32_t num_buf, pipeline_depth;
-    vx_graph_parameter_queue_params_t graph_parameters_queue_params_list[3];
+    vx_graph_parameter_queue_params_t graph_parameters_queue_params_list[3] = {0};
     vx_status status = VX_SUCCESS;
 
 
