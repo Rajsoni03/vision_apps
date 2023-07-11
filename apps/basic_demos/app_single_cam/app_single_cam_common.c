@@ -718,10 +718,10 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->uv12_c1 = NULL;
 
 #ifdef VPAC3
-    /* YUV12 output from dual CC for MV */
-    if (obj->vpac3_dual_fcp_enable)
+    /* YUV8 output from dual CC for HV and MV */
+    if (obj->vpac3_dual_fcp_enable == 1U)
     {
-        obj->y12 = vxCreateImage(obj->context, image_width, image_height, TIVX_DF_IMAGE_NV12_P12);
+        obj->y12 = vxCreateImage(obj->context, image_width, image_height, VX_DF_IMAGE_NV12);
         obj->uv12_c1 = NULL;
     }
 #endif
@@ -745,24 +745,32 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->viss_params.fcp[0].chroma_mode = 0;
 
 #ifdef VPAC3
-    /* turn on CAC, dual FCP, and YUV12 output */
-    if (obj->vpac3_dual_fcp_enable)
+    /* turn on CAC, dual FCP, and NV12 output */
+    if (obj->vpac3_dual_fcp_enable == 1U)
     {
         obj->viss_params.bypass_cac = 0;  /* CAC on */
         obj->viss_params.fcp1_config = 1; /* RAWFE --> FCP1 */
+        
+        /* HV pipeline 8bit YUV output on output0 and output 1 */
+        obj->viss_params.fcp[0].mux_output0 = 0;
+        obj->viss_params.fcp[0].mux_output1 = 0;
         obj->viss_params.fcp[0].mux_output2 = TIVX_VPAC_VISS_MUX2_NV12;
+        obj->viss_params.fcp[0].mux_output3 = TIVX_VPAC_VISS_MUX2_NV12;
+        obj->viss_params.fcp[0].mux_output4 = 0;
 
-        obj->viss_params.output_fcp_mapping[0] = 1;
-        obj->viss_params.output_fcp_mapping[1] = 1;
-        obj->viss_params.output_fcp_mapping[2] = 2;
-        obj->viss_params.output_fcp_mapping[3] = 2;
-        obj->viss_params.output_fcp_mapping[4] = 1;
+        /* Mapping for FCP output to select FCP1 or FCP2 for the output muxes */
+        obj->viss_params.output_fcp_mapping[0] = TIVX_VPAC_VISS_MAP_FCP_OUTPUT(TIVX_VPAC_VISS_FCP1,TIVX_VPAC_VISS_FCP_OUT2);
+        obj->viss_params.output_fcp_mapping[1] = TIVX_VPAC_VISS_MAP_FCP_OUTPUT(TIVX_VPAC_VISS_FCP1,TIVX_VPAC_VISS_FCP_OUT3);
+        obj->viss_params.output_fcp_mapping[2] = TIVX_VPAC_VISS_MAP_FCP_OUTPUT(TIVX_VPAC_VISS_FCP0,TIVX_VPAC_VISS_FCP_OUT0);
+        obj->viss_params.output_fcp_mapping[3] = TIVX_VPAC_VISS_MAP_FCP_OUTPUT(TIVX_VPAC_VISS_FCP0,TIVX_VPAC_VISS_FCP_OUT1);
+        obj->viss_params.output_fcp_mapping[4] = 0;
 
-        obj->viss_params.fcp[1].mux_output0 = TIVX_VPAC_VISS_MUX0_NV12_P12;
-        obj->viss_params.fcp[1].mux_output1 = TIVX_VPAC_VISS_MUX0_NV12_P12;
-        obj->viss_params.fcp[1].mux_output2 = 4;
+        /* MV pipeline 8bit YUV output on output2 and output 3 */
+        obj->viss_params.fcp[1].mux_output0 = TIVX_VPAC_VISS_MUX2_NV12;
+        obj->viss_params.fcp[1].mux_output1 = TIVX_VPAC_VISS_MUX2_NV12;
+        obj->viss_params.fcp[1].mux_output2 = 0;
         obj->viss_params.fcp[1].mux_output3 = 0;
-        obj->viss_params.fcp[1].mux_output4 = 3;
+        obj->viss_params.fcp[1].mux_output4 = 0;
 
         obj->viss_params.fcp[1].ee_mode = 0;
         obj->viss_params.fcp[1].chroma_mode = 0;

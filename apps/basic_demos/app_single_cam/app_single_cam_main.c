@@ -236,6 +236,21 @@ vx_status app_init(AppObj *obj)
         }
 
         obj->ldc_enable = ch - '0';
+
+        #ifdef VPAC3
+        /* Selection for MV enable */
+        ch = 0xFF;
+        fflush (stdin);
+        while ((ch != '0') && (ch != '1'))
+        {
+            fflush (stdin);
+            printf ("Dual FCP enable for MV Selection Yes(1)/No(0) : ");
+            ch = getchar();
+        }
+        
+        obj->vpac3_dual_fcp_enable = ch - '0';
+
+        #endif
     }
     else
     {
@@ -253,7 +268,7 @@ vx_status app_init(AppObj *obj)
     obj->table_height = LDC_TABLE_HEIGHT;
     obj->ds_factor = LDC_DS_FACTOR;
 
-    /* Display initialization */
+    /* Display initialization HV*/
     memset(&obj->display_params, 0, sizeof(tivx_display_params_t));
     obj->display_params.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
     obj->display_params.pipeId = 2;
@@ -261,6 +276,24 @@ vx_status app_init(AppObj *obj)
     obj->display_params.outWidth = 1920;
     obj->display_params.posX = 0;
     obj->display_params.posY = 0;
+
+#ifdef VPAC3
+    /* YUV8 output from dual CC for HV and MV */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    { 
+        /* Display Modification for HV*/
+        obj->display_params.outWidth = 960;
+        
+        /* Display initialization MV*/
+        memset(&obj->display_params_MV, 0, sizeof(tivx_display_params_t));
+        obj->display_params_MV.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
+        obj->display_params_MV.pipeId = 0;
+        obj->display_params_MV.outHeight = 1080;
+        obj->display_params_MV.outWidth = 960;
+        obj->display_params_MV.posX = 960;
+        obj->display_params_MV.posY = 0;
+    }
+#endif
 
     obj->scaler_enable = vx_false_e;
 
@@ -315,7 +348,10 @@ vx_status app_create_graph(AppObj *obj)
     obj->s8_b8_c4 = NULL;
     obj->histogram = NULL;
     obj->h3a_aew_af = NULL;
+#ifdef VPAC3
     obj->display_image = NULL;
+    obj->display_image_MV = NULL;
+#endif
 
     unsigned int image_width = obj->width_in;
     unsigned int image_height = obj->height_in;
@@ -334,6 +370,9 @@ vx_status app_create_graph(AppObj *obj)
 
     vx_bool yuv_cam_input = vx_false_e;
     vx_image viss_out_image = NULL;
+#ifdef VPAC3
+    vx_image viss_out_image_MV = NULL;
+#endif    
     vx_image ldc_in_image = NULL;
     vx_image capt_yuv_image = NULL;
 
@@ -620,6 +659,13 @@ Sensor driver does not support metadata yet.
             return -1;
         }
         viss_out_image = obj->y8_r8_c2;
+#ifdef VPAC3
+    /* Populate viss_out_image with image created */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    {
+        viss_out_image_MV = obj->y12;
+    }
+#endif
         ldc_in_image = viss_out_image;
     }
     else
@@ -661,6 +707,13 @@ Sensor driver does not support metadata yet.
                 status = tivxSetNodeParameterNumBufByIndex(obj->scalerNode, 1u, obj->num_cap_buf);
             }
             obj->display_params.outHeight = scaler_out_h;
+#ifdef VPAC3
+        /* HV display scaler height modification */
+        if (obj->vpac3_dual_fcp_enable == 1U)
+        {
+            obj->display_params.outHeight = (scaler_out_h)*2;
+        }
+#endif
             obj->display_params.outWidth = scaler_out_w;
             obj->display_image = obj->scaler_out_img;
         }else /*No resize needed*/
@@ -714,6 +767,13 @@ Sensor driver does not support metadata yet.
                 status = vxSetNodeTarget(obj->scalerNode, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
             }
             obj->display_params.outHeight = scaler_out_h;
+#ifdef VPAC3
+            /* HV display scaler height modification */
+            if (obj->vpac3_dual_fcp_enable == 1U)
+            {
+                obj->display_params.outHeight = (scaler_out_h)*2;
+            }
+#endif
             obj->display_params.outWidth = scaler_out_w;
             obj->display_image = obj->scaler_out_img;
         }
@@ -722,6 +782,13 @@ Sensor driver does not support metadata yet.
             obj->display_image = ldc_in_image;
         }
     }
+#ifdef VPAC3
+            /* Populate Display image MV with viss_out_image_MV */
+            if (obj->vpac3_dual_fcp_enable == 1U)
+            {
+                obj->display_image_MV = viss_out_image_MV;
+            }
+#endif
 
     if(NULL == obj->display_image)
     {
@@ -732,15 +799,53 @@ Sensor driver does not support metadata yet.
     {
         obj->display_params.posX = (1920U - obj->display_params.outWidth)/2;
         obj->display_params.posY = (1080U - obj->display_params.outHeight)/2;
+#ifdef VPAC3
+        /* HV position modification for MV display */
+        if (obj->vpac3_dual_fcp_enable == 1U)
+        {
+            obj->display_params.posX = 0U;
+            obj->display_params.posY = 0U;
+        }
+#endif
         obj->display_param_obj = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->display_params);
         obj->displayNode = tivxDisplayNode(obj->graph, obj->display_param_obj, obj->display_image);
     }
+
+#ifdef VPAC3
+    /* Check if display_image_MV is not NULL and create display node */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    {
+        if(NULL == obj->display_image_MV)
+        {
+            printf("Error : Display MV input is uninitialized \n");
+            return VX_FAILURE;
+        }
+        else
+        {
+            obj->display_params_MV.posX = 960U;
+            obj->display_params_MV.posY = 0U;
+            obj->display_param_MV_obj = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->display_params_MV);
+            obj->displayNode_MV = tivxDisplayNode(obj->graph, obj->display_param_MV_obj, obj->display_image_MV);
+        }
+    }
+#endif
 
     if(status == VX_SUCCESS)
     {
         status = vxSetNodeTarget(obj->displayNode, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
         APP_PRINTF("Display Set Target done\n");
     }
+#ifdef VPAC3
+    /* Check status of MV node creation */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    {    
+        if(status == VX_SUCCESS)
+        {
+            status = vxSetNodeTarget(obj->displayNode_MV, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
+            APP_PRINTF("Display MV Set Target done\n");
+        }
+    }
+#endif
     int graph_parameter_num = 0;
 
     /* input @ node index 1, becomes graph parameter 0 */
@@ -755,7 +860,6 @@ Sensor driver does not support metadata yet.
     if(obj->test_mode == 1)
     {
         add_graph_parameter_by_node_index(obj->graph, obj->displayNode, 1);
-
         /* set graph schedule config such that graph parameter @ index 0 is enqueuable */
         graph_parameters_queue_params_list[graph_parameter_num].graph_parameter_index = graph_parameter_num;
         graph_parameters_queue_params_list[graph_parameter_num].refs_list_size = 1;
@@ -858,6 +962,17 @@ vx_status app_delete_graph(AppObj *obj)
         APP_PRINTF("releasing displayNode\n");
         status |= vxReleaseNode(&obj->displayNode);
     }
+#ifdef VPAC3
+    /* Releasing MV display node */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    {    
+        if(NULL != obj->displayNode_MV)
+        {
+            APP_PRINTF("releasing MV displayNode\n");
+            status |= vxReleaseNode(&obj->displayNode_MV);
+        }
+    }
+#endif
 
     status |= tivxReleaseRawImage(&obj->raw);
     APP_PRINTF("releasing raw image done\n");
@@ -959,6 +1074,17 @@ vx_status app_delete_graph(AppObj *obj)
         APP_PRINTF("releasing Display Param Data Object\n");
         status |= vxReleaseUserDataObject(&obj->display_param_obj);
     }
+#ifdef VPAC3
+    /* Releasing MV params object */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    {    
+        if(NULL != obj->display_param_MV_obj)
+        {
+            APP_PRINTF("releasing MV Display Param Data Object\n");
+            status |= vxReleaseUserDataObject(&obj->display_param_MV_obj);
+        }
+    }
+#endif
 
     if(NULL != obj->dcc_param_2a)
     {

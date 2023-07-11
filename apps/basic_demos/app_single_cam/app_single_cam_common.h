@@ -123,6 +123,11 @@ typedef struct {
     vx_node  node_aewb;
     tivx_display_params_t display_params;
     vx_node displayNode;
+    #ifdef VPAC3
+    /* Display params and node for MV */
+    tivx_display_params_t display_params_MV;
+    vx_node displayNode_MV;
+    #endif
     vx_enum  ae_awb_result_type;
     tivx_raw_image raw;
     tivx_raw_image fs_test_raw_image;
@@ -143,9 +148,17 @@ typedef struct {
     vx_user_data_object dcc_param_2a;
     vx_user_data_object dcc_param_ldc;
     vx_user_data_object display_param_obj;
+    #ifdef VPAC3
+    /* Display params object for MV */
+    vx_user_data_object display_param_MV_obj;
+    #endif
 
     vx_object_array cap_frames[MAX_NUM_BUF];
     vx_image display_image;
+    #ifdef VPAC3
+    /* Display image for MV */
+    vx_image display_image_MV;
+    #endif
     vx_image viss_out_luma[MAX_NUM_BUF];
     vx_uint8 sensor_sel;
     vx_uint32 num_frames_to_run;
