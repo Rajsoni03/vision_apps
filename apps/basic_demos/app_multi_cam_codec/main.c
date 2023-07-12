@@ -393,7 +393,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
     if(fp==NULL)
     {
         printf("# ERROR: Unable to open config file [%s]\n", cfg_file_name);
-        exit(0);
+        exit(1);
     }
 
     while(fgets(line_str, sizeof(line_str), fp)!=NULL)
@@ -2092,6 +2092,13 @@ static void app_querry_param_set(AppObj *obj)
         }
         ch = getchar();
     }
+    #if defined(QNX)
+    if ((1==obj->encode) && (1==obj->decode))
+    {
+        printf("Invalid selections: Both encode and decode are not enabled in the same app for QNX\n");
+        exit(0);
+    }
+    #endif
     while (obj->sensorObj.num_cameras_enabled == 0)
     {
         fflush(stdin);
