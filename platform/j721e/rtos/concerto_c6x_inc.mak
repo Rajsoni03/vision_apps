@@ -35,6 +35,7 @@ APP_UTILS_LIBS =
 APP_UTILS_LIBS += app_utils_mem
 APP_UTILS_LIBS += app_utils_rtos
 APP_UTILS_LIBS += app_utils_console_io
+APP_UTILS_LIBS += app_utils_file_io
 APP_UTILS_LIBS += app_utils_ipc
 APP_UTILS_LIBS += app_utils_remote_service
 APP_UTILS_LIBS += app_utils_udma

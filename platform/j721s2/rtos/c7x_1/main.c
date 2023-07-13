@@ -316,6 +316,12 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
+    retVal = Mmu_map(APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_SIZE, &attrs, is_secure);
+    if(retVal == FALSE)
+    {
+        goto mmu_exit;
+    }
+
     retVal = Mmu_map(TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, &attrs, is_secure);
     if(retVal == FALSE)
     {

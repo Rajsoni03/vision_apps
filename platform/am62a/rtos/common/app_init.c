@@ -72,6 +72,7 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/file_io/include/app_fileio.h>
 #include <utils/console_io/include/app_cli.h>
 #include <utils/misc/include/app_misc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
@@ -120,6 +121,11 @@
 
 app_log_shared_mem_t g_app_log_shared_mem
 __attribute__ ((section(".bss:app_log_mem")))
+__attribute__ ((aligned(4096)))
+        ;
+
+app_fileio_shared_mem_t g_app_fileio_shared_mem
+__attribute__ ((section(".bss:app_fileio_mem")))
 __attribute__ ((aligned(4096)))
         ;
 
@@ -197,6 +203,7 @@ int32_t appInit()
     int32_t status = 0;
     app_mem_init_prm_t mem_init_prm;
     app_log_init_prm_t log_init_prm;
+    app_fileio_init_prm_t fileio_init_prm;
     app_ipc_init_prm_t ipc_init_prm;
 
     app_mem_heap_prm_t *heap_prm;
@@ -220,6 +227,7 @@ int32_t appInit()
 
     appMemInitPrmSetDefault(&mem_init_prm);
     appLogInitPrmSetDefault(&log_init_prm);
+    appFileIOInitPrmSetDefault(&fileio_init_prm);
     appIpcInitPrmSetDefault(&ipc_init_prm);
 
     mem_init_prm.virtToPhyFxn = appUdmaVirtToPhyAddrConversion;
@@ -305,6 +313,7 @@ int32_t appInit()
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_C7x_1;
     ipc_init_prm.num_cpus++;
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
     #endif
     ipc_init_prm.tiovx_obj_desc_mem = (void*)g_tiovx_obj_desc_mem;
     ipc_init_prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_SHARED_MEM_SIZE;
@@ -339,6 +348,10 @@ int32_t appInit()
     log_init_prm.device_write = appLogDeviceWrite;
     #endif
 
+    fileio_init_prm.shared_mem = &g_app_fileio_shared_mem;
+    fileio_init_prm.self_cpu_index = ipc_init_prm.self_cpu_id;
+    strncpy(fileio_init_prm.self_cpu_name, log_init_prm.self_cpu_name, APP_LOG_MAX_CPU_NAME);
+
     appPerfStatsInit();
 
     #ifdef ENABLE_UART
@@ -348,6 +361,11 @@ int32_t appInit()
 
     status = appLogWrInit(&log_init_prm);
     APP_ASSERT_SUCCESS(status);
+
+    #if defined(CPU_c7x_1)
+    status = appFileIOWrInit(&fileio_init_prm);
+    APP_ASSERT_SUCCESS(status);
+    #endif
 
     #ifdef ENABLE_PRINTF_REDIRECT
     status = appLogCioInit();
@@ -516,6 +534,9 @@ void appDeInit()
     appLogCioDeInit();
     #endif
     appLogWrDeInit();
+    #if defined(CPU_c7x_1)
+    appFileIOWrDeInit();
+    #endif
     #ifdef ENABLE_UART
     appLogRdDeInit();
     appCliDeInit();

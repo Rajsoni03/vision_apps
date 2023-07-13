@@ -66,6 +66,7 @@
 #include <pthread.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/file_io/include/app_fileio.h>
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
@@ -132,6 +133,7 @@ static int32_t appCommonInitLocal()
 {
     int32_t status = 0;
     app_log_init_prm_t log_init_prm;
+    app_fileio_init_prm_t fileio_init_prm;
     app_ipc_init_prm_t ipc_init_prm;
     app_remote_service_init_prms_t remote_service_init_prm;
 
@@ -154,6 +156,19 @@ static int32_t appCommonInitLocal()
     {
         printf("APP: ERROR: Log writer init failed !!!\n");
     }
+    
+    appFileIOInitPrmSetDefault(&fileio_init_prm);
+
+    fileio_init_prm.shared_mem = (app_fileio_shared_mem_t *)APP_FILEIO_MEM_ADDR;
+    fileio_init_prm.self_cpu_index = APP_IPC_CPU_MPU1_0;
+    strncpy(fileio_init_prm.self_cpu_name, "MPU1_0", APP_LOG_MAX_CPU_NAME);
+
+    status = appFileIOWrInit(&fileio_init_prm);
+    if(status!=0)
+    {
+        printf("APP: ERROR: File IO writer init failed !!!\n");
+    }
+
     if(status==0)
     {
         status = appMemInit(NULL);
