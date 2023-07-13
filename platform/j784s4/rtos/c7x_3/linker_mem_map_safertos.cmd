@@ -78,6 +78,8 @@ MEMORY
     APP_LOG_MEM                       : ORIGIN = 0xAF000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
+    /* Memory for remote core file operations [ size  4.00 MB ] */
+    APP_FILEIO_MEM                    : ORIGIN = 0xB3000000 , LENGTH = 0x00400000
     /* DDR for C7x_3 for Linux IPC [ size 1024.00 KB ] */
     DDR_C7x_3_IPC            ( RWIX ) : ORIGIN = 0xBA000000 , LENGTH = 0x00100000
     /* DDR for C7x_3 for Linux resource table [ size 1024 B ] */

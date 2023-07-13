@@ -192,8 +192,12 @@ tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
 tiovx_obj_desc_mem_size = 16*MB - app_log_mem_size;
 carveout_size += tiovx_obj_desc_mem_size
 
-tiovx_log_rt_mem_addr   = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
-tiovx_log_rt_mem_size   = 16*MB;
+app_fileio_mem_addr        = tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
+app_fileio_mem_size        = 4*MB;
+carveout_size += app_fileio_mem_size
+
+tiovx_log_rt_mem_addr   = app_fileio_mem_addr + app_fileio_mem_size;
+tiovx_log_rt_mem_size   = 16*MB - app_fileio_mem_size;
 carveout_size += tiovx_log_rt_mem_size
 
 # Shared memory for Buffers/ION allocator
@@ -296,6 +300,7 @@ optee_mem          = MemSection("OPTEE_MEM"        , "", optee_addr       , opte
 # Shared memory memory sections in DDR
 app_log_mem            = MemSection("APP_LOG_MEM"        , "", app_log_mem_addr       , app_log_mem_size       , "Memory for remote core logging");
 tiovx_obj_desc_mem     = MemSection("TIOVX_OBJ_DESC_MEM" , "", tiovx_obj_desc_mem_addr, tiovx_obj_desc_mem_size, "Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent");
+app_fileio_mem        = MemSection("APP_FILEIO_MEM"        , "", app_fileio_mem_addr       , app_fileio_mem_size       , "Memory for remote core file operations");
 tiovx_log_rt_mem     = MemSection("TIOVX_LOG_RT_MEM" , "", tiovx_log_rt_mem_addr, tiovx_log_rt_mem_size, "Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent");
 
 ipc_vring_mem      = MemSection("IPC_VRING_MEM"     , "", ipc_vring_mem_addr     , ipc_vring_mem_size     , "Memory for IPC Vring's. MUST be non-cached or cache-coherent");
@@ -307,6 +312,7 @@ ipc_vring_mem.setOriginTag(False);
 edgeai_ddr_total  = MemSection("DDR_EDGEAI_DTS", "", 0                      , 0                      , "DDR for EdgeAI for all sections, used for reserving memory in DTS file");
 edgeai_ddr_total.concat(app_log_mem);
 edgeai_ddr_total.concat(tiovx_obj_desc_mem);
+edgeai_ddr_total.concat(app_fileio_mem);
 edgeai_ddr_total.concat(tiovx_log_rt_mem);
 edgeai_ddr_total.setDtsName("edgeai_memory_region", "edgeai-dma-memory");
 
@@ -339,6 +345,7 @@ mcu_r5f_mmap.addMemSection( mcu_r5f_ddr_ipc_tracebuf  );
 mcu_r5f_mmap.addMemSection( mcu_r5f_ddr           );
 mcu_r5f_mmap.addMemSection( app_log_mem          );
 mcu_r5f_mmap.addMemSection( tiovx_obj_desc_mem   );
+mcu_r5f_mmap.addMemSection( app_fileio_mem          );
 mcu_r5f_mmap.addMemSection( ipc_vring_mem        );
 mcu_r5f_mmap.addMemSection( mcu_r5f_ddr_local_heap  );
 mcu_r5f_mmap.addMemSection( ddr_shared_mem       );
@@ -355,6 +362,7 @@ dm_r5f_mmap.addMemSection( dm_r5f_ddr_ipc_tracebuf  );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr           );
 dm_r5f_mmap.addMemSection( app_log_mem          );
 dm_r5f_mmap.addMemSection( tiovx_obj_desc_mem   );
+dm_r5f_mmap.addMemSection( app_fileio_mem          );
 dm_r5f_mmap.addMemSection( ipc_vring_mem        );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr_local_heap  );
 dm_r5f_mmap.addMemSection( ddr_shared_mem       );
@@ -372,6 +380,7 @@ c7x_1_mmap.addMemSection( c7x_1_ddr_vecs     );
 c7x_1_mmap.addMemSection( c7x_1_ddr          );
 c7x_1_mmap.addMemSection( app_log_mem        );
 c7x_1_mmap.addMemSection( tiovx_obj_desc_mem );
+c7x_1_mmap.addMemSection( app_fileio_mem        );
 c7x_1_mmap.addMemSection( ipc_vring_mem      );
 c7x_1_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable  );
 c7x_1_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable  );
@@ -410,6 +419,7 @@ html_mmap.addMemSection( atf_mem      );
 html_mmap.addMemSection( optee_mem      );
 html_mmap.addMemSection( app_log_mem        );
 html_mmap.addMemSection( tiovx_obj_desc_mem );
+html_mmap.addMemSection( app_fileio_mem        );
 html_mmap.addMemSection( ipc_vring_mem      );
 html_mmap.addMemSection( ddr_shared_mem     );
 html_mmap.addMemSection( tiovx_log_rt_mem );
@@ -435,6 +445,7 @@ c_header_mmap.addMemSection( c7x_1_ddr_scratch);
 c_header_mmap.addMemSection( tiovx_log_rt_mem );
 c_header_mmap.addMemSection( app_log_mem        );
 c_header_mmap.addMemSection( tiovx_obj_desc_mem );
+c_header_mmap.addMemSection( app_fileio_mem        );
 c_header_mmap.addMemSection( ipc_vring_mem      );
 c_header_mmap.addMemSection( ddr_shared_mem     );
 c_header_mmap.checkOverlap();

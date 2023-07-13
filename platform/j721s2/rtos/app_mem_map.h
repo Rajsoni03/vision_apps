@@ -155,9 +155,13 @@
 #define TIOVX_OBJ_DESC_MEM_ADDR (0xAA040000u)
 #define TIOVX_OBJ_DESC_MEM_SIZE (0x03FC0000u)
 
-/* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-#define TIOVX_LOG_RT_MEM_ADDR (0xAE000000u)
-#define TIOVX_LOG_RT_MEM_SIZE (0x02000000u)
+/* Memory for remote core file operations [ size  4.00 MB ] */
+#define APP_FILEIO_MEM_ADDR (0xAE000000u)
+#define APP_FILEIO_MEM_SIZE (0x00400000u)
+
+/* Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent [ size 28.00 MB ] */
+#define TIOVX_LOG_RT_MEM_ADDR (0xAE400000u)
+#define TIOVX_LOG_RT_MEM_SIZE (0x01C00000u)
 
 /* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
 #define DDR_C7x_1_IPC_ADDR (0xB0000000u)

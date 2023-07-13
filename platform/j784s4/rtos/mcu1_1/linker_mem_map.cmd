@@ -84,10 +84,10 @@ MEMORY
     IPC_VRING_MEM                     : ORIGIN = 0xAC000000 , LENGTH = 0x03000000
     /* Memory for remote core logging [ size 256.00 KB ] */
     APP_LOG_MEM                       : ORIGIN = 0xAF000000 , LENGTH = 0x00040000
+    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
-    APP_FILEIO_MEM                    : ORIGIN = 0xAF040000 , LENGTH = 0x00400000
-    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 59.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF440000 , LENGTH = 0x03BC0000
+    APP_FILEIO_MEM                    : ORIGIN = 0xB3000000 , LENGTH = 0x00400000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* DDR for MCU1_1 for local heap [ size  8.00 MB ] */

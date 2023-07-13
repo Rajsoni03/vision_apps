@@ -171,7 +171,7 @@ __attribute__ ((aligned(4096)))
 app_fileio_shared_mem_t g_app_fileio_shared_mem
 __attribute__ ((section(".bss:app_fileio_mem")))
 __attribute__ ((aligned(4096)))
-        ; /* TODO_TR : Define bss section in all linker files */
+        ;
 
 uint8_t g_tiovx_obj_desc_mem[TIOVX_OBJ_DESC_MEM_SIZE]
 __attribute__ ((section(".bss:tiovx_obj_desc_mem")))

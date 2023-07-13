@@ -88,6 +88,8 @@ MEMORY
     APP_LOG_MEM                       : ORIGIN = 0xA1000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 15.75 MB ] */
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA1040000 , LENGTH = 0x00FC0000
+    /* Memory for remote core file operations [ size  4.00 MB ] */
+    APP_FILEIO_MEM                    : ORIGIN = 0xA2000000 , LENGTH = 0x00400000
     /* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0B000000
     /* DDR for DM R5F for local heap [ size 16.00 MB ] */
