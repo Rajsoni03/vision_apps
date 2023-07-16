@@ -7,6 +7,9 @@ TARGETTYPE  := exe
 TARGET      := vx_app_arm_remote_log
 CSOURCES    := $(call all-c-files)
 
+ifeq ($(TARGET_OS), $(filter $(TARGET_OS), QNX))
+DEFS += QNX
+endif
 include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 include $(FINALE)

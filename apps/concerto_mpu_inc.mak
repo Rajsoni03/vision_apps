@@ -45,8 +45,6 @@ endif
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos/common
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos
 
-IDIRS       += $(APP_UTILS_PATH)/utils/file_io/include
-
 # These rpath-link linker options are to provide directories for
 # secondary *.so file lookup
 ifeq ($(TARGET_OS),LINUX)
@@ -152,7 +150,9 @@ endif
 VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_ipc
 VISION_APPS_UTILS_LIBS += app_utils_console_io
+ifneq ($(TARGET_OS),QNX)
 VISION_APPS_UTILS_LIBS += app_utils_file_io
+endif
 VISION_APPS_UTILS_LIBS += app_utils_remote_service
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 
