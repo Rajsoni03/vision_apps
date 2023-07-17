@@ -96,6 +96,10 @@
 #include <tsn_gptp/gptp_config.h>
 #endif
 
+#if defined(ETHAPP_ENABLE_IPERF_SERVER)
+#include "examples/lwiperf/lwiperf_example.h"
+#endif
+
 #if defined (SYSBIOS)
 
 #include <utils/ethfw_callbacks/include/ethfw_callbacks_nimu.h>

@@ -117,8 +117,8 @@ ADDITIONAL_STATIC_LIBS += tsn_unibase.aer5f
 endif
 
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
-	ADDITIONAL_STATIC_LIBS += lwipstack_$(RTOS_LC).aer5f
 	ADDITIONAL_STATIC_LIBS += lwipcontrib_$(RTOS_LC).aer5f
+	ADDITIONAL_STATIC_LIBS += lwipstack_$(RTOS_LC).aer5f
 	ADDITIONAL_STATIC_LIBS += lwipport_$(RTOS_LC).aer5f
 	ADDITIONAL_STATIC_LIBS += lwipif_$(RTOS_LC).aer5f
 	ADDITIONAL_STATIC_LIBS += lwipific_$(RTOS_LC).aer5f

@@ -642,6 +642,11 @@ static void EthApp_initLwip(void *arg)
     /* init network interfaces */
     EthApp_initNetif();
 
+#if defined(ETHAPP_ENABLE_IPERF_SERVER)
+    /* Enable iperf */
+    lwiperf_example_init();
+#endif
+
     sys_sem_signal(initSem);
 }
 
