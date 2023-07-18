@@ -19,7 +19,7 @@ IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/host
 IDIRS       += $(TIADALG_PATH)/include
 IDIRS       += $(IVISION_PATH)
-IDIRS       += $(TIDL_PATH)/ti_dl/inc
+IDIRS       += $(TIDL_PATH)/arm-tidl/rt/inc
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 IDIRS       += $(VXLIB_PATH)/packages
 
