@@ -509,14 +509,11 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
     OMX_U32 i;
     OMX_ERRORTYPE omxErr = OMX_ErrorNone;
     app_omax_wrapper_obj_t* p_omax_pipe_obj = &g_app_omax_wrapper_obj;
-#if !defined(CODEC_USE_HIGHMEM)
     OMX_U8 *pBuffer;
-#endif /* CODEC_USE_HIGHMEM */
 
     pthread_mutex_lock(&encH->mutex);
     if(p_omax_pipe_obj->params.appEncode == 1 && p_omax_pipe_obj->params.appDecode == 0)
     {
-    #if !defined(CODEC_USE_HIGHMEM)
         /* Allocate input port buffers */
         WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers using %u input buffers of %u size",
                 encH->nInputBufs, encH->inputPortBufSize);
@@ -548,35 +545,6 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                 encH->inputBufHdrList[i] = pBufHdr;
             }
         }
-    #else
-        /* Allocate input port buffers */
-        WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating %u input buffers of %u size",
-                    encH->nInputBufs, encH->inputPortBufSize);
-
-        for(i = 0; i < encH->nInputBufs; i++)
-        {
-            /* Buffers are allocated by MMF and shared with component */
-            OMX_BUFFERHEADERTYPE *pBufHdr = NULL;
-            omxErr = OMX_AllocateBuffer(encH->compHandle,
-                    &pBufHdr,
-                    encH->inPortIndex,
-                    NULL,
-                    encH->inputPortBufSize);
-            if(omxErr != OMX_ErrorNone)
-            {
-                WRAPPER_ERROR("\nOmxilEnc=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
-                pthread_mutex_unlock(&encH->mutex);
-                return omxErr;
-            }
-            else
-            {
-                WRAPPER_PRINTF("\nOmxilEnc=> %s:%d  Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
-                        i, encH->compHandle, encH->inPortIndex, pBufHdr, pBufHdr->pBuffer, encH->inputPortBufSize);
-                encH->inputBufHdrList[i] = pBufHdr;
-                OMAX_qPush(encH, omxil_true_e, i);
-            }
-        }
-    #endif /* CODEC_USE_HIGHMEM */
         
         /* Allocate output port buffers */
         WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating %u output buffers of %u size",
@@ -635,7 +603,6 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
             }
         }
         
-    #if !defined(CODEC_USE_HIGHMEM)
         /* Allocate output port buffers */
         WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers using %u output buffers of %u size",
                     encH->nOutputBufs, encH->outputPortBufSize);
@@ -669,35 +636,6 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                 OMAX_qPush(encH, omxil_false_e, i);
             }
         }
-    #else
-        /* Allocate output port buffers */
-        WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers using %u output buffers of %u size",
-                    encH->nOutputBufs, encH->outputPortBufSize);
-
-        for(i = 0; i < encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS; i++)
-        {
-            /* Buffers are allocated by MMF and shared with component */
-            OMX_BUFFERHEADERTYPE *pBufHdr = NULL;
-            omxErr = OMX_AllocateBuffer(encH->compHandle,
-                    &pBufHdr,
-                    encH->outPortIndex,
-                    NULL,
-                    encH->outputPortBufSize);
-            if(omxErr != OMX_ErrorNone)
-            {
-                WRAPPER_ERROR("\nOmxilDec=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
-                pthread_mutex_unlock(&encH->mutex);
-                return omxErr;
-            }
-            else
-            {
-                WRAPPER_PRINTF("\nOmxilDec=> %s:%d Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
-                        i, encH->compHandle, encH->outPortIndex, pBufHdr, pBufHdr->pBuffer, pBufHdr->nAllocLen);
-                encH->outputBufHdrList[i] = pBufHdr;
-                OMAX_qPush(encH, omxil_false_e, i);
-            }
-        }
-    #endif /* CODEC_USE_HIGHMEM */
 
         /* Allocate extra output port buffers for OMAX decode */
         WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers allocating an extra %u output buffers of %u size",
@@ -1838,7 +1776,6 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
 
         for (uint8_t idx = 0; idx < p_omax_pipe_obj->params.in_buffer_depth && status==0; idx++)
         {
-        #if !defined(CODEC_USE_HIGHMEM)
             /* Allocate the input buffer pointers. */
             void *pointer = data_ptr[idx][ch][0];
             off64_t offset = 0;
@@ -1857,7 +1794,6 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
             p_omax_pipe_obj->compHandleArray[ch].input_bufs[idx]->size = p_omax_pipe_obj->compHandleArray[ch].frame_size;
             p_omax_pipe_obj->compHandleArray[ch].input_bufs[idx]->offset = offset;
             WRAPPER_PRINTF("\nGet frame size for input_bufs[%d][%d]: %d, %p, %lx", ch, idx, p_omax_pipe_obj->compHandleArray[ch].frame_size, pointer, offset);
-        #endif
             p_omax_pipe_obj->compHandleArray[ch].inBufEmpty[idx] = omxil_true_e;
         }
     }
@@ -1964,7 +1900,6 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
 
         for (uint8_t idx = 0; idx < p_omax_pipe_obj->params.out_buffer_depth && status==0; idx++)
         {
-        #if !defined(CODEC_USE_HIGHMEM)
             void *pointer = data_ptr[idx][ch][0];
             off64_t offset = 0;
 
@@ -1984,7 +1919,6 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
             
             p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]->offset = offset;
             WRAPPER_PRINTF("\nGet frame size for ch = %d output_bufs[%d]: %d, %p, %lx", ch, idx,  p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]->size, pointer, offset);
-        #endif
             p_omax_pipe_obj->compHandleArray[ch].outBufFull[idx] = omxil_false_e;
             p_omax_pipe_obj->compHandleArray[ch].inBufEmpty[idx] = omxil_true_e;
         }
@@ -2066,14 +2000,7 @@ int32_t appOMXEnqAppEnc(uint8_t idx)
             p_omax_pipe_obj->compHandleArray[ch].input_frame_cnt++;
         }
         if (buffer != NULL)
-        {
-        #if defined(CODEC_USE_HIGHMEM)
-            /* Copy low mem output buffer to high mem input buffer */
-            void *pointer = p_omax_pipe_obj->pdataPtr[idx][ch][0];
-            WRAPPER_PRINTF("\nOmxilEnc=> Copy low mem output buffer to high mem input buffer=> low mem src=0x%p, high mem dest=0x%p, size %u", pointer, buffer->pBuffer, p_omax_pipe_obj->compHandleArray[ch].frame_size);
-            memcpy(buffer->pBuffer, pointer, p_omax_pipe_obj->compHandleArray[ch].frame_size);
-        #endif
-            
+        {            
             p_omax_pipe_obj->compHandleArray[ch].inBufEmpty[idx] = omxil_false_e;
 
             WRAPPER_PRINTF("\nOmxilEnc=> OMX_EmptyThisBuffer: %s:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
@@ -2285,16 +2212,14 @@ int32_t appOMXDeqAppDec(uint8_t idx)
 
             OmxilBuffer_t* tempBuffer = p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx];
             p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx] = p_omax_pipe_obj->compHandleArray[ch].output_bufs[index];
-            p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx] = tempBuffer;
+            p_omax_pipe_obj->compHandleArray[ch].output_bufs[index] = tempBuffer;
 
-        #if defined(SOC_J721E)
             for (uint8_t numPlanes = 0; numPlanes < p_omax_pipe_obj->params.out_num_planes; numPlanes++)
             {
                 void * tempPtr = p_omax_pipe_obj->pdataPtr[idx][ch][numPlanes];
                 p_omax_pipe_obj->pdataPtr[idx][ch][numPlanes] = p_omax_pipe_obj->pdataPtr[index][ch][numPlanes];
                 p_omax_pipe_obj->pdataPtr[index][ch][numPlanes] = tempPtr;
             }
-        #endif /* SOC_J721E */
 
             for (uint8_t qIdx = p_omax_pipe_obj->compHandleArray[ch].qOutputBufReturnFirstIdx; qIdx < p_omax_pipe_obj->compHandleArray[ch].qOutputBufReturnLastIdx; qIdx++)
             {
@@ -2311,18 +2236,6 @@ int32_t appOMXDeqAppDec(uint8_t idx)
 
             p_omax_pipe_obj->compHandleArray[ch].sentOutBuf[idx] = omxil_true_e;
         }
-
-        #if defined(CODEC_USE_HIGHMEM)
-            OMX_BUFFERHEADERTYPE *buffer = NULL;
-            buffer = p_omax_pipe_obj->compHandleArray[ch].outputBufHdrList[idx];
-            if (buffer != NULL)
-            {
-                /* Copy high mem output buffer to low mem input buffer */
-                void *pointer = p_omax_pipe_obj->pdataPtr[idx][ch][0];
-                WRAPPER_PRINTF("\nOmxilEnc=> Copy high mem output buffer to low mem input buffer=> high mem src=0x%p, low mem dest=0x%p, size %u", buffer->pBuffer, pointer, p_omax_pipe_obj->compHandleArray[ch].frame_size);
-                memcpy(pointer, buffer->pBuffer, p_omax_pipe_obj->compHandleArray[ch].frame_size);
-            }
-        #endif
     }
 
     WRAPPER_PRINTF("\nOMAX Decode Dequeue idx=%d ... Done\n", idx);
@@ -2436,12 +2349,10 @@ void appOMXDeInit()
     {
         for (uint8_t ch = 0; ch < p_omax_pipe_obj->params.out_num_channels; ch++)
         {
-        #if !defined(CODEC_USE_HIGHMEM)
             for (uint8_t idx = 0; idx < p_omax_pipe_obj->params.out_buffer_depth; idx++)
             {
                 free(p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]);
             }
-        #endif
             free(p_omax_pipe_obj->compHandleArray[ch].large_input_buf);
         }
     }
