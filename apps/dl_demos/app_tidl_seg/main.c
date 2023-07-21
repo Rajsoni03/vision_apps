@@ -866,7 +866,6 @@ static vx_status app_create_graph(AppObj *obj)
 
     tivxSetNodeParameterNumBufByIndex(obj->preProcObj.node, 2, 2);
 
-    tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 4, 2);
     tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 7, 2);
 
     tivxSetNodeParameterNumBufByIndex(obj->postProcObj.node, 4, 2);

@@ -1010,10 +1010,6 @@ static vx_status app_create_graph(AppObj *obj)
         }
         if(status == VX_SUCCESS)
         {
-            status = tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 4, APP_BUFFER_Q_DEPTH);
-        }
-        if(status == VX_SUCCESS)
-        {
             status = tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 7, APP_BUFFER_Q_DEPTH);
         }
         if(status == VX_SUCCESS)

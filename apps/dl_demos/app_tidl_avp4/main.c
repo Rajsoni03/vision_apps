@@ -1498,7 +1498,6 @@ static vx_status app_create_graph(AppObj *obj)
 
         if(obj->enable_tidl == 1)
         {
-            tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 4, APP_BUFFER_Q_DEPTH);
             tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 7, APP_BUFFER_Q_DEPTH);
         }
 

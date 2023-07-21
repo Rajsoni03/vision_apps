@@ -1241,10 +1241,6 @@ static vx_status app_create_graph(AppObj *obj)
     {
         if(status == VX_SUCCESS)
         {
-            status = tivxSetNodeParameterNumBufByIndex(obj->odTIDLObj.node, 4, 4);
-        }
-        if(status == VX_SUCCESS)
-        {
             status = tivxSetNodeParameterNumBufByIndex(obj->odTIDLObj.node, 7, 4);
         }
     }
@@ -1253,20 +1249,12 @@ static vx_status app_create_graph(AppObj *obj)
     {
         if(status == VX_SUCCESS)
         {
-            status = tivxSetNodeParameterNumBufByIndex(obj->pcTIDLObj.node, 4, 4);
-        }
-        if(status == VX_SUCCESS)
-        {
             status = tivxSetNodeParameterNumBufByIndex(obj->pcTIDLObj.node, 7, 2);
         }
     }
 
     if((obj->enable_psd == 1) || (obj->enable_vd == 1))
     {
-        if(status == VX_SUCCESS)
-        {
-            status = tivxSetNodeParameterNumBufByIndex(obj->odPostProcObj.node, 4, 2);
-        }
         if(status == VX_SUCCESS)
         {
             status = tivxSetNodeParameterNumBufByIndex(obj->odPostProcObj.node, 5, 2);

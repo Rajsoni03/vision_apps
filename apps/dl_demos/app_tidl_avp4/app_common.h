@@ -64,7 +64,10 @@
 
 #include "app_modules.h"
 
-//#define APP_DEBUG
+// #undef APP_DEBUG
+// #undef APP_PRINTF
+
+// #define APP_DEBUG
 //#define APP_WRITE_INTERMEDIATE_OUTPUTS
 
 #define APP_TIVX_LOG_RT_ENABLE
