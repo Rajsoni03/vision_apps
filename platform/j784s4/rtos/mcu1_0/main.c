@@ -135,6 +135,12 @@ int main(void)
     memcpy((void *)0x0, (void *)_freertosresetvectors, 0x40);
 #endif
 
+#if defined SAFERTOS
+    /* Relocate SafeRTOS Reset Vectors from BTCM*/
+    void _axSafeRTOSresetVectors (void);
+    memcpy((void *)0x0, (void *)_axSafeRTOSresetVectors, 0x40);
+#endif
+
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
 
