@@ -500,7 +500,7 @@ static vx_status VX_CALLBACK tivxKernelImgMosaicMscCreate(
             for (i = 0u; i < msc_obj->max_msc_instances; i ++)
             {
                 /* MSC driver delete */
-                status = tivxKernelImgMosaicMscDrvDelete(
+                status |= tivxKernelImgMosaicMscDrvDelete(
                     &msc_obj->inst_obj[i]);
             }
 
