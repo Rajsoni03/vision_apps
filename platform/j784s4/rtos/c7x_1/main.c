@@ -306,18 +306,18 @@ void appMmuMap(Bool is_secure)
     }
 
     /*-------------------------------------------------------*/
-    /* Cachable region memory attributes                     */
+    /* Cacheable region memory attributes                     */
     /*-------------------------------------------------------*/
 
     attrs.attrIndx = Mmu_AttrIndx_MAIR7;
 
-    retVal = Mmu_map(0x80000000U, 0x80000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
+    retVal = Mmu_map(0x80000000U, 0x80000000U, 0x20000000U, &attrs, is_secure); /* DRR - Marking DDR region as cacheable */
     if(retVal == FALSE)
     {
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(0xA0000000U, 0xA0000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
+    retVal = Mmu_map(0xA0000000U, 0xA0000000U, 0x20000000U, &attrs, is_secure); /* DRR - Marking DDR region as cacheable */
     if(retVal == FALSE)
     {
         goto mmu_exit;
