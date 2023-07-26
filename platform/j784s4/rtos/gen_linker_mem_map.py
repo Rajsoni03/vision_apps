@@ -1218,6 +1218,24 @@ html_mmap.addMemSection( c7x_4_3_ddr_local_heap         );
 html_mmap.addMemSection( c7x_4_3_ddr_scratch_non_cacheable );
 html_mmap.addMemSection( c7x_4_3_ddr_scratch );
 html_mmap.addMemSection( c7x_4_ddr         );
+
+html_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable_phys         );
+html_mmap.addMemSection( c7x_1_ddr_local_heap_phys         );
+html_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable_phys );
+html_mmap.addMemSection( c7x_1_ddr_scratch_phys );
+html_mmap.addMemSection( c7x_2_ddr_local_heap_non_cacheable_phys         );
+html_mmap.addMemSection( c7x_2_ddr_local_heap_phys         );
+html_mmap.addMemSection( c7x_2_ddr_scratch_non_cacheable_phys );
+html_mmap.addMemSection( c7x_2_ddr_scratch_phys );
+html_mmap.addMemSection( c7x_3_ddr_local_heap_non_cacheable_phys         );
+html_mmap.addMemSection( c7x_3_ddr_local_heap_phys         );
+html_mmap.addMemSection( c7x_3_ddr_scratch_non_cacheable_phys );
+html_mmap.addMemSection( c7x_3_ddr_scratch_phys );
+html_mmap.addMemSection( c7x_4_ddr_local_heap_non_cacheable_phys         );
+html_mmap.addMemSection( c7x_4_ddr_local_heap_phys         );
+html_mmap.addMemSection( c7x_4_ddr_scratch_non_cacheable_phys );
+html_mmap.addMemSection( c7x_4_ddr_scratch_phys );
+
 html_mmap.addMemSection( app_log_mem        );
 html_mmap.addMemSection( tiovx_obj_desc_mem );
 html_mmap.addMemSection( app_fileio_mem        );
