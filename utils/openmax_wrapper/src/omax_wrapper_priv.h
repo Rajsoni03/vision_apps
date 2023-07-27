@@ -85,11 +85,9 @@
 #if defined(SOC_J721E)
 #define OMAX_DEFAULT_RATE_CONTROL_MODE   OMX_Video_ControlRateConstant  //Other option: OMX_Video_ControlRateVariable
 #define OMAX_DEFAULT_BUFFER_SIZE         (10*1024*1024)
-#define OMAX_DEC_EXTRA_OUT_BUFFERS       0
 #else
 #define OMAX_DEFAULT_RATE_CONTROL_MODE   OMX_Video_ControlRateVariable  //Other option: OMX_Video_ControlRateConstant
 #define OMAX_DEFAULT_BUFFER_SIZE         (2*1024*1024)
-#define OMAX_DEC_EXTRA_OUT_BUFFERS       0
 #define OMAX_DEC_CUSTOM_IN_BUFFERS       2
 #endif /* SOC_J721E */
 

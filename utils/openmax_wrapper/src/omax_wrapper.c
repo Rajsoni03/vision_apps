@@ -607,7 +607,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
         WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers using %u output buffers of %u size",
                     encH->nOutputBufs, encH->outputPortBufSize);
 
-        for(i = 0; i < encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS; i++)
+        for(i = 0; i < encH->nOutputBufs; i++)
         {
             /* Buffers are allocated by MMF and shared with component */
             OmxilBuffer_t *pBuf = encH->output_bufs[i];
@@ -634,34 +634,6 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                 pBufHdr->pAppPrivate = (OMX_PTR)pBuf->addr;
                 encH->outputBufHdrList[i] = pBufHdr;
                 OMAX_qPush(encH, omxil_false_e, i);
-            }
-        }
-
-        /* Allocate extra output port buffers for OMAX decode */
-        WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers allocating an extra %u output buffers of %u size",
-                    OMAX_DEC_EXTRA_OUT_BUFFERS, encH->outputPortBufSize);
-
-        for(i = 0; i < OMAX_DEC_EXTRA_OUT_BUFFERS; i++)
-        {
-            /* Buffers are allocated by MMF and shared with component */
-            OMX_BUFFERHEADERTYPE *pBufHdr = NULL;
-            omxErr = OMX_AllocateBuffer(encH->compHandle,
-                    &pBufHdr,
-                    encH->outPortIndex,
-                    NULL,
-                    encH->outputPortBufSize);
-            if(omxErr != OMX_ErrorNone)
-            {
-                WRAPPER_ERROR("\nOmxilDec=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
-                pthread_mutex_unlock(&encH->mutex);
-                return omxErr;
-            }
-            else
-            {
-                WRAPPER_PRINTF("\nOmxilDec=> %s:%d  Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
-                        (encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS + i), encH->compHandle, encH->outPortIndex, pBufHdr, pBufHdr->pBuffer, encH->outputPortBufSize);
-                encH->outputBufHdrList[(encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS + i)] = pBufHdr;
-                OMAX_qPush(encH, omxil_false_e, (encH->nOutputBufs - OMAX_DEC_EXTRA_OUT_BUFFERS + i));
             }
         }
     }
@@ -1835,7 +1807,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
         p_omax_pipe_obj->compHandleArray[ch].frame_rate = OMAX_DEFAULT_FRAME_RATE;
         p_omax_pipe_obj->compHandleArray[ch].frame_duration = 33333;
 
-        p_omax_pipe_obj->compHandleArray[ch].output_buf_num = p_omax_pipe_obj->params.out_buffer_depth + OMAX_DEC_EXTRA_OUT_BUFFERS;
+        p_omax_pipe_obj->compHandleArray[ch].output_buf_num = p_omax_pipe_obj->params.out_buffer_depth;
     #if defined(SOC_J721E)
         p_omax_pipe_obj->compHandleArray[ch].input_buf_num = p_omax_pipe_obj->params.in_buffer_depth;
     #else
@@ -2000,7 +1972,7 @@ int32_t appOMXEnqAppEnc(uint8_t idx)
             p_omax_pipe_obj->compHandleArray[ch].input_frame_cnt++;
         }
         if (buffer != NULL)
-        {            
+        {
             p_omax_pipe_obj->compHandleArray[ch].inBufEmpty[idx] = omxil_false_e;
 
             WRAPPER_PRINTF("\nOmxilEnc=> OMX_EmptyThisBuffer: %s:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
