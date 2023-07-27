@@ -100,6 +100,10 @@ static int32_t appMemAllocFailTest(bool verbose)
         printf("APP_MEM: ERROR: Expecting failure but got success.\n");
         status = -1;
     }
+    else
+    {
+        printf("APP_MEM: Negative test passed.\n");
+    }
 
     return status;
 }
