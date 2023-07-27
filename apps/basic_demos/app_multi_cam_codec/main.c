@@ -104,6 +104,8 @@
 #define CAPTURE_PIPELINE_DEPTH   (5)
 #define DISPLAY_PIPELINE_DEPTH   (2)
 
+// #define DEC_WRITE_TO_FILE
+
 typedef struct {
 
     vx_object_array arr[APP_MODULES_MAX_BUFQ_DEPTH];
@@ -210,7 +212,12 @@ static void set_img_mosaic_params(TIOVXImgMosaicModuleObj *imgMosaicObj, vx_uint
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels);
 static vx_status unmap_vx_object_arr(vx_object_array in_arr, vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels);
 static vx_status capture_encode(AppObj* obj, vx_int32 frame_id);
+#if defined(DEC_WRITE_TO_FILE)
+static vx_status decode_display(AppObj* obj, vx_int32 frame_id, FILE *fp);
+static vx_status write_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], FILE *fp);
+#else
 static vx_status decode_display(AppObj* obj, vx_int32 frame_id);
+#endif
 #if defined(LINUX)
 static vx_status delete_array_image_buffers(vx_object_array arr);
 #endif
@@ -1438,7 +1445,11 @@ static vx_status app_verify_graph(AppObj *obj)
     return status;
 }
 
+#if defined(DEC_WRITE_TO_FILE)
+static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 frame_id, FILE *fp)
+#else
 static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 frame_id)
+#endif
 {
     vx_status status = VX_SUCCESS;
 
@@ -1454,13 +1465,21 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         /* dec_pool buffer recycling */
         if (status==VX_SUCCESS && (obj->decode==1) && frame_id>=obj->dec_pool.bufq_depth)
         {
+        #if defined(DEC_WRITE_TO_FILE)
+            status = decode_display(obj,frame_id-obj->dec_pool.bufq_depth, fp);
+        #else
             status = decode_display(obj,frame_id-obj->dec_pool.bufq_depth);
+        #endif
         }
     #else
         /* dec_pool buffer recycling */
         if (status==VX_SUCCESS && (obj->decode==1) && frame_id>=obj->enc_pool.bufq_depth)
         {
+        #if defined(DEC_WRITE_TO_FILE)
+            status = decode_display(obj,frame_id-obj->enc_pool.bufq_depth, fp);
+        #else
             status = decode_display(obj,frame_id-obj->enc_pool.bufq_depth);
+        #endif
         }
     #endif
 
@@ -1532,7 +1551,11 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
     return status;
 }
 
+#if defined(DEC_WRITE_TO_FILE)
+static vx_status decode_display(AppObj* obj, vx_int32 frame_id, FILE *fp)
+#else
 static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
+#endif
 {
     APP_PRINTF("\ndecode_display: frame %d beginning\n", frame_id);
     vx_status status = VX_SUCCESS;
@@ -1629,6 +1652,9 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
         }
         if (status == VX_SUCCESS)
         {
+        #if defined(DEC_WRITE_TO_FILE)
+            write_vx_object_arr((vx_reference*)&mosaic_input_arr, dec_pool->data_ptr[obj->appsink_pull_id], fp);
+        #endif
             status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1);
         }
     }
@@ -1651,6 +1677,9 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
         }
         if (status == VX_SUCCESS)
         {
+        #if defined(DEC_WRITE_TO_FILE)
+            write_vx_object_arr(dec_pool->arr[obj->mosaic_enq_id], dec_pool->data_ptr[obj->appsink_pull_id], fp);
+        #endif
             status = vxGraphParameterEnqueueReadyRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&dec_pool->arr[obj->mosaic_enq_id], 1);
         }
     }
@@ -1810,6 +1839,10 @@ static vx_status app_run_graph(AppObj *obj)
         }
     }
 
+#if defined(DEC_WRITE_TO_FILE)
+    FILE *fp = fopen("/tmp/output_video_ovx.yuv", "w");
+#endif
+
     for(frame_id = 0; frame_id < obj->num_frames_to_run; frame_id++)
     {
         if(obj->write_file == 1)
@@ -1831,7 +1864,11 @@ static vx_status app_run_graph(AppObj *obj)
 
         if (status == VX_SUCCESS)
         {
+        #if defined(DEC_WRITE_TO_FILE)
+            status = app_run_graph_for_one_frame_pipeline(obj, frame_id, fp);
+        #else
             status = app_run_graph_for_one_frame_pipeline(obj, frame_id);
+        #endif
         }
 
         /* user asked to stop processing or pulled EoS from CodecPipeline*/
@@ -1884,6 +1921,9 @@ static vx_status app_run_graph(AppObj *obj)
         appCodecStop();
         APP_PRINTF("appCodecStop Done!\n");
     }
+#if defined(DEC_WRITE_TO_FILE)
+    fclose(fp);
+#endif
 
     if (status == VX_SUCCESS && (obj->encode==1 || obj->decode==0 ))
     {
@@ -1904,6 +1944,74 @@ static vx_status app_run_graph(AppObj *obj)
 
     return status;
 }
+
+#if defined(DEC_WRITE_TO_FILE)
+static vx_status write_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], FILE *fp)
+{
+    vx_status status;
+    vx_int32 ch;
+    vx_map_id map_id[CODEC_MAX_NUM_PLANES];
+
+    status = vxGetStatus((vx_reference)in_arr);
+
+    for(ch = 0; status==VX_SUCCESS && ch<1; ch++)
+    {
+        vx_rectangle_t rect;
+        vx_imagepatch_addressing_t image_addr;
+
+        vx_uint32  img_width;
+        vx_uint32  img_height;
+
+        vx_image in_img = (vx_image)vxGetObjectArrayItem(in_arr,ch);
+
+        vxQueryImage(in_img, VX_IMAGE_WIDTH, &img_width, sizeof(vx_uint32));
+        vxQueryImage(in_img, VX_IMAGE_HEIGHT, &img_height, sizeof(vx_uint32));
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = img_width;
+        rect.end_y = img_height;
+
+        /* MAP Luma */
+        status = vxMapImagePatch(in_img,
+                                &rect,
+                                0,
+                                &map_id[0],
+                                &image_addr,
+                                &data_ptr[ch][0],
+                                VX_READ_AND_WRITE,
+                                VX_MEMORY_TYPE_HOST,
+                                VX_NOGAP_X);
+        if (status != VX_SUCCESS) {printf("map_obj_arr(): vxMap unsuccessful"); return(status);}
+
+        /* Map CbCr */
+        status = vxMapImagePatch(in_img,
+                                &rect,
+                                1,
+                                &map_id[1],
+                                &image_addr,
+                                &data_ptr[ch][1],
+                                VX_READ_AND_WRITE,
+                                VX_MEMORY_TYPE_HOST,
+                                VX_NOGAP_X);
+        if (status != VX_SUCCESS) {printf("copy_image(): vxMap unsuccessful"); return(status);}
+
+        //write to file
+        vx_int32 buf_len = 3133440;
+
+        fwrite(data_ptr[ch][0], 1, buf_len, fp);
+
+        /* UNMAP Luma */
+        vxUnmapImagePatch(in_img, map_id[0]);
+
+        /* UNMap CbCr */
+        vxUnmapImagePatch(in_img, map_id[1]);
+
+        vxReleaseReference((vx_reference*)&in_img);
+    }
+    return(status);
+}
+#endif
 
 static vx_status map_vx_object_arr(vx_object_array in_arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_map_id map_id[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_int32 num_channels)
 {
