@@ -2306,17 +2306,16 @@ static void construct_gst_strings(app_codec_wrapper_params_t* params, uint8_t sr
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"appsrc format=GST_FORMAT_TIME is-live=true do-timestamp=true block=false name=%s ! queue \n",params->m_AppSrcNameArr[ch]);
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
                                                                                             params->in_width, params->in_height, params->in_format);
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc extra-controls=\"controls, frame_level_rate_control_enable=1, video_bitrate=10000000\"\n");
         }
         else if (srcType == 1){
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"filesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.mp4 \n");
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! qtdemux \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"filesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.264 \n");
         }
         else if (srcType == 2){
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"videotestsrc is-live=true do-timestamp=true num-buffers=%d \n",1800);
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, width=(int)%d, height=(int)%d, framerate=(fraction)30/1, format=(string)%s, interlace-mode=(string)progressive, colorimetry=(string)bt601 \n",
                                                                                             params->in_width, params->in_height, params->in_format);
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc bitrate=10000000 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc extra-controls=\"controls, frame_level_rate_control_enable=1, video_bitrate=10000000\"\n");
         }
 
         i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! h264parse \n");
