@@ -1343,30 +1343,51 @@ static vx_status app_verify_graph(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
 
-    status = vxVerifyGraph(obj->capture_graph);
+    if ( obj->encode )
+    {
+        status = vxVerifyGraph(obj->capture_graph);
+    }
 
     if(status == VX_SUCCESS)
     {
-        APP_PRINTF("Capture Graph verify done!\n");
-        status = vxVerifyGraph(obj->display_graph);
+        if ( obj->encode )
+        {
+            APP_PRINTF("Capture Graph verify done!\n");
+        }
+        if ( obj->decode )
+        {
+            status = vxVerifyGraph(obj->display_graph);
+        }
     }
     if(status == VX_SUCCESS)
     {
-        APP_PRINTF("Display Graph verify done!\n");
+        if ( obj->decode )
+        {
+            APP_PRINTF("Display Graph verify done!\n");
+        }
     }
 
     if(VX_SUCCESS == status)
     {
-      status = tivxExportGraphToDot(obj->capture_graph,".", "vx_app_multi_cam_capture");
+        if ( obj->encode )
+        {
+            status = tivxExportGraphToDot(obj->capture_graph,".", "vx_app_multi_cam_capture");
+        }
     }
     if(VX_SUCCESS == status)
     {
-      status = tivxExportGraphToDot(obj->display_graph,".", "vx_app_multi_cam_display");
+        if ( obj->decode )
+        {
+            status = tivxExportGraphToDot(obj->display_graph,".", "vx_app_multi_cam_display");
+        }
     }
 
     if (((obj->captureObj.enable_error_detection) || (obj->test_mode)) && (status == VX_SUCCESS))
     {
-        status = app_send_error_frame(&obj->captureObj);
+        if ( obj->encode )
+        {
+            status = app_send_error_frame(&obj->captureObj);
+        }
     }
 
     if ( obj->encode )
@@ -2164,6 +2185,8 @@ static void app_querry_param_set(AppObj *obj)
     vx_char ch = 0;
     vx_bool encSelected = vx_false_e;
     vx_bool decSelected = vx_false_e;
+    vx_int8 ret;
+    vx_int8 num_cameras;
     obj->sensorObj.num_cameras_enabled = 0;
 
     while (encSelected != vx_true_e)
@@ -2212,14 +2235,14 @@ static void app_querry_param_set(AppObj *obj)
         fflush(stdin);
         printf("Max number of cameras supported by sensor %s = %d \n", obj->sensorObj.sensor_name, obj->sensorObj.sensorParams.num_channels);
         printf("Please enter number of channels to be enabled \n");
-        ch = getchar();
-        obj->sensorObj.num_cameras_enabled = ch - '0';
-        if(((obj->sensorObj.num_cameras_enabled > obj->sensorObj.sensorParams.num_channels) || (obj->sensorObj.num_cameras_enabled <= 0)))
+        ret = scanf("%d", &num_cameras);
+        while ((ch = getchar()) != '\n' && ch != EOF);
+        obj->sensorObj.num_cameras_enabled = num_cameras;
+        if((1==ret) && ((obj->sensorObj.num_cameras_enabled > obj->sensorObj.sensorParams.num_channels) || (obj->sensorObj.num_cameras_enabled <= 0)))
         {
             obj->sensorObj.num_cameras_enabled = 0;
             printf("Invalid selection %c. Try again \n", ch);
         }
-        ch = getchar();
     }
     obj->num_ch = obj->sensorObj.num_cameras_enabled;
     obj->sensorObj.ch_mask = (1<<obj->sensorObj.num_cameras_enabled) - 1;
