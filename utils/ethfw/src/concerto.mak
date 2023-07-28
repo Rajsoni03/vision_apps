@@ -42,7 +42,7 @@ CSOURCES    := app_ethfw_freertos.c
 
 endif
 
-ifeq ($(TARGET_OS),FREERTOS SAFERTOS)
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS),FREERTOS SAFERTOS))
   ifeq ($(ETHFW_INTERCORE_ETH_SUPPORT),yes)
     DEFS += ETHAPP_ENABLE_INTERCORE_ETH
   endif
