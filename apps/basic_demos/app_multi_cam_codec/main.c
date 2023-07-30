@@ -2235,7 +2235,7 @@ static void app_querry_param_set(AppObj *obj)
         fflush(stdin);
         printf("Max number of cameras supported by sensor %s = %d \n", obj->sensorObj.sensor_name, obj->sensorObj.sensorParams.num_channels);
         printf("Please enter number of channels to be enabled \n");
-        ret = scanf("%d", &num_cameras);
+        ret = scanf("%hhd", &num_cameras);
         while ((ch = getchar()) != '\n' && ch != EOF);
         obj->sensorObj.num_cameras_enabled = num_cameras;
         if((1==ret) && ((obj->sensorObj.num_cameras_enabled > obj->sensorObj.sensorParams.num_channels) || (obj->sensorObj.num_cameras_enabled <= 0)))
