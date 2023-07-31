@@ -875,6 +875,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
         encH->compHandleArray[ch].outPortIndex = portParam.nStartPortNumber + 1;
 
         /* set frame rate */
+        pthread_mutex_lock(&encH->compHandleArray[ch].mutex);
         OMX_CONFIG_FRAMERATETYPE frame_rate_t;
         SET_OMAX_VERSION_SIZE(frame_rate_t, sizeof(OMX_CONFIG_FRAMERATETYPE));
         frame_rate_t.nPortIndex = encH->compHandleArray[ch].outPortIndex;
@@ -966,7 +967,6 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
         }
 
         /* Configure input port */
-        pthread_mutex_lock(&encH->compHandleArray[ch].mutex);
         SET_OMAX_VERSION_SIZE(inPortParam, sizeof(OMX_PARAM_PORTDEFINITIONTYPE));
         inPortParam.nPortIndex = encH->compHandleArray[ch].inPortIndex;
         omxErr = OMX_GetParameter(encH->compHandleArray[ch].compHandle,
