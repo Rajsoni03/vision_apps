@@ -52,8 +52,12 @@
 #define CODEC_MAX_LEN_CMD_STR   4096u
 #define CODEC_MAX_LEN_ELEM_NAME   32u
 #define CODEC_MAX_NUM_PLANES       4u
-#define CODEC_MAX_NUM_CHANNELS     8u
 #define CODEC_MAX_BUFFER_DEPTH    16u
+#if defined(SOC_J784S4)
+#define CODEC_MAX_NUM_CHANNELS    12u
+#else
+#define CODEC_MAX_NUM_CHANNELS     8u
+#endif /* SOC_J784S4 */
 
 
 /**
