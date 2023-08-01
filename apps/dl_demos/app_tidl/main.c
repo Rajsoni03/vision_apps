@@ -1415,6 +1415,7 @@ static vx_user_data_object setCreateParams(vx_context context)
 #ifdef APP_TIDL_TRACE_DUMP
                 prms->traceLogLevel                 = 1;
                 prms->traceWriteLevel               = 1;
+                strcpy(prms->traceBaseName, "/tmp/tidl_trace_");
 #else
                 prms->traceLogLevel                 = 0;
                 prms->traceWriteLevel               = 0;

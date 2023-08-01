@@ -147,7 +147,6 @@ int main(void)
     log_init_prm.device_write = app_log_device_send_string;
 
     appLogRdInit(&log_init_prm);
-#if (!QNX)
 #if defined(ENABLE_IPC_C7x_1) || defined(ENABLE_IPC_C7x_2) || defined(ENABLE_IPC_C7x_3) || defined(ENABLE_IPC_C7x_4)
     /*******************  Create task for file io ***************/
     app_fileio_init_prm_t fileio_init_prm;
@@ -173,7 +172,6 @@ int main(void)
     fileio_init_prm.fileio_rd_max_cpus = APP_IPC_CPU_MAX;
     
     appFileIORdInit(&fileio_init_prm);
-#endif
 #endif
     while(1)
     {
