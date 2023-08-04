@@ -73,6 +73,12 @@ if {$cameras != 0} {
     send -- "1\r"
     sleep 1
 
+    if {$single == 1} {
+        # MV off for single cam
+        send -- "0\r"
+        sleep 1
+    }
+
     if {$single == 0} {
         # Num Cameras
         send -- "${cameras}\r"
