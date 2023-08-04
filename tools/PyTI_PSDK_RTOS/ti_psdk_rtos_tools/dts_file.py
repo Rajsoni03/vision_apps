@@ -111,16 +111,17 @@ class DtsFile :
 
         header = " \n" \
                  " /* \n" \
-                 "  * IMPORTANT NOTE: Follow below instructions to apply the updated memory map to linux dtsi file, \n" \
+                 "  * IMPORTANT NOTE: Follow the below instructions to apply the updated memory map to the linux dtsi file,\n" \
                  "  * \n" \
-                 "  * 1. Copy the memory sections, from the generated dts file, to the file shown below under reserved_memory: reserved-memory { ... } \n" \
-                 "  *     ${LINUX_KERNEL_PATH}/arch/arm64/boot/dts/ti/" + self.name[2:] + "\n" \
+                 "  * 1. Copy the contents of the generated k3-{SOC}-rtos-memory-map.dtsi file and replace the\n" \
+                 "  *      reserved_memory section of the k3-{SOC}-rtos-memory-map.dtsi file that is located here:\n" \
+                 "  *      PSDK_LINUX_PATH/board-support/linux*/arch/arm64/boot/dts/ti\n" \
                  "  * \n" \
-                 "  * 2. Rebuild the dtb, dtbo from PSDK Linux install directory \n" \
-                 "  *      make linux-dtbs \n" \
+                 "  * 2. Rebuild the dtb and dtbo from the PSDK_LINUX_PATH directory with the following:\n" \
+                 "  *      make linux-dtbs\n" \
                  "  * \n" \
-                 "  * 3. Install the dtb, dtbo to the rootfs/boot folder on SD card \n" \
-                 "  *      sudo make linux-dtbs_intall; sync \n" \
+                 "  * 3. Install the dtb and dtbo to the rootfs/boot folder on the SD card from the same directory with the following:\n" \
+                 "  *      sudo make linux-dtbs_install; sync\n" \
                  "  * \n " \
                  "  */\n"
 
