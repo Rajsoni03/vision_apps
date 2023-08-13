@@ -1,3 +1,4 @@
+ifeq ($(BUILD_ENABLE_ETHFW),yes)
 ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J784S4))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS SAFERTOS))
 ifeq ($(TARGET_CPU),R5F)
@@ -68,6 +69,7 @@ endif
 
 include $(FINALE)
 
+endif
 endif
 endif
 endif
