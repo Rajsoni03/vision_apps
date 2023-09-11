@@ -183,7 +183,7 @@ PTK_LIBS += ptk_base
 PTK_LIBS += ptk_algos
 endif
 
-TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule vx_tiovx_tidl_tests
+TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule vx_tiovx_tidl_tests
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink

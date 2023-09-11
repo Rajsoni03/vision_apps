@@ -51,7 +51,7 @@ SYS_STATIC_LIBS += $(APP_UTILS_LIBS)
 
 TIOVX_LIBS =
 TIOVX_LIBS += vx_conformance_engine vx_conformance_tests vx_conformance_tests_testmodule
-TIOVX_LIBS += vx_tiovx_tests vx_tutorial vx_utils
+TIOVX_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_tutorial vx_utils
 TIOVX_LIBS += vx_framework vx_vxu vx_platform_psdk_j7_rtos vx_kernels_target_utils
 TIOVX_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TIOVX_LIBS += vx_target_kernels_source_sink

@@ -122,7 +122,7 @@ VISION_APPS_STEREO_LIBS += vx_kernels_stereo
 VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 
 TEST_LIBS =
-TEST_LIBS += vx_tiovx_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
+TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_hwa_tests vx_kernels_video_io_tests vx_tiovx_tidl_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
