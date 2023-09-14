@@ -567,6 +567,25 @@ int main(int argc, char *argv[])
     App_Context        *appCntxt;
     App_CmdLineParams   cmdParams = {0};
     int32_t             status;
+    uint32_t    numAllocInitial, numAllocFinal;
+#if defined(QNX)
+    uint32_t    numMapInitial,   numMapFinal;
+    uint32_t    numBufsInitial, numBufsFinal;
+#endif
+
+    extern uint32_t appMemGetNumAllocs();
+
+#if defined(QNX)
+    extern uint32_t appMemGetNumMaps();
+    extern uint32_t appMemGetNumBufElements();
+#endif
+
+    numAllocInitial = appMemGetNumAllocs();
+
+#if defined(QNX)
+    numMapInitial   = appMemGetNumMaps();
+    numBufsInitial  = appMemGetNumBufElements();
+#endif
 
     appCntxt = &gAppCntxt;
     status   = 0;
@@ -608,6 +627,30 @@ int main(int argc, char *argv[])
     {
         VX_PRINT(VX_ZONE_ERROR, "App_deInit() failed.\n");
     }
+
+    numAllocFinal = appMemGetNumAllocs();
+
+    if (numAllocInitial != numAllocFinal)
+    {
+        VX_PRINT(VX_ZONE_ERROR, "Memory leak: some memory that was allocated was not freed\n");
+        status = -1;
+    }
+
+#if defined(QNX)
+    numMapFinal = appMemGetNumMaps();
+    if (numMapInitial != numMapFinal)
+    {
+        VX_PRINT(VX_ZONE_ERROR, "Resource leak: some memory that was mapped was not unmapped\n");
+        status = -1;
+    }
+
+    numBufsFinal  = appMemGetNumBufElements();
+    if (numBufsInitial != numBufsFinal)
+    {
+        VX_PRINT(VX_ZONE_ERROR, "Memory leak: buffer array element was not released\n");
+        status = -1;
+    }
+#endif
 
     return status;
 }
