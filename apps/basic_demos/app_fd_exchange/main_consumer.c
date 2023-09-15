@@ -183,10 +183,6 @@ static int32_t App_deInit(App_Context *appCntxt)
 
     if (appCntxt->initDone == 1)
     {
-        /* De-allocate any allocated objects. */
-        App_Common_DeAllocImageObjects(appCntxt->refs,
-                                       appCntxt->numValidObjs);
-
         vxReleaseContext(&appCntxt->vxContext);
 
         status = appDeInit();
@@ -322,6 +318,10 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
                     {
                         numFdPtr = NULL;
                         done = 1;
+
+                        /* De-allocate any allocated objects. */
+                        App_Common_DeAllocImageObjects(appCntxt->refs,
+                                                       appCntxt->numValidObjs);
                     }
                 }
                 break;
