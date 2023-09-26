@@ -744,11 +744,21 @@ vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode)
     obj->viss_params.channel_id = obj->selectedCam;
     obj->viss_params.fcp[0].chroma_mode = 0;
 
-#ifdef VPAC3
-    /* turn on CAC, dual FCP, and NV12 output */
-    if (obj->vpac3_dual_fcp_enable == 1U)
+#if defined(VPAC3) || defined(VPAC3L)
+    if(obj->cac_enable == 1U)
     {
         obj->viss_params.bypass_cac = 0;  /* CAC on */
+    }
+    else
+    {
+        obj->viss_params.bypass_cac = 1;  /* CAC off */
+    }
+#endif
+
+#ifdef VPAC3
+    /* turn on dual FCP, and NV12 output */
+    if (obj->vpac3_dual_fcp_enable == 1U)
+    {
         obj->viss_params.fcp1_config = 1; /* RAWFE --> FCP1 */
         
         /* HV pipeline 8bit YUV output on output0 and output 1 */

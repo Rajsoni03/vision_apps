@@ -249,7 +249,20 @@ vx_status app_init(AppObj *obj)
         }
         
         obj->vpac3_dual_fcp_enable = ch - '0';
-
+        #endif
+        
+        #if defined(VPAC3) || defined(VPAC3L)
+        /* Selection for CAC enable */
+        ch = 0xFF;
+        fflush (stdin);
+        while ((ch != '0') && (ch != '1'))
+        {
+            fflush (stdin);
+            printf ("CAC Selection Yes(1)/No(0) : ");
+            ch = getchar();
+        }
+        
+        obj->cac_enable = ch - '0';
         #endif
     }
     else

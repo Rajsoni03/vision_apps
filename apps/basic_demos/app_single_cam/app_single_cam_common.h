@@ -212,6 +212,9 @@ typedef struct {
 #ifdef VPAC3
     uint32_t vpac3_dual_fcp_enable;
 #endif
+#if defined(VPAC3) || defined(VPAC3L)
+    uint32_t cac_enable;
+#endif
 } AppObj;
 
 vx_status app_create_viss(AppObj *obj, uint32_t sensor_wdr_mode);
