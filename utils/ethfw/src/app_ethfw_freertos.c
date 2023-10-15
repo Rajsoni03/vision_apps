@@ -214,7 +214,7 @@ static void EthApp_configPtpCb(void *arg);
 static void EthApp_initPtp(void);
 #endif
 
-#if defined(ETHAPP_ENABLE_INTERCORE_ETH)
+#if defined(ETHAPP_ENABLE_INTERCORE_ETH) || defined(ETHFW_VEPA_SUPPORT)
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
                                         const uint8_t hostId);
 
@@ -300,6 +300,18 @@ static uint32_t netif_ic_state[IC_ETH_MAX_VIRTUAL_IF] =
 static struct netif netif_bridge;
 bridgeif_initdata_t bridge_initdata;
 #endif /* ETHAPP_ENABLE_INTERCORE_ETH */
+
+#if defined(ETHFW_VEPA_SUPPORT)
+/* Private VLAN ids used in broadcast/multicast packets sent from ETHFW
+ * to remote clients using multihost flow */
+static uint32_t gEthApp_remoteClientPrivVlanIdMap[ETHREMOTECFG_SWITCH_PORT_LAST+1] = 
+{
+    [ETHREMOTECFG_SWITCH_PORT_0] = 1100U, /* Linux client */
+    [ETHREMOTECFG_SWITCH_PORT_1] = 1200U, /* AUTOSAR or RTOS client */
+    [ETHREMOTECFG_SWITCH_PORT_2] = 1300U, /* AUTOSAR client */
+};
+#endif
+
 void appEthFwEarlyInit()
 {
     app_rtos_semaphore_params_t semParams;
@@ -514,7 +526,7 @@ static int32_t EthApp_initEthFw(void)
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
 #endif
 
-#if defined(ETHAPP_ENABLE_INTERCORE_ETH)
+#if defined(ETHAPP_ENABLE_INTERCORE_ETH) || defined(ETHFW_VEPA_SUPPORT)
     if (ARRAY_SIZE(gEthApp_sharedMcastAddrTable) > ETHAPP_MAX_SHARED_MCAST_ADDR)
     {
         appLogPrintf("ETHFW error: No. of shared mcast addr cannot exceed %d\n",
@@ -554,6 +566,12 @@ static int32_t EthApp_initEthFw(void)
             ethFwCfg.rsvdMcastCfg.numMacAddr = ARRAY_SIZE(gEthApp_rsvdMcastAddrTable);
         }
     }
+
+#if defined(ETHFW_VEPA_SUPPORT)
+    memcpy(ethFwCfg.vepaCfg.privVlanId,
+           gEthApp_remoteClientPrivVlanIdMap,
+           sizeof(gEthApp_remoteClientPrivVlanIdMap));
+#endif
 
     /* Initialize the EthFw */
     if (status == ETHAPP_OK)
@@ -930,6 +948,76 @@ static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
     if (!matchFound)
     {
         appLogPrintf("delMacSharedCb: Address not found\n");
+    }
+}
+#endif
+
+#if defined(ETHFW_VEPA_SUPPORT)
+/* Application callback function to handle addition of a shared mcast
+ * address in the ALE */
+static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
+                                        const uint8_t hostId)
+{
+    uint8_t idx = 0;
+    bool matchFound = false;
+
+    /* Search the mac_address in the shared mcast addr table */
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
+    {
+        if (EnetUtils_cmpMacAddr(mac_address,
+                    &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
+        {
+            matchFound = true;
+            appLogPrintf("filterAddMacSharedCb: Address found: %x:%x:%x:%x:%x:%x\n",
+                            mac_address[0],
+                            mac_address[1],
+                            mac_address[2],
+                            mac_address[3],
+                            mac_address[4],
+                            mac_address[5]);
+            /* The array should have unique mcast addresses,
+             * so no other match is expected */
+            break;
+        }
+    }
+
+    if (!matchFound)
+    {
+        appLogPrintf("addMacSharedCb: Address not found\n");
+    }
+}
+
+/* Application callback function to handle deletion of a shared mcast
+ * address from the ALE */
+static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
+                                        const uint8_t hostId)
+{
+    uint8_t idx = 0;
+    bool matchFound = false;
+
+    /* Search the mac_address in the shared mcast addr table */
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
+    {
+        if (EnetUtils_cmpMacAddr(mac_address,
+                    &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
+        {
+            matchFound = true;
+            appLogPrintf("filterDelMacSharedCb: Address found: %x:%x:%x:%x:%x:%x\n",
+                            mac_address[0],
+                            mac_address[1],
+                            mac_address[2],
+                            mac_address[3],
+                            mac_address[4],
+                            mac_address[5]);
+            /* The array should have unique mcast addresses,
+             * so no other match is expected */
+            break;
+        }
+    }
+
+    if (!matchFound)
+    {
+        appLogPrintf("EthApp_Vepa_filterDelMacSharedCb: Address not found\n");
     }
 }
 #endif

@@ -93,6 +93,9 @@ ETHFW_LIBS += ethfw_board
 ETHFW_LIBS += lib_remoteswitchcfg_server
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	ETHFW_LIBS += ethfw_lwip
+	ifeq ($(ETHFW_CPSW_VEPA_SUPPORT),yes)
+        STATIC_LIBS += ethfw_vepa
+  	endif
 endif
 REMOTE_DEVICE_LIBS = lib_remote_device
 endif
