@@ -78,6 +78,7 @@ SECTIONS
           LOAD_END( lnkEndFlashAddress )
     {
         .vecs                   : {} ALIGN(0x400000)
+        .interrupt_vectors      : {} ALIGN(0x400000)
         .secure_vecs            : {} ALIGN(0x200000)
         .text:_c_int00_secure   : {} ALIGN(0x200000)
         .text                   : {} ALIGN(0x200000)
