@@ -59,7 +59,7 @@ endif
 
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
-	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-contrib/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
+	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/contrib/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
 	LDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/lib/$(RTOS_LC)/${SOC}/r5f/$(TARGET_BUILD)/
 	LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
 ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
