@@ -838,8 +838,6 @@ static vx_status VX_CALLBACK tivxPointDetectDelete(
     tivxPointDetectParams *prms = NULL;
     uint32_t size;
 
-    /* < DEVELOPER_TODO: (Optional) Add any target kernel delete code here (e.g. freeing */
-    /*                   local memory buffers, etc) > */
     if ( (num_params != TIVX_KERNEL_POINT_DETECT_MAX_PARAMS)
         || (NULL == obj_desc[TIVX_KERNEL_POINT_DETECT_IN_CONFIGURATION_IDX])
         || (NULL == obj_desc[TIVX_KERNEL_POINT_DETECT_IN_LDCLUT_IDX])
@@ -851,7 +849,6 @@ static vx_status VX_CALLBACK tivxPointDetectDelete(
     }
     else
     {
-       
         tivxGetTargetKernelInstanceContext(kernel, (void **)&prms, &size);
 
         if ((NULL != prms) &&
@@ -865,6 +862,8 @@ static vx_status VX_CALLBACK tivxPointDetectDelete(
             }
             else
             {
+                /* Note: Freeing this in order to allow for total allocated memory to reset */
+                tivxMemFree(prms->buf_IntegralImg_ptr, prms->buf_IntegralImg_size, TIVX_MEM_EXTERNAL_SCRATCH);
                 tivxMemFree(prms, size, TIVX_MEM_EXTERNAL);
             }
         }
