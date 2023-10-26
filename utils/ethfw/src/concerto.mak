@@ -16,6 +16,8 @@ ifeq ($(TARGET_OS),FREERTOS)
 
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/src/include
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/freertos/include
+IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/config
+IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/config/$(SOC)
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/contrib
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/r5f
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
