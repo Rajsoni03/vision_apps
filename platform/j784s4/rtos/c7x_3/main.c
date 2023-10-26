@@ -508,19 +508,32 @@ void InitMmu(void)
     appCacheInit();
 }
 
-/* Offset to be added to convert virutal address to physical address */
-#define VIRT_PHY_ADDR_OFFSET (DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR - DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_ADDR)
+static void convertVirt2Phys(const void * virtAddr, uint64_t virtBase, uint64_t physBase, uint64_t size, uint64_t * phyAddr)
+{
+    if ( ((uint64_t)virtAddr >= virtBase) &&
+         ((uint64_t)virtAddr < (virtBase + size)) )
+    {
+        if (virtBase >= physBase)
+        {
+            *phyAddr = (uint64_t)virtAddr - (virtBase - physBase);
+        }
+        else
+        {
+            *phyAddr = (uint64_t)virtAddr + (physBase - virtBase);
+        }
+    }
+}
 
 uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
                                       void *appData)
 {
-  uint64_t phyAddr = (uint64_t)virtAddr;
+    uint64_t phyAddr = (uint64_t)virtAddr; /* Default : Return virtAddr without any modification */
 
   /* Note: I think this is correct but needs review */
-  if ( ((uint64_t)virtAddr >= (uint64_t)DDR_SHARED_MEM_ADDR) &&
-       ((uint64_t)virtAddr < ((uint64_t)DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
-  {
+    if ( ((uint64_t)virtAddr >= (uint64_t)DDR_SHARED_MEM_ADDR) &&
+        ((uint64_t)virtAddr < ((uint64_t)DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
+    {
         if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
         {
             phyAddr = (uint64_t)virtAddr + (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
@@ -529,11 +542,45 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
         {
             phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
         }
-  }
-  else if ( ((uint64_t)virtAddr >= DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_ADDR) )
-  {
-    phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
-  }
+    }
+    else
+    {
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_2_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_1_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_1_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_2_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_2_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_3_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_4_LOCAL_HEAP_ADDR, 
+            (uint64_t) DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
+        
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_1_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_2_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_4_SCRATCH_NON_CACHEABLE_ADDR, 
+            (uint64_t) DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
+        
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_1_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_1_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_2_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_2_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_3_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_PHYS_SIZE, &phyAddr);
+        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_3_4_SCRATCH_ADDR, 
+            (uint64_t) DDR_C7X_4_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_PHYS_SIZE, &phyAddr);
+    }
 
   return phyAddr;
 }
