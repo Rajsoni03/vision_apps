@@ -367,7 +367,7 @@ void appMmuMap(Bool is_secure)
     {
         goto mmu_exit;
     }
-    
+
     /* DDR local heap */
     retVal = Mmu_map(DDR_C7X_2_LOCAL_HEAP_ADDR, DDR_C7X_2_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_2_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == FALSE)
@@ -516,8 +516,8 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
   uint64_t phyAddr = (uint64_t)virtAddr;
 
   /* Note: I think this is correct but needs review */
-  if ( ((uint64_t)virtAddr >= DDR_SHARED_MEM_ADDR) &&
-       ((uint64_t)virtAddr < (DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
+  if ( ((uint64_t)virtAddr >= (uint64_t)DDR_SHARED_MEM_ADDR) &&
+       ((uint64_t)virtAddr < ((uint64_t)DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
   {
         if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
         {

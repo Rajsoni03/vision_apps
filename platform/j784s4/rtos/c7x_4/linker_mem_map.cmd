@@ -76,24 +76,24 @@ MEMORY
     IPC_VRING_MEM                     : ORIGIN = 0xAC000000 , LENGTH = 0x03000000
     /* Memory for remote core logging [ size 256.00 KB ] */
     APP_LOG_MEM                       : ORIGIN = 0xAF000000 , LENGTH = 0x00040000
-    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
+    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 31.75 MB ] */
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x01FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
-    APP_FILEIO_MEM                    : ORIGIN = 0xB3000000 , LENGTH = 0x00400000
+    APP_FILEIO_MEM                    : ORIGIN = 0xB1000000 , LENGTH = 0x00400000
     /* DDR for C7x_4 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_4_IPC            ( RWIX ) : ORIGIN = 0xBD000000 , LENGTH = 0x00100000
+    DDR_C7x_4_IPC            ( RWIX ) : ORIGIN = 0xB8000000 , LENGTH = 0x00100000
     /* DDR for C7x_4 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_4_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xBD100000 , LENGTH = 0x00000400
+    DDR_C7x_4_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB8100000 , LENGTH = 0x00000400
     /* DDR for C7x_4 for boot section [ size 1024 B ] */
-    DDR_C7x_4_BOOT           ( RWIX ) : ORIGIN = 0xBD200000 , LENGTH = 0x00000400
+    DDR_C7x_4_BOOT           ( RWIX ) : ORIGIN = 0xB8200000 , LENGTH = 0x00000400
     /* DDR for C7x_4 for vecs section [ size 16.00 KB ] */
-    DDR_C7x_4_VECS           ( RWIX ) : ORIGIN = 0xBD400000 , LENGTH = 0x00004000
+    DDR_C7x_4_VECS           ( RWIX ) : ORIGIN = 0xB8400000 , LENGTH = 0x00004000
     /* DDR for C7x_4 for secure vecs section [ size 16.00 KB ] */
-    DDR_C7x_4_SECURE_VECS    ( RWIX ) : ORIGIN = 0xBD600000 , LENGTH = 0x00004000
-    /* DDR for C7x_4 for code/data [ size 41.98 MB ] */
-    DDR_C7x_4                ( RWIX ) : ORIGIN = 0xBD604000 , LENGTH = 0x029FC000
-    /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
+    DDR_C7x_4_SECURE_VECS    ( RWIX ) : ORIGIN = 0xB8600000 , LENGTH = 0x00004000
+    /* Virtual address for C7x_4 code/data section [ size 24.00 MB ] */
+    DDR_C7x_4                ( RWIX ) : ORIGIN = 0xB8800000 , LENGTH = 0x01800000
+    /* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x3C000000
     /* Virtual address of Non-cacheable DDR for c7x_4 for local heap [ size 128.00 MB ] */
     DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of Cacheable DDR for c7x_4 for local heap [ size 128.00 MB ] */

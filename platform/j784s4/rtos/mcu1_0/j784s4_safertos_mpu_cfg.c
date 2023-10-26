@@ -218,11 +218,11 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 8 configuration: Ring buffer */
+        /* Region 8 configuration: APP_FILEIO_MEM + TIOVX_LOG_RT_MEM */
         /* ulRegionNumber */
         .ulRegionNumber         = 8U,
         /* Starting address */
-        .ulRegionBeginAddress   = 0xB0000000,
+        .ulRegionBeginAddress   = APP_FILEIO_MEM_ADDR,
         /* Access permission */
         {
             .ulexeNeverControl  = 1U,
@@ -233,7 +233,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
             .ulmemAttr          = 0U,
         },
         /* ulRegionSize */
-        .ulRegionSize           = (64U * 1024U * 1024U),
+        .ulRegionSize           = (16U * 1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },

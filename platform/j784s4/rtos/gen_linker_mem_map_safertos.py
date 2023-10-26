@@ -88,6 +88,8 @@ KB = 1024;
 MB = KB*KB;
 GB = KB*MB;
 
+SHARED_MEM_SIZE = 1024 * MB
+
 #
 # Notes,
 # - recommend to keep all memory segment sizes in units of KB at least
@@ -126,6 +128,8 @@ main_ocram_mem_addr_phys = 0x4F02000000;
 
 codec_carveout_size = 2*GB;
 
+uboot_reloc_mem_addr = 0xFC000000;
+uboot_reloc_mem_size = 64*MB;
 #
 # Other constant sizes
 #
@@ -223,7 +227,7 @@ mcu2_0_ddr_size = 32*MB - (mcu2_0_ddr_addr-mcu2_0_ddr_ipc_addr);
 mcu2_1_ddr_ipc_addr = mcu2_0_ddr_addr + mcu2_0_ddr_size;
 mcu2_1_ddr_resource_table_addr = mcu2_1_ddr_ipc_addr + linux_ddr_ipc_size;
 mcu2_1_ddr_addr = mcu2_1_ddr_resource_table_addr + linux_ddr_resource_table_size;
-mcu2_1_ddr_size = 32*MB - (mcu2_1_ddr_addr-mcu2_1_ddr_ipc_addr);
+mcu2_1_ddr_size = 16*MB - (mcu2_1_ddr_addr-mcu2_1_ddr_ipc_addr);
 
 mcu3_0_ddr_ipc_addr = mcu2_1_ddr_addr + mcu2_1_ddr_size;
 mcu3_0_ddr_resource_table_addr = mcu3_0_ddr_ipc_addr + linux_ddr_ipc_size;
@@ -238,12 +242,12 @@ mcu3_1_ddr_size = 16*MB - (mcu3_1_ddr_addr-mcu3_1_ddr_ipc_addr);
 mcu4_0_ddr_ipc_addr = mcu3_1_ddr_addr + mcu3_1_ddr_size;
 mcu4_0_ddr_resource_table_addr = mcu4_0_ddr_ipc_addr + linux_ddr_ipc_size;
 mcu4_0_ddr_addr = mcu4_0_ddr_resource_table_addr + linux_ddr_resource_table_size;
-mcu4_0_ddr_size = 32*MB - (mcu4_0_ddr_addr-mcu4_0_ddr_ipc_addr);
+mcu4_0_ddr_size = 16*MB - (mcu4_0_ddr_addr-mcu4_0_ddr_ipc_addr);
 
 mcu4_1_ddr_ipc_addr = mcu4_0_ddr_addr + mcu4_0_ddr_size;
 mcu4_1_ddr_resource_table_addr = mcu4_1_ddr_ipc_addr + linux_ddr_ipc_size;
 mcu4_1_ddr_addr = mcu4_1_ddr_resource_table_addr + linux_ddr_resource_table_size;
-mcu4_1_ddr_size = 32*MB - (mcu4_1_ddr_addr-mcu4_1_ddr_ipc_addr);
+mcu4_1_ddr_size = 16*MB - (mcu4_1_ddr_addr-mcu4_1_ddr_ipc_addr);
 
 # Hardcoding this value, as this cannot be different from IPC echo test value
 ipc_vring_mem_addr      = 0xAC000000;
@@ -252,49 +256,46 @@ ipc_vring_mem_size      = 48*MB;
 app_log_mem_addr        = ipc_vring_mem_addr + ipc_vring_mem_size;
 app_log_mem_size        = 256*KB;
 tiovx_obj_desc_mem_addr = app_log_mem_addr + app_log_mem_size;
-tiovx_obj_desc_mem_size = 64*MB - app_log_mem_size;
+tiovx_obj_desc_mem_size = 32*MB - app_log_mem_size;
 
 app_fileio_mem_addr     =  tiovx_obj_desc_mem_addr + tiovx_obj_desc_mem_size;
 app_fileio_mem_size     = 4*MB;
+
 tiovx_log_rt_mem_addr   = app_fileio_mem_addr + app_fileio_mem_size;
 tiovx_log_rt_mem_size   = 16*MB - app_fileio_mem_size;
 
 c7x_1_ddr_ipc_addr = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
 c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_1_ddr_addr = c7x_1_ddr_resource_table_addr + 1*MB;
-c7x_1_ddr_size = 48*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
+c7x_1_ddr_size = 32*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
 
 c7x_2_ddr_ipc_addr = c7x_1_ddr_addr + c7x_1_ddr_size;
 c7x_2_ddr_resource_table_addr = c7x_2_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_2_ddr_addr = c7x_2_ddr_resource_table_addr + 1*MB;
-c7x_2_ddr_size = 48*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
+c7x_2_ddr_size = 32*MB - (c7x_2_ddr_addr-c7x_2_ddr_ipc_addr);
 
 c7x_3_ddr_ipc_addr = c7x_2_ddr_addr + c7x_2_ddr_size;
 c7x_3_ddr_resource_table_addr = c7x_3_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_3_ddr_addr = c7x_3_ddr_resource_table_addr + 1*MB;
-c7x_3_ddr_size = 48*MB - (c7x_3_ddr_addr-c7x_3_ddr_ipc_addr);
+c7x_3_ddr_size = 32*MB - (c7x_3_ddr_addr-c7x_3_ddr_ipc_addr);
 
 c7x_4_ddr_ipc_addr =c7x_3_ddr_addr + c7x_3_ddr_size;
 c7x_4_ddr_resource_table_addr = c7x_4_ddr_ipc_addr + linux_ddr_ipc_size;
 c7x_4_ddr_addr = c7x_4_ddr_resource_table_addr + 1*MB;
-c7x_4_ddr_size = 48*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
-
-# Shared memory for DMA Buf FD carveout
-ddr_shared_mem_addr     = c7x_4_ddr_addr + c7x_4_ddr_size;
-ddr_shared_mem_size     = 512*MB;
+c7x_4_ddr_size = 32*MB - (c7x_4_ddr_addr-c7x_4_ddr_ipc_addr);
 
 #
 # DDR memory allocation for various shared memories
 #
 
-mcu1_0_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
+mcu1_0_ddr_local_heap_addr  = c7x_4_ddr_addr + c7x_4_ddr_size;
 mcu1_0_ddr_local_heap_size  = 8*MB;
 mcu1_1_ddr_local_heap_addr  = mcu1_0_ddr_local_heap_addr + mcu1_0_ddr_local_heap_size;
 mcu1_1_ddr_local_heap_size  = 8*MB;
 mcu2_0_ddr_local_heap_addr  = mcu1_1_ddr_local_heap_addr + mcu1_1_ddr_local_heap_size;
-mcu2_0_ddr_local_heap_size  = 16*MB;
+mcu2_0_ddr_local_heap_size  = 8*MB;
 mcu2_1_ddr_local_heap_addr  = mcu2_0_ddr_local_heap_addr + mcu2_0_ddr_local_heap_size;
-mcu2_1_ddr_local_heap_size  = 16*MB;
+mcu2_1_ddr_local_heap_size  = 8*MB;
 mcu3_0_ddr_local_heap_addr  = mcu2_1_ddr_local_heap_addr + mcu2_1_ddr_local_heap_size;
 mcu3_0_ddr_local_heap_size  = 8*MB;
 mcu3_1_ddr_local_heap_addr  = mcu3_0_ddr_local_heap_addr + mcu3_0_ddr_local_heap_size;
@@ -309,6 +310,10 @@ ddr_intercore_eth_desc_size = 8*MB;
 
 ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_desc_size;
 ddr_intercore_eth_data_size = 24*MB;
+
+# Shared memory for DMA Buf FD carveout
+ddr_shared_mem_addr     = ddr_intercore_eth_data_addr + ddr_intercore_eth_data_size;
+ddr_shared_mem_size     = SHARED_MEM_SIZE - uboot_reloc_mem_size;
 
 # C7x 1 Persistent DDR
 c7x_1_ddr_local_heap_non_cacheable_addr  = ddr_mem_addr_hi;
@@ -460,7 +465,7 @@ c7x_4_3_ddr_scratch_addr = c7x_4_2_ddr_scratch_addr + c7x_2_ddr_scratch_size;
 
 # Shared memory for DMA Buf FD carveout (located in high mem)
 ddr_shared_mem_addr_phys  = c7x_4_ddr_scratch_addr_phys + c7x_4_ddr_scratch_size;
-ddr_shared_mem_size       = 512*MB;
+ddr_shared_mem_size       = SHARED_MEM_SIZE - uboot_reloc_mem_size;
 
 #
 # Create memory section based on addr and size defined above, including
@@ -496,6 +501,8 @@ c7x_3_msmc  = MemSection("MSMC_C7x_3", "RWIX", c7x_3_msmc_addr  , c7x_3_msmc_siz
 c7x_4_l2   = MemSection("L2RAM_C7x_4", "RWIX", c7x_4_l2_addr  , c7x_4_l2_size  , "L2 for C7x_4");
 c7x_4_l1   = MemSection("L1RAM_C7x_4", "RWIX", c7x_4_l1_addr  , c7x_4_l1_size  , "L1 for C7x_4");
 c7x_4_msmc  = MemSection("MSMC_C7x_4", "RWIX", c7x_4_msmc_addr  , c7x_4_msmc_size  , "MSMC for C7x_4");
+
+uboot_reloc_mem = MemSection("UBOOT_RELOC_MEM", "", uboot_reloc_mem_addr  , uboot_reloc_mem_size  , "Uboot DDR relocation memory");
 
 # Main OCRAM memory sections
 mcu2_0_main_ocram   = MemSection("MAIN_OCRAM_MCU2_0", "RWIX", mcu2_0_main_ocram_addr  , mcu2_0_main_ocram_size  , "Main OCRAM for MCU2_0");
@@ -1162,6 +1169,7 @@ html_mmap.addMemSection( c7x_4_ddr_local_heap_phys         );
 html_mmap.addMemSection( c7x_4_ddr_scratch_non_cacheable_phys );
 html_mmap.addMemSection( c7x_4_ddr_scratch_phys );
 
+html_mmap.addMemSection( uboot_reloc_mem    );
 html_mmap.addMemSection( app_log_mem        );
 html_mmap.addMemSection( tiovx_obj_desc_mem );
 html_mmap.addMemSection( app_fileio_mem        );
@@ -1312,6 +1320,7 @@ c_header_mmap.addMemSection( app_fileio_mem        );
 c_header_mmap.addMemSection( ipc_vring_mem      );
 c_header_mmap.addMemSection( ddr_shared_mem     );
 c_header_mmap.addMemSection( ddr_shared_mem_phys     );
+c_header_mmap.addMemSection( uboot_reloc_mem     );
 c_header_mmap.addMemSection( c7x_1_msmc         );
 c_header_mmap.addMemSection( c7x_2_msmc         );
 c_header_mmap.addMemSection( c7x_3_msmc         );

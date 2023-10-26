@@ -76,18 +76,18 @@ MEMORY
     IPC_VRING_MEM                     : ORIGIN = 0xAC000000 , LENGTH = 0x03000000
     /* Memory for remote core logging [ size 256.00 KB ] */
     APP_LOG_MEM                       : ORIGIN = 0xAF000000 , LENGTH = 0x00040000
-    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
+    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 31.75 MB ] */
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x01FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
-    APP_FILEIO_MEM                    : ORIGIN = 0xB3000000 , LENGTH = 0x00400000
+    APP_FILEIO_MEM                    : ORIGIN = 0xB1000000 , LENGTH = 0x00400000
     /* DDR for C7x_2 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xB7000000 , LENGTH = 0x00100000
+    DDR_C7x_2_IPC            ( RWIX ) : ORIGIN = 0xB4000000 , LENGTH = 0x00100000
     /* DDR for C7x_2 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB7100000 , LENGTH = 0x00000400
-    /* DDR for C7x_2 for code/data [ size 46.00 MB ] */
-    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xB7200000 , LENGTH = 0x02E00000
-    /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
+    DDR_C7x_2_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xB4100000 , LENGTH = 0x00000400
+    /* DDR for C7x_2 for code/data [ size 30.00 MB ] */
+    DDR_C7x_2                ( RWIX ) : ORIGIN = 0xB4200000 , LENGTH = 0x01E00000
+    /* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x3C000000
     /* Virtual address of Non-cacheable DDR for c7x_2 for local heap [ size 128.00 MB ] */
     DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of Cacheable DDR for c7x_2 for local heap [ size 128.00 MB ] */

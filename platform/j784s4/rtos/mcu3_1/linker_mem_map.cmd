@@ -73,21 +73,21 @@ MEMORY
     /* R5F_TCMB0 [ size 32.00 KB ] */
     R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00008000
     /* DDR for MCU3_1 for Linux IPC [ size 1024.00 KB ] */
-    DDR_MCU3_1_IPC           ( RWIX ) : ORIGIN = 0xA7000000 , LENGTH = 0x00100000
+    DDR_MCU3_1_IPC           ( RWIX ) : ORIGIN = 0xA6000000 , LENGTH = 0x00100000
     /* DDR for MCU3_1 for Linux resource table [ size 1024 B ] */
-    DDR_MCU3_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA7100000 , LENGTH = 0x00000400
+    DDR_MCU3_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xA6100000 , LENGTH = 0x00000400
     /* DDR for MCU3_1 for code/data [ size 15.00 MB ] */
-    DDR_MCU3_1               ( RWIX ) : ORIGIN = 0xA7100400 , LENGTH = 0x00EFFC00
+    DDR_MCU3_1               ( RWIX ) : ORIGIN = 0xA6100400 , LENGTH = 0x00EFFC00
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 48.00 MB ] */
     IPC_VRING_MEM                     : ORIGIN = 0xAC000000 , LENGTH = 0x03000000
     /* Memory for remote core logging [ size 256.00 KB ] */
     APP_LOG_MEM                       : ORIGIN = 0xAF000000 , LENGTH = 0x00040000
-    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x03FC0000
+    /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 31.75 MB ] */
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xAF040000 , LENGTH = 0x01FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
-    APP_FILEIO_MEM                    : ORIGIN = 0xB3000000 , LENGTH = 0x00400000
-    /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
+    APP_FILEIO_MEM                    : ORIGIN = 0xB1000000 , LENGTH = 0x00400000
     /* DDR for MCU3_1 for local heap [ size  8.00 MB ] */
-    DDR_MCU3_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xE3800000 , LENGTH = 0x00800000
+    DDR_MCU3_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xBC800000 , LENGTH = 0x00800000
+    /* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x3C000000
 }

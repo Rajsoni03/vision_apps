@@ -164,12 +164,11 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
     },
     {
         /* Region 8 configuration: Remaining noncache memory
-         * This needs to be aligned, so starting it at
-         * 0xB0000000 */
+         * APP_FILEIO_MEM + TIOVX_LOG_RT_MEM */
         .regionId         = 8U,
         .enable           = 1U,
-        .baseAddr         = 0xB0000000,
-        .size             = CSL_ARM_R5_MPU_REGION_SIZE_64MB,
+        .baseAddr         = APP_FILEIO_MEM_ADDR,
+        .size             = CSL_ARM_R5_MPU_REGION_SIZE_16MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
         .accessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
