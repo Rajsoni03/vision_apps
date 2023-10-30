@@ -32,6 +32,8 @@ else ifeq ($(TARGET_OS),SAFERTOS)
 
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/src/include
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/safertos/include
+IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/config
+IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/config/$(SOC)
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/contrib
 IDIRS += $(SAFERTOS_KERNEL_INSTALL_PATH_r5f)/source_code_and_projects/SafeRTOS/api/$(SAFERTOS_ISA_EXT_r5f)
 IDIRS += $(SAFERTOS_KERNEL_INSTALL_PATH_r5f)/source_code_and_projects/SafeRTOS/api/PrivWrapperStd
