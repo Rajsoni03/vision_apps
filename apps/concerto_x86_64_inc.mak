@@ -66,6 +66,7 @@ IMAGING_LIBS += ti_imaging_dcc
 IMAGING_LIBS += vx_target_kernels_imaging_aewb
 
 TIADALG_LIBS  =
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
 TIADALG_LIBS += tiadalg_fisheye_transformation
 TIADALG_LIBS += tiadalg_image_preprocessing
 TIADALG_LIBS += tiadalg_dof_plane_seperation
@@ -79,6 +80,7 @@ TIADALG_LIBS += tiadalg_structure_from_motion
 ifeq ($(SOC),j721e)
 TIADALG_LIBS += c6xsim
 endif
+endif
 
 VISION_APPS_UTILS_LIBS  =
 VISION_APPS_UTILS_LIBS += app_utils_draw2d
@@ -86,9 +88,11 @@ VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 VISION_APPS_UTILS_LIBS += app_utils_console_io
 VISION_APPS_UTILS_LIBS += app_utils_file_io
+VISION_APPS_UTILS_LIBS += app_utils_init
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
 VISION_APPS_UTILS_LIBS += app_utils_grpx
 VISION_APPS_UTILS_LIBS += app_utils_hwa
-VISION_APPS_UTILS_LIBS += app_utils_init
+endif
 
 VISION_APPS_SRV_LIBS  =
 VISION_APPS_SRV_LIBS  += vx_kernels_sample vx_target_kernels_sample_a72
@@ -124,38 +128,42 @@ VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
 TEST_LIBS += vx_kernels_openvx_ext_tests
-TEST_LIBS += vx_kernels_hwa_tests vx_kernels_video_io_tests vx_tiovx_tidl_tests
-TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
+TEST_LIBS += vx_kernels_video_io_tests
+TEST_LIBS += vx_tiovx_tidl_tests
+TEST_LIBS += vx_kernels_test_kernels_tests
+TEST_LIBS += vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+TEST_LIBS += vx_kernels_hwa_tests 
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
-
-PDK_LIBS =
-PDK_LIBS += dmautils.lib
-PDK_LIBS += udma.lib
-PDK_LIBS += sciclient.lib
-PDK_LIBS += ti.csl.lib
-PDK_LIBS += ti.osal.lib
+endif
 
 MMA_LIBS =
 MMA_LIBS += mmalib_cn_x86_64
 MMA_LIBS += mmalib_x86_64
 MMA_LIBS += common_x86_64
 
-ifneq ($(SOC),am62a)
+PDK_LIBS =
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+PDK_LIBS += dmautils.lib
+PDK_LIBS += udma.lib
+PDK_LIBS += sciclient.lib
+PDK_LIBS += ti.csl.lib
+PDK_LIBS += ti.osal.lib
+
 ADDITIONAL_STATIC_LIBS += $(PDK_LIBS)
-STATIC_LIBS += $(VISION_APPS_UTILS_LIBS)
 endif
 
 STATIC_LIBS += $(MMA_LIBS)
 STATIC_LIBS += $(TIOVX_LIBS)
 STATIC_LIBS += vxlib_$(TARGET_CPU) c6xsim_$(TARGET_CPU)_C66
-ifeq ($(SOC),j721e)
-STATIC_LIBS += C7100-host-emulation
-else ifeq ($(SOC),am62a)
-STATIC_LIBS += C7504-host-emulation
+STATIC_LIBS += $(VISION_APPS_UTILS_LIBS)
+
+ifeq ($(SOC), j722s)
+STATIC_LIBS += C7524-MMA2_256-host-emulation
 else
-STATIC_LIBS += C7120-host-emulation
+STATIC_LIBS += $(C7X_VERSION)-host-emulation
 endif
 
 include $(TIOVX_PATH)/conformance_tests/kernels/concerto_inc.mak

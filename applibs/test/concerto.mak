@@ -69,5 +69,9 @@ ifeq ($(TARGET_CPU),x86_64)
 CFLAGS      += -DTARGET_X86_64
 endif
 
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 endif

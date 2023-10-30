@@ -28,6 +28,10 @@ SKIPBUILD=1
 endif
 endif
 
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 
 endif

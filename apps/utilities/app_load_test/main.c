@@ -124,6 +124,12 @@ int main(int argc, char *argv[])
         core_id[0] = APP_IPC_CPU_MCU1_0;
         core_cnt = 1;
     }
+    #elif defined(SOC_J722S)
+    if (core == MCU2_FAMILY)
+    {
+        core_id[0] = APP_IPC_CPU_MCU2_0;
+        core_cnt   = 1;
+    }
     #else
     if (core == MCU2_FAMILY)
     {
@@ -152,15 +158,19 @@ int main(int argc, char *argv[])
     #endif
     else if (core == C7X_FAMILY)
     {
-        core_id[0] = APP_IPC_CPU_C7x_1;
-
-        #if defined(SOC_J721S2)
-        core_id[1] = APP_IPC_CPU_C7x_2;
-        #endif
         #if defined(SOC_J721E) || defined(SOC_AM62A)
+        core_id[0] = APP_IPC_CPU_C7x_1;
         core_cnt = 1;
         #endif
+
+        #if defined(SOC_J721S2) || defined(SOC_J722S)
+        core_id[0] = APP_IPC_CPU_C7x_1;
+        core_id[1] = APP_IPC_CPU_C7x_2;
+        core_cnt = 2;
+        #endif
+
         #if defined(SOC_J784S4)
+        core_id[0] = APP_IPC_CPU_C7x_1;
         core_id[1] = APP_IPC_CPU_C7x_2;
         core_id[2] = APP_IPC_CPU_C7x_3;
         core_id[3] = APP_IPC_CPU_C7x_4;

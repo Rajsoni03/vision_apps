@@ -1,4 +1,3 @@
-ifeq ($(TARGET_PLATFORM),$(filter $(TARGET_PLATFORM), J721E J721S2 J784S4))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 
@@ -25,11 +24,12 @@ CFLAGS      += -Wno-int-to-pointer-cast
 CSOURCES    := $(call all-c-files)
 CPPSOURCES  := $(call all-cpp-files)
 
-SKIPBUILD=0
+ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+SKIPBUILD=1
+endif
 
 include $(FINALE)
 
-endif
 endif
 endif
 
@@ -49,6 +49,10 @@ CFLAGS      += -Wno-strict-aliasing
 
 CSOURCES    := $(call all-c-files)
 CPPSOURCES  := $(call all-cpp-files)
+
+ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+SKIPBUILD=1
+endif
 
 include $(FINALE)
 

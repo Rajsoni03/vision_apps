@@ -12,6 +12,9 @@ endif
 
 ifeq ($(TARGET_CPU),x86_64)
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
 endif
 
 IDIRS += ${TIOVX_PATH}

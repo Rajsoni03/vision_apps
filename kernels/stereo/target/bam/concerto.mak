@@ -35,6 +35,10 @@ else
 SKIPBUILD=1
 endif
 
+ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 
 endif

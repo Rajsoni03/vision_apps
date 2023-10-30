@@ -12,6 +12,11 @@ ifeq ($(TARGET_CPU),x86_64)
 CSOURCES    += main_x86.c
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 STATIC_LIBS += $(IMAGING_LIBS)
+
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
+
 endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))

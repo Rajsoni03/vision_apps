@@ -66,7 +66,7 @@
 #include <utils/dss/include/app_dss.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/timer/include/app_timer.h>
-#include <dss/dss.h>
+#include <dss.h>
 
 /* ========================================================================== */
 /*                           Macros & Typedefs                                */
@@ -112,8 +112,10 @@ int32_t appDssInit(app_dss_init_params_t *dssParams)
 
     dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_0] = UTRUE;
     dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_1] = UFALSE;
+#if !defined(SOC_J722S)
     dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_2] = UFALSE;
     dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_3] = UFALSE;
+#endif
 
     for(i=0U; i< APP_DSS_VID_PIPE_ID_MAX; i++)
     {
@@ -128,14 +130,15 @@ int32_t appDssInit(app_dss_init_params_t *dssParams)
         dssInitParams.socParams.rmInfo.isPortAvailable[i] = dssParams->isPortAvailable[i];
     }
 
+#if !defined(SOC_J722S)
     dssInitParams.socParams.dpInitParams.isAvailable = dssParams->isDpAvailable;
+    dssInitParams.socParams.dsiInitParams.isAvailable = dssParams->isDsiAvailable;
 #if defined (SOC_J721S2)
     dssInitParams.socParams.dpInitParams.isHpdSupported = false;
 #elif defined (SOC_J721E) || defined (SOC_J784S4)
     dssInitParams.socParams.dpInitParams.isHpdSupported = true;
 #endif
-
-    dssInitParams.socParams.dsiInitParams.isAvailable = dssParams->isDsiAvailable;
+#endif
 
     retVal = Dss_init(&dssInitParams);
 

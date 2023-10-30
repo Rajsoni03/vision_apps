@@ -40,6 +40,10 @@ STATIC_LIBS += $(VISION_APPS_SRV_LIBS)
 SYS_SHARED_LIBS += EGL
 SYS_SHARED_LIBS += GLESv2
 
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 
 endif

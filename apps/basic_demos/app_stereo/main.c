@@ -540,7 +540,7 @@ static vx_status app_create_graph(AppObj *obj)
                 status = vxSetReferenceName((vx_reference)obj->input_display_config, "InputDisplayConfiguration");
             }
             obj->input_display_params.opMode=TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
-            obj->input_display_params.pipeId = 2;
+            obj->input_display_params.pipeId = 0;
             obj->input_display_params.outWidth = INPUT_DISPLAY_WIDTH;
             obj->input_display_params.outHeight = INPUT_DISPLAY_HEIGHT;
             obj->input_display_params.posX = (1920-INPUT_DISPLAY_WIDTH)/2;

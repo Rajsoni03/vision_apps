@@ -125,8 +125,11 @@ TIOVX_LIBS += vx_platform_psdk_j7
 TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_kernels_openvx_ext vx_target_kernels_openvx_ext
 TIOVX_LIBS += vx_utils
-TIOVX_LIBS += vx_kernels_hwa vx_kernels_video_io vx_kernels_tidl vx_kernels_tvm vx_nested_kernels_tidl
 TIOVX_LIBS += vx_tutorial
+TIOVX_LIBS += vx_kernels_video_io
+TIOVX_LIBS += vx_kernels_hwa 
+TIOVX_LIBS += vx_kernels_tidl vx_nested_kernels_tidl
+TIOVX_LIBS += vx_kernels_tvm 
 
 IMAGING_LIBS += app_utils_iss
 
@@ -175,7 +178,7 @@ VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
 
 VISION_APPS_MODULES_LIBS += vx_app_modules
 
-ifneq ($(TARGET_PLATFORM), AM62A)
+ifneq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), AM62A J722S))
 VISION_APPS_STEREO_LIBS += vx_kernels_common
 VISION_APPS_STEREO_LIBS += vx_kernels_stereo
 VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
@@ -184,13 +187,15 @@ PTK_LIBS += ptk_base
 PTK_LIBS += ptk_algos
 endif
 
-TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule vx_tiovx_tidl_tests
+TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
-TEST_LIBS += vx_target_kernels_source_sink
-TEST_LIBS += vx_kernels_hwa_tests vx_kernels_video_io_tests vx_tiovx_tvm_tests
+TEST_LIBS += vx_target_kernels_source_sink vx_kernels_hwa_tests
+TEST_LIBS += vx_kernels_video_io_tests
+TEST_LIBS += vx_tiovx_tidl_tests
 
-ifneq ($(TARGET_PLATFORM), AM62A)
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J721S2 J784S4))
+TEST_LIBS += vx_tiovx_tvm_tests
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
 endif

@@ -70,7 +70,7 @@
 #include <utils/timer/include/app_timer.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/ipc/include/app_ipc.h>
-#include <dss/dss.h>
+#include <dss.h>
 
 typedef struct {
 

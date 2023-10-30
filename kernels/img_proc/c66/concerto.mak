@@ -59,6 +59,10 @@ ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7120))
 DEFS += C6X_MIGRATION _TMS320C6600 __C7120__
 endif
 
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 
 endif

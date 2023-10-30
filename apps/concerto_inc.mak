@@ -10,7 +10,12 @@ STATIC_LIBS += vx_vxu
 STATIC_LIBS += vx_utils
 STATIC_LIBS += vx_tiovx_tidl_tests
 STATIC_LIBS += vx_kernels_tidl vx_target_kernels_tidl vx_target_kernels_ivision_common tidl_algo tidl_priv_algo tidl_obj_algo tidl_custom tidl_avx_kernels
+
+ifeq ($(SOC), j722s)
+STATIC_LIBS += C7524-MMA2_256-host-emulation
+else
 STATIC_LIBS += $(C7X_VERSION)-host-emulation
+endif
 
 # Uncomment below to link to TIDL/MMALIB in host emulation mode instead of natural C mode on PC
 # STATIC_LIBS += mmalib_x86_64 mmalib_cn_x86_64 common_x86_64
@@ -36,19 +41,21 @@ STATIC_LIBS += app_utils_mem
 LDIRS       += $(VISION_APPS_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 STATIC_LIBS += app_utils_init
 
-PDK_LIBS =
-
-ifeq ($(RTOS_SDK), mcu_plus_sdk)
-	PDK_LIBS += dmautils.am62ax.c75x.ti-c7x-hostemu.$(TARGET_BUILD).lib
-else
-	PDK_LIBS += dmautils.lib
-	PDK_LIBS += ti.csl.lib
+MCU_PLUS_SDK_LIBS =
+ifeq ($(SOC), am62a)
+  MCU_PLUS_SDK_LIBS += dmautils.am62ax.c75x.ti-c7x-hostemu.$(TARGET_BUILD).lib
+endif
+ifeq ($(SOC), am62a)
+  MCU_PLUS_SDK_LIBS += dmautils.j722s.c75ssx-0.ti-c7x-hostemu.$(TARGET_BUILD).lib
 endif
 
-ifneq ($(SOC),am62a)
+PDK_LIBS =
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
 PDK_LIBS += udma.lib
 PDK_LIBS += sciclient.lib
 PDK_LIBS += ti.osal.lib
+PDK_LIBS += dmautils.lib
+PDK_LIBS += ti.csl.lib
 endif
 
 MMA_LIBS =
@@ -57,6 +64,7 @@ MMA_LIBS += mmalib_x86_64
 MMA_LIBS += common_x86_64
 
 ADDITIONAL_STATIC_LIBS += $(PDK_LIBS)
+ADDITIONAL_STATIC_LIBS += $(MCU_PLUS_SDK_LIBS)
 
 STATIC_LIBS += $(MMA_LIBS)
 

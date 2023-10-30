@@ -1411,7 +1411,7 @@ static vx_status app_create_display(AppObj *obj)
 
     posX      = 0;
     posY      = 0;
-    pipeId    = 2;
+    pipeId    = 0;
 
     /* Display initialization */
     memset(&display_params, 0, sizeof(tivx_display_params_t));

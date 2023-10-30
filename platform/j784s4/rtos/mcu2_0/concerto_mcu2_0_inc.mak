@@ -81,8 +81,11 @@ ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	STATIC_LIBS += app_rtos
 endif
 SYS_STATIC_LIBS += app_utils_hwa
-SYS_STATIC_LIBS += app_utils_dss
 SYS_STATIC_LIBS += app_utils_sciclient
+
+ifeq ($(BUILD_MCU_BOARD_DEPENDENCIES),yes)
+SYS_STATIC_LIBS += app_utils_dss
+endif
 
 ifeq ($(BUILD_ENABLE_ETHFW),yes)
 STATIC_LIBS += app_utils_ethfw

@@ -284,7 +284,7 @@ vx_status app_init(AppObj *obj)
     /* Display initialization HV*/
     memset(&obj->display_params, 0, sizeof(tivx_display_params_t));
     obj->display_params.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
-    obj->display_params.pipeId = 2;
+    obj->display_params.pipeId = 0; // TODO: Need to clean this up ultimately when merging back to mainline
     obj->display_params.outHeight = 1080;
     obj->display_params.outWidth = 1920;
     obj->display_params.posX = 0;
@@ -451,11 +451,13 @@ vx_status app_create_graph(AppObj *obj)
             sensor_gain_control_enabled = 1;
         }
 
+        #if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
         if(ISS_SENSOR_FEATURE_CFG_UC1 == (sensor_features_supported & ISS_SENSOR_FEATURE_CFG_UC1))
         {
             APP_PRINTF("CMS Usecase is supported \n");
             sensor_features_enabled |= ISS_SENSOR_FEATURE_CFG_UC1;
         }
+        #endif
 
         switch(sensorParams.sensorInfo.aewbMode)
         {
@@ -583,7 +585,6 @@ Sensor driver does not support metadata yet.
 
     local_capture_config.timeout = 33;
     local_capture_config.timeoutInitial = 500;
-
     local_capture_config.numInst  = 2U;/* Configure both instances */
     local_capture_config.numCh = 1U;/* Single cam. Only 1 channel enabled */
     {
@@ -1181,6 +1182,7 @@ vx_status app_delete_graph(AppObj *obj)
     APP_PRINTF("releasing graph\n");
     status |= vxReleaseGraph(&obj->graph);
     APP_PRINTF("releasing graph done\n");
+
     return status;
 }
 

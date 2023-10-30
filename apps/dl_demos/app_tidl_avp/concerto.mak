@@ -40,6 +40,10 @@ STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 endif
 endif
 
+ifeq ($(SOC),j722s)
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 
 endif
