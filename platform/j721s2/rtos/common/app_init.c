@@ -522,13 +522,16 @@ int32_t appInit()
     #endif
 
     #if defined(R5F)
+    /* Only programming RAT if the physical address is in high mem */
+    if (DDR_SHARED_MEM_PHYS_ADDR > 0xFFFFFFFF)
+    {
+        ddr_mem_rat_prm.size              = DDR_SHARED_MEM_SIZE;
+        ddr_mem_rat_prm.baseAddress       = DDR_SHARED_MEM_ADDR;
+        ddr_mem_rat_prm.translatedAddress = DDR_SHARED_MEM_PHYS_ADDR;
 
-    ddr_mem_rat_prm.size              = DDR_SHARED_MEM_SIZE;
-    ddr_mem_rat_prm.baseAddress       = DDR_SHARED_MEM_ADDR;
-    ddr_mem_rat_prm.translatedAddress = DDR_SHARED_MEM_PHYS_ADDR;
-
-    status = appMemAddrTranslate(&ddr_mem_rat_prm);
-    APP_ASSERT_SUCCESS(status);
+        status = appMemAddrTranslate(&ddr_mem_rat_prm);
+        APP_ASSERT_SUCCESS(status);
+    }
     #endif
 
     #ifdef ENABLE_UART
