@@ -217,18 +217,20 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
     else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DPI_HDMI)
     {
         /*
-     * initialize PLL for VP1
-     *
-     * Summary:
-     * VP1 pclk must come from PLL19 (for our EVM) because
-     * we are routing VP1's output to DPI0, which is retimed
-     * using PLL19 HSDIV0 output.
-     * Therefore, set parent to PLL19 HSDIV0 and then set rate
-     * to 148.5 MHz
-     */
+         * initialize PLL for VP1
+         *
+         * Summary:
+         * VP1 pclk must come from PLL19 (for our EVM) because
+         * we are routing VP1's output to DPI0, which is retimed
+         * using PLL19 HSDIV0 output.
+         * Therefore, set parent to PLL19 HSDIV0 and then set rate
+         * to 148.5 MHz
+         */
+        SET_DEVICE_STATE_OFF(TISCI_DEV_DSS0);
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_1_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_1_IN_2X_CLK_PARENT_DPI0_EXT_CLKSEL_OUT0);
         SET_CLOCK_FREQ (TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_1_IN_2X_CLK, prm->timings.pixelClock);
         SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_1_IN_2X_CLK, 0, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
+        SET_DEVICE_STATE_ON(TISCI_DEV_DSS0);
     }
     else if (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {
