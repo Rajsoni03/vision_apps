@@ -56,6 +56,7 @@ else
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/device_manager/rm_pm_hal/lib/
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/device_manager/sciclient_direct/lib/
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/device_manager/self_reset/lib/
+	LDIRS += ${MCU_PLUS_SDK_PATH}/source/drivers/device_manager/dm_stub/lib/
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/vhwa/lib
 endif
 include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
@@ -84,5 +85,6 @@ else
 	ADDITIONAL_STATIC_LIBS += drivers.am62ax.dm-r5f.ti-arm-clang.${TARGET_BUILD}.lib
 	ADDITIONAL_STATIC_LIBS += rm_pm_hal.am62ax.r5f.ti-arm-clang.${TARGET_BUILD}.lib
 	ADDITIONAL_STATIC_LIBS += self_reset.am62ax.r5f.ti-arm-clang.${TARGET_BUILD}.lib
+	ADDITIONAL_STATIC_LIBS += dm_stub.am62ax.r5f.ti-arm-clang.${TARGET_BUILD}.lib
 endif
 DEFS        += $(RTOS)

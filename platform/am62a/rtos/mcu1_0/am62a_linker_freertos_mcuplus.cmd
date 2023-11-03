@@ -27,7 +27,7 @@ __FIQ_STACK_SIZE   = 0x0100;
 __ABORT_STACK_SIZE = 0x0100;
 __UNDEFINED_STACK_SIZE   = 0x0100;
 __SVC_STACK_SIZE   = 0x0100;
-
+__DM_STUB_STACK_SIZE = 0x0400; /* DM stub stack size */
 /*--------------------------------------------------------------*/
 /*                     Section Configuration                    */
 /*--------------------------------------------------------------*/
@@ -45,6 +45,7 @@ SECTIONS
         .text.boot      : palign(8)
     } load = R5F_TCMB0, run = R5F_TCMA
     .mpu_cfg            : align = 8, load = R5F_TCMB0, run = R5F_TCMA
+    .fs_stub (NOLOAD)   : {} align(4)       > DDR_FS_STUB
     .text               : {} palign(8)      > DDR_DM_R5F
     .const              : {} palign(8)      > DDR_DM_R5F
     .rodata             : {} palign(8)      > DDR_DM_R5F
@@ -62,6 +63,42 @@ SECTIONS
 
     .tracebuf                : {} align(1024)   > DDR_DM_R5F_IPC_TRACEBUF
     .stack                   : {} align(4)      > DDR_DM_R5F  (HIGH)
+
+    GROUP{
+
+        .dm_stub_text : {
+            _privileged_code_begin = .;
+            _text_secure_start = .;
+            dm_stub*(.text)
+        }  palign(8)
+
+        .dm_stub_data : {
+            _privileged_data_begin = .;
+            dm_stub*(.data)
+            _privileged_data_end = .;
+        }  palign(8)
+
+        .dm_stub_bss : {
+            _start_bss = .;
+            dm_stub*(.bss)
+            _end_bss = .;
+        }  palign(8)
+
+        .dm_stub_rodata : {
+            _start_rodata = .;
+            dm_stub*(.rodata)
+            _end_rodata = .;
+        }  palign(8)
+
+    .dm_stub_stack : {
+            _start_stack = .;
+            . += __DM_STUB_STACK_SIZE;
+            _end_stack = .;
+        }  palign(8)
+    }  load = R5F_TCMB0, run = R5F_TCMA
+
+    /* Trace buffer used during low power mode */
+    .lpm_trace_buf : (NOLOAD) {} > R5F_TCMA_TRACE_BUFF
 
     .bss:ddr_local_mem      (NOLOAD) : {} > DDR_DM_R5F_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
