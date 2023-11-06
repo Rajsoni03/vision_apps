@@ -181,6 +181,40 @@ static EthFw_VirtPortCfg gEthApp_autosarVirtPortCfg[] =
     },
 };
 
+static EthFw_AllocCfg gEthApp_allocCfg[] =
+{
+        {
+            .clientId = ETHREMOTECFG_CLIENTID_AUTOSAR,
+            .remoteProcId = IPC_MCU2_1,
+            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_1),
+            .virtMacPortMask = 0,
+        },
+        {
+            .clientId = ETHREMOTECFG_CLIENTID_AUTOSAR,
+            .remoteProcId = IPC_MCU1_0,
+            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_2),
+            .virtMacPortMask = 0,
+        },
+        {
+            .clientId = ETHREMOTECFG_CLIENTID_RTOS,
+            .remoteProcId = IPC_MCU2_1,
+            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_1),
+            .virtMacPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_MAC_PORT_4),
+        },
+        {
+            .clientId = ETHREMOTECFG_CLIENTID_LINUX,
+            .remoteProcId = IPC_MPU1_0,
+            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_0),
+            .virtMacPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_MAC_PORT_1),
+        },
+        {
+            .clientId = ETHREMOTECFG_CLIENTID_QNX,
+            .remoteProcId = IPC_MPU1_0,
+            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_0),
+            .virtMacPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_MAC_PORT_1),
+        },
+};
+
 #if defined(SAFERTOS)
 static sys_sem_t gEthApp_lwipMainTaskSemObj;
 #endif
@@ -514,6 +548,10 @@ static int32_t EthApp_initEthFw(void)
 
     /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
     cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
+
+    /* Set remote client object parameters */
+    ethFwCfg.allocCfg = &gEthApp_allocCfg[0];
+    ethFwCfg.numAlloc = ARRAY_SIZE(gEthApp_allocCfg);
 
 #if defined(ETHFW_GPTP_SUPPORT)
     /* gPTP stack config parameters */

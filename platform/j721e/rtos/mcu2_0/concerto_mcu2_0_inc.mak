@@ -97,7 +97,6 @@ ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
         STATIC_LIBS += ethfw_vepa
   	endif
 endif
-REMOTE_DEVICE_LIBS = lib_remote_device
 endif
 
 SYS_STATIC_LIBS += $(ETHFW_LIBS)

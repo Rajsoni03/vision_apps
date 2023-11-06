@@ -84,6 +84,7 @@
 #include <utils/intervlan/include/eth_swintervlan.h>
 #endif
 #include <ethfw/ethfw.h>
+#include <ethremotecfg/protocol/ethremotecfg.h>
 
 /* Vision Apps utils */
 #include <utils/udma/include/app_udma.h>
