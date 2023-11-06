@@ -606,9 +606,10 @@ static int32_t EthApp_initEthFw(void)
 /* lwIP callbacks (exact name required) */
 
 bool EthFwCallbacks_isPortLinked(struct netif *netif,
-                                 Enet_Handle hEnet)
+                                 void *handleArg)
 {
     bool linked = false;
+    Enet_Handle hEnet = (Enet_Handle)handleArg;
     uint32_t i;
 
     /* Report port linked as long as any port owned by EthFw is up */
