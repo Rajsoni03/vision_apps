@@ -1050,7 +1050,7 @@ static void appUnRegisterOpenVXTargetKernels()
         #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxUnRegisterImgProcTargetR5FKernels();
         #endif
-        #if defined(ENABLE_VHWA_VPAC0)
+        #if defined(ENABLE_VHWA_VPAC0) || defined(ENABLE_VHWA_VPAC1)
         tivxUnRegisterImagingTargetAewbKernels();
         #endif
     appLogPrintf("APP: OpenVX Target kernel deinit ... Done !!!\n");
