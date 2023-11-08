@@ -77,6 +77,7 @@
 #include <ti/csl/csl_clec.h>
 #else
 #include <DebugP.h>
+#include <kernel/dpl/ClockP.h>
 #include <hw_include/cslr_soc.h>
 #include <hw_include/csl_clec.h>
 #include <hw_include/am62ax/cslr_soc_baseaddress.h>
@@ -124,8 +125,8 @@ void IpcNotify_getConfig(IpcNotify_InterruptConfig **interruptConfig, uint32_t *
 }
 ClockP_Config gClockConfig = {
     .timerBaseAddr = TIMER2_BASE_ADDR,
-    .timerHwiIntNum = 18,
-    .eventId = 122,
+    .timerHwiIntNum = 10,
+    .eventId = 378,
     .timerInputClkHz = 25000000,
     .timerInputPreScaler = 1,
     .usecPerTick = 1000,
@@ -229,6 +230,13 @@ int main(void)
 
 #if !defined(MCU_PLUS_SDK)
     OS_init();
+#else
+    /* set timer clock source */
+    SOC_controlModuleUnlockMMR(SOC_DOMAIN_ID_MAIN, 2);
+    *(volatile uint32_t*)(TIMER2_CLOCK_SRC_MUX_ADDR) = TIMER2_CLOCK_SRC_MCU_HFOSC0;
+    SOC_controlModuleLockMMR(SOC_DOMAIN_ID_MAIN, 2);
+    /* initialize Clock */
+    ClockP_init();
 #endif
 
     appRtosTaskParamsInit(&tskParams);
