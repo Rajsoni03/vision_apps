@@ -24,10 +24,6 @@ ifeq ($(TARGET_OS), QNX)
 IDIRS       += $(QNX_TARGET)/usr/include
 endif
 
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
-DEFS += CORE_A72 A53
-endif
-
 include $(FINALE)
 
 endif
