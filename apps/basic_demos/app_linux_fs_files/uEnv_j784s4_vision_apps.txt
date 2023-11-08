@@ -11,4 +11,4 @@ dorprocboot=1
 name_overlays=k3-j784s4-evm-virt-mac-client.dtbo k3-j784s4-vision-apps.dtbo
 
 # Name overlays when booting from fit image
-name_overlays_fit=conf-ti_k3-j784s4-evm-virt-mac-client.dtbo conf-ti_k3-j784s4-vision-apps.dtbo
+name_overlays_fit=ti/k3-j784s4-evm-virt-mac-client.dtbo ti/k3-j784s4-vision-apps.dtbo
