@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2023 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -121,6 +121,24 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
  *  2 x MAC address for mcu2_1 virtual switch and MAC-only ports (RTOS)
  *  1 x MAC address for mcu2_1 virtual switch port (AUTOSAR) */
 #define ETHAPP_MAC_ADDR_POOL_SIZE           (6U)
+
+#if defined(SOC_J721E)
+#define ETHAPP_DFLT_PORT_MASK               (CPSW_ALE_HOST_PORT_MASK | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_8) | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_2) | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_5) | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_6) | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_7))
+#elif defined(SOC_J784S4)
+#define ETHAPP_DFLT_PORT_MASK               (CPSW_ALE_HOST_PORT_MASK | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
+                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_4))
+#endif
+
+#define ETHAPP_DFLT_VIRT_PORT_MASK          (ETHFW_BIT(ETHREMOTECFG_SWITCH_PORT_0) | \
+                                             ETHFW_BIT(ETHREMOTECFG_SWITCH_PORT_1) | \
+                                             ETHFW_BIT(ETHREMOTECFG_SWITCH_PORT_2))
 
 static EthAppObj gEthAppObj =
 {
@@ -250,10 +268,12 @@ static void EthApp_initPtp(void);
 
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH) || defined(ETHFW_VEPA_SUPPORT)
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
-                                        const uint8_t hostId);
+                                        uint16_t vlanId,
+                                        uint8_t hostId);
 
 static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
-                                        const uint8_t hostId);
+                                        uint16_t vlanId,
+                                        uint8_t hostId);
 
 /* Array to store coreId to lwip bridge portId map */
 static uint8_t gEthApp_lwipBridgePortIdMap[IPC_MAX_PROCS];
@@ -268,38 +288,52 @@ typedef struct
 } EthApp_SharedMcastAddrTable;
 
 /* Must not exceed ETHAPP_MAX_SHARED_MCAST_ADDR entries */
-static EthApp_SharedMcastAddrTable gEthApp_sharedMcastAddrTable[] =
+static EthFwMcast_McastCfg gEthApp_sharedMcastCfgTable[] =
 {
     {
         /* MCast IP ADDR: 224.0.0.1 */
-        .macAddr = {0x01,0x00,0x5E,0x00,0x00,0x01},
-        .portMask= 0U,
+        .macAddr      = {0x01, 0x00, 0x5E, 0x00, 0x00, 0x01},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         /* MCast IP ADDR: 224.0.0.251 */
-        .macAddr = {0x01,0x00,0x5E,0x00,0x00,0xFB},
-        .portMask= 0U,
+        .macAddr      = {0x01, 0x00, 0x5E, 0x00, 0x00, 0xFB},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         /* MCast IP ADDR: 224.0.0.252 */
-        .macAddr = {0x01,0x00,0x5E,0x00,0x00,0xFC},
-        .portMask= 0U,
+        .macAddr      = {0x01, 0x00, 0x5E, 0x00, 0x00, 0xFC},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
-        .macAddr = {0x33,0x33,0x00,0x00,0x00,0x01},
-        .portMask= 0U,
+        .macAddr      = {0x33, 0x33, 0x00, 0x00, 0x00, 0x01},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
-        .macAddr = {0x33,0x33,0xFF,0x1D,0x92,0xC2},
-        .portMask= 0U,
+        .macAddr      = {0x33, 0x33, 0xFF, 0x1D, 0x92, 0xC2},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
-        .macAddr = {0x01,0x80,0xC2,0x00,0x00,0x00},
-        .portMask= 0U,
+        .macAddr      = {0x01, 0x80, 0xC2, 0x00, 0x00, 0x00},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
-        .macAddr = {0x01,0x80,0xC2,0x00,0x00,0x03},
-        .portMask= 0U,
+        .macAddr      = {0x01, 0x80, 0xC2, 0x00, 0x00, 0x03},
+        .vlanId       = 0U,
+        .portMask     = ETHAPP_DFLT_PORT_MASK,
+        .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
 };
 #endif
@@ -308,15 +342,19 @@ static EthApp_SharedMcastAddrTable gEthApp_sharedMcastAddrTable[] =
  * only with PTP related multicast addresses which are used by the test PTP stack
  * used by EthFw.
  * Note: Must not exceed ETHFW_RSVD_MCAST_LIST_LEN */
-static uint8_t gEthApp_rsvdMcastAddrTable[][ENET_MAC_ADDR_LEN] =
+static EthFwMcast_RsvdMcast gEthApp_rsvdMcastCfgTable[] =
 {
     /* PTP - Peer delay messages */
     {
-        0x01, 0x80, 0xc2, 0x00, 0x00, 0x0E,
+        .macAddr  = {0x01, 0x80, 0xc2, 0x00, 0x00, 0x0E},
+        .vlanId   = 0U,
+        .portMask = ETHAPP_DFLT_PORT_MASK,
     },
     /* PTP - Non peer delay messages */
     {
-        0x01, 0x1b, 0x19, 0x00, 0x00, 0x00,
+        .macAddr  = {0x01, 0x1b, 0x19, 0x00, 0x00, 0x00},
+        .vlanId   = 0U,
+        .portMask = ETHAPP_DFLT_PORT_MASK,
     },
 };
 
@@ -345,6 +383,14 @@ static uint32_t gEthApp_remoteClientPrivVlanIdMap[ETHREMOTECFG_SWITCH_PORT_LAST+
     [ETHREMOTECFG_SWITCH_PORT_2] = 1300U, /* AUTOSAR client */
 };
 #endif
+
+/* Trace configuration */
+static EthFwTrace_Cfg gEthApp_traceCfg =
+{
+    .print        = appLogPrintf,
+    .traceTsFunc  = NULL,
+    .extTraceFunc = NULL,
+};
 
 void appEthFwEarlyInit()
 {
@@ -376,6 +422,12 @@ int32_t appEthFwInit()
 #if defined(ETHFW_GPTP_SUPPORT)
     SemaphoreP_Params semParams;
 #endif
+
+    /* Initialize EthFw trace utils */
+    if (status == ENET_SOK)
+    {
+        EthFwTrace_init(&gEthApp_traceCfg);
+    }
 
     /* Board related initialization */
 #if defined(SOC_J721E)
@@ -518,6 +570,8 @@ static int32_t EthApp_initEthFw(void)
     Cpsw_Cfg *cpswCfg = &ethFwCfg.cpswCfg;
     EnetUdma_Cfg dmaCfg;
     EnetRm_MacAddressPool *pool = &cpswCfg->resCfg.macList;
+    EthFwMcast_SharedMcastCfg *sharedMcastCfg = &ethFwCfg.mcastCfg.sharedMcastCfg;
+    EthFwMcast_RsvdMcastCfg *rsvdMcastCfg = &ethFwCfg.mcastCfg.rsvdMcastCfg;
     uint32_t poolSize;
     int32_t status = ETHAPP_OK;
     int32_t i;
@@ -565,7 +619,7 @@ static int32_t EthApp_initEthFw(void)
 #endif
 
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH) || defined(ETHFW_VEPA_SUPPORT)
-    if (ARRAY_SIZE(gEthApp_sharedMcastAddrTable) > ETHAPP_MAX_SHARED_MCAST_ADDR)
+    if (ARRAY_SIZE(gEthApp_sharedMcastCfgTable) > ETHAPP_MAX_SHARED_MCAST_ADDR)
     {
         appLogPrintf("ETHFW error: No. of shared mcast addr cannot exceed %d\n",
                     ETHAPP_MAX_SHARED_MCAST_ADDR);
@@ -573,21 +627,16 @@ static int32_t EthApp_initEthFw(void)
     }
     else
     {
-        for (i = 0U; i < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); i++)
-        {
-            EnetUtils_copyMacAddr(&ethFwCfg.sharedMcastCfg.macAddrList[i][0],
-                                  &gEthApp_sharedMcastAddrTable[i].macAddr[0]);
-        }
-
-        ethFwCfg.sharedMcastCfg.numMacAddr = ARRAY_SIZE(gEthApp_sharedMcastAddrTable);
-        ethFwCfg.sharedMcastCfg.filterAddMacSharedCb = EthApp_filterAddMacSharedCb;
-        ethFwCfg.sharedMcastCfg.filterDelMacSharedCb = EthApp_filterDelMacSharedCb;
+        sharedMcastCfg->mcastCfg = &gEthApp_sharedMcastCfgTable[0U];
+        sharedMcastCfg->numMcast = ARRAY_SIZE(gEthApp_sharedMcastCfgTable);
+        sharedMcastCfg->filterAddMacSharedCb = EthApp_filterAddMacSharedCb;
+        sharedMcastCfg->filterDelMacSharedCb = EthApp_filterDelMacSharedCb;
     }
 #endif
 
     if (status == ETHAPP_OK)
     {
-        if (ARRAY_SIZE(gEthApp_rsvdMcastAddrTable) > ETHFW_RSVD_MCAST_LIST_LEN)
+        if (ARRAY_SIZE(gEthApp_rsvdMcastCfgTable) > ETHFW_RSVD_MCAST_LIST_LEN)
         {
             appLogPrintf("ETHFW error: No. of rsvd mcast addr cannot exceed %d\n",
                          ETHFW_RSVD_MCAST_LIST_LEN);
@@ -595,13 +644,8 @@ static int32_t EthApp_initEthFw(void)
         }
         else
         {
-            for (i = 0U; i < ARRAY_SIZE(gEthApp_rsvdMcastAddrTable); i++)
-            {
-                EnetUtils_copyMacAddr(&ethFwCfg.rsvdMcastCfg.macAddrList[i][0],
-                                      &gEthApp_rsvdMcastAddrTable[i][0]);
-            }
-
-            ethFwCfg.rsvdMcastCfg.numMacAddr = ARRAY_SIZE(gEthApp_rsvdMcastAddrTable);
+            rsvdMcastCfg->mcastCfg = &gEthApp_rsvdMcastCfgTable[0U];
+            rsvdMcastCfg->numMcast = ARRAY_SIZE(gEthApp_rsvdMcastCfgTable);
         }
     }
 
@@ -882,25 +926,23 @@ static void EthApp_initPtp(void)
 /* Application callback function to handle addition of a shared mcast
  * address in the ALE */
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
-                                        const uint8_t hostId)
+                                        uint16_t vlanId,
+                                        uint8_t hostId)
 {
     uint8_t idx = 0;
-    bridgeif_portmask_t portMask;
     struct eth_addr ethaddr;
     bool matchFound = false;
     int32_t errVal = 0;
 
     /* Search the mac_address in the shared mcast addr table */
-    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastCfgTable); idx++)
     {
         if (EnetUtils_cmpMacAddr(mac_address,
-                    &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
+                    &gEthApp_sharedMcastCfgTable[idx].macAddr[0]))
         {
             matchFound = true;
             /* Read and update stored port mask */
-            portMask = gEthApp_sharedMcastAddrTable[idx].portMask;
-            portMask |= (0x01 << gEthApp_lwipBridgePortIdMap[hostId]);
-            gEthApp_sharedMcastAddrTable[idx].portMask = portMask;
+            gEthApp_bridgePortMask[idx] |= ETHFW_BIT(gEthApp_lwipBridgePortIdMap[hostId]);
 
             /* Update bridge fdb entry for this mac_address */
             EnetUtils_copyMacAddr(&ethaddr.addr[0U], mac_address);
@@ -913,7 +955,7 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
 
             errVal = bridgeif_fdb_add(&netif_bridge,
                                       &ethaddr,
-                                      gEthApp_sharedMcastAddrTable[idx].portMask);
+                                      gEthApp_bridgePortMask[idx]);
 
             if (errVal)
             {
@@ -936,25 +978,24 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
 /* Application callback function to handle deletion of a shared mcast
  * address from the ALE */
 static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
-                                        const uint8_t hostId)
+                                        uint16_t vlanId,
+                                        uint8_t hostId)
 {
     uint8_t idx = 0;
-    bridgeif_portmask_t portMask;
+    bridgeif_portmask_t bridgePortMask;
     struct eth_addr ethaddr;
     bool matchFound = false;
     int32_t errVal = 0;
 
     /* Search the mac_address in the shared mcast addr table */
-    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastCfgTable); idx++)
     {
         if (EnetUtils_cmpMacAddr(mac_address,
-                    &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
+                    &gEthApp_sharedMcastCfgTable[idx].macAddr[0]))
         {
             matchFound = true;
             /* Read and update stored port mask */
-            portMask = gEthApp_sharedMcastAddrTable[idx].portMask;
-            portMask &= ~(0x01 << gEthApp_lwipBridgePortIdMap[hostId]);
-            gEthApp_sharedMcastAddrTable[idx].portMask = portMask;
+            gEthApp_bridgePortMask[idx] &= ~ETHFW_BIT(gEthApp_lwipBridgePortIdMap[hostId]);
 
             /* Update bridge fdb entry for this mac_address */
             EnetUtils_copyMacAddr(&ethaddr.addr[0U], mac_address);
@@ -965,11 +1006,11 @@ static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
              */
             bridgeif_fdb_remove(&netif_bridge, &ethaddr);
 
-            if (gEthApp_sharedMcastAddrTable[idx].portMask)
+            if (gEthApp_bridgePortMask[idx])
             {
                 errVal = bridgeif_fdb_add(&netif_bridge,
                                           &ethaddr,
-                                          gEthApp_sharedMcastAddrTable[idx].portMask);
+                                          gEthApp_bridgePortMask[idx]);
             }
 
             if (errVal)
@@ -995,16 +1036,17 @@ static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
 /* Application callback function to handle addition of a shared mcast
  * address in the ALE */
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
-                                        const uint8_t hostId)
+                                        uint16_t vlanId,
+                                        uint8_t hostId)
 {
     uint8_t idx = 0;
     bool matchFound = false;
 
     /* Search the mac_address in the shared mcast addr table */
-    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastCfgTable); idx++)
     {
         if (EnetUtils_cmpMacAddr(mac_address,
-                    &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
+                    &gEthApp_sharedMcastCfgTable[idx].macAddr[0]))
         {
             matchFound = true;
             appLogPrintf("filterAddMacSharedCb: Address found: %x:%x:%x:%x:%x:%x\n",
@@ -1029,16 +1071,17 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
 /* Application callback function to handle deletion of a shared mcast
  * address from the ALE */
 static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
-                                        const uint8_t hostId)
+                                        uint16_t vlanId,
+                                        uint8_t hostId)
 {
     uint8_t idx = 0;
     bool matchFound = false;
 
     /* Search the mac_address in the shared mcast addr table */
-    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastAddrTable); idx++)
+    for (idx = 0; idx < ARRAY_SIZE(gEthApp_sharedMcastCfgTable); idx++)
     {
         if (EnetUtils_cmpMacAddr(mac_address,
-                    &gEthApp_sharedMcastAddrTable[idx].macAddr[0]))
+                    &gEthApp_sharedMcastCfgTable[idx].macAddr[0]))
         {
             matchFound = true;
             appLogPrintf("filterDelMacSharedCb: Address found: %x:%x:%x:%x:%x:%x\n",

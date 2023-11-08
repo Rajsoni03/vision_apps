@@ -86,17 +86,11 @@ SYS_STATIC_LIBS += app_utils_sciclient
 
 ifeq ($(BUILD_ENABLE_ETHFW),yes)
 STATIC_LIBS += app_utils_ethfw
-ETHFW_LIBS = ethfw
 ETHFW_LIBS += ethfw_callbacks
 ETHFW_LIBS += eth_intervlan
 ETHFW_LIBS += ethfw_board
-ETHFW_LIBS += lib_remoteswitchcfg_server
-ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
-	ETHFW_LIBS += ethfw_lwip
-	ifeq ($(ETHFW_CPSW_VEPA_SUPPORT),yes)
-        STATIC_LIBS += ethfw_vepa
-  	endif
-endif
+ETHFW_LIBS += ethfw_remotecfg_server
+ETHFW_LIBS += ethfw_common
 endif
 
 SYS_STATIC_LIBS += $(ETHFW_LIBS)

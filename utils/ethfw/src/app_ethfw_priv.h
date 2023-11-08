@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2023 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -83,7 +83,7 @@
 #include <utils/intervlan/include/eth_hwintervlan.h>
 #include <utils/intervlan/include/eth_swintervlan.h>
 #endif
-#include <ethfw/ethfw.h>
+#include <ethremotecfg/server/include/ethfw.h>
 #include <ethremotecfg/protocol/ethremotecfg.h>
 
 /* Vision Apps utils */
