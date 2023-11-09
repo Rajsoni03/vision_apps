@@ -59,7 +59,7 @@ extern "C" {
 #define APP_MSGTYPE_IMAGE_BUF_CMD   (2U)
 #define APP_MSGTYPE_IMAGE_BUF_RSP   (2U)
 
-#define APP_MAX_NUM_REFS            (32U)
+#define APP_MAX_NUM_REFS            (48U)
 
 #define APP_CMD_STATUS_SUCCESS      (0U)
 #define APP_CMD_STATUS_FAILURE      (1U)

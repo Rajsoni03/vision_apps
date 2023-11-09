@@ -381,7 +381,8 @@ static int32_t App_sendObjInfo(App_Context     *appCntxt,
     appBuffDesc->msgId   = APP_MSGTYPE_IMAGE_BUF_CMD;
     appBuffDesc->lastObj = 0;
 
-    for (i = 0; i < appCntxt->numValidObjs; i++)
+    /* Sending the same object twice in order to verify the usage of comparing what got sent */
+    for (i = 0; i < 2*appCntxt->numValidObjs; i++)
     {
         tivx_utils_ref_ipc_msg_t   *ipcMsg;
         vx_reference                ref;
@@ -389,7 +390,7 @@ static int32_t App_sendObjInfo(App_Context     *appCntxt,
 
         ipcMsg  = &appBuffDesc->ipcMsg;
 
-        ref = appCntxt->refs[i];
+        ref = appCntxt->refs[i/2];
 
         /* Create data to transport it over IPC to a different process. */
         vxStatus = tivx_utils_export_ref_for_ipc_xfer(ref, ipcMsg);
@@ -401,7 +402,7 @@ static int32_t App_sendObjInfo(App_Context     *appCntxt,
             break;
         }
         
-        if (i == (appCntxt->numValidObjs - 1))
+        if (i == (2*appCntxt->numValidObjs - 1))
         {
             appBuffDesc->lastObj = 1;
         }
@@ -443,7 +444,7 @@ static int32_t App_sendObjInfo(App_Context     *appCntxt,
             }
         }
 
-    } /* for (i = 0; i < appBuffDesc->numObjs; i++) */
+    } /* for (i = 0; i < 2*appBuffDesc->numObjs; i++) */
 
     return status;
 }

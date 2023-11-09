@@ -82,6 +82,8 @@ typedef struct
 
 static App_Context gAppCntxt;
 
+static tivx_utils_ref_ipc_msg_t   prevIpcMsg;
+
 static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
                                          App_BuffDesc  *appBuffDesc,
                                          int32_t       *fd,
@@ -152,7 +154,8 @@ static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
             {
                 uint32_t    expected;
 
-                expected = appCntxt->testPattern * (objNum + j + 1);
+                /* Since the producer app is sending the same obj twice, accounting for this with test pattern */
+                expected = appCntxt->testPattern * (objNum/2 + j + 1);
 
                 if (expected != *(uint32_t*)ptrs[j])
                 {
@@ -173,6 +176,25 @@ static int32_t App_createObjFromBuffInfo(App_Context   *appCntxt,
 
         appCntxt->numValidObjs++;
     }
+
+    /* Validating that the ipcMsg received */
+    if (appCntxt->numValidObjs > 1)
+    {
+        vx_bool         refCompare;
+
+        refCompare = tivx_utils_compare_refs_from_ipc_xfer(ipcMsg, &prevIpcMsg);
+
+        if ( ((appCntxt->numValidObjs % 2) == 0) && (refCompare == (vx_bool)vx_false_e) )
+        {
+            VX_PRINT(VX_ZONE_ERROR, "The previous IPC message should have matched the previous IPC message but didn't\n");
+        }
+        else if ( ((appCntxt->numValidObjs % 2) == 1) && (refCompare == (vx_bool)vx_true_e) )
+        {
+            VX_PRINT(VX_ZONE_ERROR, "The previous IPC message should not have matched the previous IPC message but did\n");
+        }
+    }
+
+    prevIpcMsg = *ipcMsg;
 
     return status;
 }
@@ -314,7 +336,7 @@ int32_t App_msgProcThread(App_Context  *appCntxt)
                                  "App_createObjFromBuffInfo() failed.\n");
                     }
 
-                    if (appBuffDesc->lastObj)
+                    if (1==appBuffDesc->lastObj)
                     {
                         numFdPtr = NULL;
                         done = 1;
