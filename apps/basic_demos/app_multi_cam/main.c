@@ -1069,6 +1069,7 @@ static vx_status app_create_graph(AppObj *obj)
             #else
             status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC_VISS1);
             #endif
+            vxSetReferenceName((vx_reference)obj->vissObj1.node, "viss_node2");
             APP_PRINTF("VISS graph done!\n");
         }
         if(1 == obj->enable_aewb)
@@ -1076,7 +1077,7 @@ static vx_status app_create_graph(AppObj *obj)
             if(status == VX_SUCCESS)
             {
                 status = app_create_graph_aewb(obj->graph, &obj->aewbObj1, obj->vissObj1.h3a_stats_arr);
-
+                vxSetReferenceName((vx_reference)obj->aewbObj1.node, "aewb_node2");
                 APP_PRINTF("AEWB graph done!\n");
             }
         }
@@ -1098,6 +1099,7 @@ static vx_status app_create_graph(AppObj *obj)
                 #else
                 status = app_create_graph_ldc(obj->graph, &obj->ldcObj1, ldc_in_arr, TIVX_TARGET_VPAC_LDC1);
                 #endif
+                vxSetReferenceName((vx_reference)obj->ldcObj1.node, "ldc_node2");
                 APP_PRINTF("LDC graph done!\n");
             }
             obj->imgMosaicObj.input_arr[idx++] = obj->ldcObj1.output_arr;
