@@ -252,6 +252,10 @@ static void EthApp_netifStatusCb(struct netif *netif);
 
 static int32_t EthApp_initEthFw(void);
 
+static void EthApp_closeDmaCb(void *arg);
+
+static void EthApp_openDmaCb(void *arg);
+
 #if defined(ETHFW_DEMO_SUPPORT)
 static void EthApp_startSwInterVlan(char *recvBuff,
                                     char *sendBuff);
@@ -609,6 +613,11 @@ static int32_t EthApp_initEthFw(void)
     ethFwCfg.allocCfg = &gEthApp_allocCfg[0];
     ethFwCfg.numAlloc = ARRAY_SIZE(gEthApp_allocCfg);
 
+    /* Save the Lwip Dma parametrers */
+    ethFwCfg.lwipDmaCbArg   = (void *)&netif;
+    ethFwCfg.closeLwipDmaCb = EthApp_closeDmaCb;
+    ethFwCfg.openLwipDmaCb  = EthApp_openDmaCb;
+
 #if defined(ETHFW_GPTP_SUPPORT)
     /* gPTP stack config parameters */
     ethFwCfg.configPtpCb    = EthApp_configPtpCb;
@@ -868,6 +877,30 @@ static void EthApp_netifStatusCb(struct netif *netif)
     {
         appLogPrintf("Removed interface '%c%c%d'\n", netif->name[0], netif->name[1], netif->num);
     }
+}
+
+static void EthApp_closeDmaCb(void *arg)
+{
+    struct netif *netif = (struct netif *)arg;
+
+    /* Issue link down to Lwip stack and close the Lwip DMA channels */
+    sys_lock_tcpip_core();
+    netif_set_link_down(netif);
+    sys_unlock_tcpip_core();
+
+    LWIPIF_LWIP_closeDma(netif);
+}
+
+static void EthApp_openDmaCb(void *arg)
+{
+    struct netif *netif = (struct netif *)arg;
+
+    /* Open the lwip dma channels and issue link up to Lwip stack */
+    LWIPIF_LWIP_openDma(netif);
+
+    sys_lock_tcpip_core();
+    netif_set_link_up(netif);
+    sys_unlock_tcpip_core();
 }
 
 /* Functions called from Config server library based on selection from GUI */
