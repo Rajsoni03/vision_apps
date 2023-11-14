@@ -336,6 +336,8 @@ static EthFwMcast_McastCfg gEthApp_sharedMcastCfgTable[] =
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
 };
+
+static bridgeif_portmask_t gEthApp_bridgePortMask[ARRAY_SIZE(gEthApp_sharedMcastCfgTable)];
 #endif
 
 /* List of multicast addresses reserved for EthFw. Currently, this list is populated
