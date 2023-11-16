@@ -83,6 +83,8 @@
 #define APP_BUFFER_Q_DEPTH      (4)
 #define APP_PIPELINE_DEPTH      (7)
 
+//#define APP_TIVX_LOG_RT_ENABLE
+
 typedef struct {
 
     SensorObj     sensorObj;
@@ -928,6 +930,12 @@ static void app_deinit(AppObj *obj)
 
 static void app_delete_graph(AppObj *obj)
 {
+
+    #ifdef APP_TIVX_LOG_RT_ENABLE
+    tivxLogRtTraceExportToFile("app_multicam.bin");
+    tivxLogRtTraceDisable(obj->graph);
+    #endif
+
     app_delete_capture(&obj->captureObj);
     APP_PRINTF("Capture delete done!\n");
 
@@ -1249,6 +1257,10 @@ static vx_status app_verify_graph(AppObj *obj)
     {
         status = app_send_error_frame(&obj->captureObj);
     }
+
+    #ifdef APP_TIVX_LOG_RT_ENABLE
+    tivxLogRtTraceEnable(obj->graph);
+    #endif
 
     /* wait a while for prints to flush */
     tivxTaskWaitMsecs(100);
