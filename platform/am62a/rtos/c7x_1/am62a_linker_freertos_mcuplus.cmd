@@ -73,9 +73,9 @@ SECTIONS
     {
       boot.*<boot.oe71>(.text)
     } load > DDR_C7x_1_BOOT ALIGN(0x200000)
-    .vecs       >       DDR_C7x_1_VECS ALIGN(0x200000)
-    .text:_c_int00_secure > DDR_C7x_1_BOOT ALIGN(0x100000)
-    .text       >       DDR_C7x_1 ALIGN(0x10000)
+    .vecs       >       DDR_C7x_1_VECS ALIGN(0x400000)
+    .text:_c_int00_secure > DDR_C7x_1_BOOT ALIGN(0x200000)
+    .text       >       DDR_C7x_1 ALIGN(0x200000)
 
     .bss        >       DDR_C7x_1  /* Zero-initialized data */
     RUN_START(__BSS_START)
