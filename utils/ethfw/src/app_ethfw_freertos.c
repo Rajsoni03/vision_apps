@@ -252,9 +252,11 @@ static void EthApp_netifStatusCb(struct netif *netif);
 
 static int32_t EthApp_initEthFw(void);
 
+#if defined(ETHFW_MONITOR_SUPPORT)
 static void EthApp_closeDmaCb(void *arg);
 
 static void EthApp_openDmaCb(void *arg);
+#endif
 
 #if defined(ETHFW_DEMO_SUPPORT)
 static void EthApp_startSwInterVlan(char *recvBuff,
@@ -613,10 +615,12 @@ static int32_t EthApp_initEthFw(void)
     ethFwCfg.allocCfg = &gEthApp_allocCfg[0];
     ethFwCfg.numAlloc = ARRAY_SIZE(gEthApp_allocCfg);
 
+#if defined(ETHFW_MONITOR_SUPPORT)
     /* Save the Lwip Dma parametrers */
-    ethFwCfg.lwipDmaCbArg   = (void *)&netif;
-    ethFwCfg.closeLwipDmaCb = EthApp_closeDmaCb;
-    ethFwCfg.openLwipDmaCb  = EthApp_openDmaCb;
+    ethFwCfg.monitorCfg.lwipDmaCbArg   = (void *)&netif;
+    ethFwCfg.monitorCfg.closeLwipDmaCb = EthApp_closeDmaCb;
+    ethFwCfg.monitorCfg.openLwipDmaCb  = EthApp_openDmaCb;
+#endif
 
 #if defined(ETHFW_GPTP_SUPPORT)
     /* gPTP stack config parameters */
@@ -879,6 +883,7 @@ static void EthApp_netifStatusCb(struct netif *netif)
     }
 }
 
+#if defined(ETHFW_MONITOR_SUPPORT)
 static void EthApp_closeDmaCb(void *arg)
 {
     struct netif *netif = (struct netif *)arg;
@@ -902,6 +907,7 @@ static void EthApp_openDmaCb(void *arg)
     netif_set_link_up(netif);
     sys_unlock_tcpip_core();
 }
+#endif
 
 /* Functions called from Config server library based on selection from GUI */
 #if defined(ETHFW_DEMO_SUPPORT)
