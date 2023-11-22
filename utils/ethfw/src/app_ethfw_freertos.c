@@ -171,6 +171,27 @@ static Enet_MacPort gEthAppPorts[] =
 #endif
 };
 
+#if defined(ETHFW_GPTP_SUPPORT)
+static Enet_MacPort gEthAppSwitchPorts[]=
+{
+#if defined(SOC_J721E)
+    ENET_MAC_PORT_3,
+    ENET_MAC_PORT_8,
+#if defined(ENABLE_QSGMII_PORTS)
+    ENET_MAC_PORT_2,
+    ENET_MAC_PORT_5,
+    ENET_MAC_PORT_6,
+    ENET_MAC_PORT_7,
+#endif
+#endif
+
+#if defined(SOC_J784S4)
+    ENET_MAC_PORT_3,
+    ENET_MAC_PORT_5,
+#endif
+};
+#endif
+
 static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
 {
     {
@@ -949,12 +970,14 @@ static void EthApp_configPtpCb(void *arg)
 
 static void EthApp_initPtp(void)
 {
-    Enet_MacPort macPort;
-    uint32_t portMask;
+    uint32_t portMask = 0U;
+    uint8_t i;
 
     /* MAC port used for PTP */
-    macPort = ENET_MAC_PORT_3;
-    portMask = ENET_MACPORT_MASK(macPort);
+    for (i = 0U; i < ENET_ARRAYSIZE(gEthAppSwitchPorts); i++)
+    {
+        portMask |= ENET_MACPORT_MASK(gEthAppSwitchPorts[i]);
+    }
 
     /* Wait for host port MAC address to be allocated during lwIP getHandle */
     SemaphoreP_pend(gEthAppObj.hHostMacAllocSem, SemaphoreP_WAIT_FOREVER);
