@@ -85,6 +85,8 @@ typedef struct
     vx_uint32 num_output_tensors;
 
     vx_int32 graph_parameter_index;
+
+    vx_int32 core_id;
     
     vx_char label_names[3][APP_MAX_FILE_PATH];
     vx_char config_file_path[APP_MAX_FILE_PATH];

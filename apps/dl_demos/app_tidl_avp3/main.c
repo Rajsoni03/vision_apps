@@ -870,10 +870,20 @@ static vx_status app_init(AppObj *obj)
     /* Initialize TIDL first to get tensor I/O information from network */
     if(status == VX_SUCCESS)
     {
+        #if defined (SOC_J784S4)
+        obj->odTIDLObj.core_id = 2;
+        #else
+        obj->odTIDLObj.core_id = 0;
+        #endif
         status = app_init_tidl_od(obj->context, &obj->odTIDLObj, "od_tidl_obj");
     }
     if(status == VX_SUCCESS)
     {
+        #if defined (SOC_J784S4)
+        obj->pcTIDLObj.core_id = 3;
+        #else
+        obj->pcTIDLObj.core_id = 0;
+        #endif
         status = app_init_tidl_pc(obj->context, &obj->pcTIDLObj, "pc_tidl_obj");
     }
 

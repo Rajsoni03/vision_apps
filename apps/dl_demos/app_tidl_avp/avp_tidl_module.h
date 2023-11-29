@@ -85,6 +85,8 @@ typedef struct
     vx_uint32 num_output_tensors;
 
     vx_int32 graph_parameter_index;
+
+    vx_int32 core_id;
     
     vx_char label_names[3][APP_MAX_FILE_PATH];
     vx_char config_file_path[APP_MAX_FILE_PATH];
@@ -100,7 +102,7 @@ typedef struct
 vx_status app_init_tidl_od(vx_context context, TIDLObj *obj, char *objName);
 void app_deinit_tidl_od(TIDLObj *obj);
 void app_delete_tidl_od(TIDLObj *obj);
-vx_status app_create_graph_tidl_od(vx_context context, vx_graph graph, TIDLObj *obj, vx_object_array input_tensor_arr, uint8_t c7_instance);
+vx_status app_create_graph_tidl_od(vx_context context, vx_graph graph, TIDLObj *obj, vx_object_array input_tensor_arr);
 
 vx_status app_init_tidl_pc(vx_context context, TIDLObj *obj, char *objName);
 void app_deinit_tidl_pc(TIDLObj *obj);

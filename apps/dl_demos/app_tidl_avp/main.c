@@ -899,14 +899,29 @@ static vx_status app_init(AppObj *obj)
     /* Initialize TIDL first to get tensor I/O information from network */
     if(status == VX_SUCCESS)
     {
+        #if defined (SOC_J784S4)
+        obj->psdTIDLObj.core_id = 2;
+        #else
+        obj->psdTIDLObj.core_id = 0;
+        #endif
         status = app_init_tidl_od(obj->context, &obj->psdTIDLObj, "psd_tidl_obj");
     }
     if(status == VX_SUCCESS)
     {
+        #if defined (SOC_J784S4)
+        obj->vdTIDLObj.core_id = 2;
+        #else
+        obj->vdTIDLObj.core_id = 0;
+        #endif
         status = app_init_tidl_od(obj->context, &obj->vdTIDLObj, "vd_tidl_obj");
     }
     if(status == VX_SUCCESS)
     {
+        #if defined (SOC_J784S4)
+        obj->segTIDLObj.core_id = 3;
+        #else
+        obj->segTIDLObj.core_id = 0;
+        #endif
         status = app_init_tidl_pc(obj->context, &obj->segTIDLObj, "seg_tidl_obj");
     }
 
@@ -1109,16 +1124,12 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(obj->enable_psd == 1 && (status == VX_SUCCESS))
     {
-        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->psdTIDLObj, obj->psdPreProcObj.output_tensor_arr, 1);
+        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->psdTIDLObj, obj->psdPreProcObj.output_tensor_arr);
     }
 
     if(obj->enable_vd == 1 && (status == VX_SUCCESS))
     {
-        #if defined(SOC_J784S4)
-        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->vdTIDLObj, obj->vdPreProcObj.output_tensor_arr, 4);
-        #else
-        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->vdTIDLObj, obj->vdPreProcObj.output_tensor_arr, 1);
-        #endif
+        status = app_create_graph_tidl_od(obj->context, obj->graph, &obj->vdTIDLObj, obj->vdPreProcObj.output_tensor_arr);
     }
 
     if(obj->enable_sem_seg == 1 && (status == VX_SUCCESS))
