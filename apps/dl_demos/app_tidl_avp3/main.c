@@ -1134,9 +1134,9 @@ static vx_status app_create_graph(AppObj *obj)
     }
     if(obj->enable_sem_seg == 1)
     {
-        obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[0]; //Seg output
-        obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[1]; //Motion output
-        obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[2]; //Depth output
+        obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[1]; //Seg output
+        obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[2]; //Motion output
+        obj->imgMosaicObj.input_arr[idx++] = obj->pcPostProcObj.output_image_arr[0]; //Depth output
     }
     obj->imgMosaicObj.input_arr[idx++] = obj->dofVizObj.flow_vector_field_image_array; //DOF output
 
