@@ -61,7 +61,8 @@
  */
 #include "app_tidl_module.h"
 #include "app_pose_calc_module.h"
-#define COMPUTE_CHECKSUM
+
+#undef COMPUTE_CHECKSUM
 
 #ifdef APP_TIDL_TRACE_DUMP
 #define TIVX_TIDL_TRACE_DATA_SIZE  (128 * 1024 * 1024)
@@ -499,6 +500,9 @@ static vx_user_data_object readConfig(vx_context context, vx_char *config_file, 
 #ifdef COMPUTE_CHECKSUM
             tidlParams->compute_config_checksum  = 0;
             tidlParams->compute_network_checksum = 1;
+#else
+            tidlParams->compute_config_checksum  = 0;
+            tidlParams->compute_network_checksum = 0;
 #endif
             vxUnmapUserDataObject(config, map_id);
         }
