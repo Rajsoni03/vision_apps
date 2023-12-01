@@ -80,7 +80,7 @@ extern "C" {
 /* ========================================================================== */
 
 /**
- * \defgroup group_vision_apps_utils_dctrl Display controller remote service APIs (TI-RTOS only)
+ * \defgroup group_vision_apps_utils_dctrl Display controller remote service APIs (RTOS only)
  *
  * \brief This section contains APIs for display controller remote service
  *

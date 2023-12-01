@@ -64,7 +64,7 @@
 #define APP_SCISERVER_H_
 
 /**
- * \defgroup group_vision_apps_utils_server SCISERVER initialization APIs (TI-RTOS only)
+ * \defgroup group_vision_apps_utils_server SCISERVER initialization APIs (RTOS only)
  *
  * \brief This section contains APIs for SCISERVER initialization
  *

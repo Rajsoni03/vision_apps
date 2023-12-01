@@ -81,7 +81,7 @@ extern "C" {
 /* ========================================================================== */
 
 /**
- * \defgroup group_vision_apps_utils_dss Display subsystem initialization APIs (TI-RTOS only)
+ * \defgroup group_vision_apps_utils_dss Display subsystem initialization APIs (RTOS only)
  *
  * \brief This section contains APIs for display initialization
  *

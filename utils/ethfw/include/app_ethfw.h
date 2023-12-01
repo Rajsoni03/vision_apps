@@ -65,7 +65,7 @@
 
 
 /**
- * \defgroup group_vision_apps_utils_ethfw Ethfw APIs (TI-RTOS only)
+ * \defgroup group_vision_apps_utils_ethfw Ethfw APIs (RTOS only)
  *
  * \brief This section contains APIs to initialize Ethfw within MCU Image firmware
  *
