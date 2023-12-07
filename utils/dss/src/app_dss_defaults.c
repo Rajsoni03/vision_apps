@@ -357,27 +357,31 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
     isDpConnected = true;
     #endif
 
-    if ( (FVID2_SOK == retVal) && (true == isDpConnected) )
+    if (FVID2_SOK == retVal)
     {
-        if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+        if ((obj->initPrm.display_type!=APP_DSS_DEFAULT_DISPLAY_TYPE_EDP) ||
+            (true == isDpConnected))
         {
-            /* Only two lanes output supported for AOU LCD */
-            dsiParams.num_lanes = 2u;
-            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_DSI_PARAMS, &dsiParams, sizeof(app_dctrl_dsi_params_t), 0U);
-        }
+            if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+            {
+                /* Only two lanes output supported for AOU LCD */
+                dsiParams.num_lanes = 2u;
+                retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_DSI_PARAMS, &dsiParams, sizeof(app_dctrl_dsi_params_t), 0U);
+            }
 
-        retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_PATH, &pathInfo, sizeof(pathInfo), 0U);
-        retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_VP_PARAMS, &vpParams, sizeof(vpParams), 0U);
-        if(true == doAdvVpSetup)
-        {
-            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_ADV_VP_PARAMS, &advVpParams, sizeof(advVpParams), 0U);
+            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_PATH, &pathInfo, sizeof(pathInfo), 0U);
+            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_VP_PARAMS, &vpParams, sizeof(vpParams), 0U);
+            if(true == doAdvVpSetup)
+            {
+                retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_ADV_VP_PARAMS, &advVpParams, sizeof(advVpParams), 0U);
+            }
+            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_OVERLAY_PARAMS, &overlayParams, sizeof(overlayParams), 0U);
+            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_LAYER_PARAMS, &layerParams, sizeof(layerParams), 0U);
         }
-        retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_OVERLAY_PARAMS, &overlayParams, sizeof(overlayParams), 0U);
-        retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_LAYER_PARAMS, &layerParams, sizeof(layerParams), 0U);
-    }
-    else
-    {
-        appLogPrintf("DSS: Display is not connected\n");
+        else
+        {
+            appLogPrintf("DSS: Display is not connected\n");
+        }
     }
 
     return retVal;
