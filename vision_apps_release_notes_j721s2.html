@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 09.00.00</h2>
+<h2 align='center'>Version: 09.01.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -184,7 +184,7 @@ New features in this release are highlighted in <strong>bold</strong>
     <li>Dense optical flow (DOF) demo</li>
     <li>Stereo disparity engine demo</li>
     <li>Single and multi camera CSI2RX + VISS + LDC + MSC + Display demo</li>
-    <li>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display with Linux <strong>and QNX</strong> running on A72</li>
+    <li>Multi channel codec demo utilizing CSI2RX + VISS + LDC + MSC + Display with Linux and QNX running on A72</li>
     <li>C7x algorithm offload demo (with DMA acceleration)</li>
     </ul>
 </li>
@@ -261,32 +261,36 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11422">ADASVISION-5914</a></td>
-<td align="left"><span>psdk_rtos/scripts/board_env.sh has wrong image name </span></td>
+<td align="center">ADASVISION-6109</td>
+<td align="left"><span>app_utils: Missing C++ guard from header files</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11423">ADASVISION-5893</a></td>
-<td align="left"><span>Removal about information about PyTorch based training script for DKAZE</span></td>
+<td align="center">ADASVISION-6097</td>
+<td align="left"><span>Missing ?= in vision_apps/tools_path.mak makefile</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11424">ADASVISION-5880</a></td>
-<td align="left"><span>PSDK RTOS - ADDON package mySecureSW request link does not exist</span></td>
+<td align="center">ADASVISION-6096</td>
+<td align="left"><span>Vision Apps documentation update for J721S2 and J784S4 to discount C66x</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11425">ADASVISION-5878</a></td>
-<td align="left"><span>[Documentation] [J784s4] - The Multi cam demo is not updated regarding the changes of object split array </span></td>
+<td align="center">ADASVISION-6083</td>
+<td align="left"><span>Vision Apps Datasheets incorrect task name</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11426">ADASVISION-5877</a></td>
-<td align="left"><span>Documentation: SafeRTOS documentation with PDK reference is broken</span></td>
+<td align="center">ADASVISION-6082</td>
+<td align="left"><span>Vision Apps Datasheets incorrect CPU loading</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11075">ADASVISION-5789</a></td>
-<td align="left"><span>vx_app_load_test provides a lower load when given 100% load as input </span></td>
+<td align="center">ADASVISION-6019</td>
+<td align="left"><span>Enable CAC from single CAM app demo.</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11077">ADASVISION-5763</a></td>
-<td align="left"><span>MCU2_0 startups much more slower if its OS is SafeRTOS</span></td>
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11428">ADASVISION-5986</a></td>
+<td align="left"><span>NFS steps mentioned in Vision Apps User guide not working</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11076">ADASVISION-5788</a></td>
+<td align="left"><span>L2_MEM shows 100% unused when tidl_od demo is run</span></td>
 </tr>
 </tbody>
 </table>
@@ -304,12 +308,28 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-5990</a></td>
-<td align="left"><span>Single Cam application not running in PC emulation mode</span></td>
+<td align="center">ADASVISION-6117</td>
+<td align="left"><span>SFM demo hangs on J784S4</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11428">ADASVISION-5986</a></td>
-<td align="left"><span>NFS steps mentioned in Vision Apps User guide not working</span></td>
+<td align="center">ADASVISION-6116</td>
+<td align="left"><span>run_mutli_cam_codec.sh fails</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6112</td>
+<td align="left"><span>[J784s4] ENABLE_UDMA_COPY is disabled on C7x_1 on vision_apps</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6090</td>
+<td align="left"><span>Perf Stats can not print full list of task loads</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6088</td>
+<td align="left"><span>make package 4.3 takes more execution time during build than make package 4.1</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6064</td>
+<td align="left"><span>[J784s4] MSMC Cache reserve region is not considered in gen_linker_mem_map.py </span></td>
 </tr>
 <tr class="odd">
 <td align="center">ADASVISION-5967</td>
@@ -336,24 +356,16 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>HDMI display from infotainment board not rendering image</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11076">ADASVISION-5788</a></td>
-<td align="left"><span>L2_MEM shows 100% unused when tidl_od demo is run</span></td>
-</tr>
-<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11079">ADASVISION-5774</a></td>
 <td align="left"><span>Glitches seen on stereo app for J784S4 with safertos</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11078">ADASVISION-5758</a></td>
 <td align="left"><span>Enable en_out_ldc_write cause freeze in Multi Cam Demo</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11003">ADASVISION-5734</a></td>
 <td align="left"><span>App_multi_cam_codec decode framerate drops for more than 2 channels</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11004">ADASVISION-5732</a></td>
-<td align="left"><span>eDP to HDMI adaptors failing on J721S2 QNX builds with SBL boot app</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11433">ADASVISION-5726</a></td>
@@ -447,28 +459,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">JACINTOREQ-5018</a></td>
-<td align="left"><span>De-scope BAM enablement on J7 from 8.6</span></td>
-<td align="left"><span>08.06.00</span></td>
+<td align="center">JACINTOREQ-6650</a></td>
+<td align="left"><span>Defer BAM enablement on J7 to SDK 10.0</span></td>
 <td align="left"><span>09.01.00</span></td>
-</tr>
-<tr class="odd">
-<td align="center">JACINTOREQ-6636</a></td>
-<td align="left"><span>Descope of few TIDL 9.0 MRs</span></td>
-<td align="left"><span>09.00.00</span></td>
-<td align="left"><span>DESCOPE</span></td>
-</tr>
-<tr class="odd">
-<td align="center">JACINTOREQ-5374</a></td>
-<td align="left"><span>Descope Orphaned FR's for J721E, J721S2, and J784S4 on QNX</span></td>
-<td align="left"><span>08.06.00</span></td>
-<td align="left"><span>DESCOPE</span></td>
-</tr>
-<tr class="odd">
-<td align="center">JACINTOREQ-6510</a></td>
-<td align="left"><span>QoS Scope Modify CR w.r.t AEN PPR and SDK restructuring</span></td>
-<td align="left"><span>09.00.00</span></td>
-<td align="left"><span>PSDK_9.x</span></td>
+<td align="left"><span>10.00.00</span></td>
 </tr>
 </tbody>
 </table>
