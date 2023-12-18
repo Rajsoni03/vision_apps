@@ -182,7 +182,7 @@ extern "C" {
 /* Number of maximum output tensor for visualization purpose. motion/semantic/depth*/
 #define TIVX_PIXEL_VIZ_MAX_TENSOR  (3U)
 
-/*For semantic segmentation supported maximum class is 5 including background*/
+/*For semantic segmentation supported maximum class is 256 including background*/
 /*For depth tensor output is U08, which makes for each value one different color has to be assigned, so each value is treated as different class*/
 #define TIVX_PIXEL_VIZ_MAX_CLASS  (256U)
 
