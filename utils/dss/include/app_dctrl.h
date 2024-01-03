@@ -587,24 +587,24 @@ typedef struct
      *   supply to prevent DC charge buildup within the display */
     uint32_t vSyncGated;
     /**< VSYNC gated enabled
-     *   FALSE: VSYNC gated disabled
-     *   TRUE: VSYNC gated enabled */
+     *   UFALSE: VSYNC gated disabled
+     *   UTRUE: VSYNC gated enabled */
     uint32_t hSyncGated;
     /**< HSYNC gated enabled
-     *   FALSE: HSYNC gated disabled
-     *   TRUE: HSYNC gated enabled */
+     *   UFALSE: HSYNC gated disabled
+     *   UTRUE: HSYNC gated enabled */
     uint32_t pixelClockGated;
     /**< Pixel clock gated enabled
-     *   FALSE: Pixel clock gated disabled
-     *   TRUE: Pixel clock gated enabled */
+     *   UFALSE: Pixel clock gated disabled
+     *   UTRUE: Pixel clock gated enabled */
     uint32_t pixelDataGated;
     /**< Pixel data gated enabled
-     *   FALSE: Pixel data gated disabled
-     *   TRUE: Pixel data gated enabled */
+     *   UFALSE: Pixel data gated disabled
+     *   UTRUE: Pixel data gated enabled */
     uint32_t pixelGated;
     /**< Pixel gated enable (only for TFT)
-     *   FALSE: Pixel clock always toggles (only in TFT mode)
-     *   TRUE: Pixel clock toggles only when there is valid data to
+     *   UFALSE: Pixel clock always toggles (only in TFT mode)
+     *   UTRUE: Pixel clock toggles only when there is valid data to
      *   display (only in TFT mode) */
 } app_dctrl_adv_vp_params_t;
 

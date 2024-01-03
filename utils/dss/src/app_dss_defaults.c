@@ -127,7 +127,7 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
         obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
     }
 
-    if(prm->enableM2m == TRUE)
+    if(prm->enableM2m == UTRUE)
     {
         appLogPrintf("DSS: M2M Path is enabled !!!\n");
         obj->m2m.enableM2m     = true;
@@ -156,7 +156,7 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
     dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VID2] = true;
     dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL1] = true;
 
-    if(prm->enableM2m == TRUE)
+    if(prm->enableM2m == UTRUE)
     {
         dssParams.isPipeAvailable[APP_DSS_VID_PIPE_ID_VIDL2] = true;
     }
@@ -167,7 +167,7 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
     dssParams.isOverlayAvailable[obj->overlayId] = true;
     dssParams.isPortAvailable[obj->vpId] = true;
 
-    if(prm->enableM2m == TRUE)
+    if(prm->enableM2m == UTRUE)
     {
         dssParams.isOverlayAvailable[obj->m2m.overlayId] = true;
         dssParams.isPortAvailable[obj->m2m.vpId] = true;

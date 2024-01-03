@@ -1108,7 +1108,7 @@ static void tivxKernelImgMosaicMscDrvSetScCfg(
     const tivx_obj_desc_image_t *in_img_desc,
     const tivxImgMosaicWindow *window)
 {
-    sc_cfg->enable = TRUE;
+    sc_cfg->enable = UTRUE;
     if(window->width > in_img_desc->imagepatch_addr[0U].dim_x)
     {
         /* Upscaling not supported - set MSC width same as input */

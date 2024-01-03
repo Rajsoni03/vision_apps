@@ -165,8 +165,8 @@ static void appC7xClecInitDru(void)
     for(i=dru_input_start; i<(dru_input_start+dru_input_num); i++)
     {
         /* Configure CLEC */
-        cfgClec.secureClaimEnable = FALSE;
-        cfgClec.evtSendEnable     = TRUE;
+        cfgClec.secureClaimEnable = UFALSE;
+        cfgClec.evtSendEnable     = UTRUE;
 
         /* cfgClec.rtMap value is different for each C7x */
         cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_5;
@@ -226,31 +226,31 @@ void appMmuMap(Bool is_secure)
     attrs.ns = ns;
 
     retVal = Mmu_map(0x00000000U, 0x00000000U, 0x20000000U, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x20000000U, 0x20000000U, 0x20000000U, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x40000000U, 0x40000000U, 0x20000000U, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x60000000U, 0x60000000U, 0x10000000U, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x78000000U, 0x78000000U, 0x08000000U, &attrs, is_secure); /* CLEC */
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
@@ -258,25 +258,25 @@ void appMmuMap(Bool is_secure)
     attrs.attrIndx = Mmu_AttrIndx_MAIR7;
 
     retVal = Mmu_map(0x80000000U, 0x80000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0xA0000000U, 0xA0000000U, 0x20000000U, &attrs, is_secure); /* OCMC - 1MB */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x70000000U, 0x70000000U, 0x00400000U, &attrs, is_secure); /* MSMC - 4MB */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x41C00000U, 0x41C00000U, 0x00100000U, &attrs, is_secure); /* OCMC - 1MB */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
@@ -287,31 +287,31 @@ void appMmuMap(Bool is_secure)
       translation table in DDR are expensive, especially in context of high-
       throughput, low-latency memory like L2 SRAM*/
     retVal = Mmu_map(L2RAM_C7x_2_ADDR, L2RAM_C7x_2_ADDR, 0x00200000, &attrs, is_secure); /* L2 sram 448KB        */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7x_2_DTS_ADDR, DDR_C7x_2_DTS_ADDR, DDR_C7x_2_DTS_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7X_2_LOCAL_HEAP_VADDR, DDR_C7X_2_LOCAL_HEAP_PADDR, DDR_C7X_2_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7X_2_SCRATCH_VADDR, DDR_C7X_2_SCRATCH_PADDR, DDR_C7X_2_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_PHYS_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
@@ -319,37 +319,37 @@ void appMmuMap(Bool is_secure)
     attrs.attrIndx = Mmu_AttrIndx_MAIR4;
 
     retVal = Mmu_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(IPC_VRING_MEM_ADDR, IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7x_2_IPC_ADDR, DDR_C7x_2_IPC_ADDR, DDR_C7x_2_IPC_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
 mmu_exit:
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         g_app_rtos_c7x_mmu_map_error++;
     }
@@ -380,8 +380,8 @@ void InitMmu(void)
 
     appC7xClecInitForNonSecAccess();
 
-    appMmuMap(FALSE);
-    appMmuMap(TRUE);
+    appMmuMap(UFALSE);
+    appMmuMap(UTRUE);
 
     appCacheInit();
 }

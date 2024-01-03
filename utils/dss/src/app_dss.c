@@ -109,10 +109,10 @@ int32_t appDssInit(app_dss_init_params_t *dssParams)
     memset(&dssInitParams, 0, sizeof(Dss_InitParams));
     Dss_initParamsInit(&dssInitParams);
 
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_0] = TRUE;
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_1] = FALSE;
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_2] = FALSE;
-    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_3] = FALSE;
+    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_0] = UTRUE;
+    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_1] = UFALSE;
+    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_2] = UFALSE;
+    dssInitParams.socParams.rmInfo.isCommRegAvailable[APP_DSS_COMM_REG_ID_3] = UFALSE;
 
     for(i=0U; i< APP_DSS_VID_PIPE_ID_MAX; i++)
     {

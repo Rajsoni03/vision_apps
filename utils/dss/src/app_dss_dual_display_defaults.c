@@ -174,7 +174,7 @@ int32_t appDssDualDisplayDefaultInit(app_dss_dual_display_default_prm_t *dual_di
         }
     }
 
-    if(dual_display_prm->enableM2m == TRUE)
+    if(dual_display_prm->enableM2m == UTRUE)
     {
         appLogPrintf("DSS: M2M Path is enabled !!!\n");
         dual_display_obj->m2m.enableM2m     = true;

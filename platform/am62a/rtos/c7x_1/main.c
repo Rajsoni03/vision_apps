@@ -287,43 +287,43 @@ void appMmuMap(Bool is_secure)
     attrs.ns = ns;
 
     retVal = Mmu_map(0x00000000, 0x00000000, 0x20000000, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x20000000, 0x20000000, 0x20000000, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x40000000, 0x40000000, 0x20000000, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x60000000, 0x60000000, 0x10000000, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x70000000, 0x70000000, 0x10000000, &attrs, is_secure);
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x7C200000U, 0x7C200000U, 0x00100000U, &attrs, is_secure); /* CLEC */
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(0x7C400000U, 0x7C400000U, 0x00100000U, &attrs, is_secure); /* DRU */
-    if(retVal==FALSE)
+    if(retVal==UFALSE)
     {
         goto mmu_exit;
     }
@@ -334,49 +334,49 @@ void appMmuMap(Bool is_secure)
     attrs.ns = ns;
 
     retVal = Mmu_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(IPC_VRING_MEM_ADDR, IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
 	retVal = Mmu_map(DDR_C7x_1_IPC_ADDR, DDR_C7x_1_IPC_ADDR, 2*DDR_C7x_1_IPC_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
@@ -386,43 +386,43 @@ void appMmuMap(Bool is_secure)
     attrs.ns = ns;
 
     retVal = Mmu_map(L2RAM_C7x_1_MAIN_ADDR, L2RAM_C7x_1_MAIN_ADDR, 0x01000000, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(L2RAM_C7x_1_AUX_ADDR, L2RAM_C7x_1_AUX_ADDR, 0x01000000, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure);
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         goto mmu_exit;
     }
 
 mmu_exit:
-    if(retVal == FALSE)
+    if(retVal == UFALSE)
     {
         g_app_rtos_c7x_mmu_map_error++;
     }
@@ -601,7 +601,7 @@ void MmuP_setConfig(void)
     g_app_rtos_c7x_mmu_map_error = 0;
 
     /* There is no secure mode in C7504 */
-    appMmuMap(FALSE);
+    appMmuMap(UFALSE);
 
     appCacheInit();
 }

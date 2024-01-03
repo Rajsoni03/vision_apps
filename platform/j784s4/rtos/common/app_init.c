@@ -153,7 +153,7 @@
 
 /* PDK header files */
 #ifdef ENABLE_BOARD
-/* This header is only needed for the definition of TRUE used */
+/* This header is only needed for the definition of UTRUE used */
 #include <ti/csl/csl_types.h>
 #include <ti/board/board.h>
 #endif
@@ -518,14 +518,14 @@ int32_t appInit()
         appPinMuxCfgSetDefault(&pinmux_cfg);
 
         #if defined(ENABLE_DSS_SINGLE)
-            pinmux_cfg.enable_i2c = TRUE; /* i2c is needed for on board HDMI mux config, eDP to HDMI adapter config */
+            pinmux_cfg.enable_i2c = UTRUE; /* i2c is needed for on board HDMI mux config, eDP to HDMI adapter config */
             #ifdef ENABLE_DSS_HDMI
-                pinmux_cfg.enable_hdmi = TRUE;
+                pinmux_cfg.enable_hdmi = UTRUE;
             #endif
         #endif
         #if defined(ENABLE_DSS_DUAL)
-            pinmux_cfg.enable_hdmi = TRUE; /* enable HDMI unconditionally for dual display */
-            pinmux_cfg.enable_i2c = TRUE; /* i2c is needed for on board HDMI mux config, eDP to HDMI adapter config */
+            pinmux_cfg.enable_hdmi = UTRUE; /* enable HDMI unconditionally for dual display */
+            pinmux_cfg.enable_i2c = UTRUE; /* i2c is needed for on board HDMI mux config, eDP to HDMI adapter config */
         #endif
 
         appSetPinmux(&pinmux_cfg);
