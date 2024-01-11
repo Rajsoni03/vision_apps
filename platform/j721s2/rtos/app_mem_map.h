@@ -187,9 +187,13 @@
 #define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xB8800000u)
 #define DDR_MCU1_1_LOCAL_HEAP_SIZE (0x00800000u)
 
-/* DDR for MCU2_0 for local heap [ size 16.00 MB ] */
+/* DDR for MCU2_0 for local heap [ size 14.00 MB ] */
 #define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xB9000000u)
-#define DDR_MCU2_0_LOCAL_HEAP_SIZE (0x01000000u)
+#define DDR_MCU2_0_LOCAL_HEAP_SIZE (0x00E00000u)
+
+/* VISS configuration memory. MUST be write through cache policy. [ size  2.00 MB ] */
+#define DDR_MCU2_0_VISS_CONFIG_HEAP_ADDR (0xB9E00000u)
+#define DDR_MCU2_0_VISS_CONFIG_HEAP_SIZE (0x00200000u)
 
 /* DDR for MCU2_1 for local heap [ size 16.00 MB ] */
 #define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xBA000000u)

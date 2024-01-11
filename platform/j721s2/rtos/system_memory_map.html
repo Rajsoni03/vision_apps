@@ -395,74 +395,82 @@
             <tr>
                 <td class="tg-kftd">DDR_MCU2_0_LOCAL_HEAP</td>
                 <td class="tg-kftd">0xB9000000</td>
-                <td class="tg-kftd">0xB9FFFFFF</td>
-                <td class="tg-kftd">16.00 MB</td>
+                <td class="tg-kftd">0xB9DFFFFF</td>
+                <td class="tg-kftd">14.00 MB</td>
                 <td class="tg-kftd">RWIX</td>
                 <td class="tg-kftd">DDR for MCU2_0 for local heap</td>
             </tr>
             <tr>
-                <td class="tg-6sgx">DDR_MCU2_1_LOCAL_HEAP</td>
-                <td class="tg-6sgx">0xBA000000</td>
-                <td class="tg-6sgx">0xBAFFFFFF</td>
-                <td class="tg-6sgx">16.00 MB</td>
+                <td class="tg-6sgx">DDR_MCU2_0_VISS_CONFIG_HEAP</td>
+                <td class="tg-6sgx">0xB9E00000</td>
+                <td class="tg-6sgx">0xB9FFFFFF</td>
+                <td class="tg-6sgx"> 2.00 MB</td>
                 <td class="tg-6sgx">RWIX</td>
-                <td class="tg-6sgx">DDR for MCU2_1 for local heap</td>
+                <td class="tg-6sgx">VISS configuration memory. MUST be write through cache policy.</td>
             </tr>
             <tr>
-                <td class="tg-kftd">DDR_MCU3_0_LOCAL_HEAP</td>
-                <td class="tg-kftd">0xBB000000</td>
-                <td class="tg-kftd">0xBB7FFFFF</td>
-                <td class="tg-kftd"> 8.00 MB</td>
+                <td class="tg-kftd">DDR_MCU2_1_LOCAL_HEAP</td>
+                <td class="tg-kftd">0xBA000000</td>
+                <td class="tg-kftd">0xBAFFFFFF</td>
+                <td class="tg-kftd">16.00 MB</td>
                 <td class="tg-kftd">RWIX</td>
-                <td class="tg-kftd">DDR for MCU3_0 for local heap</td>
+                <td class="tg-kftd">DDR for MCU2_1 for local heap</td>
             </tr>
             <tr>
-                <td class="tg-6sgx">DDR_MCU3_1_LOCAL_HEAP</td>
-                <td class="tg-6sgx">0xBB800000</td>
-                <td class="tg-6sgx">0xBBFFFFFF</td>
+                <td class="tg-6sgx">DDR_MCU3_0_LOCAL_HEAP</td>
+                <td class="tg-6sgx">0xBB000000</td>
+                <td class="tg-6sgx">0xBB7FFFFF</td>
                 <td class="tg-6sgx"> 8.00 MB</td>
                 <td class="tg-6sgx">RWIX</td>
-                <td class="tg-6sgx">DDR for MCU3_1 for local heap</td>
+                <td class="tg-6sgx">DDR for MCU3_0 for local heap</td>
             </tr>
             <tr>
-                <td class="tg-kftd">DDR_SHARED_MEM</td>
-                <td class="tg-kftd">0xC0000000</td>
-                <td class="tg-kftd">0xDFFFFFFF</td>
-                <td class="tg-kftd">512.00 MB</td>
-                <td class="tg-kftd"></td>
-                <td class="tg-kftd">Memory for shared memory buffers in DDR</td>
-            </tr>
-            <tr>
-                <td class="tg-6sgx">DDR_C7X_1_SCRATCH</td>
-                <td class="tg-6sgx">0x100000000</td>
-                <td class="tg-6sgx">0x116FFFFFF</td>
-                <td class="tg-6sgx">368.00 MB</td>
-                <td class="tg-6sgx">RWIX</td>
-                <td class="tg-6sgx">DDR for c7x_1 for Scratch Memory</td>
-            </tr>
-            <tr>
-                <td class="tg-kftd">DDR_C7X_1_LOCAL_HEAP</td>
-                <td class="tg-kftd">0x117000000</td>
-                <td class="tg-kftd">0x126FFFFFF</td>
-                <td class="tg-kftd">256.00 MB</td>
+                <td class="tg-kftd">DDR_MCU3_1_LOCAL_HEAP</td>
+                <td class="tg-kftd">0xBB800000</td>
+                <td class="tg-kftd">0xBBFFFFFF</td>
+                <td class="tg-kftd"> 8.00 MB</td>
                 <td class="tg-kftd">RWIX</td>
-                <td class="tg-kftd">DDR for c7x_1 for local heap</td>
+                <td class="tg-kftd">DDR for MCU3_1 for local heap</td>
             </tr>
             <tr>
-                <td class="tg-6sgx">DDR_C7X_2_LOCAL_HEAP</td>
-                <td class="tg-6sgx">0x127000000</td>
-                <td class="tg-6sgx">0x127FFFFFF</td>
-                <td class="tg-6sgx">16.00 MB</td>
-                <td class="tg-6sgx">RWIX</td>
-                <td class="tg-6sgx">DDR for c7x_2 for local heap</td>
+                <td class="tg-6sgx">DDR_SHARED_MEM</td>
+                <td class="tg-6sgx">0xC0000000</td>
+                <td class="tg-6sgx">0xDFFFFFFF</td>
+                <td class="tg-6sgx">512.00 MB</td>
+                <td class="tg-6sgx"></td>
+                <td class="tg-6sgx">Memory for shared memory buffers in DDR</td>
             </tr>
             <tr>
-                <td class="tg-kftd">DDR_C7X_2_SCRATCH</td>
-                <td class="tg-kftd">0x128000000</td>
-                <td class="tg-kftd">0x12BFFFFFF</td>
-                <td class="tg-kftd">64.00 MB</td>
+                <td class="tg-kftd">DDR_C7X_1_SCRATCH</td>
+                <td class="tg-kftd">0x100000000</td>
+                <td class="tg-kftd">0x116FFFFFF</td>
+                <td class="tg-kftd">368.00 MB</td>
                 <td class="tg-kftd">RWIX</td>
-                <td class="tg-kftd">DDR for c7x_2 for Scratch Memory</td>
+                <td class="tg-kftd">DDR for c7x_1 for Scratch Memory</td>
+            </tr>
+            <tr>
+                <td class="tg-6sgx">DDR_C7X_1_LOCAL_HEAP</td>
+                <td class="tg-6sgx">0x117000000</td>
+                <td class="tg-6sgx">0x126FFFFFF</td>
+                <td class="tg-6sgx">256.00 MB</td>
+                <td class="tg-6sgx">RWIX</td>
+                <td class="tg-6sgx">DDR for c7x_1 for local heap</td>
+            </tr>
+            <tr>
+                <td class="tg-kftd">DDR_C7X_2_LOCAL_HEAP</td>
+                <td class="tg-kftd">0x127000000</td>
+                <td class="tg-kftd">0x127FFFFFF</td>
+                <td class="tg-kftd">16.00 MB</td>
+                <td class="tg-kftd">RWIX</td>
+                <td class="tg-kftd">DDR for c7x_2 for local heap</td>
+            </tr>
+            <tr>
+                <td class="tg-6sgx">DDR_C7X_2_SCRATCH</td>
+                <td class="tg-6sgx">0x128000000</td>
+                <td class="tg-6sgx">0x12BFFFFFF</td>
+                <td class="tg-6sgx">64.00 MB</td>
+                <td class="tg-6sgx">RWIX</td>
+                <td class="tg-6sgx">DDR for c7x_2 for Scratch Memory</td>
             </tr>
         </table>
     </body>

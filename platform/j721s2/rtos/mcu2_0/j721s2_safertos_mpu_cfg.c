@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Texas Instruments Incorporated 2020
+ *  Copyright (c) Texas Instruments Incorporated 2020-2024
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -65,8 +65,16 @@ static const uint32_t gMemAttr[CSL_ARM_R5_MEM_ATTR_MAX][3U] =
 
 xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((weak)) gMPUConfigParms[CSL_ARM_R5F_MPU_REGIONS_MAX] =
 {
+    /* DO NOT PROGRAM Regions 0, 11-15, these are reserved
+     * Region Summary:
+     * 0:     Programmed by __mpu_init hook in SafeRTOS_config_r5f.c
+     * 1-10:  Can be programmed in this file for global configuration
+     * 11,12: Task Specific regions, updated by OS on context switch
+     * 13:    Task Stack region, updated by OS on context switch
+     * 14,15: OS Kernel Functions, OS Kernel Data
+     */
     {
-        /* Region 0 configuration: complete 32 bit address space = 4Gbits add one more 2gb */
+        /* Region 1 configuration: complete 32 bit address space = 4Gbits add one more 2gb */
         /* ulRegionNumber */
         .ulRegionNumber         = 1U,
         /* Starting address */
@@ -86,7 +94,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 3 configuration: ATCM memory */
+        /* Region 2 configuration: ATCM memory */
         /* ulRegionNumber */
         .ulRegionNumber         = 2U,
         /* Starting address */
@@ -106,7 +114,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 2 configuration: 1024 KB OCMC RAM */
+        /* Region 3 configuration: 1024 KB OCMC RAM */
         /* ulRegionNumber */
         .ulRegionNumber         = 3U,
         /* Starting address */
@@ -126,7 +134,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 3 configuration: 2 MB MCMS3 RAM */
+        /* Region 4 configuration: 2 MB MCMS3 RAM */
         /* ulRegionNumber */
         .ulRegionNumber         = 4U,
         /* Starting address */
@@ -146,7 +154,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 4 configuration: 2 GB DDR RAM */
+        /* Region 5 configuration: 2 GB DDR RAM */
         /* ulRegionNumber */
         .ulRegionNumber         = 5U,
         /* Starting address */
@@ -166,7 +174,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 5 configuration: 32 KB BTCM */
+        /* Region 6 configuration: 32 KB BTCM */
         /* Address of ATCM/BTCM are configured via MCU_SEC_MMR registers
            It can either be '0x0' or '0x41010000'. Application/Boot-loader shall
            take care this configurations and linker command file shall be
@@ -194,7 +202,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 6 configuration: 128 MB FSS DAT */
+        /* Region 7 configuration: 128 MB FSS DAT */
         /* ulRegionNumber */
         .ulRegionNumber         = 7U,
         /* Starting address */
@@ -214,7 +222,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 7 configuration: Ring buffer */
+        /* Region 8 configuration: Ring buffer */
         /* ulRegionNumber */
         .ulRegionNumber         = 8U,
         /* Starting address */
@@ -234,7 +242,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 8 configuration: Ring buffer */
+        /* Region 9 configuration: Ring buffer */
         /* ulRegionNumber */
         .ulRegionNumber         = 9U,
         /* Starting address */
@@ -252,5 +260,26 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulRegionSize           = (1U * 1024U * 1024U),
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
+    },
+    {
+        /* Region 10 configuration: VISS shadow configuration memory */
+        /* ulRegionNumber */
+        .ulRegionNumber         = 10U,
+        /* Starting address */
+        .ulRegionBeginAddress   = DDR_MCU2_0_VISS_CONFIG_HEAP_ADDR,
+        /* Access permission */
+        {
+            .ulexeNeverControl  = 1U,
+            .ulaccessPermission = CSL_ARM_R5_ACC_PERM_PRIV_USR_RD_WR,
+            .ulshareable        = 0U,
+            .ulcacheable        = 1U,
+            .ulcachePolicy      = CSL_ARM_R5_CACHE_POLICY_WT_NO_WA,
+            .ulmemAttr          = CSL_ARM_R5_MEM_ATTR_CACHED_WT_NO_WA,
+        },
+        /* ulRegionSize */
+        .ulRegionSize           = (2U * 1024U * 1024U),
+        /* ulSubRegionDisable */
+        .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     }
+    /* DO NOT PROGRAM Regions 11-15, these are reserved for SAFERTOS */
 };

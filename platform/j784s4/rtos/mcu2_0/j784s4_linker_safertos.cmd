@@ -84,6 +84,7 @@ SECTIONS
 
     .bss:l3mem              (NOLOAD) : {} > MAIN_OCRAM_MCU2_0
     .bss:ddr_local_mem      (NOLOAD) : {} > DDR_MCU2_0_LOCAL_HEAP
+    .bss:ddr_cache_wt_mem   (NOLOAD) : {} > DDR_MCU2_0_VISS_CONFIG_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
     .bss:app_fileio_mem     (NOLOAD) : {} > APP_FILEIO_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM

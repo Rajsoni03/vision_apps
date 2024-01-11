@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) Texas Instruments Incorporated 2020
+ *  Copyright (c) Texas Instruments Incorporated 2020-2024
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,14 @@ static const uint32_t gMemAttr[CSL_ARM_R5_MEM_ATTR_MAX][3U] =
 
 xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((weak)) gMPUConfigParms[CSL_ARM_R5F_MPU_REGIONS_MAX] =
 {
+    /* DO NOT PROGRAM Regions 0, 11-15, these are reserved
+     * Region Summary:
+     * 0:     Programmed by __mpu_init hook in SafeRTOS_config_r5f.c
+     * 1-10:  Can be programmed in this file for global configuration
+     * 11,12: Task Specific regions, updated by OS on context switch
+     * 13:    Task Stack region, updated by OS on context switch
+     * 14,15: OS Kernel Functions, OS Kernel Data
+     */
     {
         /* Region 1 configuration: complete 32 bit address space = 4Gbits add one more 2gb */
         /* ulRegionNumber */
@@ -233,4 +241,5 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         /* ulSubRegionDisable */
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     }
+    /* DO NOT PROGRAM Regions 11-15, these are reserved for SAFERTOS */
 };

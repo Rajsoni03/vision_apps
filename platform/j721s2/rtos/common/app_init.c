@@ -219,6 +219,13 @@ __attribute__ ((aligned(4096)))
         ;
 #endif
 
+#ifdef DDR_VISS_HEAP_MEM_SIZE
+uint8_t g_ddr_cache_wt_mem[DDR_VISS_HEAP_MEM_SIZE]
+__attribute__ ((section(".bss:ddr_cache_wt_mem")))
+__attribute__ ((aligned(4096)))
+        ;
+#endif
+
 static void appRegisterOpenVXTargetKernels();
 static void appUnRegisterOpenVXTargetKernels();
 void appRtosTestRegister();
@@ -317,6 +324,13 @@ int32_t appInit()
     heap_prm->base = g_ddr_non_cache_mem;
     strncpy(heap_prm->name, "DDR_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX);
     heap_prm->size = DDR_HEAP_NON_CACHE_MEM_SIZE;
+    heap_prm->flags = 0;
+    #endif
+    #ifdef DDR_VISS_HEAP_MEM_SIZE
+    heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR_WT_CACHE];
+    heap_prm->base = g_ddr_cache_wt_mem;
+    strncpy(heap_prm->name, "DDR_CACHE_WT_MEM", APP_MEM_HEAP_NAME_MAX);
+    heap_prm->size = DDR_VISS_HEAP_MEM_SIZE;
     heap_prm->flags = 0;
     #endif
 

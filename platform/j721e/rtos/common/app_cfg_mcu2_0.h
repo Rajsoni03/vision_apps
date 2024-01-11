@@ -68,6 +68,8 @@
 #define L3_MEM_SIZE (MAIN_OCRAM_MCU2_0_SIZE)
 
 #define DDR_HEAP_MEM_SIZE               (DDR_MCU2_0_LOCAL_HEAP_SIZE)
+#define DDR_VISS_HEAP_MEM_SIZE          (DDR_MCU2_0_VISS_CONFIG_HEAP_SIZE)
+
 
 /* There are several external board interfaces to the SoC that can either be controlled by the MCU RTOS core
  * or the MPU HLOS core.  The top level build option BUILD_MCU_BOARD_DEPENDENCIES can be used to optionally enable
