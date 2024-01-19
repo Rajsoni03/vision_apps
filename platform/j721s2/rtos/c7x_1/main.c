@@ -392,7 +392,6 @@ uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
 {
   uint64_t phyAddr = (uint64_t)virtAddr;
 
-  /* Note: I think this is correct but needs review */
   if ( ((uint64_t)virtAddr >= DDR_SHARED_MEM_ADDR) &&
        ((uint64_t)virtAddr < (DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
   {
@@ -405,7 +404,7 @@ uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
             phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
         }
   }
-  else if ( ((uint64_t)virtAddr >= DDR_C7X_1_SCRATCH_ADDR) )
+  else if ( ((uint64_t)virtAddr >= DDR_64BIT_BASE_VADDR) )
   {
     phyAddr = ((uint64_t)virtAddr + VIRT_PHY_ADDR_OFFSET);
   }
