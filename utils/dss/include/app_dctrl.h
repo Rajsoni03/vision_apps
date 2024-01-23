@@ -654,6 +654,7 @@ typedef struct
 typedef struct
 {
     uint32_t num_lanes;
+    uint32_t lane_speed_in_kbps;
     /**< Total number of output lanes */
 } app_dctrl_dsi_params_t;
 

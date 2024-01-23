@@ -79,28 +79,30 @@
 
     #define ENABLE_CSI2RX
     #define ENABLE_CSI2TX
+    #undef  ENABLE_DSS_HDMI
 
     /* IMPORANT NOTE:
      * - Only one of ENABLE_DSS_SINGLE or ENABLE_DSS_DUAL should be defined
-     * - When ENABLE_DSS_SINGLE is defined, only one of ENABLE_DSS_HDMI or ENABLE_DSS_EDP should be defined
-     * - When ENABLE_DSS_DUAL is defined, ENABLE_DSS_HDMI and ENABLE_DSS_EDP are not used, both EDP and HDMI are enabled unconditionally
+     * - When ENABLE_DSS_SINGLE is defined, only one of ENABLE_DSS_DSI or ENABLE_DSS_EDP should be defined
+     * - When ENABLE_DSS_DUAL is defined, ENABLE_DSS_DSI and ENABLE_DSS_EDP are not used, both EDP and DSI are enabled unconditionally
      */
     #define ENABLE_DSS_SINGLE
     #undef  ENABLE_DSS_DUAL
 
-    /* define below to enable eDP display,
-       make sure to undef ENABLE_DSS_HDMI & ENABLE_DSS_DSI as well */
+#if defined(ENABLE_DSS_DUAL)
+    #undef  ENABLE_DSS_SINGLE
     #define ENABLE_DSS_EDP
-    /* define below to enable HDMI display,
-       make sure to undef ENABLE_DSS_EDP & ENABLE_DSS_DSI as well */
-    #undef ENABLE_DSS_HDMI
-    /* define below to enable DSI display, make sure to undef ENABLE_DSS_HDMI
-       & ENABLE_DSS_EDP as well */
-    #undef ENABLE_DSS_DSI
-
+    #define ENABLE_DSS_DSI
+#elif defined(ENABLE_DSS_SINGLE)
+    #undef  ENABLE_DSS_DUAL
+    #undef  ENABLE_DSS_DSI
+    #define ENABLE_DSS_EDP
+#endif
+#if defined(ENABLE_DSS_DSI)
+    #undef  ENABLE_CSI2TX
+#endif
     #define ENABLE_I2C
     #define ENABLE_BOARD
-
 #else
 
     #undef ENABLE_CSI2RX

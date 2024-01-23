@@ -141,14 +141,17 @@ int32_t appDssDefaultInit(app_dss_default_prm_t *prm)
     appDssConfigurePm(prm);
 
     if( (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DPI_HDMI) ||
-        (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP))
+        (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)||
+        (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI))
     {
         appDssConfigureBoard(prm);
     }
 
     if (prm->display_type == APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {
+#if defined (SOC_J721E)        
         appDssConfigureUB941AndUB925(prm);
+#endif
     }
 
     appDssInitParamsInit(&dssParams);
@@ -302,7 +305,14 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
     vpParams.vFrontPorch  = obj->initPrm.timings.vFrontPorch;
     vpParams.vBackPorch   = obj->initPrm.timings.vBackPorch;
     vpParams.vSyncLen     = obj->initPrm.timings.vSyncLen;
-    vpParams.pixelClock   = (uint32_t)(obj->initPrm.timings.pixelClock / 1000ULL);
+    if(obj->initPrm.display_type != APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+    {
+        vpParams.pixelClock   = (uint32_t)(obj->initPrm.timings.pixelClock / 1000ULL);
+    }
+    else
+    {
+        vpParams.pixelClock   = (uint32_t)(obj->initPrm.timings.pixelClock);
+    }
 
     vpParams.videoIfWidth     = obj->videoIfWidth;
     if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
@@ -364,8 +374,16 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
         {
             if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
             {
+                #if defined (SOC_J721E)
                 /* Only two lanes output supported for AOU LCD */
                 dsiParams.num_lanes = 2u;
+                #else
+                /* For 1080p the DSITX clock will be higher than the clock that the DSI to DP bridge can support.
+                 * Hence, use 4 lanes to reduce the DSITX clock.
+                 */
+                dsiParams.num_lanes = 4u;
+                dsiParams.lane_speed_in_kbps = 799920u;
+                #endif
                 retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_DSI_PARAMS, &dsiParams, sizeof(app_dctrl_dsi_params_t), 0U);
             }
 

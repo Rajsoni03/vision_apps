@@ -755,17 +755,17 @@ int32_t appInit()
 
         #ifdef ENABLE_DSS_DSI
             prm.display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_DSI;
-
-            prm.timings.width        = 1280U;
-            prm.timings.height       = 800U;
-            prm.timings.hFrontPorch  = 110U;
-            prm.timings.hBackPorch   = 220U;
-            prm.timings.hSyncLen     = 40U;
-            prm.timings.vFrontPorch  = 5U;
-            prm.timings.vBackPorch   = 20U;
-            prm.timings.vSyncLen     = 5U;
-            prm.timings.pixelClock   = 74250000ULL;
+            prm.timings.width        = 1920U;
+            prm.timings.height       = 1080U;
+            prm.timings.hFrontPorch  = 8U;
+            prm.timings.hBackPorch   = 40U;
+            prm.timings.hSyncLen     = 32U;
+            prm.timings.vFrontPorch  = 17U;
+            prm.timings.vBackPorch   = 6U;
+            prm.timings.vSyncLen     = 8U;
+            prm.timings.pixelClock   = 133320000U;
         #endif
+
         status = appDssDefaultInit(&prm);
         APP_ASSERT_SUCCESS(status);
     }
@@ -783,15 +783,33 @@ int32_t appInit()
         /* Do not rely on "init". Always provide known good tmings */
         for(i=0; i<2; i++)
         {
-            prm.display[i].timings.width        = 1920U;
-            prm.display[i].timings.height       = 1080U;
-            prm.display[i].timings.hFrontPorch  = 88U;
-            prm.display[i].timings.hBackPorch   = 148U;
-            prm.display[i].timings.hSyncLen     = 44U;
-            prm.display[i].timings.vFrontPorch  = 4U;
-            prm.display[i].timings.vBackPorch   = 36U;
-            prm.display[i].timings.vSyncLen     = 5U;
-            prm.display[i].timings.pixelClock   = 148500000ULL;
+            if(i==0)
+            {
+                prm.display[i].display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_EDP;
+                prm.display[i].timings.width        = 1920U;
+                prm.display[i].timings.height       = 1080U;
+                prm.display[i].timings.hFrontPorch  = 88U;
+                prm.display[i].timings.hBackPorch   = 148U;
+                prm.display[i].timings.hSyncLen     = 44U;
+                prm.display[i].timings.vFrontPorch  = 4U;
+                prm.display[i].timings.vBackPorch   = 36U;
+                prm.display[i].timings.vSyncLen     = 5U;
+                prm.display[i].timings.pixelClock   = 148500000ULL;
+            }
+            else if(i==1)
+
+            {
+                prm.display[i].display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_DSI;
+                prm.display[i].timings.width        = 1920U;
+                prm.display[i].timings.height       = 1080U;
+                prm.display[i].timings.hFrontPorch  = 8U;
+                prm.display[i].timings.hBackPorch   = 40U;
+                prm.display[i].timings.hSyncLen     = 32U;
+                prm.display[i].timings.vFrontPorch  = 17U;
+                prm.display[i].timings.vBackPorch   = 6U;
+                prm.display[i].timings.vSyncLen     = 8U;
+                prm.display[i].timings.pixelClock   = 133320000U;
+            }
         }
 
         status = appDssDualDisplayDefaultInit(&prm);

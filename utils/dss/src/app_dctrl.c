@@ -542,6 +542,7 @@ static int32_t appDctrlSetDsiParamsCmd(Fvid2_Handle handle,
     if(0 == retVal)
     {
         dsi_params.numOfLanes = prms->num_lanes;
+        dsi_params.laneSpeedInKbps = prms->lane_speed_in_kbps;
 
         retVal = Fvid2_control(handle, IOCTL_DSS_DCTRL_SET_DSI_PARAMS,
             &dsi_params, NULL);

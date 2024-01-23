@@ -146,7 +146,7 @@ int32_t appDssDualDisplayDefaultInit(app_dss_dual_display_default_prm_t *dual_di
             obj->vpId          = APP_DSS_VP_ID_1;
             obj->videoIfWidth  = APP_DCTRL_VIFW_36BIT;
         }
-        else
+        else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DPI_HDMI)
         {
             appLogPrintf("DSS DUAL DISPLAY: Display %d type is HDMI !!!\n", i);
             obj->nodeOverlayId = APP_DCTRL_NODE_OVERLAY2;
@@ -156,11 +156,22 @@ int32_t appDssDualDisplayDefaultInit(app_dss_dual_display_default_prm_t *dual_di
             obj->vpId          = APP_DSS_VP_ID_2;
             obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
         }
+        else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+        {
+            appLogPrintf("DSS DUAL DISPLAY: Display %d type is DSI !!!\n", i);
+            obj->nodeOverlayId = APP_DCTRL_NODE_OVERLAY3;
+            obj->nodeVpId      = APP_DCTRL_NODE_VP3;
+            obj->nodeDpiId     = APP_DCTRL_NODE_DSI_DPI2;
+            obj->overlayId     = APP_DSS_OVERLAY_ID_3;
+            obj->vpId          = APP_DSS_VP_ID_3;
+            obj->videoIfWidth  = APP_DCTRL_VIFW_24BIT;
+        }
 
         appDssConfigurePm(prm);
 
         if( (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DPI_HDMI) ||
-            (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP))
+            (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP) ||
+            (prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI))
         {
             appDssConfigureBoard(prm);
         }
@@ -171,6 +182,10 @@ int32_t appDssDualDisplayDefaultInit(app_dss_dual_display_default_prm_t *dual_di
         if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
         {
             dssParams.isDpAvailable = true;
+        }
+        else if(prm->display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+        {
+            dssParams.isDsiAvailable = true;
         }
     }
 
@@ -250,13 +265,13 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
     app_dctrl_adv_vp_params_t advVpParams[2];
     app_dctrl_overlay_params_t overlayParams[2];
     app_dctrl_layer_params_t layerParams[2];
+    app_dss_default_obj_t *obj;
+    app_dctrl_dsi_params_t dsiParams;
 
     appDctrlPathInfoInit(&pathInfo);
 
     for(i=0; i<2; i++)
     {
-        app_dss_default_obj_t *obj;
-
         obj = &dual_display_obj->display[i];
 
         appDctrlVpParamsInit(&vpParams[i]);
@@ -282,7 +297,14 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
         vpParams[i].vFrontPorch  = obj->initPrm.timings.vFrontPorch;
         vpParams[i].vBackPorch   = obj->initPrm.timings.vBackPorch;
         vpParams[i].vSyncLen     = obj->initPrm.timings.vSyncLen;
-        vpParams[i].pixelClock   = (uint32_t)(obj->initPrm.timings.pixelClock / 1000ULL);
+        if(obj->initPrm.display_type != APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+        {
+            vpParams[i].pixelClock   = (uint32_t)(obj->initPrm.timings.pixelClock / 1000ULL);
+        }
+        else
+        {
+            vpParams[i].pixelClock   = (uint32_t)(obj->initPrm.timings.pixelClock );
+        }
 
         vpParams[i].videoIfWidth     = obj->videoIfWidth;
         if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_EDP)
@@ -299,6 +321,14 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
         else
         {
             vpParams[i].pixelClkPolarity = APP_DCTRL_EDGE_POL_FALLING;
+        }
+
+        if(obj->initPrm.display_type == APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+        {
+            vpParams[i].videoIfWidth = FVID2_VIFW_24BIT;
+            vpParams[i].hsPolarity = FVID2_POL_LOW;
+            vpParams[i].vsPolarity = FVID2_POL_LOW;
+            vpParams[i].pixelClkPolarity = FVID2_EDGE_POL_RISING;
         }
 
         overlayParams[i].overlayId = obj->overlayId;
@@ -393,8 +423,19 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
 
     retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_REGISTER_HANDLE, &doHpd, sizeof(doHpd), 0U);
     retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_PATH, &pathInfo, sizeof(pathInfo), 0U);
+
     for(i=0; i<2; i++)
     {
+        obj = &dual_display_obj->display[i];
+        if(obj->initPrm.display_type==APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+        {
+            /* 1080P Can onlly be supported by 4 lanes. 
+             * With 2 lanes, the DSITX clock will be high enough for the DSI to DP bridge to break;
+             */
+            dsiParams.num_lanes = 4u;
+            dsiParams.lane_speed_in_kbps = 799920u;
+            retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_DSI_PARAMS, &dsiParams, sizeof(app_dctrl_dsi_params_t), 0U);
+        }
         retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_VP_PARAMS, &vpParams[i], sizeof(vpParams[i]), 0U);
         if(true == doAdvVpSetup[i])
         {

@@ -145,9 +145,19 @@ typedef struct {
     vx_rectangle_t disp_rect;
     vx_imagepatch_addressing_t image_addr;
 
+    vx_graph   disp_graph2;
+    vx_node disp_node2;
+    vx_image disp_image2;
+
+    vx_user_data_object disp_params_obj2;
+    tivx_display_params_t disp_params2;
+    vx_rectangle_t disp_rect2;
+    vx_imagepatch_addressing_t image_addr2;
+
     vx_size in_tensor_data_type[APP_MAX_TENSORS];
 
     vx_uint32 display_option;
+    vx_uint32 use_dual_display;
     vx_uint32 delay_in_msecs;
     vx_uint32 num_iterations;
 
@@ -252,7 +262,7 @@ int app_tidl_main(int argc, char* argv[])
 static int app_init(AppObj *obj)
 {
 
-    int status = 0;
+    int status = 0, useVideo = 0;
 
     uint32_t num_input_tensors = 0;
     uint32_t num_output_tensors = 0;
@@ -321,7 +331,47 @@ static int app_init(AppObj *obj)
 
         obj->disp_params_obj = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->disp_params);
         APP_ASSERT_VALID_REF(obj->disp_params_obj)
+        useVideo = 1;
+    }
 
+    if (obj->use_dual_display == 1)
+    {
+        if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2)) && (obj->display_option == 1))
+        {
+            obj->disp_image2 = vxCreateImage(obj->context, DISPLAY_WIDTH, DISPLAY_HEIGHT, VX_DF_IMAGE_RGB);
+            APP_ASSERT_VALID_REF(obj->disp_image2)
+
+            obj->image_addr2.dim_x = DISPLAY_WIDTH;
+            obj->image_addr2.dim_y = DISPLAY_HEIGHT;
+            obj->image_addr2.stride_x = 3; /* RGB */
+            obj->image_addr2.stride_y = DISPLAY_WIDTH * 3;
+            obj->image_addr2.scale_x = VX_SCALE_UNITY;
+            obj->image_addr2.scale_y = VX_SCALE_UNITY;
+            obj->image_addr2.step_x = 1;
+            obj->image_addr2.step_y = 1;
+
+            obj->disp_rect2.start_x = 0;
+            obj->disp_rect2.start_y = 0;
+            obj->disp_rect2.end_x = DISPLAY_WIDTH;
+            obj->disp_rect2.end_y = DISPLAY_HEIGHT;
+
+            memset(&obj->disp_params2, 0, sizeof(tivx_display_params_t));
+
+            obj->disp_params2.opMode = TIVX_KERNEL_DISPLAY_BUFFER_COPY_MODE;
+            obj->disp_params2.pipeId = 1;
+            obj->disp_params2.outWidth = DISPLAY_WIDTH;
+            obj->disp_params2.outHeight = DISPLAY_HEIGHT;
+            obj->disp_params2.posX = (1920-DISPLAY_WIDTH)/2;
+            obj->disp_params2.posY = (1080-DISPLAY_HEIGHT)/2;
+
+            obj->disp_params_obj2 = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->disp_params2);
+            APP_ASSERT_VALID_REF(obj->disp_params_obj2)
+            useVideo = 1;
+        }
+    }
+
+    if(1 == useVideo)
+    {
         tivxVideoIOLoadKernels(obj->context);
     }
 
@@ -662,6 +712,16 @@ static int app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                   obj->test_mode = atoi(token);
                 }
             }
+            else
+            if(strcmp(token, "use_dual_display")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                  token[strlen(token)-1]=0;
+                  obj->use_dual_display = atoi(token);
+                }
+            }
         }
         if (obj->test_mode == 1)
         {
@@ -815,6 +875,21 @@ static vx_status app_create_graph(AppObj *obj)
 
         vxSetNodeTarget(obj->disp_node, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
     }
+    if (obj->use_dual_display == 1)
+    {
+        if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2)) && (obj->display_option == 1))
+        {
+            /* Create OpenVx Graph */
+            obj->disp_graph2 = vxCreateGraph(obj->context);
+            APP_ASSERT_VALID_REF(obj->disp_graph2)
+            vxSetReferenceName((vx_reference)obj->disp_graph2, "Display2");
+
+            obj->disp_node2 = tivxDisplayNode(obj->disp_graph2, obj->disp_params_obj2, obj->disp_image2);
+            APP_ASSERT_VALID_REF(obj->disp_node2)
+
+            vxSetNodeTarget(obj->disp_node2, VX_TARGET_STRING, TIVX_TARGET_DISPLAY2);
+        }
+    }
 
     /* Set names for diferent OpenVX objects */
     vxSetReferenceName((vx_reference)obj->config, "Config");
@@ -844,6 +919,15 @@ static vx_status app_create_graph(AppObj *obj)
     {
         vxSetReferenceName((vx_reference)obj->disp_params_obj, "DisplayParams");
         vxSetReferenceName((vx_reference)obj->disp_node, "DisplayNode");
+    }
+
+    if (obj->use_dual_display == 1)
+    {
+        if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2) && (obj->display_option == 1))
+        {
+            vxSetReferenceName((vx_reference)obj->disp_params_obj2, "DisplayParams2");
+            vxSetReferenceName((vx_reference)obj->disp_node2, "DisplayNode2");
+        }
     }
 
     APP_PRINTF("app_tidl: Creating graph ... Done.\n");
@@ -1004,7 +1088,25 @@ static vx_status app_verify_graph(AppObj *obj)
             return status;
         }
 
-        APP_PRINTF("app_tidl: Verifying display graph ... Done.\n");
+        APP_PRINTF("app_tidl: Verifying display graph for display 1 ... Done.\n");
+    }
+
+    if (obj->use_dual_display == 1)
+    {
+        if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2)) && (obj->display_option == 1))
+        {
+            APP_PRINTF("app_tidl: Verifying display graph ... \n");
+
+            /* Verify the TIDL Graph */
+            status = vxVerifyGraph(obj->disp_graph2);
+            if(status != VX_SUCCESS)
+            {
+                printf("app_tidl: ERROR: Verifying display for display 2 ... Failed !!!\n");
+                return status;
+            }
+
+            APP_PRINTF("app_tidl: Verifying display graph ... Done.\n");
+        }
     }
 
     /* wait a while for prints to flush */
@@ -1104,10 +1206,36 @@ static vx_status app_run_graph_for_one_frame(AppObj *obj, char *curFileName, vx_
             /* Execute the display graph */
             if(status == VX_SUCCESS)
             {
-                status = vxProcessGraph(obj->disp_graph);
+                status = vxProcessGraph(obj->disp_graph2);
             }
             APP_PRINTF("app_tidl: Running display graph ... Done.\n");
         }
+
+        if (obj->use_dual_display == 1)
+        {
+            if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2)) && (obj->display_option == 1)) {
+                /* At this point, the output is ready to copy the updated buffer */
+                if(status == VX_SUCCESS)
+                {
+                    status = vxCopyImagePatch(obj->disp_image2,
+                                            &obj->disp_rect2,
+                                            0,
+                                            &obj->image_addr2,
+                                            (void *)obj->pDisplayBuf888,
+                                            VX_WRITE_ONLY,
+                                            VX_MEMORY_TYPE_HOST
+                                            );
+                }
+                APP_PRINTF("app_tidl: Running display graph 2... \n");
+                /* Execute the display graph */
+                if(status == VX_SUCCESS)
+                {
+                    status = vxProcessGraph(obj->disp_graph);
+                }
+                APP_PRINTF("app_tidl: Running display graph ... Done.\n");
+            }
+        }
+
         /* Check that you are within the first n frames, where n is the number
             of samples in the checksums_expected */
         if ((obj->test_mode == 1) &&

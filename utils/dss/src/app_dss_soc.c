@@ -72,6 +72,14 @@
 /*                             Global Variables                               */
 /* ========================================================================== */
 
+#define VX_DSI_RESO_1080P  (FVID2_STD_1080P_60)
+#define VX_DSI_RESO_720P   (FVID2_STD_720P_60)
+#define VX_APP_I2C_TIMEOUT (100U)
+
+/* ========================================================================== */
+/*                             Global Variables                               */
+/* ========================================================================== */
+
 static I2C_Handle gI2cHandle = NULL;
 
 uint8_t Ub941Ub925Config[][4] = {
@@ -137,20 +145,58 @@ uint8_t Ub941Ub925Config[][4] = {
 
 };
 
+/* SN65DSI bridge configurations. Default is for 720p. 
+ * {addr, value, delay}
+ */
+uint8_t gI2cDsiBridgeCfg[][3] = {
+{0xFF, 0x7, 200U},
+{0x16, 0x1, 200U},
+{0xFF, 0x0, 200U},
+{0x0A, 0x2, 200U},
+{0x10, 0x36, 200U},
+{0x12, 0x4C, 200U},
+{0x13, 0x4C, 200U},
+{0x94, 0x80, 200U},
+{0x0D, 0x1, 200U},
+{0x5A, 0x4, 200U},
+{0x5F, 0x28, 200U},
+{0x93, 0x10, 200U},
+{0x96, 0x0A, 200U},
+{0x20, 0x00, 200U},
+{0x21, 0x05, 200U},
+{0x22, 0x0, 200U},
+{0x23, 0x0, 200U},
+{0x24, 0xD0, 200U},
+{0x25, 0x02, 200U},
+{0x2C, 0x20, 200U},
+{0x2D, 0x00, 200U},
+{0x30, 0x05, 200U},
+{0x31, 0x00, 200U},
+{0x34, 0x50, 200U},
+{0x36, 0x0C, 200U},
+{0x38, 0x30, 200U},
+{0x3A, 0x04, 200U},
+{0x5B, 0x0, 200U},
+{0x3C, 0x00, 200U},
+{0x5A, 0x0C, 200U},
+};
 
 /* ========================================================================== */
 /*                             Local Function Declaration                     */
 /* ========================================================================== */
 
-static int32_t appDssDsiSetBoardMux();
 static int32_t appDssDsiInitI2c();
-
+#if defined (SOC_J721E)
+static int32_t appDssDsiSetBoardMux();
+#elif defined (SOC_J721S2) || defined (SOC_J784S4)
+static uint32_t DispApp_ErrorRegRead();
+#endif
 
 /* ========================================================================== */
 /*                             Function Defination                            */
 /* ========================================================================== */
 
-
+int32_t appDssDsiConfigureSN65(uint32_t resolution);
 void appDssConfigurePm(app_dss_default_prm_t *prm)
 {
     appLogPrintf("DSS: SoC init ... !!!\n");
@@ -273,6 +319,24 @@ void appDssConfigureBoard(app_dss_default_prm_t *prm)
     }
 #endif
 
+#if defined(SOC_J721S2) || defined(SOC_J784S4)
+    if(prm->display_type == APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
+    {
+        if ((prm->timings.width       == 1920U  &&
+            prm->timings.height       == 1080U   &&
+            prm->timings.hFrontPorch  == 8U    &&
+            prm->timings.hBackPorch   == 40U    &&
+            prm->timings.hSyncLen     == 32U    &&
+            prm->timings.vFrontPorch  == 17U     &&
+            prm->timings.vBackPorch   == 6U    &&
+            prm->timings.vSyncLen     == 8U) 
+        )
+        {
+            appDssDsiConfigureSN65(VX_DSI_RESO_1080P);
+        }
+    }
+#endif
+
     appLogPrintf("DSS: Board init ... Done !!!\n");
 }
 
@@ -312,6 +376,43 @@ void appDssConfigureDP(void)
     }
 }
 
+static int32_t appDssDsiInitI2c()
+{
+    int32_t status = FVID2_SOK;
+    uint8_t domain, i2cInst, slaveAddr;
+    I2C_Params i2cParams;
+    Board_IoExpCfg_t ioExpCfg;
+    Board_STATUS b_status;
+
+    /* Initializes the I2C Parameters */
+    I2C_Params_init(&i2cParams);
+    i2cParams.bitRate = I2C_400kHz; /* 400KHz */
+
+#if defined (SOC_J721E)
+    Board_fpdUb941GetI2CAddr(&domain, &i2cInst, &slaveAddr);
+#else
+    i2cInst = 4;
+    #if defined (SOC_J784S4)
+        /* For J784S4, linux does not have ownership of GPIOExp that enables DSI to eDP bridge. 
+         * Remote core must take full ownership of the I2C, enable the bridge, and configure it as well.
+         * For J721S2, Linux uBoot hogs up the GPIO expander pin that enables the DSI to eDP bridge.
+         */
+        Board_control(BOARD_CTRL_CMD_ENABLE_DSI2DP_BRIDGE, NULL);
+        Osal_delay(1000);
+    #endif
+#endif
+    /* Configures the I2C instance with the passed parameters*/
+    gI2cHandle = I2C_open(i2cInst, &i2cParams);
+    if(gI2cHandle == NULL)
+    {
+        appLogPrintf("DSS: I2C Open failed!\n");
+        status = FVID2_EFAIL;
+    }
+
+    return (status);
+}
+
+#if defined (SOC_J721E)
 void appDssConfigureUB941AndUB925(app_dss_default_prm_t *prm)
 {
     int32_t status;
@@ -353,7 +454,6 @@ void appDssConfigureUB941AndUB925(app_dss_default_prm_t *prm)
     }
 }
 
-#if defined (SOC_J721E)
 static int32_t appDssDsiSetBoardMux()
 {
     Board_I2cInitCfg_t i2cCfg;
@@ -395,26 +495,185 @@ static int32_t appDssDsiSetBoardMux()
 
     return (FVID2_SOK);
 }
+#endif
 
-static int32_t appDssDsiInitI2c()
+#if defined (SOC_J721S2) || defined (SOC_J784S4)
+uint32_t appDssSN65DsiErrorRegRead(void)
+{
+    uint32_t i, retVal = 0U;
+    uint8_t readVal;
+
+    for(i = 0xF0U; i < 0xF8U; i++)
+    {
+        Board_i2c8BitRegRd(gI2cHandle,
+                           0x2c,
+                           i & 0xFF,
+                           &readVal,
+                           1,
+                           VX_APP_I2C_TIMEOUT);
+        if (readVal != 0)
+        {
+            retVal = 1U;
+            appLogPrintf("Status at 0x%x in the SN65DSI bridge is 0x%x...\n", i, readVal);
+        }
+    }
+
+    return retVal;
+}
+
+void appDssPrepareSN65I2cConfig(uint32_t resolution)
+{
+    int32_t i = 0;
+    for(i=0; i<sizeof(gI2cDsiBridgeCfg)/sizeof(gI2cDsiBridgeCfg[0]); i++)
+    {
+        if (gI2cDsiBridgeCfg[i][0] == 0x10)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x26;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x12)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x4f;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x93)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x20;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x20)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x80;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x21)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x07;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x24)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x38;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x25)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x4;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x30)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x08;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x34)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x28;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x36)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x06;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x38)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x08;
+            }
+        }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x3a)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x10;
+            }
+        }
+    }
+}
+
+int32_t appDssDsiConfigureSN65(uint32_t resolution)
 {
     int32_t status = FVID2_SOK;
-    uint8_t domain, i2cInst, slaveAddr;
-    I2C_Params i2cParams;
 
-    /* Initializes the I2C Parameters */
-    I2C_Params_init(&i2cParams);
-    i2cParams.bitRate = I2C_400kHz; /* 400KHz */
-
-    Board_fpdUb941GetI2CAddr(&domain, &i2cInst, &slaveAddr);
-
-    /* Configures the I2C instance with the passed parameters*/
-    gI2cHandle = I2C_open(i2cInst, &i2cParams);
-    if(gI2cHandle == NULL)
+    appLogPrintf("DSS: Configuring Bridge !!!\n");
+    if (FVID2_SOK == status)
     {
-        appLogPrintf("DSS: I2C Open failed!\n");
-        status = FVID2_EFAIL;
+        status = appDssDsiInitI2c();
     }
+
+    uint8_t readVal, wrVal=0xFF, i;
+    for(i = 0xF0; i < 0xF9; i++)
+    {
+        Board_i2c8BitRegWr(gI2cHandle,
+                            0x2c,
+                            i & 0xFF,
+                            &wrVal,
+                            1,
+                            VX_APP_I2C_TIMEOUT);
+    }
+    appDssPrepareSN65I2cConfig(resolution);
+    for(i=0; i<sizeof(gI2cDsiBridgeCfg)/sizeof(gI2cDsiBridgeCfg[0]); i++)
+    {
+        /* Read the value at bridge address. */
+        Board_i2c8BitRegWr(gI2cHandle,
+                            0x2c,
+                            gI2cDsiBridgeCfg[i][0] & 0xFF,
+                            &(gI2cDsiBridgeCfg[i][1]),
+                            1,
+                            VX_APP_I2C_TIMEOUT);
+        Osal_delay(gI2cDsiBridgeCfg[i][2]);
+        /* Wait untill the DP_PLL has been locked. */
+        if(gI2cDsiBridgeCfg[i][0] == 0x0d)
+        {
+            do {
+                Board_i2c8BitRegRd(gI2cHandle,
+                            0x2c,
+                            0x0a,
+                            &readVal,
+                            1,
+                            VX_APP_I2C_TIMEOUT);
+            } while( (readVal & 0x80) == 0x00);
+        }
+
+        /* Main link should not be off. So keep waiting as long as the main links are off. */
+        if(gI2cDsiBridgeCfg[i][0] == 0x96)
+        {
+            do {
+                Board_i2c8BitRegRd(gI2cHandle,
+                            0x2c,
+                            0x96,
+                            &readVal,
+                            1,
+                            VX_APP_I2C_TIMEOUT);
+            } while( (readVal) == 0x00);
+        }
+    }
+    appDssSN65DsiErrorRegRead();
+    I2C_close(gI2cHandle);
+    appLogPrintf("DSS: Configuring Bridge Done !!!\n");
+
     return (status);
 }
 #endif
