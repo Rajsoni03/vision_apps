@@ -68,6 +68,7 @@
 #include <tivx_alg_ivision_if.h>
 #include <tivx_sfm_host.h>
 #include "tiadalg_interface.h"
+#include <utils/udma/include/app_udma.h>
 #include <utils/udma/include/app_udma_utils.h>
 #include <utils/mem/include/app_mem.h>
 #include <utils/ipc/include/app_ipc.h>
@@ -506,7 +507,7 @@ static vx_status VX_CALLBACK tivxKernelSFMCreate
 #ifdef x86_64
             sfmObj->createParams.udmaDrvObj = tiadalgX86UdmaInit();
 #else
-            sfmObj->createParams.udmaDrvObj = tivxPlatformGetDmaObj();
+            sfmObj->createParams.udmaDrvObj = appUdmaGetObj();
 #endif
 
             if ((vx_status)VX_SUCCESS == status)
