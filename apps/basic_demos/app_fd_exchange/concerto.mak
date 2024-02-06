@@ -9,7 +9,13 @@ TARGET      := vx_app_arm_fd_exchange_producer
 TARGETTYPE  := exe
 CSOURCES    := main_producer.c apputils_net.c app_common.c
 
+# Use this for all devices that use io-sock
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
+ifeq ($(SOC),j722s)
+IDIRS += $(QNX_TARGET)/usr/include/io-sock
+LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/usr/lib/
+LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/lib/
+endif
 SYS_SHARED_LIBS += socket
 endif
 
@@ -31,7 +37,13 @@ TARGET      := vx_app_arm_fd_exchange_consumer
 TARGETTYPE  := exe
 CSOURCES    := main_consumer.c apputils_net.c app_common.c
 
+# Use this for all devices that use io-sock
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
+ifeq ($(SOC),j722s)
+IDIRS += $(QNX_TARGET)/usr/include/io-sock
+LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/usr/lib/
+LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/lib/
+endif
 SYS_SHARED_LIBS += socket
 endif
 
