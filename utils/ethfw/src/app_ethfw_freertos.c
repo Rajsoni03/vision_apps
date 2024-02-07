@@ -192,32 +192,81 @@ static Enet_MacPort gEthAppSwitchPorts[]=
 };
 #endif
 
+/* NOTE: 2 virtual ports should not have same tx channel allocated to them */
 static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
 {
     {
-        .remoteCoreId = IPC_MPU1_0,
-        .portId       = ETHREMOTECFG_SWITCH_PORT_0,
+        .remoteCoreId  = IPC_MPU1_0,
+        .portId        = ETHREMOTECFG_SWITCH_PORT_0,
+        .numTxCh       = 2U,
+        .txCh          = {
+                            [0] = ENET_RM_TX_CH_4, 
+                            [1] = ENET_RM_TX_CH_7
+                         },
+        .numRxFlow     = 1U,
+        .numMacAddress = 1U,
+        .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_LINUX) | ETHFW_BIT(ETHREMOTECFG_CLIENTID_QNX),
     },
     {
-        .remoteCoreId = IPC_MCU2_1,
-        .portId       = ETHREMOTECFG_SWITCH_PORT_1,
+        .remoteCoreId  = IPC_MCU1_0,
+        .portId        = ETHREMOTECFG_SWITCH_PORT_2,
+        .numTxCh       = 1U,
+        .txCh          = {
+                            [0] = ENET_RM_TX_CH_5,
+                         },
+        .numRxFlow     = 1U,
+        .numMacAddress = 1U,
+        .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_AUTOSAR),
     },
     {
-        .remoteCoreId = IPC_MPU1_0,
-        .portId       = ETHREMOTECFG_MAC_PORT_1,
+        /* Virtual switch port for Ethfw, using ETHREMOTECFG_SWITCH_PORT_LAST */
+        .remoteCoreId  = IPC_MCU2_0,
+        .portId        = ETHREMOTECFG_SWITCH_PORT_LAST,
+        .numTxCh       = 2U,
+        .txCh          = {
+                            [0] = ENET_RM_TX_CH_0,
+                            [1] = ENET_RM_TX_CH_6
+                         },
+        .numRxFlow     = 5U,
+        .numMacAddress = 1U,
+        .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_NONE),
     },
     {
-        .remoteCoreId = IPC_MCU2_1,
-        .portId       = ETHREMOTECFG_MAC_PORT_4,
+        /* SWITCH_PORT_1 is used for both RTOS and Autosar client */
+        .remoteCoreId  = IPC_MCU2_1,
+        .portId        = ETHREMOTECFG_SWITCH_PORT_1,
+        .numTxCh       = 1U,
+        .txCh          = {
+                            [0] = ENET_RM_TX_CH_1
+                         },
+        .numRxFlow     = 1U,
+        .numMacAddress = 1U,
+        .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_AUTOSAR) | ETHFW_BIT(ETHREMOTECFG_CLIENTID_RTOS),
     },
-};
-
-static EthFw_VirtPortCfg gEthApp_autosarVirtPortCfg[] =
-{
+#if defined(ENABLE_MAC_ONLY_PORTS)
     {
-        .remoteCoreId = IPC_MCU2_1,
-        .portId       = ETHREMOTECFG_SWITCH_PORT_1,
+        .remoteCoreId  = IPC_MPU1_0,
+        .portId        = ETHREMOTECFG_MAC_PORT_1,
+        .numTxCh       = 1U,
+        .txCh          = {
+                            [0] = ENET_RM_TX_CH_3
+                         },
+        .numRxFlow     = 1U,
+        .numMacAddress = 1U,
+        .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_LINUX) | ETHFW_BIT(ETHREMOTECFG_CLIENTID_QNX),
     },
+    {
+        .remoteCoreId  = IPC_MCU2_1,
+        .portId        = ETHREMOTECFG_MAC_PORT_4,
+        .numTxCh       = 1U,
+        .txCh          = {
+                            [0] = ENET_RM_TX_CH_2
+                         },
+        .numRxFlow     = 1U,
+        .numMacAddress = 1U,
+        .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_RTOS),
+    },
+#endif
 };
 
 static EthFw_AllocCfg gEthApp_allocCfg[] =
@@ -624,10 +673,7 @@ static int32_t EthApp_initEthFw(void)
     /* Set virtual port configuration parameters */
     ethFwCfg.virtPortCfg  = &gEthApp_virtPortCfg[0];
     ethFwCfg.numVirtPorts = ARRAY_SIZE(gEthApp_virtPortCfg);
-
-    /* Set AUTOSAR virtual port configuration parameters */
-    ethFwCfg.autosarVirtPortCfg  = &gEthApp_autosarVirtPortCfg[0];
-    ethFwCfg.numAutosarVirtPorts = ARRAY_SIZE(gEthApp_autosarVirtPortCfg);
+    ethFwCfg.isStaticTxChanAllocated = true;
 
     /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
     cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
