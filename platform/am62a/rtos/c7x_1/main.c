@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2018-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -221,6 +221,32 @@ static void configureC7xL1DCacheAsWriteThrough()
 }
 #endif
 
+static void appC75ClecInitDru(void)
+{
+    CSL_ClecEventConfig   cfgClec;
+    CSL_CLEC_EVTRegs   *clecBaseAddr = (CSL_CLEC_EVTRegs*) CSL_C7X256V0_CLEC_BASE;
+
+    uint32_t i;
+    uint32_t dru_input_num   = 16;
+    
+    /* DRU Local event start ref: AM62A clec spec*/
+    uint32_t dru_input_start = 128;
+
+    /* program CLEC events from DRU used for polling by TIDL
+     * to map to required events in C7x
+     */
+    for(i = dru_input_start; i < (dru_input_start + dru_input_num); i++)
+    {
+        /* Configure CLEC */
+        cfgClec.secureClaimEnable = FALSE;
+        cfgClec.evtSendEnable     = TRUE;
+        cfgClec.rtMap             = CSL_CLEC_RTMAP_CPU_ALL;
+        cfgClec.extEvtNum         = 0;
+        cfgClec.c7xEvtNum         = (i - dru_input_start) + 32;
+        CSL_clecConfigEvent(clecBaseAddr, i, &cfgClec);
+    }
+}
+
 int main(void)
 {
     app_rtos_task_params_t tskParams;
@@ -238,6 +264,8 @@ int main(void)
     /* initialize Clock */
     ClockP_init();
 #endif
+
+    appC75ClecInitDru();
 
     appRtosTaskParamsInit(&tskParams);
     tskParams.priority = 8u;
@@ -602,6 +630,9 @@ void MmuP_setConfig(void)
 
     /* There is no secure mode in C7504 */
     appMmuMap(UFALSE);
+
+    /* Initialize clec */
+    HwiP_configClecAccessCtrl();
 
     appCacheInit();
 }
