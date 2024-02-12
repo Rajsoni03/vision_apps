@@ -132,11 +132,51 @@ int32_t appPerfStatsOsStatsPrintAll()
     return status;
 }
 
+int32_t appPerfStatsStackStatsPrintAll()
+{
+    uint32_t cpu_id;
+    int32_t status=0;
+    app_perf_stats_task_stats_t cpu_task_stats;
 
+    printf("\n");
+    printf("Detailed CPU Task Stack statistics,\n");
+    printf(" (Unused stack memory, in bytes)\n");
+    printf("====================================\n");
+    for(cpu_id=0; cpu_id<APP_IPC_CPU_MAX; cpu_id++)
+    {
+        if(appIpcIsCpuEnabled(cpu_id))
+        {
+            #if defined(LINUX) || defined(QNX)
+            /* NOT supported for Linux/QNX A72 as of now */
+            if(cpu_id!=appIpcGetSelfCpuId())
+            #endif
+            {
+                cpu_task_stats.starting_task = 0;
+                status = appPerfStatsCpuTaskStacksStatsGet(cpu_id, &cpu_task_stats);
+                if(status==0)
+                {
+                    appPerfStatsCpuTaskStacksStatsPrint(cpu_id, &cpu_task_stats);
+                    if(cpu_task_stats.num_tasks == APP_PERF_STATS_TASK_MAX)
+                    {
+                        cpu_task_stats.starting_task = APP_PERF_STATS_TASK_MAX;
+                        status = appPerfStatsCpuTaskStacksStatsGet(cpu_id, &cpu_task_stats);
+                        if(status==0)
+                        {
+                            appPerfStatsCpuTaskStacksStatsPrint(cpu_id, &cpu_task_stats);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    printf("\n");
+    return status;
+}
 
 int main(int argc, char *argv[])
 {
     vx_status status = 0;
+    int i;
 
     status = appCommonInit();
 
@@ -147,6 +187,20 @@ int main(int argc, char *argv[])
         if(status == VX_SUCCESS)
         {
             status = appPerfStatsOsStatsPrintAll();
+        }
+
+        if(status == VX_SUCCESS)
+        {
+            if(argc>1)
+            {
+                for(i=0; i<argc; i++)
+                {
+                    if(strcmp(argv[i], "-v")==0)
+                    {
+                        status = appPerfStatsStackStatsPrintAll();
+                    }
+                }
+            }
         }
 
         if(status == VX_SUCCESS)
