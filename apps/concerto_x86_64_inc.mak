@@ -94,7 +94,9 @@ endif
 endif
 
 VISION_APPS_UTILS_LIBS  =
+ifneq ($(SOC), am62a)
 VISION_APPS_UTILS_LIBS += app_utils_draw2d
+endif
 VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 VISION_APPS_UTILS_LIBS += app_utils_console_io

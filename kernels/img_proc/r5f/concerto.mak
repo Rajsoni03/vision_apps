@@ -11,7 +11,7 @@ ifeq ($(TARGET_CPU), R5F)
   CSOURCES    += vx_img_mosaic_msc_target.c
 else
   CSOURCES    += vx_img_mosaic_msc_target_sim.c
-  IDIRS       += $(J7_C_MODELS_PATH)/include
+  IDIRS       += $(VPAC_C_MODELS_PATH)/include
   IDIRS       += $(IMAGING_PATH)/kernels/hwa/include
 endif
 
