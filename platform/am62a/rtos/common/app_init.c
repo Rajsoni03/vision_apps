@@ -492,12 +492,6 @@ int32_t appInit()
     APP_ASSERT_SUCCESS(status);
     #endif
 
-    #ifdef CPU_mcu1_0
-    #if defined(FREERTOS) || defined(SAFERTOS)
-    status = appIpcCreateTraceBufFlushTask();
-    #endif
-    #endif
-
     appLogPrintf("APP: Init ... Done !!!\n");
 
     return status;
