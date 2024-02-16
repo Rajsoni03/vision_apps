@@ -24,7 +24,6 @@ IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include
 ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
     IDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack
-    IDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack/tsn_combase/tilld/jacinto
 endif
 
 CSOURCES    := app_ethfw_freertos.c

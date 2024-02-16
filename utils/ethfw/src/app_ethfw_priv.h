@@ -94,10 +94,7 @@
 
 #if defined(ETHFW_GPTP_SUPPORT)
 /* Timesync header files */
-#include <tsn_buildconf/jacinto_buildconf.h>
-#include <tsn_gptp/gptpconf/gptpgcfg.h>
-#include <tsn_gptp/gptpconf/xl4-extmod-xl4gptp.h>
-#include <ethremotecfg/server/include/ethfw_tsn.h>
+#include <tsn_gptp/gptp_config.h>
 #endif
 
 #if defined(ETHAPP_ENABLE_IPERF_SERVER)

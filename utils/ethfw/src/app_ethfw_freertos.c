@@ -707,6 +707,12 @@ static int32_t EthApp_initEthFw(void)
     ethFwCfg.monitorCfg.openLwipDmaCb  = EthApp_openDmaCb;
 #endif
 
+#if defined(ETHFW_GPTP_SUPPORT)
+    /* gPTP stack config parameters */
+    ethFwCfg.configPtpCb    = EthApp_configPtpCb;
+    ethFwCfg.configPtpCbArg = NULL;
+#endif
+
 #if defined(ETHFW_DEMO_SUPPORT)
     /* Overwrite config params with those for hardware interVLAN */
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
@@ -1023,21 +1029,13 @@ static void EthApp_configPtpCb(void *arg)
     int32_t useHwPhase = 1;
 
     /* Apply phase adjustment directly to the HW */
-    gptpgcfg_set_item(0, XL4_EXTMOD_XL4GPTP_USE_HW_PHASE_ADJUSTMENT,
-                      YDBI_CONFIG, &useHwPhase, sizeof(useHwPhase));
+    gptpconf_set_item(CONF_USE_HW_PHASE_ADJUSTMENT, &useHwPhase);
 }
 
 static void EthApp_initPtp(void)
 {
     uint32_t portMask = 0U;
     uint8_t i;
-    EthFwTsn_Config tsnCfg;
-
-    /* gPTP stack config parameters */
-    tsnCfg.enetType         = gEthAppObj.enetType;
-    tsnCfg.instId           = gEthAppObj.instId;
-    tsnCfg.configPtpCb      = EthApp_configPtpCb;
-    tsnCfg.configPtpCbArg   = NULL;
 
     /* MAC port used for PTP */
     for (i = 0U; i < ENET_ARRAYSIZE(gEthAppSwitchPorts); i++)
@@ -1047,7 +1045,7 @@ static void EthApp_initPtp(void)
 
     /* Wait for host port MAC address to be allocated during lwIP getHandle */
     SemaphoreP_pend(gEthAppObj.hHostMacAllocSem, SemaphoreP_WAIT_FOREVER);
-    EthFwTsn_initTimeSyncPtp(&tsnCfg, &gEthAppObj.hostMacAddr[0U], portMask);
+    EthFw_initTimeSyncPtp(&gEthAppObj.hostMacAddr[0U], portMask);
 }
 
 #endif

@@ -66,8 +66,6 @@ ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
 	LDIRS += $(PDK_PATH)/packages/ti/drv/enet/lib/$(RTOS_LC)/$(SOC)/r5f/$(TARGET_BUILD)/
 ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
 	LDIRS += $(PDK_PATH)/packages/ti/transport/tsn/lib/r5f/$(TARGET_BUILD)/
-	LDIRS += $(PDK_PATH)/packages/ti/drv/mmcsd/lib/r5f/$(TARGET_BUILD)/
-    LDIRS += $(PDK_PATH)/packages/ti/fs/fatfs/lib/r5f/$(TARGET_BUILD)/
 endif
 endif
 
@@ -110,11 +108,8 @@ ADDITIONAL_STATIC_LIBS += enet.aer5f
 ADDITIONAL_STATIC_LIBS += enetphy.aer5f
 ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
 ADDITIONAL_STATIC_LIBS += tsn_gptp.aer5f
-ADDITIONAL_STATIC_LIBS += tsn_uniconf.aer5f
 ADDITIONAL_STATIC_LIBS += tsn_combase.aer5f
 ADDITIONAL_STATIC_LIBS += tsn_unibase.aer5f
-ADDITIONAL_STATIC_LIBS += ti.drv.mmcsd.aer5f
-ADDITIONAL_STATIC_LIBS += ti.fs.fatfs.aer5f
 endif
 
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
