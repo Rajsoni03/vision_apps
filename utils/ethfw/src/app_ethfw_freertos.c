@@ -192,6 +192,10 @@ static Enet_MacPort gEthAppSwitchPorts[]=
 };
 #endif
 
+/* Custom policers which clients need to provide to add their own policers.
+ * Make sure that size of this array is <= ETHFW_UTILS_NUM_CUSTOM_POLICERS */
+static CpswAle_SetPolicerEntryInPartitionInArgs gEthApp_customPolicers[ETHFW_UTILS_NUM_CUSTOM_POLICERS] = {};
+
 /* NOTE: 2 virtual ports should not have same tx channel allocated to them */
 static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
 {
@@ -203,7 +207,21 @@ static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
                             [0] = ENET_RM_TX_CH_4, 
                             [1] = ENET_RM_TX_CH_7
                          },
+        /* Number of rx flow for this virtual port */
         .numRxFlow     = 1U,
+        /* To create custom policers on rx flows clients need to give flow information (i.e. numCustomPolicers and customPolicersInArgs)
+         * for each allocated flow.
+         * Map the customPolicersInArgs with global custom policer's (i.e. gEthApp_customPolicers) array.
+         * For example if numRxFlow is 1 and we want to create 1 custom policer to match with 2'nd custom policer in global array do this: 
+         * .rxFlowInfo = {  
+         *                  [0] = {
+         *                           .numCustomPolicers    = 1U,
+         *                           .customPolicersInArgs = {
+         *                                                       [0] = &gEthApp_customPolicers[2U],
+         *                                                   }
+         *                         }
+         *               }
+         * It is important to note that number of custom policers per rx flow is <= ETHREMOTECFG_POLICER_PERFLOW */
         .numMacAddress = 1U,
         .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_LINUX) | ETHFW_BIT(ETHREMOTECFG_CLIENTID_QNX),
     },
