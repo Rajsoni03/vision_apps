@@ -68,7 +68,7 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/console_io/include/app_cli.h>
-
+#include <utils/timer/include/app_timer.h>
 
 typedef struct {
 

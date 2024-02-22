@@ -69,6 +69,7 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/timer/include/app_timer.h>
 
 int32_t appPerfStatsMemStatsPrintAll()
 {

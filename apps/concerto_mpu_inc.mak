@@ -147,6 +147,7 @@ endif
 VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_ipc
 VISION_APPS_UTILS_LIBS += app_utils_console_io
+VISION_APPS_UTILS_LIBS += app_utils_timer
 VISION_APPS_UTILS_LIBS += app_utils_file_io
 VISION_APPS_UTILS_LIBS += app_utils_remote_service
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats

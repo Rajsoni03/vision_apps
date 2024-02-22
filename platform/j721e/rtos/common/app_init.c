@@ -76,6 +76,7 @@
 #include <utils/console_io/include/app_cli.h>
 #include <utils/misc/include/app_misc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
+#include <utils/timer/include/app_timer.h>
 
 #if defined(ENABLE_FVID2)
 #include <utils/hwa/include/app_hwa.h>

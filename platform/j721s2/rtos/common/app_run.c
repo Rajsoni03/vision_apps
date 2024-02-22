@@ -63,6 +63,7 @@
 #include APP_CFG_FILE
 #include <app_run.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/timer/include/app_timer.h>
 
 #if defined(ENABLE_TIOVX_HOST)
 #include <app.h>

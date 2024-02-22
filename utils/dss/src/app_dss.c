@@ -65,6 +65,7 @@
 /* ========================================================================== */
 #include <utils/dss/include/app_dss.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/timer/include/app_timer.h>
 #include <dss/dss.h>
 
 /* ========================================================================== */

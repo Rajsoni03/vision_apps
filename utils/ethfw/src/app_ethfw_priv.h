@@ -89,6 +89,7 @@
 /* Vision Apps utils */
 #include <utils/udma/include/app_udma.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/timer/include/app_timer.h>
 #include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
 

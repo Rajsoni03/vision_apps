@@ -61,6 +61,7 @@
  */
 
 #include <utils/console_io/include/app_log.h>
+#include <utils/timer/include/app_timer.h>
 #include <stdio.h>
 
 #if !defined(MCU_PLUS_SDK)

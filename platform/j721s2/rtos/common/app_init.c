@@ -72,6 +72,7 @@
 #include <utils/ipc/include/app_ipc.h>
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/console_io/include/app_log.h>
+#include <utils/timer/include/app_timer.h>
 #include <utils/file_io/include/app_fileio.h>
 #include <utils/console_io/include/app_cli.h>
 #include <utils/misc/include/app_misc.h>
