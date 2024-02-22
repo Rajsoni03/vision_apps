@@ -387,7 +387,7 @@ int32_t appInit()
     #endif
 
     #ifdef ENABLE_SCICLIENT
-    status = appSciclientInit();
+    status = appSciclientInit(ipc_init_prm.self_cpu_id);
     APP_ASSERT_SUCCESS(status);
     #endif
 
