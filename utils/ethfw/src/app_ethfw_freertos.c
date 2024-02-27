@@ -180,8 +180,6 @@ static Enet_MacPort gEthAppSwitchPorts[]=
 #if defined(ENABLE_QSGMII_PORTS)
     ENET_MAC_PORT_2,
     ENET_MAC_PORT_5,
-    ENET_MAC_PORT_6,
-    ENET_MAC_PORT_7,
 #endif
 #endif
 
@@ -707,6 +705,12 @@ static int32_t EthApp_initEthFw(void)
     ethFwCfg.monitorCfg.openLwipDmaCb  = EthApp_openDmaCb;
 #endif
 
+#if defined(ETHFW_GPTP_SUPPORT)
+    /* gPTP stack config parameters */
+    ethFwCfg.configPtpCb    = EthApp_configPtpCb;
+    ethFwCfg.configPtpCbArg = NULL;
+#endif
+
 #if defined(ETHFW_DEMO_SUPPORT)
     /* Overwrite config params with those for hardware interVLAN */
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
@@ -1031,13 +1035,6 @@ static void EthApp_initPtp(void)
 {
     uint32_t portMask = 0U;
     uint8_t i;
-    EthFwTsn_Config tsnCfg;
-
-    /* gPTP stack config parameters */
-    tsnCfg.enetType         = gEthAppObj.enetType;
-    tsnCfg.instId           = gEthAppObj.instId;
-    tsnCfg.configPtpCb      = EthApp_configPtpCb;
-    tsnCfg.configPtpCbArg   = NULL;
 
     /* MAC port used for PTP */
     for (i = 0U; i < ENET_ARRAYSIZE(gEthAppSwitchPorts); i++)
@@ -1047,7 +1044,7 @@ static void EthApp_initPtp(void)
 
     /* Wait for host port MAC address to be allocated during lwIP getHandle */
     SemaphoreP_pend(gEthAppObj.hHostMacAllocSem, SemaphoreP_WAIT_FOREVER);
-    EthFwTsn_initTimeSyncPtp(&tsnCfg, &gEthAppObj.hostMacAddr[0U], portMask);
+    EthFwTsn_initTimeSyncPtp(&gEthAppObj.hostMacAddr[0U], portMask);
 }
 
 #endif
