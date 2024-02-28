@@ -259,7 +259,6 @@ static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
         .numMacAddress = 1U,
         .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_AUTOSAR) | ETHFW_BIT(ETHREMOTECFG_CLIENTID_RTOS),
     },
-#if defined(ENABLE_MAC_ONLY_PORTS)
     {
         .remoteCoreId  = IPC_MPU1_0,
         .portId        = ETHREMOTECFG_MAC_PORT_1,
@@ -282,7 +281,6 @@ static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
         .numMacAddress = 1U,
         .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_RTOS),
     },
-#endif
 };
 
 static EthFw_AllocCfg gEthApp_allocCfg[] =
