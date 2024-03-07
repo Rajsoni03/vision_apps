@@ -51,6 +51,7 @@ TIOVX_LIBS += vx_kernels_hwa_tests vx_kernels_hwa
 TIOVX_LIBS += vx_target_kernels_vpac_viss vx_target_kernels_vpac_msc vx_target_kernels_vpac_ldc
 TIOVX_LIBS += vx_target_kernels_dmpac_dof vx_target_kernels_dmpac_sde
 TIOVX_LIBS += vx_target_kernels_capture
+TIOVX_LIBS += vx_target_kernels_csitx
 TIOVX_LIBS += vx_target_kernels_j7_arm
 TIOVX_LIBS += vx_target_kernels_display
 

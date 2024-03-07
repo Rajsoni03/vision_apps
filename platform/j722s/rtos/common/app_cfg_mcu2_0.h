@@ -75,7 +75,7 @@
 #ifdef BUILD_MCU_BOARD_DEPENDENCIES
    /* TBD: Check board dependencies */
     #define ENABLE_CSI2RX
-    #undef ENABLE_CSI2TX
+    #define ENABLE_CSI2TX
 
     /* IMPORANT NOTE:
      * - Only one of ENABLE_DSS_SINGLE or ENABLE_DSS_DUAL should be defined
