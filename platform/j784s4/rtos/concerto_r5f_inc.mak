@@ -1,5 +1,7 @@
 ifeq ($(TARGET_CPU),R5F)
 
+LDFLAGS += --rom_model
+
 IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos/common
 IDIRS+=$(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS+=$(VISION_APPS_PATH)/kernels/fileio/include
