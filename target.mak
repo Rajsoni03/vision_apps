@@ -52,6 +52,9 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J721S2 J784S4 AM62A
                 SYSIDIRS += $(PDK_QNX_PATH)/packages/ti/drv
                 SYSIDIRS += $(GCC_QNX_ARM_ROOT)/../usr/include
                 SYSLDIRS += $(GCC_QNX_ARM_ROOT)/../usr/lib
+                SYSDEFS  += QNX_OS
+                SYSDEFS  += BUILD_MPU1_0
+                SYSDEFS  += $(TARGET_PLATFORM)
             else
                 SYSIDIRS += $(LINUX_FS_PATH)/usr/include
                 SYSLDIRS += $(LINUX_FS_PATH)/usr/lib
