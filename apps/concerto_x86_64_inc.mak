@@ -41,6 +41,15 @@ LDIRS       += $(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
+ifeq ($(RTOS_SDK), mcu_plus_sdk)
+LDIRS+= $(MCU_PLUS_SDK_PATH)/source/drivers/dmautils/lib/
+else
+LDIRS+= $(PDK_PATH)/packages/ti/drv/udma/lib/$(SOC)_hostemu/c7x-hostemu/$(TARGET_BUILD)
+LDIRS+= $(PDK_PATH)/packages/ti/csl/lib/$(SOC)/c7x-hostemu/$(TARGET_BUILD)
+LDIRS+= $(PDK_PATH)/packages/ti/drv/sciclient/lib/$(SOC)_hostemu/c7x-hostemu/$(TARGET_BUILD)
+LDIRS+= $(PDK_PATH)/packages/ti/osal/lib/nonos/$(SOC)/c7x-hostemu/$(TARGET_BUILD)
+endif
+
 CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-unused-result
@@ -151,9 +160,18 @@ PDK_LIBS += udma.lib
 PDK_LIBS += sciclient.lib
 PDK_LIBS += ti.csl.lib
 PDK_LIBS += ti.osal.lib
+endif
+
+MCU_PLUS_SDK_LIBS =
+ifeq ($(SOC), am62a)
+  MCU_PLUS_SDK_LIBS += dmautils.am62ax.c75x.ti-c7x-hostemu.$(TARGET_BUILD).lib
+endif
+ifeq ($(SOC), j722s)
+  MCU_PLUS_SDK_LIBS += dmautils.j722s.c75ssx-0.ti-c7x-hostemu.$(TARGET_BUILD).lib
+endif
 
 ADDITIONAL_STATIC_LIBS += $(PDK_LIBS)
-endif
+ADDITIONAL_STATIC_LIBS += $(MCU_PLUS_SDK_LIBS)
 
 STATIC_LIBS += $(MMA_LIBS)
 STATIC_LIBS += $(TIOVX_LIBS)

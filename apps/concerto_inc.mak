@@ -45,7 +45,7 @@ MCU_PLUS_SDK_LIBS =
 ifeq ($(SOC), am62a)
   MCU_PLUS_SDK_LIBS += dmautils.am62ax.c75x.ti-c7x-hostemu.$(TARGET_BUILD).lib
 endif
-ifeq ($(SOC), am62a)
+ifeq ($(SOC), j722s)
   MCU_PLUS_SDK_LIBS += dmautils.j722s.c75ssx-0.ti-c7x-hostemu.$(TARGET_BUILD).lib
 endif
 
