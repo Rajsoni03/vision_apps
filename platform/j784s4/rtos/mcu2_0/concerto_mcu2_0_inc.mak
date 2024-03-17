@@ -94,6 +94,9 @@ ETHFW_LIBS += eth_intervlan
 ETHFW_LIBS += ethfw_board
 ETHFW_LIBS += ethfw_remotecfg_server
 ETHFW_LIBS += ethfw_common
+ifeq ($(ETHFW_EST_DEMO_SUPPORT),yes)
+ETHFW_LIBS += ethfw_estdemo
+endif
 endif
 
 SYS_STATIC_LIBS += $(ETHFW_LIBS)

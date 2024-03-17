@@ -200,15 +200,15 @@ static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
     {
         .remoteCoreId  = IPC_MPU1_0,
         .portId        = ETHREMOTECFG_SWITCH_PORT_0,
-#if defined(ETHFW_DEMO_SUPPORT)
+#if defined(ETHFW_EST_DEMO_SUPPORT) || defined(ETHFW_DEMO_SUPPORT)
         .numTxCh       = 1U,
         .txCh          = {
                             [0] = ENET_RM_TX_CH_4
                          },
 #else
-        .numTxCh       = 2U,
-        .txCh          = {
-                            [0] = ENET_RM_TX_CH_4, 
+         .numTxCh      = 2U,
+         .txCh         = {
+                            [0] = ENET_RM_TX_CH_4,
                             [1] = ENET_RM_TX_CH_7
                          },
 #endif
@@ -245,7 +245,7 @@ static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
         /* Virtual switch port for Ethfw, using ETHREMOTECFG_SWITCH_PORT_LAST */
         .remoteCoreId  = IPC_MCU2_0,
         .portId        = ETHREMOTECFG_SWITCH_PORT_LAST,
-#if defined(ETHFW_DEMO_SUPPORT)
+#if defined(ETHFW_EST_DEMO_SUPPORT) || defined(ETHFW_DEMO_SUPPORT)
         .numTxCh       = 3U,
         .txCh          = {
                             [0] = ENET_RM_TX_CH_0,

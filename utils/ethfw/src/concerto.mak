@@ -75,6 +75,13 @@ ifeq ($(ETHFW_DEMO_SUPPORT),yes)
   DEFS += ETHFW_DEMO_SUPPORT
 endif
 
+# Feature flags: ETHFW EST demo - should be supported with gPTP
+ifeq ($(ETHFW_EST_DEMO_SUPPORT),yes)
+  ifeq ($(ETHFW_GPTP_SUPPORT),yes)
+    DEFS += ETHFW_EST_DEMO_SUPPORT
+  endif
+endif
+
 include $(FINALE)
 
 endif
