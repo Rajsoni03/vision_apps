@@ -22,8 +22,9 @@ VISION_APPS_SRV_IDIRS =
 VISION_APPS_SRV_IDIRS += $(VISION_APPS_PATH)/kernels/srv/include
 VISION_APPS_SRV_IDIRS += $(VISION_APPS_PATH)/kernels/srv/c66
 VISION_APPS_SRV_IDIRS += $(VISION_APPS_PATH)/kernels/srv/gpu/3dsrv
-VISION_APPS_SRV_IDIRS += $(VISION_APPS_PATH)/kernels/sample/include
-VISION_APPS_SRV_IDIRS += $(VISION_APPS_PATH)/kernels/sample/host
+
+VISION_APPS_SAMPLE_IDIRS += $(VISION_APPS_PATH)/kernels/sample/include
+VISION_APPS_SAMPLE_IDIRS += $(VISION_APPS_PATH)/kernels/sample/host
 
 VISION_APPS_APPLIBS_IDIRS =
 VISION_APPS_APPLIBS_IDIRS += $(VISION_APPS_PATH)/applibs
@@ -84,6 +85,8 @@ endif # ifeq ($(TARGET_OS), QNX)
 TIOVX_LIBS  =
 IMAGING_LIBS =
 VISION_APPS_SRV_LIBS  =
+VISION_APPS_SAMPLE_LIBS  =
+VISION_APPS_OPENGL_UTILS_LIBS =
 VISION_APPS_KERNELS_LIBS  =
 VISION_APPS_MODULES_LIBS  =
 TEST_LIBS =
@@ -163,13 +166,15 @@ endif
 VISION_APPS_UTILS_LIBS += app_utils_hwa
 VISION_APPS_UTILS_LIBS += app_utils_init
 
-VISION_APPS_SRV_LIBS  += vx_kernels_sample vx_target_kernels_sample_a72
+VISION_APPS_OPENGL_UTILS_LIBS += app_utils_opengl
+
+VISION_APPS_SAMPLE_LIBS  += vx_kernels_sample vx_target_kernels_sample_a72
+
 VISION_APPS_SRV_LIBS  += vx_kernels_srv vx_target_kernels_srv_gpu
 VISION_APPS_SRV_LIBS  += vx_applib_srv_bowl_lut_gen
 VISION_APPS_SRV_LIBS  += vx_applib_srv_calibration
 VISION_APPS_SRV_LIBS  += vx_srv_render_utils
 VISION_APPS_SRV_LIBS  += vx_srv_render_utils_tools
-VISION_APPS_SRV_LIBS  += app_utils_opengl
 
 VISION_APPS_KERNELS_LIBS += vx_kernels_img_proc
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_a72
