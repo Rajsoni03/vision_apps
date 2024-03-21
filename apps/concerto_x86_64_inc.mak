@@ -74,7 +74,9 @@ IMAGING_LIBS += app_utils_iss
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
 IMAGING_LIBS += ti_imaging_dcc
+ifneq ($(SOC), am62a)
 IMAGING_LIBS += vx_target_kernels_imaging_aewb
+endif
 
 TIADALG_LIBS  =
 ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
