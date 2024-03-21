@@ -15,6 +15,7 @@ ifeq ($(SOC),j722s)
 IDIRS += $(QNX_TARGET)/usr/include/io-sock
 LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/usr/lib/
 LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/lib/
+SKIPBUILD=1
 endif
 SYS_SHARED_LIBS += socket
 endif
@@ -43,6 +44,7 @@ ifeq ($(SOC),j722s)
 IDIRS += $(QNX_TARGET)/usr/include/io-sock
 LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/usr/lib/
 LDIRS +=$(QNX_TARGET)/aarch64le/io-sock/lib/
+SKIPBUILD=1
 endif
 SYS_SHARED_LIBS += socket
 endif
