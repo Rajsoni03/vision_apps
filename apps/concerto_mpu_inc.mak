@@ -183,7 +183,7 @@ VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
 
 VISION_APPS_MODULES_LIBS += vx_app_modules
 
-ifneq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), AM62A J722S))
+ifneq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), AM62A))
 VISION_APPS_STEREO_LIBS += vx_kernels_common
 VISION_APPS_STEREO_LIBS += vx_kernels_stereo
 VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
