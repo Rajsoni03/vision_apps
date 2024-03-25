@@ -10,7 +10,7 @@ ifeq ($(RTOS),FREERTOS)
 	CSOURCES += generated/ti_drivers_open_close.c
 	CSOURCES += generated/ti_pinmux_config.c
 	CSOURCES += generated/ti_power_clock_config.c
-	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos_mcuplus.cmd
+	LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos.cmd
 endif
 
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd

@@ -92,11 +92,11 @@
 #define L2RAM_C7x_2_AUX_AS_L1_SIZE (0x00004000u)
 
 /* DDR for MCU1_0 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_MCU1_0_IPC_ADDR (0xA1000000u)
+#define DDR_MCU1_0_IPC_ADDR (0xA0000000u)
 #define DDR_MCU1_0_IPC_SIZE (0x00100000u)
 
 /* DDR for MCU1_0 for all sections, used for reserving memory in DTS file [ size 15.00 MB ] */
-#define DDR_MCU1_0_DTS_ADDR (0xA1100000u)
+#define DDR_MCU1_0_DTS_ADDR (0xA0100000u)
 #define DDR_MCU1_0_DTS_SIZE (0x00F00000u)
 
 /* DDR for MCU2_0 for Linux IPC [ size 1024.00 KB ] */

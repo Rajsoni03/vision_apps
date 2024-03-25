@@ -82,7 +82,7 @@ SECTIONS
         __RESOURCE_TABLE = .;
     }                                           > DDR_MCU2_0_RESOURCE_TABLE
 
-    .tracebuf                : {} align(1024)   > DDR_MCU2_0
+    .tracebuf                : {} align(1024)   > DDR_MCU2_0_IPC_TRACE
 
     .bss:ddr_local_mem      (NOLOAD) : {} > DDR_MCU2_0_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM

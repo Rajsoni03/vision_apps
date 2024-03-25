@@ -64,12 +64,19 @@
 #include <utils/console_io/include/app_log.h>
 #include <utils/timer/include/app_timer.h>
 #include <utils/sciserver/include/app_sciserver.h>
+#include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
 #include <stdio.h>
 #include <string.h>
-#include <ti/osal/osal.h>
 #include <app_ipc_rsctable.h>
-#include <utils/perf_stats/include/app_perf_stats.h>
+#include "app_cfg_mcu1_0.h"
+
+#include "ti_drivers_config.h"
+#include "ti_board_config.h"
+#include "ti_drivers_open_close.h"
+#include "ti_board_open_close.h"
+#include <ipc_notify.h>
+#include <ipc_notify/v0/ipc_notify_v0.h>
 
 /**< SCI Server Init Task stack size */
 #define APP_SCISERVER_INIT_TSK_STACK        (32U * 1024U)
@@ -80,12 +87,27 @@
 static uint8_t  gSciserverInitTskStack[APP_SCISERVER_INIT_TSK_STACK]
 __attribute__ ((aligned(8192)));
 
+extern void vTaskStartScheduler( void );
+
+void IpcNotify_getConfig(IpcNotify_InterruptConfig **interruptConfig, uint32_t *interruptConfigNum)
+{
+    /* extern globals that are specific to this core */
+    extern IpcNotify_InterruptConfig gIpcNotifyInterruptConfig_wkup_r5fss0_0[];
+    extern uint32_t gIpcNotifyInterruptConfigNum_wkup_r5fss0_0;
+
+    *interruptConfig = &gIpcNotifyInterruptConfig_wkup_r5fss0_0[0];
+    *interruptConfigNum = gIpcNotifyInterruptConfigNum_wkup_r5fss0_0;
+}
+
 static void appMain(void* arg0, void* arg1)
 {
     app_rtos_task_handle_t sciserverInitTask;
     app_rtos_task_params_t sciserverInitTaskParams;
 
-    appSciserverSciclientInit();
+    appUtilsTaskInit();
+
+    Drivers_open();
+    Board_driversOpen();
 
     /* Initialize SCI Client Server */
     appRtosTaskParamsInit(&sciserverInitTaskParams);
@@ -95,13 +117,16 @@ static void appMain(void* arg0, void* arg1)
     sciserverInitTaskParams.taskfxn = &appSciserverInit;
 
     sciserverInitTask = appRtosTaskCreate(&sciserverInitTaskParams);
+
     if(NULL == sciserverInitTask)
     {
-        OS_stop();
+        extern void vTaskEndScheduler( void );
+        vTaskEndScheduler();
     }
 
     appInit();
     appRun();
+
     #if 1
     while(1)
     {
@@ -132,22 +157,15 @@ int main(void)
 
 #if defined FREERTOS
     /* Relocate FreeRTOS Reset Vectors from BTCM*/
-    void _freertosresetvectors (void);
-    memcpy((void *)0x0, (void *)_freertosresetvectors, 0x40);
-#endif
-
-#if defined SAFERTOS
-    /* Relocate SafeRTOS Reset Vectors from BTCM*/
-    void _axSafeRTOSresetVectors (void);
-    memcpy((void *)0x0, (void *)_axSafeRTOSresetVectors, 0x40);
+    void _vectors (void);
+    memcpy((void *)0x0, (void *)_vectors, 0x40);
 #endif
 
     /* This is for debug purpose - see the description of function header */
     StartupEmulatorWaitFxn();
 
-    OS_init();
-
-    appPerfStatsInit();
+    System_init();
+    Board_init();
 
     /* Initialize the task params */
     appRtosTaskParamsInit(&tskParams);
@@ -157,19 +175,17 @@ int main(void)
     tskParams.stacksize    = sizeof (gTskStackMain);
     tskParams.taskfxn = &appMain;
     task = appRtosTaskCreate(&tskParams);
-    if(NULL == task)
-    {
-        OS_stop();
-    }
-    OS_start();    /* does not return */
+
+    DebugP_assert(task != NULL);
+
+    vTaskStartScheduler();
+    /* The following line should never be reached because vTaskStartScheduler()
+    will only return if there was not enough FreeRTOS heap memory available to
+    create the Idle and (if configured) Timer tasks.  Heap management, and
+    techniques for trapping heap exhaustion, are described in the book text. */
+    DebugP_assertNoLog(0);
 
     return 0;
-}
-
-uint32_t appGetDdrSharedHeapSize()
-{
-    return DDR_SHARED_MEM_SIZE;
-
 }
 
 uint64_t appTarget2SharedConversion(const uint64_t virtAddr)

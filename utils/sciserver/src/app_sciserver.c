@@ -73,7 +73,7 @@
 #include <SystemP.h>
 #endif
 
-#if defined(SOC_AM62A)
+#if defined(SOC_AM62A) || defined(SOC_J722S)
 #if !defined(MCU_PLUS_SDK)
 #include <ti/board/board.h>
 #include <uart/UART.h>
@@ -126,8 +126,9 @@ int32_t appSciserverSciclientInit()
         retVal = Sciclient_init(&clientParams);
     }
 #else
+#if defined(SOC_AM62A)
 #ifdef CPU_c7x_1
-/* Only for C7x sysconfig is not used now. 
+/* Only for C7x sysconfig is not used now.
  * For R5, sci client init is done by sysconfig generated files
  */
     int32_t retVal = CSL_PASS;
@@ -149,6 +150,7 @@ int32_t appSciserverSciclientInit()
 
 #endif
 #endif
+#endif
 
     return retVal;
 }
@@ -160,7 +162,7 @@ int32_t appSciserverSciclientDeInit()
     retVal = Sciclient_deinit();
     if(retVal!=0)
     {
-        #if defined(SOC_AM62A)
+        #if defined(SOC_AM62A) || defined(SOC_J722S)
 
         #if !defined(MCU_PLUS_SDK)
         UART_printf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
@@ -181,7 +183,7 @@ void appSciserverInit(void* arg0, void* arg1)
     int32_t retVal = CSL_PASS;
     Sciserver_TirtosCfgPrms_t serverParams;
 
-    #if defined(SOC_AM62A)
+    #if defined(SOC_AM62A) || defined(SOC_J722S)
     const char *version_str = NULL;
     const char *rmpmhal_version_str = NULL;
     #endif
@@ -196,7 +198,7 @@ void appSciserverInit(void* arg0, void* arg1)
         retVal = Sciserver_tirtosInit(&serverParams);
     }
 
-    #if defined(SOC_AM62A)
+    #if defined(SOC_AM62A) || defined(SOC_J722S)
     version_str = Sciserver_getVersionStr();
     rmpmhal_version_str = Sciserver_getRmPmHalVersionStr();
     #if !defined(MCU_PLUS_SDK)
@@ -213,7 +215,7 @@ void appSciserverInit(void* arg0, void* arg1)
     {
     #if !defined(MCU_PLUS_SDK)
         UART_printf("##Starting Sciserver..... PASSED\r\n");
-    
+
     #else
         DebugP_log("##Starting Sciserver..... PASSED\r\n");
     #endif
