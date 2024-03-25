@@ -187,10 +187,10 @@ ifneq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), AM62A))
 VISION_APPS_STEREO_LIBS += vx_kernels_common
 VISION_APPS_STEREO_LIBS += vx_kernels_stereo
 VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
+endif
 
 PTK_LIBS += ptk_base
 PTK_LIBS += ptk_algos
-endif
 
 TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
 TEST_LIBS += vx_kernels_openvx_ext_tests
