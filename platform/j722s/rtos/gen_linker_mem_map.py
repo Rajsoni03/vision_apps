@@ -270,9 +270,7 @@ c7x_2_1_ddr_local_heap_addr = c7x_1_ddr_local_heap_addr;
 c7x_2_1_ddr_scratch_addr = c7x_1_ddr_scratch_addr;
 
 # Shared memory for DMA Buf FD carveout (located in high mem)
-ddr_shared_mem_addr_phys   = ddr_shared_mem_addr;
-#ddr_shared_mem_addr_phys  = 0x900000000; # TODO: Clean this up
-#ddr_shared_mem_size       = 512*MB;
+ddr_shared_mem_addr_phys  = 0x900000000;
 
 #
 # Create memory section based on addr and size defined above, including
