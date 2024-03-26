@@ -635,8 +635,7 @@ dts_mmap.addMemSection( vision_apps_ddr_total );
 dts_mmap.addMemSection( ipc_vring_mem      );
 dts_mmap.addMemSection( vision_apps_core_heaps_lo );
 dts_mmap.addMemSection( c7x_ddr_heaps_hi );
-dts_mmap.addMemSection( ddr_shared_mem );
-#dts_mmap.addMemSection( ddr_shared_mem_high );
+dts_mmap.addMemSection( ddr_shared_mem_high );
 dts_mmap.checkOverlap();
 
 #
