@@ -525,9 +525,7 @@ static void convertVirt2Phys(const void * virtAddr, uint64_t virtBase, uint64_t 
     }
 }
 
-uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData)
+uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
 {
     uint64_t phyAddr = (uint64_t)virtAddr; /* Default : Return virtAddr without any modification */
 
@@ -584,6 +582,13 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
     }
 
   return phyAddr;
+}
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+    return appTarget2SharedConversion((uint64_t)virtAddr);
 }
 
 static void convertPhys2Virt(uint64_t shared_ptr, uint64_t virtBase, uint64_t physBase, uint64_t size, uint64_t * target_ptr)

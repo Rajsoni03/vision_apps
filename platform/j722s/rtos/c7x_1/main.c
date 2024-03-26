@@ -232,9 +232,7 @@ static void convertVirt2Phys(const void * virtAddr, uint64_t virtBase, uint64_t 
     }
 }
 
-uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData)
+uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
 {
     uint64_t phyAddr = (uint64_t)virtAddr; /* Default : Return virtAddr without any modification */
 
@@ -278,6 +276,13 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
             (uint64_t) DDR_C7X_2_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_PHYS_SIZE, &phyAddr);
     }
     return phyAddr;
+}
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+    return appTarget2SharedConversion((uint64_t)virtAddr);
 }
 
 /** Description : This function converts a physical memory region address to virtual memory region address given the base addresses of both memory regions

@@ -262,6 +262,7 @@ int32_t appInit()
 
     mem_init_prm.virtToPhyFxn     = appUdmaVirtToPhyAddrConversion;
     mem_init_prm.shared2TargetFxn = appShared2TargetConversion;
+    mem_init_prm.target2SharedFxn = appTarget2SharedConversion;
 
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR];
     heap_prm->base = g_ddr_local_mem;

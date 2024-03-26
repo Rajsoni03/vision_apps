@@ -79,5 +79,6 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
                                       void *appData);
 uint64_t appShared2TargetConversion(const uint64_t shared_ptr);
+uint64_t appTarget2SharedConversion(const uint64_t shared_ptr);
 
 #endif /* APP_H_ */

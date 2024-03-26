@@ -129,12 +129,31 @@ uint32_t appGetDdrSharedHeapSize()
     return DDR_SHARED_MEM_SIZE;
 }
 
+uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
+{
+  uint64_t phyAddr = (uint64_t)virtAddr;
+
+  if ( ((uint64_t)virtAddr >= DDR_SHARED_MEM_ADDR) &&
+       ((uint64_t)virtAddr < (DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
+  {
+        if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
+        {
+            phyAddr = (uint64_t)virtAddr + (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
+        }
+        else
+        {
+            phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+        }
+  }
+
+  return phyAddr;
+}
+
 uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
                                       uint32_t chNum,
                                       void *appData)
 {
-
-  return (uint64_t)virtAddr;
+    return appTarget2SharedConversion((uint64_t)virtAddr);
 }
 
 uint64_t appShared2TargetConversion(const uint64_t shared_ptr)

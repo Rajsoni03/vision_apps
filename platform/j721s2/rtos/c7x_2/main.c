@@ -390,9 +390,7 @@ void InitMmu(void)
 /* Offset to be added to convert virtual address to physical address */
 #define VIRT_PHY_ADDR_OFFSET (DDR_64BIT_BASE_PADDR - DDR_64BIT_BASE_VADDR)
 
-uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
-                                      uint32_t chNum,
-                                      void *appData)
+uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
 {
   uint64_t phyAddr = (uint64_t)virtAddr;
 
@@ -415,6 +413,13 @@ uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
   }
 
   return phyAddr;
+}
+
+uint64_t appUdmaVirtToPhyAddrConversion(const void *virtAddr,
+                                      uint32_t chNum,
+                                      void *appData)
+{
+    return appTarget2SharedConversion((uint64_t)virtAddr);
 }
 
 uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
