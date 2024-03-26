@@ -60,6 +60,12 @@ SECTIONS
         .sysmem: {} palign(8)   /* This is where the malloc heap goes */
         .stack:  {} palign(8)   /* This is where the main() stack goes */
     } > DDR_MCU2_0
+
+    /* This is rest of initialized data. This can be placed in DDR if DDR is available and needed */
+    GROUP {
+        .data:   {} palign(8)   /* This is where initialized globals and static go */
+    } > DDR_MCU2_0
+
     .bss.devgroup     : {*(.bss.devgroup*)} align(4)       > DDR_MCU2_0
     .bss:taskStackSection > DDR_MCU2_0
 
