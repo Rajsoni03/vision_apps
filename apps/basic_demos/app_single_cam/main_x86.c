@@ -611,6 +611,14 @@ static void x86_app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
             obj->ldc_enable = atoi(token);
             APP_PRINTF(" ldc_enable = [%d]\n", obj->ldc_enable);
         }
+#if defined(VPAC3) || defined(VPAC3L)
+        else if(strcmp(token, "cac_enable")==0)
+        {
+            token = strtok(NULL, s);
+            obj->cac_enable = atoi(token);
+            APP_PRINTF(" cac_enable = [%d]\n", obj->cac_enable);
+        }
+#endif
 #ifdef VPAC3
         else if(strcmp(token, "vpac3_dual_fcp_enable")==0)
         {
