@@ -754,6 +754,7 @@ static void appRegisterOpenVXTargetKernels()
         }
         tivxRegisterTIDLTargetKernels();
         /* tivxRegisterTVMTargetKernels(); */
+        tivxRegisterStereoTargetKernels();
         #endif
 
         #ifdef CPU_c7x_1
@@ -762,7 +763,6 @@ static void appRegisterOpenVXTargetKernels()
         #endif
 
         #ifdef CPU_c7x_2
-        /* tivxRegisterStereoTargetKernels(); */
         /* tivxRegisterSrvTargetC66Kernels(); */
         tivxRegisterHwaTargetArmKernels();
         /* tivxRegisterImgProcTargetC66Kernels(); */
@@ -811,12 +811,12 @@ static void appUnRegisterOpenVXTargetKernels()
             */
             }
             tivxUnRegisterTIDLTargetKernels();
+        tivxUnRegisterStereoTargetKernels();
         /* tivxUnRegisterTVMTargetKernels(); */
         /* tivxUnRegisterImgProcTargetC71Kernels(); */
         #endif
 
         #ifdef CPU_c7x_2
-        /* tivxUnRegisterStereoTargetKernels(); */
         /* tivxUnRegisterSrvTargetC66Kernels(); */
         /* tivxUnRegisterHwaTargetArmKernels(); */
         /* tivxUnRegisterImgProcTargetC66Kernels(); */

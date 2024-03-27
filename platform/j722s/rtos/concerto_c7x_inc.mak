@@ -29,10 +29,10 @@ LDIRS += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
 LDIRS += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 STATIC_LIBS += vx_app_c7x_target_kernel
-#STATIC_LIBS += vx_target_kernels_stereo
-#STATIC_LIBS += vx_kernels_common
+STATIC_LIBS += vx_target_kernels_stereo
+STATIC_LIBS += vx_kernels_common
 #STATIC_LIBS += vx_target_kernels_srv_c66
-#STATIC_LIBS += vx_target_kernels_img_proc_c66
+STATIC_LIBS += vx_target_kernels_img_proc_c66
 
 APP_UTILS_LIBS =
 APP_UTILS_LIBS += app_utils_mem
@@ -48,6 +48,12 @@ APP_UTILS_LIBS += app_utils_misc
 APP_UTILS_LIBS += app_utils_perf_stats
 
 SYS_STATIC_LIBS += $(APP_UTILS_LIBS)
+
+PTK_LIBS =
+PTK_LIBS += ptk_algos
+PTK_LIBS += ptk_base
+
+SYS_STATIC_LIBS += $(PTK_LIBS)
 
 TIOVX_LIBS =
 TIOVX_LIBS += vx_target_kernels_tidl

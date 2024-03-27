@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66 C71 C7120 A72 A53))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), X86 x86_64 C66 C71 C7120 C7524 A72 A53))
 
 include $(PRELUDE)
 TARGET      := vx_target_kernels_stereo
@@ -28,7 +28,7 @@ ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7120))
 DEFS += C6X_MIGRATION _TMS320C6600 __C7120__
 endif
 
-ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+ifeq ($(SOC),$(filter $(SOC), am62a))
 SKIPBUILD=1
 endif
 

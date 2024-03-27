@@ -10,7 +10,7 @@ IDIRS       += $(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS       += $(VISION_APPS_PATH)/utils/perception
 IDIRS       += $(PTK_PATH)/include
 
-ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+ifeq ($(SOC),$(filter $(SOC), am62a))
 SKIPBUILD=1
 endif
 

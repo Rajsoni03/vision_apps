@@ -74,7 +74,7 @@
 #include <math.h>
 
 #ifndef x86_64
-#if defined (__C7100__) || defined (__C7120__)
+#if defined (__C7100__) || defined (__C7120__) || defined (__C7524__)
     #include <c7x.h>
     #if defined (C6X_MIGRATION)
         #include <c6x_migration.h>

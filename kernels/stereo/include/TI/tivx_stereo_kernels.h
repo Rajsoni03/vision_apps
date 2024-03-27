@@ -213,7 +213,6 @@ typedef struct {
     vx_uint8   vis_confidence;
 } tivx_sde_disparity_vis_params_t;
 
-
 /*!
  * \brief Stereo based obstacle detection parameters
  *
@@ -316,7 +315,6 @@ typedef PTK_Alg_StereoOG_CreateOGAllParams           tivx_ss_sde_og_detection_pa
  * \ingroup group_vision_apps_kernels_stereo
  */
 typedef PTK_Alg_StereoOG_obs3DBox                     tivx_ss_sde_obs_3d_bound_box_t;
-
 
 
 /*********************************

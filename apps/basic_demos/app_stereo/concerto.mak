@@ -14,6 +14,10 @@ include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 
 SYSLDIRS += /usr/lib64
 
+ifeq ($(SOC),$(filter $(SOC), j722s))
+SKIPBUILD=1
+endif
+
 endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
@@ -32,10 +36,6 @@ IDIRS += $(PTK_IDIRS)
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(PTK_LIBS)
 STATIC_LIBS += $(VISION_APPS_STEREO_LIBS)
-
-ifeq ($(SOC),j722s)
-SKIPBUILD=1
-endif
 
 include $(FINALE)
 

@@ -1,5 +1,5 @@
 
-ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 C66 C7120 ))
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 C66 C7120 C7524))
 
 include $(PRELUDE)
 TARGET      := vx_target_kernels_img_proc_c66
@@ -23,6 +23,11 @@ ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), x86_64 C66 ))
 CSOURCES    += vx_dl_color_convert_target.c
 CSOURCES    += vx_dl_pre_proc_target.c
 CSOURCES    += vx_image_preprocessing_target.c
+
+ifeq ($(SOC),$(filter $(SOC), j722s))
+SKIPBUILD=1
+endif
+
 endif
 
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7120))
@@ -59,8 +64,8 @@ ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7120))
 DEFS += C6X_MIGRATION _TMS320C6600 __C7120__
 endif
 
-ifeq ($(SOC),j722s)
-SKIPBUILD=1
+ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7524))
+DEFS += C6X_MIGRATION _TMS320C6600 __C7524__
 endif
 
 include $(FINALE)

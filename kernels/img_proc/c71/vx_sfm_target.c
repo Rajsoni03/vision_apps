@@ -78,7 +78,13 @@
 
 #ifndef x86_64
 //#include "c7x.h"
+
+#if defined(SOC_J722S)
+#include <kernel/dpl/HwiP.h>
+#else
 #include <ti/osal/HwiP.h>
+#endif
+
 #define DISABLE_INTERRUPTS_DURING_PROCESS
 #endif
 

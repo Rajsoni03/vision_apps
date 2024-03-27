@@ -220,7 +220,9 @@ static vx_status app_init(AppObj *obj)
 {
 
     vx_status status = VX_SUCCESS;
+#ifndef SOC_J722S
     app_grpx_init_prms_t grpx_prms;
+#endif
 
     obj->context = vxCreateContext();
     status = vxGetStatus((vx_reference)obj->context);
@@ -232,12 +234,14 @@ static vx_status app_init(AppObj *obj)
     }
 
 #ifndef x86_64
+#ifndef SOC_J722S
     if (1 == obj->display_option)
     {
         appGrpxInitParamsInit(&grpx_prms, obj->context);
         grpx_prms.draw_callback = app_draw_graphics;
         appGrpxInit(&grpx_prms);
     }
+#endif
 #endif
 
     if(obj->pipeline_option==1)
@@ -257,10 +261,12 @@ static void app_deinit(AppObj *obj)
     tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
 #ifndef x86_64
+#ifndef SOC_J722S
     if (1 == obj->display_option)
     {
         appGrpxDeInit();
     }
+#endif
 #endif
     vxReleaseContext(&obj->context);
 }
@@ -540,7 +546,11 @@ static vx_status app_create_graph(AppObj *obj)
                 status = vxSetReferenceName((vx_reference)obj->input_display_config, "InputDisplayConfiguration");
             }
             obj->input_display_params.opMode=TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
-            obj->input_display_params.pipeId = 0;
+            #if defined(SOC_J722S)
+            obj->input_display_params.pipeId = 1;
+            #else
+            obj->input_display_params.pipeId = 2;
+            #endif
             obj->input_display_params.outWidth = INPUT_DISPLAY_WIDTH;
             obj->input_display_params.outHeight = INPUT_DISPLAY_HEIGHT;
             obj->input_display_params.posX = (1920-INPUT_DISPLAY_WIDTH)/2;
@@ -1930,6 +1940,7 @@ static void app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
     }
 }
 #ifndef x86_64
+#ifndef SOC_J722S
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
   AppObj *obj = &gAppObj;
@@ -1981,6 +1992,7 @@ static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufIn
 
   return;
 }
+#endif
 #endif
 
 static void app_find_object_array_index(vx_object_array object_array[], vx_reference ref, vx_int32 array_size, vx_int32 *array_idx)

@@ -207,7 +207,9 @@ static void app_run_task_delete(AppObj *obj);
 static vx_status app_save_sde_output(char* filename, vx_image disparity, AppObj * obj, vx_uint32 curFileNum);
 
 #ifndef x86_64
+#ifndef SOC_J722S
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
+#endif
 #endif
 static vx_status add_graph_parameter_by_node_index(vx_graph graph, vx_node node,vx_uint32 node_parameter_index);
 static void app_find_object_array_index(vx_object_array object_array[], vx_reference ref, vx_int32 array_size, vx_int32 *array_idx);

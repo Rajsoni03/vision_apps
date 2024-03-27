@@ -27,6 +27,7 @@ LDIRS += $(MCU_PLUS_SDK_PATH)/source/board/lib/
 include $($(_MODULE)_SDIR)/../concerto_c7x_inc.mak
 
 # CPU instance specific libraries
+STATIC_LIBS += vx_target_kernels_img_proc_c71
 STATIC_LIBS += app_rtos_common_c7x_1
 
 ifeq ($(RTOS),FREERTOS)
