@@ -507,7 +507,7 @@ void InitMmu(void)
     appCacheInit();
 }
 
-static void convertVirt2Phys(const void * virtAddr, uint64_t virtBase, uint64_t physBase, uint64_t size, uint64_t * phyAddr)
+static void convertVirt2Phys(uint64_t virtAddr, uint64_t virtBase, uint64_t physBase, uint64_t size, uint64_t * phyAddr)
 {
     if ( ((uint64_t)virtAddr >= virtBase) &&
          ((uint64_t)virtAddr < (virtBase + size)) )
