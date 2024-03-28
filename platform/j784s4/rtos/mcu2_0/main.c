@@ -71,6 +71,7 @@
 #include <app_ipc_rsctable.h>
 #include "app_cfg_mcu2_0.h"
 #include <utils/perf_stats/include/app_perf_stats.h>
+#include <app_cfg_mcu2_0.h>
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -152,6 +153,18 @@ uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
             phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
         }
   }
+  else if ( ((uint64_t)virtAddr >= MAIN_OCRAM_MCU2_0_ADDR) &&
+       ((uint64_t)virtAddr < (MAIN_OCRAM_MCU2_0_ADDR+L3_MEM_SIZE)) )
+  {
+        if (MAIN_OCRAM_MCU2_0_PHYS_ADDR >= MAIN_OCRAM_MCU2_0_ADDR)
+        {
+            phyAddr = (uint64_t)virtAddr + (MAIN_OCRAM_MCU2_0_PHYS_ADDR - MAIN_OCRAM_MCU2_0_ADDR);
+        }
+        else
+        {
+            phyAddr = (uint64_t)virtAddr - (MAIN_OCRAM_MCU2_0_ADDR - MAIN_OCRAM_MCU2_0_PHYS_ADDR);
+        }
+  }
 
   return phyAddr;
 }
@@ -178,6 +191,18 @@ uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
         else
         {
             target_ptr = (uint64_t)shared_ptr + (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+        }
+    }
+    else if ( ((uint64_t)shared_ptr >= MAIN_OCRAM_MCU2_0_PHYS_ADDR) &&
+         ((uint64_t)shared_ptr < (MAIN_OCRAM_MCU2_0_PHYS_ADDR+L3_MEM_SIZE)) )
+    {
+        if (MAIN_OCRAM_MCU2_0_PHYS_ADDR >= MAIN_OCRAM_MCU2_0_ADDR)
+        {
+            target_ptr = (uint64_t)shared_ptr - (MAIN_OCRAM_MCU2_0_PHYS_ADDR - MAIN_OCRAM_MCU2_0_ADDR);
+        }
+        else
+        {
+            target_ptr = (uint64_t)shared_ptr + (MAIN_OCRAM_MCU2_0_ADDR - MAIN_OCRAM_MCU2_0_PHYS_ADDR);
         }
     }
     else
