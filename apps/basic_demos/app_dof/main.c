@@ -313,12 +313,16 @@ static vx_status app_init(AppObj *obj)
     {
         status = app_init_display2( obj->context, &obj->displayObj , "display2Obj");
     }
+
+#ifndef SOC_J722S
     if (1 == obj->displayObj.display_option)
     {
         appGrpxInitParamsInit(&grpx_prms, obj->context);
         grpx_prms.draw_callback = app_draw_graphics;
         appGrpxInit(&grpx_prms);
     }
+#endif
+
     return status;
 }
 
@@ -330,10 +334,13 @@ static void app_deinit(AppObj *obj)
 
     app_deinit_display1(&obj->displayObj);
     app_deinit_display2(&obj->displayObj);
+
+#ifndef SOC_J722S
     if (1 == obj->displayObj.display_option)
     {
         appGrpxDeInit();
     }
+#endif
 
     tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
@@ -1277,7 +1284,11 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                 token = strtok(NULL, s);
                 if (NULL != token)
                 {
+                    #if defined(SOC_J722S)
+                    obj->displayObj.display_option = 0;
+                    #else
                     obj->displayObj.display_option = atoi(token);
+                    #endif
                 }
             }
             else

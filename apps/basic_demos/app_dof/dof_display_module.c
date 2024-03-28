@@ -103,7 +103,11 @@ vx_status app_init_display2(vx_context context, DisplayObj *displayObj, char *ob
         vxSetReferenceName((vx_reference)displayObj->input_display_config, "InputDisplayConfiguration");
 
         displayObj->input_display_params.opMode=TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
-        displayObj->input_display_params.pipeId = 0;
+        #if defined(SOC_J722S)
+        displayObj->input_display_params.pipeId = 1;
+        #else
+        displayObj->input_display_params.pipeId = 2;
+        #endif
         displayObj->input_display_params.outWidth = INPUT_DISPLAY_WIDTH;
         displayObj->input_display_params.outHeight = INPUT_DISPLAY_HEIGHT;
         displayObj->input_display_params.posX = 0;

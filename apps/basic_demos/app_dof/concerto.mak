@@ -10,6 +10,11 @@ ifeq ($(TARGET_CPU),x86_64)
 TARGETTYPE  := exe
 CSOURCES    += main_x86.c
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
+
+ifeq ($(SOC),$(filter $(SOC),j722s))
+SKIPBUILD=1
+endif
+
 endif
 
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
@@ -25,10 +30,6 @@ ifeq ($(TARGET_OS),SYSBIOS)
 TARGETTYPE  := library
 include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 endif
-endif
-
-ifeq ($(SOC),j722s)
-SKIPBUILD=1
 endif
 
 include $(FINALE)
