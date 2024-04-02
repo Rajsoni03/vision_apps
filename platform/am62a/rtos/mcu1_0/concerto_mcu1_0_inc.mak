@@ -2,6 +2,7 @@ DEFS+=CPU_mcu1_0
 DEFS+=BUILD_MCU1_0
 DEFS+=BUILD_MCU
 DEFS+=VIM_DIRECT_REGISTRATION
+DEFS+=ENABLE_SCICLIENT_DIRECT
 
 # This enables ARM Thumb mode which reduces firmware size and enables faster boot
 COPT +=--code_state=16
