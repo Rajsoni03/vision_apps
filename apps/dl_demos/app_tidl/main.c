@@ -1206,7 +1206,7 @@ static vx_status app_run_graph_for_one_frame(AppObj *obj, char *curFileName, vx_
             /* Execute the display graph */
             if(status == VX_SUCCESS)
             {
-                status = vxProcessGraph(obj->disp_graph2);
+                status = vxProcessGraph(obj->disp_graph);
             }
             APP_PRINTF("app_tidl: Running display graph ... Done.\n");
         }
@@ -1230,7 +1230,7 @@ static vx_status app_run_graph_for_one_frame(AppObj *obj, char *curFileName, vx_
                 /* Execute the display graph */
                 if(status == VX_SUCCESS)
                 {
-                    status = vxProcessGraph(obj->disp_graph);
+                    status = vxProcessGraph(obj->disp_graph2);
                 }
                 APP_PRINTF("app_tidl: Running display graph ... Done.\n");
             }
