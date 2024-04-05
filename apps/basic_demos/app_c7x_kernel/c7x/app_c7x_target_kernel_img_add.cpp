@@ -312,7 +312,11 @@ static vx_status add_img_dma_setup_input_image(tivxC7xKernelParams *prms,
     tfrPrms->eltype       = sizeof(uint8_t);
 
     tfrPrms->dest_addr    = (uintptr_t)pL2;
+    #if defined(USE_HW_DMA)
     tfrPrms->src_addr     = tivxMemShared2PhysPtr((uint64_t)pDDR, TIVX_MEM_EXTERNAL);
+    #else
+    tfrPrms->src_addr     = (uint64_t)pDDR, TIVX_MEM_EXTERNAL;
+    #endif
 
     tfrPrms->icnt0        = img_width;
     tfrPrms->icnt1        = prms->blkHeight;
@@ -354,7 +358,11 @@ static vx_status add_img_dma_setup_output_image(tivxC7xKernelParams *prms,
     tfrPrms->copy_mode    = 2;
     tfrPrms->eltype       = sizeof(uint8_t);
 
+    #if defined(USE_HW_DMA)
     tfrPrms->dest_addr    = tivxMemShared2PhysPtr((uint64_t)pDDR, TIVX_MEM_EXTERNAL);
+    #else
+    tfrPrms->dest_addr    = (uint64_t)pDDR, TIVX_MEM_EXTERNAL;
+    #endif
     tfrPrms->src_addr     = (uintptr_t)pL2;
 
     tfrPrms->icnt0        = img_width;
