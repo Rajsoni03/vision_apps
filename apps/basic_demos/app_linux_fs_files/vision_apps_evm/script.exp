@@ -63,23 +63,33 @@ if {$cameras != 0} {
         # Channel Number
         send -- "0\r"
         sleep 1
-    }
 
-    # Camera Selection
-    send -- "a\r"
-    sleep 1
+        # Camera Selection
+        send -- "a\r"
+        sleep 1
 
-    # LDC On
-    send -- "1\r"
-    sleep 1
+        # LDC On
+        send -- "1\r"
+        sleep 1
 
-    if {$single == 1} {
         # MV off for single cam
+        send -- "0\r"
+        sleep 1
+
+        # CAC off for single cam
         send -- "0\r"
         sleep 1
     }
 
     if {$single == 0} {
+        # Camera Selection
+        send -- "a\r"
+        sleep 1
+
+        # LDC On
+        send -- "1\r"
+        sleep 1
+
         # Num Cameras
         send -- "${cameras}\r"
     }
