@@ -1394,7 +1394,7 @@ static vx_status app_run_graph(AppObj *obj)
     app_pipeline_params_defaults(obj);
     APP_PRINTF("app_pipeline_params_defaults returned\n");
 
-    if(NULL == sensorObj->sensor_name)
+    if('\0' == sensorObj->sensor_name[0])
     {
         printf("sensor name is NULL \n");
         return VX_FAILURE;

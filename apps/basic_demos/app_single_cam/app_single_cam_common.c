@@ -302,7 +302,7 @@ vx_int32 read_test_image_raw(char *raw_image_test_fname, tivx_raw_image raw_imag
         }
     }
 
-    if (NULL != raw_image_fname)
+    if ('\0' != raw_image_fname[0])
     {
         fp = fopen(raw_image_fname, "rb");
         if(!fp)
