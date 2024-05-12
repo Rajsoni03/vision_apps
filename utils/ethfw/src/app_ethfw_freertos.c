@@ -195,7 +195,7 @@ static Enet_MacPort gEthAppSwitchPorts[]=
 static CpswAle_SetPolicerEntryInPartitionInArgs gEthApp_customPolicers[ETHFW_UTILS_NUM_CUSTOM_POLICERS] = {};
 
 /* NOTE: 2 virtual ports should not have same tx channel allocated to them */
-static EthFw_VirtPortCfg gEthApp_virtPortCfg[] =
+static EthFwVirtPort_VirtPortCfg gEthApp_virtPortCfg[] =
 {
     {
         .remoteCoreId  = IPC_MPU1_0,
