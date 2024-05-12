@@ -143,8 +143,6 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
 static EthAppObj gEthAppObj =
 {
     .enetType = ENET_CPSW_9G,
-    .hEthFw = NULL,
-    .hUdmaDrv = NULL,
     .instId   = 0U,
 };
 
@@ -297,40 +295,6 @@ static EthFwVirtPort_VirtPortCfg gEthApp_virtPortCfg[] =
         .numMacAddress = 1U,
         .clientIdMask  = ETHFW_BIT(ETHREMOTECFG_CLIENTID_RTOS),
     },
-};
-
-static EthFw_AllocCfg gEthApp_allocCfg[] =
-{
-        {
-            .clientId = ETHREMOTECFG_CLIENTID_AUTOSAR,
-            .remoteProcId = IPC_MCU2_1,
-            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_1),
-            .virtMacPortMask = 0,
-        },
-        {
-            .clientId = ETHREMOTECFG_CLIENTID_AUTOSAR,
-            .remoteProcId = IPC_MCU1_0,
-            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_2),
-            .virtMacPortMask = 0,
-        },
-        {
-            .clientId = ETHREMOTECFG_CLIENTID_RTOS,
-            .remoteProcId = IPC_MCU2_1,
-            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_1),
-            .virtMacPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_MAC_PORT_4),
-        },
-        {
-            .clientId = ETHREMOTECFG_CLIENTID_LINUX,
-            .remoteProcId = IPC_MPU1_0,
-            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_0),
-            .virtMacPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_MAC_PORT_1),
-        },
-        {
-            .clientId = ETHREMOTECFG_CLIENTID_QNX,
-            .remoteProcId = IPC_MPU1_0,
-            .virtSwitchPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_SWITCH_PORT_0),
-            .virtMacPortMask = ENET_MACPORT_MASK(ETHREMOTECFG_MAC_PORT_1),
-        },
 };
 
 #if defined(SAFERTOS)
@@ -554,17 +518,6 @@ int32_t appEthFwInit()
         appLogPrintf("ETHFW: Board initialization failed\n");
     }
 
-    /* Open UDMA driver */
-    if (status == ENET_SOK)
-    {
-        gEthAppObj.hUdmaDrv = appUdmaGetObj();
-        if (gEthAppObj.hUdmaDrv == NULL)
-        {
-            appLogPrintf("ETHFW: ERROR: failed to open UDMA driver\n");
-            status = -1;
-        }
-    }
-
 #if defined(ETHFW_GPTP_SUPPORT)
     /* Create semaphore used to synchronize MAC alloc by lwIP which is required and
      * shared with the gPTP stack */
@@ -625,7 +578,7 @@ int32_t appEthFwDeInit()
 {
     int32_t status = 0;
 
-    EthFw_deinit(gEthAppObj.hEthFw);
+    EthFw_deinit();
 
     return status;
 }
@@ -637,7 +590,7 @@ int32_t appEthFwRemoteServerInit()
     appLogPrintf("ETHFW: Remove server Init ... !!!\n");
 
     /* Initialize the Remote Config server (CPSW Proxy Server) */
-    status = EthFw_initRemoteConfig(gEthAppObj.hEthFw);
+    status = EthFw_initRemoteConfig();
     if (status != ENET_SOK)
     {
         appLogPrintf("ETHFW: Remove server Init ... ERROR (%d) !!! \n", status);
@@ -685,10 +638,15 @@ static int32_t EthApp_initEthFw(void)
     int32_t i;
 
     /* Set EthFw config params */
-    EthFw_initConfigParams(gEthAppObj.enetType, &ethFwCfg);
+    EthFw_initConfigParams(gEthAppObj.enetType, gEthAppObj.instId, &ethFwCfg);
 
     dmaCfg.rxChInitPrms.dmaPriority = UDMA_DEFAULT_RX_CH_DMA_PRIORITY;
-    dmaCfg.hUdmaDrv = gEthAppObj.hUdmaDrv;
+    dmaCfg.hUdmaDrv = appUdmaGetObj();
+    if (dmaCfg.hUdmaDrv == NULL)
+    {
+        appLogPrintf("ETHFW: ERROR: failed to open UDMA driver\n");
+        status = -1;
+    }
     cpswCfg->dmaCfg = (void *)&dmaCfg;
 
     /* Populate MAC address pool */
@@ -707,10 +665,6 @@ static int32_t EthApp_initEthFw(void)
 
     /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
     cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
-
-    /* Set remote client object parameters */
-    ethFwCfg.allocCfg = &gEthApp_allocCfg[0];
-    ethFwCfg.numAlloc = ARRAY_SIZE(gEthApp_allocCfg);
 
 #if defined(ETHFW_MONITOR_SUPPORT)
     /* Save the Lwip Dma parametrers */
@@ -770,8 +724,8 @@ static int32_t EthApp_initEthFw(void)
     /* Initialize the EthFw */
     if (status == ETHAPP_OK)
     {
-        gEthAppObj.hEthFw = EthFw_init(gEthAppObj.enetType, &ethFwCfg);
-        if (gEthAppObj.hEthFw == NULL)
+        status = EthFw_init(gEthAppObj.enetType, gEthAppObj.instId, &ethFwCfg);
+        if (ETHAPP_OK != status)
         {
             appLogPrintf("ETHFW: failed to initialize the firmware\n");
             status = ETHAPP_ERROR;
@@ -781,7 +735,7 @@ static int32_t EthApp_initEthFw(void)
     /* Get and print EthFw version */
     if (status == ETHAPP_OK)
     {
-        EthFw_getVersion(gEthAppObj.hEthFw, &ver);
+        EthFw_getVersion(&ver);
         appLogPrintf("\nETHFW Version   : %d.%02d.%02d\n", ver.major, ver.minor, ver.rev);
         appLogPrintf("ETHFW Build Date: %s %s, %s\n", ver.month, ver.date, ver.year);
         appLogPrintf("ETHFW Build Time: %s:%s:%s\n", ver.hour, ver.min, ver.sec);
@@ -1090,7 +1044,7 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
 
             /* There will be a delay between removing existing FDB entry
              * and adding the updated one. During this time, multicast
-             * packets will be flodded to all the bridge ports
+             * packets will be flooded to all the bridge ports
              */
             bridgeif_fdb_remove(&netif_bridge, &ethaddr);
 
