@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2018-24 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -64,6 +64,13 @@
 #include <string.h>
 #include <assert.h>
 #include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#include "ti/drv/udma/udma.h"
+#include "ti/drv/udma/examples/udma_apputils/udma_apputils.h"
 #include <utils/mem/include/app_mem.h>
 #include <utils/console_io/include/app_log.h>
 #include <utils/timer/include/app_timer.h>
@@ -71,6 +78,8 @@
 #include <utils/remote_service/include/app_remote_service.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <stdint.h>
+#include <TI/tivx.h>
+#include <TI/video_io_capture.h>
 
 #include <app_mem_map.h>
 #include <app_cfg.h>
@@ -79,6 +88,15 @@
 #include <sys/mman.h>
 #include <sys/neutrino.h>
 
+#include <utils/iss/include/app_iss.h>
+#include <utils/sensors/include/app_sensors.h>
+#include <utils/hwa/include/app_hwa_api.h>
+#include <utils/udma/include/app_udma.h>
+#include <utils/ipc/include/app_ipc.h>
+#include <utils/dss/include/app_dss_defaults.h>
+#include <TI/j7_kernels_imaging_aewb.h>
+
+#define APP_ASSERT_SUCCESS(x)  { if((x)!=0) while(1); }
 /* Mutex for controlling access to Init/De-Init. */
 static pthread_mutex_t gMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -90,22 +108,245 @@ static uint32_t gInitCount = 0U;
 static int32_t appCommonInitLocal();
 static int32_t appCommonDeInitLocal();
 
+/*
+ * UDMA driver objects
+ */
+struct Udma_DrvObj      *gUdmaDrvObj;
+struct Udma_ChObj       *gUdmaChObj;
+
+/*
+ * Definition and Macro for debug vs. logging
+ */
+#define APP_LOG 1
+#define APP_DBG 2
+#define APP_PRINT(level, f_, ...)   if(((gVerbose == 1) && (level == APP_DBG)) || \
+                                      (level == APP_LOG)) \
+                                      printf((f_), ##__VA_ARGS__)
+/*
+ * Memory file descriptor
+ */
+int memFd = -1;
+uint16_t gVerbose = 0;
+
+void *App_alloc(size_t size, paddr64_t *paddr, int noCache)
+{
+    off64_t offset;
+    size_t contig_len;
+    uint64_t physAddr = 0;
+
+    void *buf = MAP_FAILED;
+    int fd    = -1;
+    int flags = 0;
+    int prot  = PROT_READ | PROT_WRITE;
+
+
+    /* The caller of the API, may or may not have provided a physical address to be mapped */
+    if(paddr != NULL)
+    {
+        physAddr = *paddr;
+    }
+
+    if(noCache)
+    {
+        APP_PRINT(APP_DBG, "%s: Cache Disabled\n",__func__);
+        prot |= PROT_NOCACHE;
+    }
+
+    /*
+     * User did not specify a physical address, then use the memory pool.
+     * This is the expected usage.
+     *
+     * Specifying physical address only required for failure testing
+     */
+    if(physAddr == 0)
+    {
+        fd = memFd;
+        flags = MAP_SHARED;
+    }
+    /*
+     * User did specify a src/dst physical address so create a memory
+     * mapping directly to that address.
+     *
+     */
+    else
+    {
+        fd = NOFD;
+        flags = MAP_PHYS | MAP_PRIVATE;
+        APP_PRINT(APP_DBG,
+               "%s: physical addr specified, mmap flags = MAP_PHYS | MAP_PRIVATE\n",
+               __FUNCTION__);
+    }
+
+    buf = mmap64(0, size, prot, flags, fd, physAddr);
+    if(buf != MAP_FAILED)
+    {
+        /*
+        * If physical address was not provided, figure out which
+        * address was mapped.
+        */
+        if(physAddr == 0)
+        {
+            int tmp_fd = -1;
+            if (posix_mem_offset64(buf, size, &offset, &contig_len, &tmp_fd) != 0)
+            {
+
+                APP_PRINT(APP_LOG, "%s:%d: Error: Could not obtain buffer physical address\n",
+                __FUNCTION__, __LINE__);
+
+                munmap(buf, size);
+
+                return MAP_FAILED;
+            }
+            if (paddr != NULL)
+            {
+                *paddr = (uint32_t) offset;
+            }
+            physAddr = offset;
+        }
+
+        APP_PRINT(APP_DBG, "%s: Alloc successful; Virt: 0x%p, Phy: 0x%lx Contig_len: %ld\n",
+              __FUNCTION__, buf, physAddr, contig_len);
+    }
+    else
+    {
+        perror("mmap64 failed");
+        APP_PRINT(APP_LOG, "%s: Alloc failed; Virt: 0x%p, Phys: 0x%lx\n",
+                    __FUNCTION__,  buf, offset);
+    }
+
+
+    if(paddr != NULL)
+    {
+        *paddr = physAddr;
+    }
+
+    return buf;
+}
+
+void App_free(void *addr, size_t size)
+{
+    munmap(addr, size);
+}
+
+uint64_t Udma_qnxVirtToPhyFxn(const void * virtAddr,
+                              uint32_t chNum,
+                              void *appData)
+{
+    off64_t    phyAddr = 0;
+    uint32_t   length;
+
+    if(appData != NULL_PTR) {
+        length = (uint32_t) *((uint32_t *) appData);
+    }
+    else {
+        APP_PRINT(APP_LOG,"%s: Must specify memory size to map\n",__FUNCTION__);
+        return -1;
+    }
+
+    int     tmp_fd = -1;
+    size_t  contig_len = 0;
+    if (posix_mem_offset64((void *) virtAddr, length, &phyAddr, &contig_len, &tmp_fd) != 0)
+    {
+        if (errno != EAGAIN) {
+            printf("%s:Error from mem_offset - errno=%d\n", __func__, errno);
+        }
+        else if (phyAddr == 0) {
+            printf("%s:Error from mem_offset - errno=%d and phyAddr is NULL \n", __func__, errno);
+        }
+    }
+
+    APP_PRINT(APP_DBG,"%s: virt/%p phy/0x%lx\n",__FUNCTION__, virtAddr, phyAddr);
+
+    return (uint64_t ) phyAddr;
+}
+
+void * Udma_qnxPhyToVirtFxn(uint64_t phyAddr,
+                            uint32_t chNum,
+                            void *appData)
+{
+    uint64_t *temp = 0;
+    uint32_t length = 0;
+    int prot = PROT_READ | PROT_WRITE;
+    int flags;
+
+    if(appData != NULL_PTR) {
+        length = (uint32_t) *((uint32_t *) appData);
+    }
+    else {
+        APP_PRINT(APP_LOG,"%s: Must specify memory size to map\n",__FUNCTION__);
+        return NULL;
+    }
+
+    flags =  MAP_SHARED;
+    temp = mmap64(0, length, prot, flags, memFd, phyAddr);
+    if(temp != MAP_FAILED)
+    {
+        APP_PRINT(APP_LOG,"%s: mma64 failed errno/%d, phy/0x%lx\n",__FUNCTION__, errno, phyAddr);
+    }
+    else
+    {
+        APP_PRINT(APP_DBG,"%s: virt/%p phy/0x%lx\n",__FUNCTION__, temp, phyAddr);
+    }
+
+    return ((void *) temp);
+}
+
+static void appRegisterOpenVXTargetKernels()
+{
+    appLogPrintf("APP: OpenVX Target kernel init ... !!!\n");
+    tivxRegisterVideoIOTargetCaptureKernels();
+    tivxRegisterImagingTargetAewbKernels();
+    appLogPrintf("APP: OpenVX Target kernel init ... Done !!!\n");
+}
+
 int32_t appCommonInit()
 {
     int32_t status = 0;
-
+    app_udma_init_prms_t *prms = NULL;
     pthread_mutex_lock(&gMutex);
 
     if (gInitCount == 0U)
     {
         status = appCommonInitLocal();
+        APP_ASSERT_SUCCESS(status);
+
+        /* Allocate UDMA Objects */
+        gUdmaDrvObj = (struct Udma_DrvObj *) App_alloc(sizeof(struct Udma_DrvObj), NULL, 0);
+        gUdmaChObj  =  (struct Udma_ChObj *) App_alloc(sizeof(struct Udma_ChObj),  NULL, 0);
+        if ((gUdmaDrvObj == MAP_FAILED) || (gUdmaDrvObj == MAP_FAILED))
+        {
+            APP_PRINT(APP_LOG, "%s: Allocation of UDMA objects failed\n",__func__);
+            exit(-1);
+        }
+
+        status = appFvid2Init();
+        APP_ASSERT_SUCCESS(status);
+        status = appUdmaInit(prms);
+        APP_ASSERT_SUCCESS(status);
+
+        tivxInit();
+        tivxHostInit();
+        appRegisterOpenVXTargetKernels();
+
+        status = appCsi2RxInit();
+        APP_ASSERT_SUCCESS(status);
+
+        status = appIssInit();
+        APP_ASSERT_SUCCESS(status);
     }
 
     gInitCount++;
-
     pthread_mutex_unlock(&gMutex);
 
     return status;
+}
+
+static void appUnRegisterOpenVXTargetKernels()
+{
+    appLogPrintf("APP: OpenVX Target kernel deinit ... !!!\n");
+    tivxUnRegisterVideoIOTargetCaptureKernels();
+    tivxUnRegisterImagingTargetAewbKernels();
+    appLogPrintf("APP: OpenVX Target kernel deinit ... Done !!!\n");
 }
 
 int32_t appCommonDeInit()
@@ -120,6 +361,13 @@ int32_t appCommonDeInit()
 
         if (gInitCount == 0U)
         {
+            appUnRegisterOpenVXTargetKernels();
+            tivxHostDeInit();
+            tivxDeInit();
+            appIssDeInit();
+            appCsi2RxDeInit();
+            appFvid2DeInit();
+            appUdmaDeInit();
             status = appCommonDeInitLocal();
         }
     }
@@ -251,3 +499,13 @@ static int32_t appCommonDeInitLocal()
     return status;
 }
 
+/* Dummy function to avoid build issues */
+void appUtilsTaskInit(void)
+{
+    #if defined(FREERTOS)
+    /* Any task that uses the floating point unit MUST call portTASK_USES_FLOATING_POINT()
+     * before any floating point instructions are executed.
+     */
+    portTASK_USES_FLOATING_POINT();
+    #endif
+}

@@ -72,6 +72,10 @@ LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/udmalld/aarch64/$(BUILD_PROFILE_QNX
 LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
+ifeq ($(TARGET_PLATFORM), AM62A)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/csirxlld/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/fvid2lld/aarch64/$(BUILD_PROFILE_QNX_SO)
+endif
 
 SHARED_LIBS += sharedmemallocator$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += tiipc-usr$(BUILD_PROFILE_QNX_SUFFIX)
@@ -79,6 +83,11 @@ SHARED_LIBS += tiudma-usr$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-pdk$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-sciclient$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-udmalld$(BUILD_PROFILE_QNX_SUFFIX)
+ifeq ($(TARGET_PLATFORM), AM62A)
+SHARED_LIBS += ti-csirxlld$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += ti-fvid2lld$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += screen
+endif
 
 endif # ifeq ($(TARGET_OS), QNX)
 
@@ -132,7 +141,10 @@ TIOVX_LIBS += vx_tutorial
 TIOVX_LIBS += vx_kernels_video_io
 TIOVX_LIBS += vx_kernels_hwa 
 TIOVX_LIBS += vx_kernels_tidl vx_nested_kernels_tidl
-TIOVX_LIBS += vx_kernels_tvm 
+TIOVX_LIBS += vx_kernels_tvm
+ifeq ($(TARGET_PLATFORM)$(TARGET_OS), AM62AQNX)
+TIOVX_LIBS+=vx_target_kernels_capture
+endif
 
 IMAGING_LIBS += app_utils_iss
 
@@ -150,6 +162,17 @@ IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_itt_server
 endif
 
+ifeq ($(TARGET_PLATFORM)$(TARGET_OS), AM62AQNX)
+IMAGING_LIBS = vx_kernels_imaging
+IMAGING_LIBS += vx_target_kernels_imaging_aewb
+IMAGING_LIBS += ti_2a_wrapper
+IMAGING_LIBS += ti_imaging_aealg
+IMAGING_LIBS += ti_imaging_awbalg
+IMAGING_LIBS += ti_imaging_dcc
+IMAGING_LIBS += ti_imaging_ittsrvr
+IMAGING_LIBS += ti_imaging_sensordrv
+endif
+
 VISION_APPS_UTILS_LIBS += app_utils_mem
 VISION_APPS_UTILS_LIBS += app_utils_ipc
 VISION_APPS_UTILS_LIBS += app_utils_console_io
@@ -161,6 +184,12 @@ VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 ifneq ($(TARGET_PLATFORM), AM62A)
 VISION_APPS_UTILS_LIBS += app_utils_grpx
 VISION_APPS_UTILS_LIBS += app_utils_draw2d
+endif
+
+ifeq ($(TARGET_PLATFORM)$(TARGET_OS), AM62AQNX)
+VISION_APPS_UTILS_LIBS += app_utils_udma
+VISION_APPS_UTILS_LIBS += app_utils_sensors
+VISION_APPS_UTILS_LIBS += app_utils_iss
 endif
 
 VISION_APPS_UTILS_LIBS += app_utils_hwa
