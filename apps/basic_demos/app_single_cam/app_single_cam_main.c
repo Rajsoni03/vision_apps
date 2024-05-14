@@ -74,6 +74,13 @@
 #endif
 #endif
 
+#if defined(SOC_AM62A) && defined(QNX)
+/*AM62A: QNX to use screen package for displaying frames on A53*/
+#include <screen/screen.h>
+screen_context_t screen_ctx = NULL;
+screen_window_t screen_win = NULL;
+#endif
+
 static char availableSensorNames[ISS_SENSORS_MAX_SUPPORTED_SENSOR][ISS_SENSORS_MAX_NAME];
 static vx_uint8 num_sensors_found;
 static IssSensor_CreateParams sensorParams;
@@ -103,6 +110,183 @@ void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 n
     vxAddParameterToGraph(graph, parameter);
     vxReleaseParameter(&parameter);
 }
+
+#if defined(SOC_AM62A) && defined(QNX)
+int32_t app_run_screen(AppObj *obj)
+{
+    int32_t err = 0;
+    int usage = SCREEN_USAGE_READ | SCREEN_USAGE_WRITE;
+    int screenFormat = SCREEN_FORMAT_NV12;
+    screen_context_t screen_ctx = NULL;
+    screen_window_t screen_win = NULL;
+    vx_uint32 width, height;
+    vx_df_image df;
+    vx_imagepatch_addressing_t image_addr;
+    vx_rectangle_t rect;
+    vx_map_id map_id1, map_id2;
+    void *data_ptr1 = NULL, *data_ptr2 = NULL;
+    vx_uint32 num_bytes_per_4pixels;
+    vx_uint32 imgaddr_width, imgaddr_height, imgaddr_stride;
+    uint32_t i;
+
+    /* connect to screen */
+    err = screen_create_context(&screen_ctx, SCREEN_APPLICATION_CONTEXT);
+    if(err != 0) {
+        printf("Failed to create screen context\n");
+    }
+
+    /* create a window */
+    err = screen_create_window(&screen_win, screen_ctx);
+    if(err != 0) {
+        printf("Failed to create screen window\n");
+    }
+
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_USAGE, &usage);
+    if(err != 0) {
+        printf("Failed to set usage property\n");
+    }
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_FORMAT, &screenFormat);
+    if(err != 0) {
+        printf("Failed to set format prpoerty\n");
+    }
+
+    /* create screen buffers */
+    int nbuffers = 2;
+    err = screen_create_window_buffers(screen_win, nbuffers);
+    if(err != 0) {
+        printf("Failed to create window buffer\n");
+    }
+
+    while(1)
+    {
+        int buffer_size[2];
+        err = screen_get_window_property_iv(screen_win, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size);
+        if(err != 0) {
+            printf("Failed to get window buffer size\n");
+        }
+
+        screen_buffer_t screen_buf[2];
+        err = screen_get_window_property_pv(screen_win, SCREEN_PROPERTY_RENDER_BUFFERS, (void **)&screen_buf);
+        if(err != 0) {
+            printf("Failed to get window buffer\n");
+        }
+
+        /* obtain pointers to the buffers */
+        void *ptr1 = NULL;
+        err = screen_get_buffer_property_pv(screen_buf[0], SCREEN_PROPERTY_POINTER, (void **)&ptr1);
+        if(err != 0) {
+            printf("Failed to get buffer pointer\n");
+        }
+
+        int buf_stride1 = 0;
+        err = screen_get_buffer_property_iv(screen_buf[0], SCREEN_PROPERTY_STRIDE, &buf_stride1);
+        if(err != 0) {
+           printf("Failed to get buffer stride1\n");
+        }
+
+        /* copy frames from OVX buffer to screen buffer*/
+        vx_image display_image = obj->display_image;
+        vxQueryImage(display_image, VX_IMAGE_WIDTH, &width, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_FORMAT, &df, sizeof(vx_df_image));
+
+        if(VX_DF_IMAGE_NV12 == df)
+        {
+            num_bytes_per_4pixels = 4;
+        }
+        else if(TIVX_DF_IMAGE_NV12_P12 == df)
+        {
+            num_bytes_per_4pixels = 6;
+        }
+        else
+        {
+            num_bytes_per_4pixels = 8;
+        }
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = width;
+        rect.end_y = height;
+
+        vxMapImagePatch(display_image,
+            &rect,
+            0,
+            &map_id1,
+            &image_addr,
+            &data_ptr1,
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            VX_NOGAP_X
+            );
+
+        if(!data_ptr1)
+        {
+            printf("data_ptr1 is NULL \n");
+            return -1;
+        }
+
+        imgaddr_width  = image_addr.dim_x;
+        imgaddr_height = image_addr.dim_y;
+        imgaddr_stride = image_addr.stride_y;
+
+        /*  The current implementation performs memcpy of frame from TIOVX buffer
+         *  to screen buffer. This is not the optimal implementation and needs to
+         *  be updated going ahead for better G2G latency figures
+         */
+        for(i=0;i<height;i++)
+        {
+            memcpy(ptr1, data_ptr1, imgaddr_width*num_bytes_per_4pixels/4);
+            data_ptr1 += imgaddr_stride;
+            ptr1 += (buf_stride1);
+        }
+        vxUnmapImagePatch(display_image, map_id1);
+
+        if(VX_DF_IMAGE_NV12 == df || TIVX_DF_IMAGE_NV12_P12 == df)
+        {
+            vxMapImagePatch(display_image,
+                &rect,
+                1,
+                &map_id2,
+                &image_addr,
+                &data_ptr2,
+                VX_WRITE_ONLY,
+                VX_MEMORY_TYPE_HOST,
+                VX_NOGAP_X
+                );
+
+            if(!data_ptr2)
+            {
+                printf("data_ptr2 is NULL \n");
+                return -1;
+            }
+
+            imgaddr_width  = image_addr.dim_x;
+            imgaddr_height = image_addr.dim_y;
+            imgaddr_stride = image_addr.stride_y;
+
+            for(i=0;i<imgaddr_height/2;i++)
+            {
+                memcpy(ptr1, data_ptr2, imgaddr_width*num_bytes_per_4pixels/4);
+                data_ptr2 += imgaddr_stride;
+                ptr1 += buf_stride1;
+            }
+            vxUnmapImagePatch(display_image, map_id2);
+        }
+
+        err = screen_post_window(screen_win, screen_buf[0], 0, NULL, 0);
+        if(err != 0) {
+            printf("Failed to post window\n");
+        }
+
+        if(obj->stop_screen_task == 1)
+        {
+            break;
+        }
+    }
+
+    return err;
+}
+#endif
 
 vx_status app_init(AppObj *obj)
 {
@@ -135,6 +319,10 @@ vx_status app_init(AppObj *obj)
 
     obj->stop_task = 0;
     obj->stop_task_done = 0;
+#if defined(SOC_AM62A) && defined(QNX)
+    obj->stop_screen_task = 0;
+    obj->stop_screen_task_done = 0;
+#endif
     obj->selectedCam = 0xFF;
 
     if(status == VX_SUCCESS)
@@ -585,7 +773,12 @@ Sensor driver does not support metadata yet.
 
     local_capture_config.timeout = 33;
     local_capture_config.timeoutInitial = 500;
+
+#if defined(SOC_AM62A)
+    local_capture_config.numInst  = 1U;/* Single instance for AM62A */
+#else
     local_capture_config.numInst  = 2U;/* Configure both instances */
+#endif
     local_capture_config.numCh = 1U;/* Single cam. Only 1 channel enabled */
     {
         vx_uint8 ch, id, lane, q;
@@ -821,10 +1014,13 @@ Sensor driver does not support metadata yet.
             obj->display_params.posY = 0U;
         }
 #endif
+#if !defined(SOC_AM62A) && !defined(QNX)
         obj->display_param_obj = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->display_params);
         obj->displayNode = tivxDisplayNode(obj->graph, obj->display_param_obj, obj->display_image);
+#endif
     }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
 #ifdef VPAC3
     /* Check if display_image_MV is not NULL and create display node */
     if (obj->vpac3_dual_fcp_enable == 1U)
@@ -860,6 +1056,7 @@ Sensor driver does not support metadata yet.
         }
     }
 #endif
+#endif //if !defined(SOC_AM62A) && !defined(QNX)
     int graph_parameter_num = 0;
 
     /* input @ node index 1, becomes graph parameter 0 */
@@ -1182,9 +1379,48 @@ vx_status app_delete_graph(AppObj *obj)
     APP_PRINTF("releasing graph\n");
     status |= vxReleaseGraph(&obj->graph);
     APP_PRINTF("releasing graph done\n");
+    return status;
+}
+
+#if defined(SOC_AM62A) && defined(QNX)
+static void app_run_screen_task(void *app_var)
+{
+    AppObj *obj = (AppObj *)app_var;
+
+    app_run_screen(obj);
+
+    obj->stop_screen_task_done = 1;
+}
+
+static int32_t app_screen_task_create(AppObj *obj)
+{
+    tivx_task_create_params_t params;
+    int32_t status;
+
+    tivxTaskSetDefaultCreateParams(&params);
+    params.task_main = app_run_screen_task;
+    params.app_var = obj;
+
+    obj->stop_screen_task_done = 0;
+    obj->stop_screen_task = 0;
+
+    status = tivxTaskCreate(&obj->screen_task, &params);
 
     return status;
 }
+
+static void app_run_screen_task_delete(AppObj *obj)
+{
+    while(obj->stop_screen_task_done==0)
+    {
+         tivxTaskWaitMsecs(100);
+    }
+
+    screen_destroy_window(screen_win);
+    screen_destroy_context(screen_ctx);
+    tivxTaskDelete(&obj->screen_task);
+}
+#endif
 
 vx_status app_run_graph(AppObj *obj)
 {
@@ -1254,6 +1490,14 @@ vx_status app_run_graph(AppObj *obj)
                         obj->node_ldc, 0,
                         obj->context);
 #endif
+#endif
+
+#if defined(SOC_AM62A) && defined(QNX)
+    status = app_screen_task_create(obj);
+    if(status!=0)
+    {
+        printf("ERROR: Unable to create screen task\n");
+    }
 #endif
 
     for(i=0; i<frm_loop_cnt; i++)
@@ -1452,6 +1696,9 @@ static vx_status app_run_graph_interactive(AppObj *obj)
 
                 case 'x':
                     obj->stop_task = 1;
+#if defined(SOC_AM62A) && defined(QNX)
+                    obj->stop_screen_task = 1;
+#endif
                     done = 1;
                     break;
 
@@ -1462,6 +1709,9 @@ static vx_status app_run_graph_interactive(AppObj *obj)
             }
         }
         app_run_task_delete(obj);
+#if defined(SOC_AM62A) && defined(QNX)
+        app_run_screen_task_delete(obj);
+#endif
     }
     if(status == VX_SUCCESS)
     {

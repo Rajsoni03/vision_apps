@@ -30,7 +30,9 @@ DIRECTORIES += apps/utilities
 
 DIRECTORIES += kernels/fileio
 DIRECTORIES += kernels/img_proc
-
+ifeq ($(BUILD_QNX_MPU),yes)
+	DIRECTORIES += apps/basic_demos/app_single_cam
+endif
 else
 DIRECTORIES += utils
 DIRECTORIES += kernels

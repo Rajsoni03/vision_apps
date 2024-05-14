@@ -170,6 +170,11 @@ typedef struct {
     tivx_task task;
     uint32_t stop_task;
     uint32_t stop_task_done;
+#if defined(SOC_AM62A) && defined(QNX)
+    tivx_task screen_task;
+    uint32_t stop_screen_task;
+    uint32_t stop_screen_task_done;
+#endif
 
     uint32_t ldc_enable;
     vx_node node_ldc;
