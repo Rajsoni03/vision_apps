@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -161,7 +161,7 @@ void app_deinit_viss(VISSObj *vissObj);
  */
 void app_delete_viss(VISSObj *vissObj);
 
-/** \brief VISS module create helper function
+/** \brief VISS module create helper function for RGB frames
  *
  * This VISS create helper function will create the node using all the data objects created during the \ref app_init_viss call.
  * Internally calls \ref app_create_graph_viss_write_output if en_out_viss_write is set

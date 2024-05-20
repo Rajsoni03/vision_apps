@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017 Texas Instruments Incorporated
+ * Copyright (c) 2017-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -67,6 +67,7 @@ vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *obj
 
     if (displayObj->display_option == 1)
     {
+#if !defined(SOC_AM62A) && !defined(QNX)
         if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1))
         {
             status = VX_SUCCESS;
@@ -75,6 +76,7 @@ vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *obj
         {
             status = VX_FAILURE;
         }
+#endif
 
         if(VX_SUCCESS == status)
         {
@@ -102,7 +104,11 @@ vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *obj
 
 void app_deinit_display(DisplayObj *displayObj)
 {
+#if !defined(SOC_AM62A) && !defined(QNX)
     if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (displayObj->display_option == 1))
+#else
+    if (displayObj->display_option == 1)
+#endif
     {
         vxReleaseUserDataObject(&displayObj->disp_params_obj);
     }
@@ -110,7 +116,11 @@ void app_deinit_display(DisplayObj *displayObj)
 
 void app_delete_display(DisplayObj *displayObj)
 {
+#if !defined(SOC_AM62A) && !defined(QNX)
     if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (displayObj->display_option == 1))
+#else
+    if (displayObj->display_option == 1)
+#endif
     {
         vxReleaseNode(&displayObj->disp_node);
     }
@@ -119,16 +129,22 @@ void app_delete_display(DisplayObj *displayObj)
 vx_status app_create_graph_display(vx_graph graph, DisplayObj *displayObj, vx_image disp_image)
 {
     vx_status status = VX_SUCCESS;
-
+#if !defined(SOC_AM62A) && !defined(QNX)
     if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (displayObj->display_option == 1))
+#else
+    if (displayObj->display_option == 1)
+#endif
     {
+#if !defined(SOC_AM62A) && !defined(QNX)
         displayObj->disp_node = tivxDisplayNode(graph, displayObj->disp_params_obj, disp_image);
         status = vxGetStatus((vx_reference)displayObj->disp_node);
-
+#endif
         if(status == VX_SUCCESS)
         {
             vxSetReferenceName((vx_reference)displayObj->disp_node, "DisplayNode");
+#if !defined(SOC_AM62A) && !defined(QNX)
             vxSetNodeTarget(displayObj->disp_node, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
+#endif
         }
         else
         {

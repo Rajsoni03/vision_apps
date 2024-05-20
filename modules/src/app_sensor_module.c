@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -71,7 +71,9 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
     vx_uint16 selectedSensor = 0xFFF;
     vx_uint8 sensors_detected[ISS_SENSORS_MAX_SUPPORTED_SENSOR];
     vx_bool sensorSelected = vx_false_e;
+#if !defined(SOC_AM62A) && !defined(QNX)
     vx_bool ldcSelected = vx_false_e;
+#endif
     int32_t i;
 
     memset(availableSensorNames, 0, ISS_SENSORS_MAX_SUPPORTED_SENSOR*ISS_SENSORS_MAX_NAME);
@@ -178,6 +180,7 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
             }
         }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
         while (ldcSelected != vx_true_e)
         {
             fflush (stdin);
@@ -194,6 +197,7 @@ vx_status app_querry_sensor(SensorObj *sensorObj)
                 ldcSelected = vx_true_e;
             }
         }
+#endif
 
         sensorObj->num_cameras_enabled = 0;
         while(sensorObj->num_cameras_enabled == 0)

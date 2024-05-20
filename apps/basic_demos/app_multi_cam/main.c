@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -78,6 +78,9 @@
 #include "app_img_mosaic_module.h"
 #include "app_display_module.h"
 #include "app_test.h"
+#if defined(SOC_AM62A) && defined(QNX)
+#include <screen/screen.h>
+#endif
 
 #define CAPTURE_BUFFER_Q_DEPTH  (4)
 #define APP_BUFFER_Q_DEPTH      (4)
@@ -97,7 +100,9 @@ typedef struct {
     AEWBObj       aewbObj1;
     LDCObj        ldcObj1;
     ImgMosaicObj  imgMosaicObj;
+#if !defined(SOC_AM62A) && !defined(QNX)
     DisplayObj    displayObj;
+#endif
 
     vx_char output_file_path[APP_MAX_FILE_PATH];
 
@@ -123,6 +128,12 @@ typedef struct {
     app_perf_point_t fileio_perf;
     app_perf_point_t draw_perf;
 
+#if defined(SOC_AM62A) && defined(QNX)
+    tivx_task screen_task;
+    uint32_t stop_screen_task;
+    uint32_t stop_screen_task_done;
+#endif
+
     int32_t enable_ldc;
     int32_t enable_viss;
     int32_t enable_split_graph;
@@ -139,6 +150,8 @@ typedef struct {
     vx_uint32 enable_configure_hwa_freq;
     vx_uint32 hwa_freq_config;
     vx_uint32 bypass_split_graph;
+
+    vx_image gDisplayInImage;
 
 } AppObj;
 
@@ -158,7 +171,230 @@ static void app_pipeline_params_defaults(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh, ObjArrSplitObj *objArrSplitObj, int32_t enable_split_graph);
+#if !defined(SOC_AM62A) && !defined(QNX)
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
+#endif
+
+#if defined(SOC_AM62A) && defined(QNX)
+/*AM62A: QNX to use screen package for displaying frames on A53*/
+screen_context_t screen_ctx = NULL;
+screen_window_t screen_win = NULL;
+#endif
+
+#if defined(SOC_AM62A) && defined(QNX)
+int32_t app_run_screen(AppObj *obj)
+{
+    int32_t err = 0;
+    int usage = SCREEN_USAGE_READ | SCREEN_USAGE_WRITE;
+    int screenFormat = SCREEN_FORMAT_NV12;
+    screen_context_t screen_ctx = NULL;
+    screen_window_t screen_win = NULL;
+    vx_uint32 width, height;
+    vx_df_image df;
+    vx_imagepatch_addressing_t image_addr;
+    vx_rectangle_t rect;
+    vx_map_id map_id1, map_id2;
+    void *data_ptr1 = NULL, *data_ptr2 = NULL;
+    vx_uint32 num_bytes_per_4pixels;
+    vx_uint32 imgaddr_width, imgaddr_height, imgaddr_stride;
+    uint32_t i;
+
+    /* connect to screen */
+    err = screen_create_context(&screen_ctx, SCREEN_APPLICATION_CONTEXT);
+    if(err != 0) {
+        printf("Failed to create screen context\n");
+    }
+
+    /* create a window */
+    err = screen_create_window(&screen_win, screen_ctx);
+    if(err != 0) {
+        printf("Failed to create screen window\n");
+    }
+
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_USAGE, &usage);
+    if(err != 0) {
+        printf("Failed to set usage property\n");
+    }
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_FORMAT, &screenFormat);
+    if(err != 0) {
+        printf("Failed to set format prpoerty\n");
+    }
+
+    /* create screen buffers */
+    int nbuffers = 2;
+    err = screen_create_window_buffers(screen_win, nbuffers);
+    if(err != 0) {
+        printf("Failed to create window buffer\n");
+    }
+
+    while(1)
+    {
+        int buffer_size[2];
+        err = screen_get_window_property_iv(screen_win, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size);
+        if(err != 0) {
+            printf("Failed to get window buffer size\n");
+        }
+
+        screen_buffer_t screen_buf[2];
+        err = screen_get_window_property_pv(screen_win, SCREEN_PROPERTY_RENDER_BUFFERS, (void **)&screen_buf);
+        if(err != 0) {
+            printf("Failed to get window buffer\n");
+        }
+
+        /* obtain pointers to the buffers */
+        void *ptr1 = NULL;
+        err = screen_get_buffer_property_pv(screen_buf[0], SCREEN_PROPERTY_POINTER, (void **)&ptr1);
+        if(err != 0) {
+            printf("Failed to get buffer pointer\n");
+        }
+
+        int buf_stride1 = 0;
+        err = screen_get_buffer_property_iv(screen_buf[0], SCREEN_PROPERTY_STRIDE, &buf_stride1);
+        if(err != 0) {
+           printf("Failed to get buffer stride1\n");
+        }
+
+        /* copy frames from OVX buffer to screen buffer*/
+        vx_image display_image = obj->gDisplayInImage;
+        vxQueryImage(display_image, VX_IMAGE_WIDTH, &width, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_FORMAT, &df, sizeof(vx_df_image));
+
+        if(VX_DF_IMAGE_NV12 == df)
+        {
+            num_bytes_per_4pixels = 4;
+        }
+        else if(TIVX_DF_IMAGE_NV12_P12 == df)
+        {
+            num_bytes_per_4pixels = 6;
+        }
+        else
+        {
+            num_bytes_per_4pixels = 8;
+        }
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = width;
+        rect.end_y = height;
+
+        vxMapImagePatch(display_image,
+            &rect,
+            0,
+            &map_id1,
+            &image_addr,
+            &data_ptr1,
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            VX_NOGAP_X
+            );
+
+        if(!data_ptr1)
+        {
+            printf("data_ptr1 is NULL \n");
+            return -1;
+        }
+
+        imgaddr_width  = image_addr.dim_x;
+        imgaddr_height = image_addr.dim_y;
+        imgaddr_stride = image_addr.stride_y;
+
+        /*  The current implementation performs memcpy of frame from TIOVX buffer
+         *  to screen buffer. This is not the optimal implementation and needs to
+         *  be updated going ahead for better G2G latency figures
+         */
+        for(i=0;i<height;i++)
+        {
+            memcpy(ptr1, data_ptr1, imgaddr_width*num_bytes_per_4pixels/4);
+            data_ptr1 += imgaddr_stride;
+            ptr1 += (buf_stride1);
+        }
+        vxUnmapImagePatch(display_image, map_id1);
+
+        if(VX_DF_IMAGE_NV12 == df || TIVX_DF_IMAGE_NV12_P12 == df)
+        {
+            vxMapImagePatch(display_image,
+                &rect,
+                1,
+                &map_id2,
+                &image_addr,
+                &data_ptr2,
+                VX_WRITE_ONLY,
+                VX_MEMORY_TYPE_HOST,
+                VX_NOGAP_X
+                );
+
+            if(!data_ptr2)
+            {
+                printf("data_ptr2 is NULL \n");
+                return -1;
+            }
+
+            imgaddr_width  = image_addr.dim_x;
+            imgaddr_height = image_addr.dim_y;
+            imgaddr_stride = image_addr.stride_y;
+
+            for(i=0;i<imgaddr_height/2;i++)
+            {
+                memcpy(ptr1, data_ptr2, imgaddr_width*num_bytes_per_4pixels/4);
+                data_ptr2 += imgaddr_stride;
+                ptr1 += buf_stride1;
+            }
+            vxUnmapImagePatch(display_image, map_id2);
+        }
+
+        err = screen_post_window(screen_win, screen_buf[0], 0, NULL, 0);
+        if(err != 0) {
+            printf("Failed to post window\n");
+        }
+
+        if(obj->stop_screen_task == 1)
+        {
+            break;
+        }
+    }
+
+    return err;
+}
+
+static void app_run_screen_task(void *app_var)
+{
+    AppObj *obj = (AppObj *)app_var;
+
+    app_run_screen(obj);
+
+    obj->stop_screen_task_done = 1;
+}
+
+static int32_t app_screen_task_create(AppObj *obj)
+{
+    tivx_task_create_params_t params;
+    int32_t status;
+
+    tivxTaskSetDefaultCreateParams(&params);
+    params.task_main = app_run_screen_task;
+    params.app_var = obj;
+
+    obj->stop_screen_task_done = 0;
+    obj->stop_screen_task = 0;
+
+    status = tivxTaskCreate(&obj->screen_task, &params);
+
+    return status;
+}
+
+static void app_run_screen_task_delete(AppObj *obj)
+{
+    while(obj->stop_screen_task_done==0)
+    {
+         tivxTaskWaitMsecs(100);
+    }
+
+    screen_destroy_window(screen_win);
+    screen_destroy_context(screen_ctx);
+    tivxTaskDelete(&obj->screen_task);
+}
+#endif
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -292,11 +528,17 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                     break;
                 case 'x':
                     obj->stop_task = 1;
+#if defined(SOC_AM62A) && defined(QNX)
+                    obj->stop_screen_task = 1;
+#endif
                     done = 1;
                     break;
             }
         }
         app_run_task_delete(obj);
+#if defined(SOC_AM62A) && defined(QNX)
+        app_run_screen_task_delete(obj);
+#endif
     }
     return status;
 }
@@ -466,6 +708,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
             else
             if(strcmp(token, "display_option")==0)
             {
+#if !defined(SOC_AM62A) && !defined(QNX)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
@@ -473,6 +716,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     if(obj->displayObj.display_option > 1)
                         obj->displayObj.display_option = 1;
                 }
+#endif
             }
             else
             if(strcmp(token, "is_interactive")==0)
@@ -674,7 +918,10 @@ vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
         obj->enable_aewb = 1;
         obj->enable_mosaic = 1;
     }
-
+#if defined(SOC_AM62A) && defined(QNX)
+        obj->stop_screen_task = 0;
+        obj->stop_screen_task_done = 0;
+#endif
     /*Update of parameters are config file read*/
     app_update_param_set(obj);
 
@@ -743,7 +990,9 @@ vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
 static vx_status app_init(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
+#if !defined(SOC_AM62A) && !defined(QNX)
     app_grpx_init_prms_t grpx_prms;
+#endif
 
     if (1U == obj->enable_configure_hwa_freq)
     {
@@ -843,6 +1092,7 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("Img Mosaic init done!\n");
     }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
     if (status == VX_SUCCESS)
     {
         status = app_init_display(obj->context, &obj->displayObj, "display_obj");
@@ -852,6 +1102,7 @@ static vx_status app_init(AppObj *obj)
     appGrpxInitParamsInit(&grpx_prms, obj->context);
     grpx_prms.draw_callback = app_draw_graphics;
     appGrpxInit(&grpx_prms);
+#endif
 
     appPerfPointSetName(&obj->total_perf , "TOTAL");
     appPerfPointSetName(&obj->fileio_perf, "FILEIO");
@@ -912,10 +1163,12 @@ static void app_deinit(AppObj *obj)
         APP_PRINTF("Img Mosaic deinit done!\n");
     }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
     app_deinit_display(&obj->displayObj);
     APP_PRINTF("Display deinit done!\n");
 
     appGrpxDeInit();
+#endif
 
     tivxHwaUnLoadKernels(obj->context);
     tivxExtUnLoadKernels(obj->context);
@@ -974,11 +1227,57 @@ static void app_delete_graph(AppObj *obj)
     app_delete_img_mosaic(&obj->imgMosaicObj);
     APP_PRINTF("Img Mosaic delete done!\n");
 
+#if !defined(SOC_AM62A) && !defined(QNX)
     app_delete_display(&obj->displayObj);
     APP_PRINTF("Display delete done!\n");
+#endif
 
     vxReleaseGraph(&obj->graph);
     APP_PRINTF("Graph delete done!\n");
+}
+
+/* VISS module create helper function for IR frames */
+vx_status app_create_graph_viss_ir(vx_graph graph, VISSObj *vissObj, vx_object_array raw_image_arr, const char *target)
+{
+    vx_status status = VX_SUCCESS;
+
+    tivx_raw_image raw_image = (tivx_raw_image)vxGetObjectArrayItem(raw_image_arr, 0);
+    vx_user_data_object h3a_stats = (vx_user_data_object)vxGetObjectArrayItem(vissObj->h3a_stats_arr, 0);
+    vx_image output_img = (vx_image)vxGetObjectArrayItem(vissObj->output_arr, 0);
+
+    vissObj->node = tivxVpacVissNode(
+                                graph,
+                                vissObj->config,
+                                NULL,
+                                vissObj->dcc_config,
+                                raw_image, output_img, NULL,
+                                NULL, NULL, NULL,
+                                h3a_stats, NULL, NULL, NULL);
+
+    tivxReleaseRawImage(&raw_image);
+    vxReleaseImage(&output_img);
+    vxReleaseUserDataObject(&h3a_stats);
+
+    status = vxGetStatus((vx_reference)vissObj->node);
+    if(status == VX_SUCCESS)
+    {
+        vxSetReferenceName((vx_reference)vissObj->node, "viss_node");
+        vxSetNodeTarget(vissObj->node, VX_TARGET_STRING, target);
+
+        vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e};
+        vxReplicateNode(graph, vissObj->node, replicate, 13);
+
+        if(vissObj->en_out_viss_write == 1)
+        {
+            status = app_create_graph_viss_write_output(graph, vissObj);
+        }
+    }
+    else
+    {
+        printf("[VISS-IR-MODULE] Unable to create VISS Node! \n");
+    }
+
+    return status;
 }
 
 static vx_status app_create_graph(AppObj *obj)
@@ -1074,6 +1373,14 @@ static vx_status app_create_graph(AppObj *obj)
         {
             #if defined(SOC_J784S4)
             status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC2_VISS1);
+            #elif defined(SOC_AM62A) && defined(QNX)
+            if (strcmp(obj->sensorObj.sensor_name,"OV2312-UB953_LI")==0) {
+                /* Second instance of VISS to be configured for IR */
+                status = app_create_graph_viss_ir(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC_VISS1);
+            }
+            else {
+                status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC_VISS1);
+            }
             #else
             status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC_VISS1);
             #endif
@@ -1129,7 +1436,6 @@ static vx_status app_create_graph(AppObj *obj)
         }
     }
 
-    vx_image display_in_image;
     if(obj->enable_mosaic == 1)
     {
         obj->imgMosaicObj.num_inputs = idx;
@@ -1139,18 +1445,20 @@ static vx_status app_create_graph(AppObj *obj)
             status = app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
             APP_PRINTF("Img Mosaic graph done!\n");
         }
-        display_in_image = obj->imgMosaicObj.output_image[0];
+        obj->gDisplayInImage = obj->imgMosaicObj.output_image[0];
     }
     else
     {
-        display_in_image = (vx_image)vxGetObjectArrayItem(obj->captureObj.raw_image_arr[0], 0);
+        obj->gDisplayInImage = (vx_image)vxGetObjectArrayItem(obj->captureObj.raw_image_arr[0], 0);
     }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_display(obj->graph, &obj->displayObj, display_in_image);
+        status = app_create_graph_display(obj->graph, &obj->displayObj, obj->gDisplayInImage);
         APP_PRINTF("Display graph done!\n");
     }
+#endif
 
     if(status == VX_SUCCESS)
     {
@@ -1411,6 +1719,14 @@ static vx_status app_run_graph(AppObj *obj)
         APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
     }
 
+#if defined(SOC_AM62A) && defined(QNX)
+    status = app_screen_task_create(obj);
+    if(status!=0)
+    {
+        printf("ERROR: Unable to create screen task\n");
+    }
+#endif
+
     if(0 == obj->enable_viss)
     {
         obj->vissObj.en_out_viss_write = 0;
@@ -1476,10 +1792,12 @@ static vx_status app_run_graph(AppObj *obj)
     return status;
 }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
 static void set_display_defaults(DisplayObj *displayObj)
 {
     displayObj->display_option = 1;
 }
+#endif
 
 static void app_pipeline_params_defaults(AppObj *obj)
 {
@@ -1505,7 +1823,9 @@ static void app_default_param_set(AppObj *obj)
 {
     set_sensor_defaults(&obj->sensorObj);
 
+#if !defined(SOC_AM62A) && !defined(QNX)
     set_display_defaults(&obj->displayObj);
+#endif
 
     app_pipeline_params_defaults(obj);
 
@@ -1635,6 +1955,7 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
     vxReleaseParameter(&parameter);
 }
 
+#if !defined(SOC_AM62A) && !defined(QNX)
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
     appGrpxDrawDefault(handle, draw2dBufInfo, update_type);
@@ -1649,3 +1970,4 @@ static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufIn
 
   return;
 }
+#endif

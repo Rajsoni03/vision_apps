@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-24 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -318,7 +318,12 @@ vx_status app_create_graph_aewb(vx_graph graph, AEWBObj *aewbObj, vx_object_arra
     }
 
     vxSetReferenceName((vx_reference)aewbObj->node, "aewb_node");
+
+#if defined(SOC_AM62A)
+    vxSetNodeTarget(aewbObj->node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
+#else
     vxSetNodeTarget(aewbObj->node, VX_TARGET_STRING, TIVX_TARGET_MCU2_0);
+#endif
 
     vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_true_e, vx_false_e};
     vxReplicateNode(graph, aewbObj->node, replicate, 6);
