@@ -84,6 +84,7 @@ ifeq ($(RTOS),SAFERTOS)
 	ADDITIONAL_STATIC_LIBS += ti.kernel.safertos.ae71
 endif
 ADDITIONAL_STATIC_LIBS += ti.csl.ae71
+ADDITIONAL_STATIC_LIBS += ti.csl.init.ae71
 
 ADDITIONAL_STATIC_LIBS += libc.a
 

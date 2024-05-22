@@ -73,7 +73,7 @@
 #include <app_mem_map.h>
 #include <app_ipc_rsctable.h>
 #include <ti/csl/soc.h>
-#include <ti/csl/csl_clec.h>
+#include <ti/csl/arch/csl_arch.h>
 #include <ti/csl/arch/c7x/Cache.h>
 #include <ti/csl/arch/c7x/Hwi.h>
 #include <ti/csl/arch/c7x/Mmu.h>
