@@ -625,7 +625,7 @@ void LwipifEnetAppCb_getHandle(LwipifEnetAppIf_GetHandleInArgs *inArgs,
     /* Wait for EthFw to be initialized */
     appRtosSemaphorePend(gEthAppObj.hInitSem, APP_RTOS_SEMAPHORE_WAIT_FOREVER);
 
-    EthFwCallbacks_lwipifCpswGetHandle(inArgs, outArgs);
+    EthFwCallbacks_lwipifCpswGetHandle(gEthAppObj.enetType, gEthAppObj.instId, inArgs, outArgs);
 
     /* Save host port MAC address */
     EnetUtils_copyMacAddr(&gEthAppObj.hostMacAddr[0U],
@@ -637,7 +637,7 @@ void LwipifEnetAppCb_getHandle(LwipifEnetAppIf_GetHandleInArgs *inArgs,
 
 void LwipifEnetAppCb_releaseHandle(LwipifEnetAppIf_ReleaseHandleInfo *releaseInfo)
 {
-    EthFwCallbacks_lwipifCpswReleaseHandle(releaseInfo);
+    EthFwCallbacks_lwipifCpswReleaseHandle(gEthAppObj.enetType, gEthAppObj.instId, releaseInfo);
 }
 
 static int32_t EthApp_initEthFw(void)
@@ -1042,7 +1042,7 @@ static void EthApp_startHwInterVlan(char *recvBuff,
     if (recvBuff != NULL)
     {
         pInterVlanCfg = (EnetCfgServer_InterVlanConfig *)recvBuff;
-        EthHwInterVlan_setupRouting(gEthAppObj.enetType, pInterVlanCfg);
+        EthHwInterVlan_setupRouting(gEthAppObj.enetType, gEthAppObj.instId, pInterVlanCfg);
     }
 }
 #endif
