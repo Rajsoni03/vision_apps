@@ -30,6 +30,8 @@ IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/khronos/openmaxil/
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/core/public/khronos/openmaxil
 endif
 
+CFLAGS += -Wno-array-parameter
+
 ifeq ($(SOC),j722s)
 SKIPBUILD=1
 endif

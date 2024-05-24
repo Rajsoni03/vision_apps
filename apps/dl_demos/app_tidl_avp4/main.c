@@ -1649,7 +1649,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     if(obj->enable_capture == 1)
     {
-        if(NULL == sensorObj->sensor_name)
+        if('\0' == sensorObj->sensor_name[0])
         {
             printf("sensor name is NULL \n");
             return VX_FAILURE;

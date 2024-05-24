@@ -19,6 +19,7 @@ ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 ifeq ($(TARGET_OS), $(filter $(TARGET_OS), LINUX QNX))
 include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 CSOURCES    += main_linux_arm.c
+CFLAGS += -Wno-stringop-overflow
 endif
 endif
 
@@ -42,7 +43,6 @@ SHARED_LIBS += gobject-2.0
 SHARED_LIBS += glib-2.0
 
 CFLAGS += -Wno-restrict
-CFLAGS += -Wno-stringop-overflow
 endif
 
 ifeq ($(TARGET_OS), QNX)
