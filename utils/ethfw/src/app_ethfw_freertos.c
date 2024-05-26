@@ -140,6 +140,19 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
                                              ETHFW_BIT(ETHREMOTECFG_SWITCH_PORT_1) | \
                                              ETHFW_BIT(ETHREMOTECFG_SWITCH_PORT_2))
 
+/* TimeSync router SYNC0_OUT source interrupt */
+#define ETHAPP_PPS_TIMESYNC_INTR_SYNC0_OUT_PIN                       (34U)
+/* TimeSync router SYNC1_OUT source interrupt */
+#define ETHAPP_PPS_TIMESYNC_INTR_SYNC1_OUT_PIN                       (35U)
+/* TimeSync router SYNC2_OUT source interrupt */
+#define ETHAPP_PPS_TIMESYNC_INTR_SYNC2_OUT_PIN                       (36U)
+/* TimeSync router SYNC3_OUT source interrupt */
+#define ETHAPP_PPS_TIMESYNC_INTR_SYNC3_OUT_PIN                       (37U)
+/* Function generator length value for a given ref clk in Hz (1kHz) */
+#define ETHAPP_PPS_TIMESYNC_REF_CLK_HZ                               (1000)
+/* GenF generator instance index value */
+#define ETHAPP_PPS_TIMESYNC_GENF_INST_IDX                            (0U)
+
 static EthAppObj gEthAppObj =
 {
     .enetType = ENET_CPSW_9G,
@@ -633,6 +646,7 @@ static int32_t EthApp_initEthFw(void)
     EnetRm_MacAddressPool *pool = &cpswCfg->resCfg.macList;
     EthFwMcast_SharedMcastCfg *sharedMcastCfg = &ethFwCfg.mcastCfg.sharedMcastCfg;
     EthFwMcast_RsvdMcastCfg *rsvdMcastCfg = &ethFwCfg.mcastCfg.rsvdMcastCfg;
+    EthFwTsn_PpsConfig ppsConfig;
     uint32_t poolSize;
     int32_t status = ETHAPP_OK;
     int32_t i;
@@ -665,6 +679,8 @@ static int32_t EthApp_initEthFw(void)
 
     /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
     cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
+    /* Enable clear GenF */
+    cpswCfg->cptsCfg.tsGenfClrEn = BTRUE;
 
 #if defined(ETHFW_MONITOR_SUPPORT)
     /* Save the Lwip Dma parametrers */
@@ -674,6 +690,23 @@ static int32_t EthApp_initEthFw(void)
 #endif
 
 #if defined(ETHFW_GPTP_SUPPORT)
+    gEthAppObj.enablePPS = BTRUE;
+
+    if (gEthAppObj.enablePPS)
+    {
+#if defined(SOC_J721E) || defined (SOC_J7200)
+        ethFwCfg.ppsConfig.tsrIn = CSLR_TIMESYNC_INTRTR0_IN_CPSW0_CPTS_GENF0_0;
+        ethFwCfg.ppsConfig.tsrOut = ETHAPP_PPS_TIMESYNC_INTR_SYNC2_OUT_PIN;
+#elif defined(SOC_J784S4)
+        ethFwCfg.ppsConfig.tsrIn = CSLR_TIMESYNC_INTRTR0_IN_CPSW_9XUSSM0_CPTS_GENF0_0;
+        ethFwCfg.ppsConfig.tsrOut = ETHAPP_PPS_TIMESYNC_INTR_SYNC3_OUT_PIN;
+#else
+#error "TSN: Unsupported SoC"
+#endif
+
+        ethFwCfg.ppsConfig.ppsFreqHz = ETHAPP_PPS_TIMESYNC_REF_CLK_HZ;
+        ethFwCfg.ppsConfig.genfIdx = ETHAPP_PPS_TIMESYNC_GENF_INST_IDX;
+    }
     /* gPTP stack config parameters */
     ethFwCfg.configPtpCb    = EthApp_configPtpCb;
     ethFwCfg.configPtpCbArg = NULL;
@@ -992,11 +1025,24 @@ static void EthApp_startHwInterVlan(char *recvBuff,
 #if defined(ETHFW_GPTP_SUPPORT)
 static void EthApp_configPtpCb(void *arg)
 {
+    EthFwTsn_gPTPConfigArg *cbArgs = (EthFwTsn_gPTPConfigArg *)arg;
     int32_t useHwPhase = 1;
+    uint32_t ppsFreqHz = 0U;
+    uint32_t genfIdx = 0U;
+
+    if (gEthAppObj.enablePPS)
+    {
+        ppsFreqHz = ETHAPP_PPS_TIMESYNC_REF_CLK_HZ;
+        genfIdx = ETHAPP_PPS_TIMESYNC_GENF_INST_IDX;
+    }
 
     /* Apply phase adjustment directly to the HW */
-    gptpgcfg_set_item(0, XL4_EXTMOD_XL4GPTP_USE_HW_PHASE_ADJUSTMENT,
+    gptpgcfg_set_item(cbArgs->inst, XL4_EXTMOD_XL4GPTP_USE_HW_PHASE_ADJUSTMENT,
                       YDBI_CONFIG, &useHwPhase, sizeof(useHwPhase));
+    gptpgcfg_set_item(cbArgs->inst, XL4_EXTMOD_XL4GPTP_CONF_TILLD_PPS_REFCLK_HZ,
+                      YDBI_CONFIG, &ppsFreqHz, sizeof(ppsFreqHz));
+    gptpgcfg_set_item(cbArgs->inst, XL4_EXTMOD_XL4GPTP_CONF_TILLD_PPS_OUTIDX,
+                      YDBI_CONFIG, &genfIdx, sizeof(genfIdx));
 }
 
 static void EthApp_initPtp(void)

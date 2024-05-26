@@ -179,6 +179,9 @@ typedef struct
     /* Enet instance id */
     uint32_t instId;
 
+    /* Enable/disable PPS gen check */
+    bool enablePPS;
+
 #if defined(FREERTOS) || defined(SAFERTOS)
     /* DHCP network interface */
     struct dhcp dhcpNetif;
