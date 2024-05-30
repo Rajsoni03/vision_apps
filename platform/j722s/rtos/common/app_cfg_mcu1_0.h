@@ -70,7 +70,6 @@
 
 #undef ENABLE_UDMA
 #undef ENABLE_UDMA_COPY
-#undef ENABLE_TIOVX
 #undef ENABLE_SCICLIENT
 
 #endif /* APP_CFG_MCU1_0_H_ */
