@@ -169,6 +169,7 @@ PDK_LIBS += dmautils.lib
 PDK_LIBS += udma.lib
 PDK_LIBS += sciclient.lib
 PDK_LIBS += ti.csl.lib
+PDK_LIBS += ti.csl.init.lib
 PDK_LIBS += ti.osal.lib
 endif
 
