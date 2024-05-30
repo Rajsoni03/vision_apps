@@ -76,7 +76,9 @@ static vx_status configure_viss_params(vx_context context, VISSObj *vissObj, Sen
     vissObj->params.fcp[0].mux_output3      = 0;
     vissObj->params.fcp[0].mux_output4      = 3;
     if (strcmp(sensorObj->sensor_name,"OV2312-UB953_LI")==0){
+#if defined (VPAC3L)
         vissObj->params.bypass_pcid = 0;
+#endif
         vissObj->params.h3a_in      = 4;
     }else{
         vissObj->params.h3a_in      = 3;
@@ -115,12 +117,16 @@ static vx_status configure_viss_params_ir(vx_context context, VISSObj *vissObj, 
 
     tivx_vpac_viss_params_init(&vissObj->params);
 
+#if defined (VPAC3L)
     vissObj->params.bypass_pcid      = 0;
     vissObj->params.enable_ir_op     = TIVX_VPAC_VISS_IR_ENABLE;
     vissObj->params.enable_bayer_op  = TIVX_VPAC_VISS_BAYER_DISABLE;
+#endif
     vissObj->params.sensor_dcc_id    = sensorObj->sensorParams.dccId;
     vissObj->params.fcp[0].ee_mode          = TIVX_VPAC_VISS_EE_MODE_OFF;
+#if defined (VPAC3L)
     vissObj->params.fcp[0].mux_output0      = TIVX_VPAC_VISS_MUX0_IR8;
+#endif
     vissObj->params.fcp[0].mux_output1      = 0;
     vissObj->params.fcp[0].mux_output2      = 0;
     vissObj->params.fcp[0].mux_output3      = 0;
