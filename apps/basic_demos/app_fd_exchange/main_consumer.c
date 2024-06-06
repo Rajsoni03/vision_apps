@@ -253,9 +253,6 @@ static int32_t App_init(App_Context *appCntxt)
 
         if (status == 0)
         {
-            tivxInit();
-            tivxHostInit();
-
             appCntxt->vxContext = vxCreateContext();
 
             if (appCntxt->vxContext == NULL)
