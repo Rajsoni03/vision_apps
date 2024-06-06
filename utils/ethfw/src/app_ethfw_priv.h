@@ -165,6 +165,9 @@ typedef struct
     /* CPSW instance type */
     Enet_Type enetType;
 
+    /* Ethernet Firmware handle */
+    EthFw_Handle hEthFw;
+
     /* Semaphore for synchronizing EthFw and NDK initialization */
     app_rtos_semaphore_handle_t hInitSem;
 

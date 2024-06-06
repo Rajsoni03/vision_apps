@@ -156,6 +156,7 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
 static EthAppObj gEthAppObj =
 {
     .enetType = ENET_CPSW_9G,
+    .hEthFw = NULL,
     .instId   = 0U,
 };
 
@@ -591,7 +592,7 @@ int32_t appEthFwDeInit()
 {
     int32_t status = 0;
 
-    EthFw_deinit();
+    EthFw_deinit(gEthAppObj.hEthFw);
 
     return status;
 }
@@ -603,7 +604,7 @@ int32_t appEthFwRemoteServerInit()
     appLogPrintf("ETHFW: Remove server Init ... !!!\n");
 
     /* Initialize the Remote Config server (CPSW Proxy Server) */
-    status = EthFw_initRemoteConfig();
+    status = EthFw_initRemoteConfig(gEthAppObj.hEthFw);
     if (status != ENET_SOK)
     {
         appLogPrintf("ETHFW: Remove server Init ... ERROR (%d) !!! \n", status);
@@ -757,8 +758,8 @@ static int32_t EthApp_initEthFw(void)
     /* Initialize the EthFw */
     if (status == ETHAPP_OK)
     {
-        status = EthFw_init(gEthAppObj.enetType, gEthAppObj.instId, &ethFwCfg);
-        if (ETHAPP_OK != status)
+        gEthAppObj.hEthFw = EthFw_init(gEthAppObj.enetType, gEthAppObj.instId, &ethFwCfg);
+        if (gEthAppObj.hEthFw == NULL)
         {
             appLogPrintf("ETHFW: failed to initialize the firmware\n");
             status = ETHAPP_ERROR;
@@ -768,7 +769,7 @@ static int32_t EthApp_initEthFw(void)
     /* Get and print EthFw version */
     if (status == ETHAPP_OK)
     {
-        EthFw_getVersion(&ver);
+        EthFw_getVersion(gEthAppObj.hEthFw, &ver);
         appLogPrintf("\nETHFW Version   : %d.%02d.%02d\n", ver.major, ver.minor, ver.rev);
         appLogPrintf("ETHFW Build Date: %s %s, %s\n", ver.month, ver.date, ver.year);
         appLogPrintf("ETHFW Build Time: %s:%s:%s\n", ver.hour, ver.min, ver.sec);
