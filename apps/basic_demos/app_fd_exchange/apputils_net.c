@@ -42,7 +42,10 @@ AppUtil_netReadUnixSock(int32_t     sockFd,
                         uint32_t   *numFd)
 {
     struct msghdr   msg;
-    char            buf[CMSG_SPACE(sizeof(int32_t)*APPUTIL_MAX_NUM_FD)];
+    union {
+        struct cmsghdr cm;
+        uint8_t pktinfo_sizer[sizeof(struct cmsghdr) + sizeof(int32_t)*APPUTIL_MAX_NUM_FD];
+    } control_un;
     struct iovec    iov[1];
     int32_t         status;
 
@@ -57,8 +60,8 @@ AppUtil_netReadUnixSock(int32_t     sockFd,
 
     if (numFd)
     {
-        msg.msg_control    = buf;
-        msg.msg_controllen = CMSG_LEN(sizeof(buf));
+        msg.msg_control    = &control_un;
+        msg.msg_controllen = sizeof(control_un);
     }
     else
     {
