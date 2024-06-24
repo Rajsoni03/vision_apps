@@ -31,8 +31,11 @@ DIRECTORIES += apps/utilities
 DIRECTORIES += kernels/fileio
 DIRECTORIES += kernels/img_proc
 ifeq ($(BUILD_QNX_MPU),yes)
+	DIRECTORIES += utils/codec_wrapper
+	DIRECTORIES += utils/openmax_wrapper
 	DIRECTORIES += apps/basic_demos/app_single_cam
 	DIRECTORIES += apps/basic_demos/app_multi_cam
+	DIRECTORIES += apps/basic_demos/app_multi_cam_codec
 endif
 else
 DIRECTORIES += utils

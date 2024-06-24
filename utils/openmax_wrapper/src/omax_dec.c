@@ -844,10 +844,10 @@ int32_t loadConfig(OmxilVideoEncDec_t *encH)
     WRAPPER_PRINTF("\n%s get config(%u) input buffer(encH->currPtr=%p, encH->large_input_buf_data_size=%d)", __func__,
             encH->config_size, encH->currPtr, encH->large_input_buf_data_size);
 
-#if defined(SOC_J721S2) || defined(SOC_J784S4)
+#if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
     /* Return the read pointer back to beginning of the file */
     lseek(encH->in_fd, 0, SEEK_SET);
-#endif /* SOC_J721S2 or SOC_J784S4 */
+#endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
 
     return err;
 }

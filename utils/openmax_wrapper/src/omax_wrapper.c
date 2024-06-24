@@ -514,6 +514,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
     pthread_mutex_lock(&encH->mutex);
     if(p_omax_pipe_obj->params.appEncode == 1 && p_omax_pipe_obj->params.appDecode == 0)
     {
+    #if !(defined(SOC_AM62A) && defined(QNX))
         /* Allocate input port buffers */
         WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers using %u input buffers of %u size",
                 encH->nInputBufs, encH->inputPortBufSize);
@@ -545,6 +546,35 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                 encH->inputBufHdrList[i] = pBufHdr;
             }
         }
+    #else
+        /* Allocate input port buffers */
+        WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating %u input buffers of %u size",
+                    encH->nInputBufs, encH->inputPortBufSize);
+
+        for(i = 0; i < encH->nInputBufs; i++)
+        {
+            /* Buffers are allocated by MMF and shared with component */
+            OMX_BUFFERHEADERTYPE *pBufHdr = NULL;
+            omxErr = OMX_AllocateBuffer(encH->compHandle,
+                    &pBufHdr,
+                    encH->inPortIndex,
+                    NULL,
+                    encH->inputPortBufSize);
+            if(omxErr != OMX_ErrorNone)
+            {
+                WRAPPER_ERROR("\nOmxilEnc=> ERROR: %s:%d OMX_AllocateBuffer() returned 0x%08x:'%s'", __func__, __LINE__, omxErr, OmxErrorTypeToStr(omxErr));
+                pthread_mutex_unlock(&encH->mutex);
+                return omxErr;
+            }
+            else
+            {
+                WRAPPER_PRINTF("\nOmxilEnc=> %s:%d  Count:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
+                        i, encH->compHandle, encH->inPortIndex, pBufHdr, pBufHdr->pBuffer, encH->inputPortBufSize);
+                encH->inputBufHdrList[i] = pBufHdr;
+                OMAX_qPush(encH, omxil_true_e, i);
+            }
+        }
+    #endif /* !(defined(SOC_AM62A) && defined(QNX)) */
         
         /* Allocate output port buffers */
         WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating %u output buffers of %u size",
@@ -802,9 +832,9 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
     OMX_PORT_PARAM_TYPE portParam;
     OMX_PARAM_PORTDEFINITIONTYPE inPortParam;
     OMX_PARAM_PORTDEFINITIONTYPE outPortParam;
-    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
     OMX_VENDOR_TIVPU_PARAM_TYPE vpuParam = { 0 };
-    #endif /* SOC_J721S2 or SOC_J784S4 */
+    #endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
 
     /* Create the OMX component */
     OMX_STRING comp_name = (OMX_STRING)QNX_ENC_COMP_NAME;
@@ -826,7 +856,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             return omxErr;
         }
 
-    #if defined(SOC_J721S2) || defined(SOC_J784S4)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
         /* Get number of VPU cores */
         omxErr = OMX_GetParameter(encH->compHandleArray[ch].compHandle,
                     (OMX_INDEXTYPE)OMX_VendorTIVPUConfigCoreIndex,
@@ -848,7 +878,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             WRAPPER_ERROR("\nOmxilEnc=> ERROR: Component OMX_SetParameter() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
             return omxErr;
         }
-    #endif /* SOC_J721S2 or SOC_J784S4 */
+    #endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
 
         /* Get component ports info and prepare internal port contexts. */
         SET_OMAX_VERSION_SIZE(portParam, sizeof(OMX_PORT_PARAM_TYPE));
@@ -1973,6 +2003,15 @@ int32_t appOMXEnqAppEnc(uint8_t idx)
         }
         if (buffer != NULL)
         {
+#if (defined(SOC_AM62A) && defined(QNX))
+        #if defined(CODEC_USE_HIGHMEM)
+            /* Copy low mem output buffer to high mem input buffer */
+            void *pointer = p_omax_pipe_obj->pdataPtr[idx][ch][0];
+            WRAPPER_PRINTF("\nOmxilEnc=> Copy low mem output buffer to high mem input buffer=> low mem src=0x%p, high mem dest=0x%p, size %u", pointer, buffer->pBuffer, p_omax_pipe_obj->compHandleArray[ch].frame_size);
+            memcpy(buffer->pBuffer, pointer, p_omax_pipe_obj->compHandleArray[ch].frame_size);
+        #endif
+#endif
+
             p_omax_pipe_obj->compHandleArray[ch].inBufEmpty[idx] = omxil_false_e;
 
             WRAPPER_PRINTF("\nOmxilEnc=> OMX_EmptyThisBuffer: %s:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,

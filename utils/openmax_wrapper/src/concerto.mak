@@ -1,7 +1,7 @@
 ifneq ($(TARGET_PLATFORM),PC)
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J784S4 J721S2))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J784S4 J721S2 AM62A))
 include $(PRELUDE)
 
 TARGET      := app_utils_omax_wrapper
@@ -9,7 +9,7 @@ TARGETTYPE  := library
 
 CSOURCES    := $(call all-c-files)
 
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2 AM62A))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/OpenMAXIL/khronos/openmaxil/
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/OpenMAXIL/core/public/khronos/openmaxil
 IDIRS += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/public

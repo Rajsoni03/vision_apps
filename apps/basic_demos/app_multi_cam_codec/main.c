@@ -722,6 +722,12 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
             obj->sensorObj.sensor_index = sensor_override;
         }
     }
+#if defined(SOC_AM62A) && defined(QNX)
+    if ( obj->is_interactive )
+    {
+        obj->sensorObj.is_interactive = 1;
+    }
+#endif
 
     return;
 }
@@ -2416,9 +2422,9 @@ static void set_codec_pipe_params(AppObj *obj)
     #if defined(SOC_J721E)
     sinkType    = 0;
     #endif /* SOC_J721E */
-    #if defined(SOC_J721S2)
+    #if defined(SOC_J721S2) || defined(SOC_AM62A)
     sinkType    = 3;
-    #endif /* SOC_J721S2 */
+    #endif /* SOC_J721S2 or SOC_AM62A */
     #if defined(SOC_J784S4)
     sinkType    = 3;
     #endif /* SOC_J784S4 */
@@ -2484,6 +2490,15 @@ static void app_update_param_set(AppObj *obj)
         obj->dec_pool.height = 1088;
     }
 #endif /* QNX && !SOC_J721E */
+#if defined(SOC_AM62A) && defined(QNX)
+    if ((0 == strcmp(obj->sensorObj.sensor_name, SENSOR_OV2312_UB953_LI)))
+    {
+        obj->enc_pool.width = 1600;
+        obj->enc_pool.height = 1300;
+        obj->dec_pool.width = 1600;
+        obj->dec_pool.height = 1300;
+    }
+#endif /* QNX && SOC_AM62A */
     obj->enc_pool.plane_sizes[0] = obj->enc_pool.width * obj->enc_pool.height;
     obj->enc_pool.plane_sizes[1] = obj->enc_pool.width * obj->enc_pool.height/2;
     obj->dec_pool.plane_sizes[0] = obj->dec_pool.width * obj->dec_pool.height;

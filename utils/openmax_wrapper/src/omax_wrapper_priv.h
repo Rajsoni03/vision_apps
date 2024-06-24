@@ -46,9 +46,9 @@
 #include <OMX_Core.h>
 #include <OMX_Component.h>
 #include <OMX_Extension_video_TI.h>
-#if defined(SOC_J721S2) || defined(SOC_J784S4)
+#if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
 #include <OMX_Extension_index_TI.h>
-#endif /* SOC_J721S2 or SOC_J784S4 */
+#endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
 
 #include <utils/openmax_wrapper/include/omax_wrapper.h>
 
