@@ -547,6 +547,11 @@ int32_t appInit()
     status = appMemInit(&mem_init_prm);
     APP_ASSERT_SUCCESS(status);
 
+    #ifdef ENABLE_ETHFW
+    status = appEthFwInit();
+    APP_ASSERT_SUCCESS(status);
+    #endif
+    
     #ifdef ENABLE_IPC
     status = appIpcInit(&ipc_init_prm);
     APP_ASSERT_SUCCESS(status);
@@ -599,8 +604,6 @@ int32_t appInit()
     #endif
 
     #ifdef ENABLE_ETHFW
-    status = appEthFwInit();
-    APP_ASSERT_SUCCESS(status);
     status = appEthFwRemoteServerInit();
     APP_ASSERT_SUCCESS(status);
 
