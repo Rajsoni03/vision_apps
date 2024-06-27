@@ -23,6 +23,12 @@ IDIRS       += $(TIDL_PATH)/arm-tidl/rt/inc
 IDIRS       += $(TIOVX_PATH)/kernels/ivision/include
 IDIRS       += $(VXLIB_PATH)/packages
 
+ifeq ($(RTOS_SDK), mcu_plus_sdk)
+  IDIRS       += $(MCU_PLUS_SDK_PATH)/source/drivers/vhwa
+else
+  IDIRS       += $(PDK_PATH)/packages/ti/drv/vhwa
+endif
+
 ifeq ($(TARGET_CPU), x86_64)
 ifeq ($(SOC),am62a)
 SKIPBUILD=1
