@@ -856,6 +856,16 @@ static void EthApp_initLwip(void *arg)
 static void EthApp_initNetif(void)
 {
     ip4_addr_t ipaddr, netmask, gw;
+#if LWIP_CHECKSUM_CTRL_PER_NETIF
+    uint32_t chksumFlags = NETIF_CHECKSUM_ENABLE_ALL;
+/* Disable checksum in software if CPSW can do it (i.e. not impacted by errata) */
+#if !defined(ETHFW_CPSW_MULTIHOST_CHECKSUM_ERRATA)
+    chksumFlags &= ~(NETIF_CHECKSUM_GEN_UDP |
+                    NETIF_CHECKSUM_GEN_TCP |
+                    NETIF_CHECKSUM_CHECK_TCP |
+                    NETIF_CHECKSUM_CHECK_UDP);
+#endif
+#endif
 #if ETHAPP_LWIP_USE_DHCP
     err_t err;
 #endif
@@ -876,6 +886,9 @@ static void EthApp_initNetif(void)
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH)
     /* Create Enet LLD ethernet interface */
     netif_add(&netif, NULL, NULL, NULL, NULL, LWIPIF_LWIP_init, tcpip_input);
+#if LWIP_CHECKSUM_CTRL_PER_NETIF
+    NETIF_SET_CHECKSUM_CTRL(&netif, chksumFlags);
+#endif
 
     /* Create inter-core virtual ethernet interface: MCU2_0 <-> MCU2_1 */
     netif_add(&netif_ic[ETHAPP_NETIF_IC_MCU2_0_MCU2_1_IDX], NULL, NULL, NULL,
@@ -899,17 +912,26 @@ static void EthApp_initNetif(void)
     bridgeif_add_port(&netif_bridge, &netif);
     gEthApp_lwipBridgePortIdMap[IPC_MCU2_0] = ETHAPP_BRIDGEIF_CPU_PORT_ID;
 
-    bridgeif_add_port(&netif_bridge, &netif_ic[0]);
+    bridgeif_add_port(&netif_bridge, &netif_ic[ETHAPP_NETIF_IC_MCU2_0_MCU2_1_IDX]);
     gEthApp_lwipBridgePortIdMap[IPC_MCU2_1] = ETHAPP_BRIDGEIF_PORT1_ID;
 
-    bridgeif_add_port(&netif_bridge, &netif_ic[1]);
+    bridgeif_add_port(&netif_bridge, &netif_ic[ETHAPP_NETIF_IC_MCU2_0_A72_IDX]);
     gEthApp_lwipBridgePortIdMap[IPC_MPU1_0] = ETHAPP_BRIDGEIF_PORT2_ID;
 
     /* Set bridge interface as the default */
     netif_set_default(&netif_bridge);
+
+#if LWIP_CHECKSUM_CTRL_PER_NETIF
+    NETIF_SET_CHECKSUM_CTRL(&netif_bridge, chksumFlags);
+    NETIF_SET_CHECKSUM_CTRL(&netif_ic[ETHAPP_NETIF_IC_MCU2_0_MCU2_1_IDX], chksumFlags);
+    NETIF_SET_CHECKSUM_CTRL(&netif_ic[ETHAPP_NETIF_IC_MCU2_0_A72_IDX], chksumFlags);
+#endif
 #else
     netif_add(&netif, &ipaddr, &netmask, &gw, NULL, LWIPIF_LWIP_init, tcpip_input);
     netif_set_default(&netif);
+#if LWIP_CHECKSUM_CTRL_PER_NETIF
+    NETIF_SET_CHECKSUM_CTRL(&netif, chksumFlags);
+#endif
 #endif
 
     netif_set_status_callback(netif_default, EthApp_netifStatusCb);
