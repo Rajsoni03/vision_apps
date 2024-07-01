@@ -359,9 +359,6 @@ static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
                                         uint16_t vlanId,
                                         uint8_t hostId);
 
-/* Array to store coreId to lwip bridge portId map */
-static uint8_t gEthApp_lwipBridgePortIdMap[IPC_MAX_PROCS];
-
 /* Shared multicast address table */
 typedef struct
 {
@@ -420,6 +417,11 @@ static EthFwMcast_McastCfg gEthApp_sharedMcastCfgTable[] =
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
 };
+#endif
+
+#if defined(ETHAPP_ENABLE_INTERCORE_ETH)
+/* Array to store coreId to lwip bridge portId map */
+static uint8_t gEthApp_lwipBridgePortIdMap[IPC_MAX_PROCS];
 
 static bridgeif_portmask_t gEthApp_bridgePortMask[ARRAY_SIZE(gEthApp_sharedMcastCfgTable)];
 #endif
