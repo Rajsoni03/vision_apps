@@ -100,7 +100,7 @@ typedef struct {
     AEWBObj       aewbObj1;
     LDCObj        ldcObj1;
     ImgMosaicObj  imgMosaicObj;
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     DisplayObj    displayObj;
 #endif
 
@@ -171,7 +171,7 @@ static void app_pipeline_params_defaults(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh, ObjArrSplitObj *objArrSplitObj, int32_t enable_split_graph);
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
 #endif
 
@@ -708,7 +708,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
             else
             if(strcmp(token, "display_option")==0)
             {
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
@@ -990,7 +990,7 @@ vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
 static vx_status app_init(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     app_grpx_init_prms_t grpx_prms;
 #endif
 
@@ -1092,7 +1092,7 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("Img Mosaic init done!\n");
     }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     if (status == VX_SUCCESS)
     {
         status = app_init_display(obj->context, &obj->displayObj, "display_obj");
@@ -1163,7 +1163,7 @@ static void app_deinit(AppObj *obj)
         APP_PRINTF("Img Mosaic deinit done!\n");
     }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     app_deinit_display(&obj->displayObj);
     APP_PRINTF("Display deinit done!\n");
 
@@ -1227,7 +1227,7 @@ static void app_delete_graph(AppObj *obj)
     app_delete_img_mosaic(&obj->imgMosaicObj);
     APP_PRINTF("Img Mosaic delete done!\n");
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     app_delete_display(&obj->displayObj);
     APP_PRINTF("Display delete done!\n");
 #endif
@@ -1452,7 +1452,7 @@ static vx_status app_create_graph(AppObj *obj)
         obj->gDisplayInImage = (vx_image)vxGetObjectArrayItem(obj->captureObj.raw_image_arr[0], 0);
     }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     if(status == VX_SUCCESS)
     {
         status = app_create_graph_display(obj->graph, &obj->displayObj, obj->gDisplayInImage);
@@ -1792,7 +1792,7 @@ static vx_status app_run_graph(AppObj *obj)
     return status;
 }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
 static void set_display_defaults(DisplayObj *displayObj)
 {
     displayObj->display_option = 1;
@@ -1823,7 +1823,7 @@ static void app_default_param_set(AppObj *obj)
 {
     set_sensor_defaults(&obj->sensorObj);
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     set_display_defaults(&obj->displayObj);
 #endif
 
@@ -1955,7 +1955,7 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
     vxReleaseParameter(&parameter);
 }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
     appGrpxDrawDefault(handle, draw2dBufInfo, update_type);

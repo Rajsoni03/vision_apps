@@ -1014,13 +1014,13 @@ Sensor driver does not support metadata yet.
             obj->display_params.posY = 0U;
         }
 #endif
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
         obj->display_param_obj = vxCreateUserDataObject(obj->context, "tivx_display_params_t", sizeof(tivx_display_params_t), &obj->display_params);
         obj->displayNode = tivxDisplayNode(obj->graph, obj->display_param_obj, obj->display_image);
 #endif
     }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
 #ifdef VPAC3
     /* Check if display_image_MV is not NULL and create display node */
     if (obj->vpac3_dual_fcp_enable == 1U)
@@ -1056,7 +1056,8 @@ Sensor driver does not support metadata yet.
         }
     }
 #endif
-#endif //if !defined(SOC_AM62A) && !defined(QNX)
+#endif /* #if !(defined(SOC_AM62A) && defined(QNX)) */
+
     int graph_parameter_num = 0;
 
     /* input @ node index 1, becomes graph parameter 0 */
