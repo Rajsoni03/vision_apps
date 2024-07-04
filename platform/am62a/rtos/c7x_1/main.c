@@ -98,6 +98,10 @@
 #include <soc.h>
 #include <ClockP.h>
 #include <SystemP.h>
+#include "ti_drivers_config.h"
+#include "ti_board_config.h"
+#include "ti_drivers_open_close.h"
+#include "ti_board_open_close.h"
 #endif
 #else
 #include <ti/sysbios/family/c7x/Cache.h>
@@ -109,11 +113,10 @@
 
 #if (defined (MCU_PLUS_SDK))
 
-extern void vTaskStartScheduler( void );
+extern MmuP_Config gMmuConfig;
+extern MmuP_RegionConfig gMmuRegionConfig[];
 
-#define TIMER2_CLOCK_SRC_MUX_ADDR (0x1081B8u)
-#define TIMER2_CLOCK_SRC_MCU_HFOSC0 (0x0u)
-#define TIMER2_BASE_ADDR     (0x2420000u)
+extern void vTaskStartScheduler( void );
 
 void IpcNotify_getConfig(IpcNotify_InterruptConfig **interruptConfig, uint32_t *interruptConfigNum)
 {
@@ -123,21 +126,6 @@ void IpcNotify_getConfig(IpcNotify_InterruptConfig **interruptConfig, uint32_t *
 
     *interruptConfig = &gIpcNotifyInterruptConfig_c75ss0_0[0];
     *interruptConfigNum = gIpcNotifyInterruptConfigNum_c75ss0_0;
-}
-ClockP_Config gClockConfig = {
-    .timerBaseAddr = TIMER2_BASE_ADDR,
-    .timerHwiIntNum = 10,
-    .eventId = 378,
-    .timerInputClkHz = 25000000,
-    .timerInputPreScaler = 1,
-    .usecPerTick = 1000,
-};
-
-/* ----------- DebugP ----------- */
-void putchar_(char character)
-{
-    /* Output to CCS console */
-    putchar(character);    
 }
 #endif 
 
@@ -161,6 +149,9 @@ static void setC7xSnoopCfgReg()
 
 static void appMain(void* arg0, void* arg1)
 {
+    Drivers_open();
+    Board_driversOpen();
+
     appUtilsTaskInit();
     appInit();
     appRun();
@@ -255,16 +246,8 @@ int main(void)
 
     StartupEmulatorWaitFxn();
 
-#if !defined(MCU_PLUS_SDK)
-    OS_init();
-#else
-    /* set timer clock source */
-    SOC_controlModuleUnlockMMR(SOC_DOMAIN_ID_MAIN, 2);
-    *(volatile uint32_t*)(TIMER2_CLOCK_SRC_MUX_ADDR) = TIMER2_CLOCK_SRC_MCU_HFOSC0;
-    SOC_controlModuleLockMMR(SOC_DOMAIN_ID_MAIN, 2);
-    /* initialize Clock */
-    ClockP_init();
-#endif
+    System_init();
+    Board_init(); 
 
     appC75ClecInitDru();
 
@@ -296,318 +279,6 @@ int main(void)
 
 uint32_t g_app_rtos_c7x_mmu_map_error = 0;
 
-void appMmuMap(Bool is_secure)
-{
-
-#if !defined(MCU_PLUS_SDK)
-    Bool            retVal;
-    Mmu_MapAttrs    attrs;
-
-    uint32_t ns = 1;
-
-    if(is_secure)
-        ns = 0;
-    else
-        ns = 1;
-
-    Mmu_initMapAttrs(&attrs);
-
-    attrs.attrIndx = Mmu_AttrIndx_MAIR0;
-    attrs.ns = ns;
-
-    retVal = Mmu_map(0x00000000, 0x00000000, 0x20000000, &attrs, is_secure);
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(0x20000000, 0x20000000, 0x20000000, &attrs, is_secure);
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(0x40000000, 0x40000000, 0x20000000, &attrs, is_secure);
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(0x60000000, 0x60000000, 0x10000000, &attrs, is_secure);
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(0x70000000, 0x70000000, 0x10000000, &attrs, is_secure);
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(0x7C200000U, 0x7C200000U, 0x00100000U, &attrs, is_secure); /* CLEC */
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(0x7C400000U, 0x7C400000U, 0x00100000U, &attrs, is_secure); /* DRU */
-    if(retVal==UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    Mmu_initMapAttrs(&attrs);
-
-    attrs.attrIndx = Mmu_AttrIndx_MAIR4;
-    attrs.ns = ns;
-
-    retVal = Mmu_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(IPC_VRING_MEM_ADDR, IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-	retVal = Mmu_map(DDR_C7x_1_IPC_ADDR, DDR_C7x_1_IPC_ADDR, 2*DDR_C7x_1_IPC_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    Mmu_initMapAttrs(&attrs);
-    attrs.attrIndx = Mmu_AttrIndx_MAIR7;
-    attrs.ns = ns;
-
-    retVal = Mmu_map(L2RAM_C7x_1_MAIN_ADDR, L2RAM_C7x_1_MAIN_ADDR, 0x01000000, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(L2RAM_C7x_1_AUX_ADDR, L2RAM_C7x_1_AUX_ADDR, 0x01000000, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure);
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-mmu_exit:
-    if(retVal == UFALSE)
-    {
-        g_app_rtos_c7x_mmu_map_error++;
-    }
-#else
-
-    int32_t retVal;
-    MmuP_MapAttrs    attrs;
-
-    MmuP_MapAttrs_init(&attrs);
-
-    attrs.attrIndx = MMUP_ATTRINDX_MAIR0;
-
-    retVal = MmuP_map(0x00000000, 0x00000000, 0x20000000, &attrs);
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(0x20000000, 0x20000000, 0x20000000, &attrs);
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(0x40000000, 0x40000000, 0x20000000, &attrs);
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(0x60000000, 0x60000000, 0x10000000, &attrs);
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(0x70000000, 0x70000000, 0x10000000, &attrs);
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(0x7C200000U, 0x7C200000U, 0x00100000U, &attrs); /* CLEC */
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(0x7C400000U, 0x7C400000U, 0x00100000U, &attrs); /* DRU */
-    if(retVal==SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    MmuP_MapAttrs_init(&attrs);
-    attrs.attrIndx = MMUP_ATTRINDX_MAIR0;
-
-    retVal = MmuP_map(L2RAM_C7x_1_MAIN_ADDR, L2RAM_C7x_1_MAIN_ADDR, 0x01000000, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-    retVal = MmuP_map(L2RAM_C7x_1_AUX_ADDR, L2RAM_C7x_1_AUX_ADDR, 0x01000000, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-    attrs.attrIndx = MMUP_ATTRINDX_MAIR7;
-
-
-    retVal = MmuP_map(DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_ADDR, DDR_C7x_1_DTS_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_ADDR, DDR_SHARED_MEM_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_ADDR, DDR_C7X_1_LOCAL_HEAP_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    MmuP_MapAttrs_init(&attrs);
-
-    attrs.attrIndx = MMUP_ATTRINDX_MAIR4;
-
-    retVal = MmuP_map(APP_LOG_MEM_ADDR, APP_LOG_MEM_ADDR, APP_LOG_MEM_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_ADDR, APP_FILEIO_MEM_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_ADDR, TIOVX_OBJ_DESC_MEM_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(IPC_VRING_MEM_ADDR, IPC_VRING_MEM_ADDR, IPC_VRING_MEM_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-	retVal = MmuP_map(DDR_C7x_1_IPC_ADDR, DDR_C7x_1_IPC_ADDR, 2*DDR_C7x_1_IPC_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_ADDR, TIOVX_LOG_RT_MEM_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = MmuP_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs);
-    if(retVal == SystemP_FAILURE)
-    {
-        goto mmu_exit;
-    }
-
-mmu_exit:
-    if(retVal == SystemP_FAILURE)
-    {
-        g_app_rtos_c7x_mmu_map_error++;
-    }
-#endif
-
-    return;
-}
-
 void appCacheInit()
 {
     /* Going with default cache setting on reset */
@@ -620,17 +291,17 @@ void appCacheInit()
 
 }
 
-#if !defined(MCU_PLUS_SDK)
-void InitMmu(void)
-#else
 void MmuP_setConfig(void)
-#endif
 {
-    /* This is for debug purpose - see the description of function header */
-    g_app_rtos_c7x_mmu_map_error = 0;
+    uint32_t i;
+	int32_t status;
 
-    /* There is no secure mode in C7504 */
-    appMmuMap(UFALSE);
+	for(i = 0; i < gMmuConfig.numRegions; i++)
+	{
+		status = MmuP_map(gMmuRegionConfig[i].vaddr, gMmuRegionConfig[i].paddr,
+						gMmuRegionConfig[i].size, &gMmuRegionConfig[i].attr);
+        DebugP_assertNoLog(status == SystemP_SUCCESS);
+	}
 
     /* Initialize clec */
     HwiP_configClecAccessCtrl();
