@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2018-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -187,12 +187,14 @@ int32_t appGrpxInit(app_grpx_init_prms_t *prm)
     }
     if(status==VX_SUCCESS)
     {
+#if !(defined(SOC_AM62A) && defined(QNX))
         obj->disp_node = tivxDisplayNode(obj->disp_graph, obj->disp_config, obj->disp_image);
         status = vxGetStatus((vx_reference)obj->disp_node);
         if(status!=VX_SUCCESS)
         {
             printf("GRPX: ERROR: Unable to create vx_node for graphics !!!\n");
         }
+#endif
     }
     if(status==VX_SUCCESS)
     {

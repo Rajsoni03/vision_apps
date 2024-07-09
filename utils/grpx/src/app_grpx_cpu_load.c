@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2018-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -184,6 +184,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                           );
                 break;
             #endif
+            #if !defined(SOC_AM62A)
             case APP_IPC_CPU_MCU2_0:
                 snprintf(string1, APP_GRPX_STRING_MAX,
                           "%3s",
@@ -225,6 +226,7 @@ int32_t appGrpxDrawCpuLoad(app_grpx_obj_t *obj,
                           "3-1"
                           );
                 break;
+            #endif
             #endif
             #if defined(SOC_J784S4)
             case APP_IPC_CPU_MCU4_0:

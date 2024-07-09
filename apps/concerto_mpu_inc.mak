@@ -190,6 +190,8 @@ ifeq ($(TARGET_PLATFORM)$(TARGET_OS), AM62AQNX)
 VISION_APPS_UTILS_LIBS += app_utils_udma
 VISION_APPS_UTILS_LIBS += app_utils_sensors
 VISION_APPS_UTILS_LIBS += app_utils_iss
+VISION_APPS_UTILS_LIBS += app_utils_grpx
+VISION_APPS_UTILS_LIBS += app_utils_draw2d
 endif
 
 VISION_APPS_UTILS_LIBS += app_utils_hwa

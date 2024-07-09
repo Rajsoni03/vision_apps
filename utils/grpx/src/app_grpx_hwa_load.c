@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2018-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -182,7 +182,11 @@ void appGrpxGetHwaLoad(app_grpx_obj_t *obj)
         obj->hwa_perf[hwa_id] = 0;
     }
 
+    #if defined(SOC_AM62A)
+    status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU1_0, &hwa_load);
+    #else
     status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU2_0, &hwa_load);
+    #endif
     if(status==0)
     {
         for(hwa_id=(app_perf_hwa_id_t)0; hwa_id<APP_PERF_HWA_MAX; hwa_id++)
