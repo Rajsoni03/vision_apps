@@ -39,6 +39,7 @@ ifeq ($(BUILD_QNX_MPU),yes)
 	DIRECTORIES += apps/basic_demos/app_multi_cam
 	DIRECTORIES += apps/basic_demos/app_multi_cam_codec
 	DIRECTORIES += apps/dl_demos/app_tidl
+	DIRECTORIES += apps/dl_demos/app_tidl_cam
 endif
 else
 DIRECTORIES += utils

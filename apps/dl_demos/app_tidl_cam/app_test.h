@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -141,7 +141,7 @@ static void print_new_checksum_structs()
     printf("};\n\n");
 }
 
-
+#if !(defined(SOC_AM62A) && defined(QNX))
 static void populate_gatherer(vx_uint32 set_idx, vx_uint32 sample_idx, vx_uint32 calculated_checksum)
 {
     checksums_gatherer[set_idx][sample_idx] = calculated_checksum;
@@ -213,3 +213,4 @@ static vx_bool app_test_check_object(vx_user_data_object obj, vx_uint32 size,
     }
     return result;
 }
+#endif

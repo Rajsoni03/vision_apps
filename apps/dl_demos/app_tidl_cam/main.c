@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -81,9 +81,19 @@
 #include "app_img_mosaic_module.h"
 #include "app_display_module.h"
 #include "app_test.h"
+#if defined(SOC_AM62A) && defined(QNX)
+#include <screen/screen.h>
+#endif
 
 #define APP_BUFFER_Q_DEPTH   (4)
 #define APP_PIPELINE_DEPTH   (7)
+
+#if defined(SOC_AM62A) && defined(QNX)
+/*AM62A: QNX to use screen package for displaying frames on A53*/
+#include <screen/screen.h>
+screen_context_t screen_ctx = NULL;
+screen_window_t screen_win = NULL;
+#endif
 
 typedef struct {
 
@@ -128,13 +138,19 @@ typedef struct {
     int32_t dequeueCnt;
 
     int32_t write_file;
-
+#if defined(SOC_AM62A) && defined(QNX)
+    tivx_task screen_task;
+    uint32_t stop_screen_task;
+    uint32_t stop_screen_task_done;
+#endif
 } AppObj;
 
 AppObj gAppObj;
+#if !(defined(SOC_AM62A) && defined(QNX))
 vx_uint8 g_update_result;
 vx_uint8 g_num_top_results;
 vx_uint32 g_classid[TIVX_OC_MAX_CLASSES];
+#endif
 
 extern const char imgnet_labels[1001][256];
 
@@ -151,8 +167,189 @@ static void app_update_param_set(AppObj *obj);
 static void app_pipeline_params_defaults(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static void set_img_mosaic_params(AppObj *obj, ImgMosaicObj *imgMosaicObj);
+#if !(defined(SOC_AM62A) && defined(QNX))
 #ifndef x86_64
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
+#endif
+#endif
+
+#if defined(SOC_AM62A) && defined(QNX)
+int32_t app_run_screen(AppObj *obj)
+{
+    int32_t err = 0;
+    int usage = SCREEN_USAGE_READ | SCREEN_USAGE_WRITE;
+    int screenFormat = SCREEN_FORMAT_NV12;
+    screen_context_t screen_ctx = NULL;
+    screen_window_t screen_win = NULL;
+    vx_uint32 width, height;
+    vx_df_image df;
+    vx_imagepatch_addressing_t image_addr;
+    vx_rectangle_t rect;
+    vx_map_id map_id1, map_id2;
+    void *data_ptr1 = NULL, *data_ptr2 = NULL;
+    vx_uint32 num_bytes_per_4pixels;
+    vx_uint32 imgaddr_width, imgaddr_height, imgaddr_stride;
+    uint32_t i;
+
+    /* connect to screen */
+    err = screen_create_context(&screen_ctx, SCREEN_APPLICATION_CONTEXT);
+    if(err != 0) {
+        printf("Failed to create screen context\n");
+    }
+
+    /* create a window */
+    err = screen_create_window(&screen_win, screen_ctx);
+    if(err != 0) {
+        printf("Failed to create screen window\n");
+    }
+
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_USAGE, &usage);
+    if(err != 0) {
+        printf("Failed to set usage property\n");
+    }
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_FORMAT, &screenFormat);
+    if(err != 0) {
+        printf("Failed to set format prpoerty\n");
+    }
+
+    /* create screen buffers */
+    int nbuffers = 2;
+    err = screen_create_window_buffers(screen_win, nbuffers);
+    if(err != 0) {
+        printf("Failed to create window buffer\n");
+    }
+
+    while(1) {
+        int buffer_size[2];
+        err = screen_get_window_property_iv(screen_win, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size);
+        if(err != 0) {
+            printf("Failed to get window buffer size\n");
+        }
+
+        screen_buffer_t screen_buf[2];
+        err = screen_get_window_property_pv(screen_win, SCREEN_PROPERTY_RENDER_BUFFERS, (void **)&screen_buf);
+        if(err != 0) {
+            printf("Failed to get window buffer\n");
+        }
+
+        /* obtain pointers to the buffers */
+        void *ptr1 = NULL;
+        err = screen_get_buffer_property_pv(screen_buf[0], SCREEN_PROPERTY_POINTER, (void **)&ptr1);
+        if(err != 0) {
+            printf("Failed to get buffer pointer\n");
+        }
+
+        int buf_stride1 = 0;
+        err = screen_get_buffer_property_iv(screen_buf[0], SCREEN_PROPERTY_STRIDE, &buf_stride1);
+        if(err != 0) {
+           printf("Failed to get buffer stride1\n");
+        }
+
+        /* copy frames from OVX buffer to screen buffer*/
+        vx_image display_image = (vx_image)vxGetObjectArrayItem((vx_object_array)obj->postProcObj.output_arr[0], 0);
+        vxQueryImage(display_image, VX_IMAGE_WIDTH, &width, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_FORMAT, &df, sizeof(vx_df_image));
+
+        if(VX_DF_IMAGE_NV12 == df)
+        {
+            num_bytes_per_4pixels = 4;
+        }
+        else if(TIVX_DF_IMAGE_NV12_P12 == df)
+        {
+            num_bytes_per_4pixels = 6;
+        }
+        else
+        {
+            num_bytes_per_4pixels = 8;
+        }
+
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = width;
+        rect.end_y = height;
+
+        if (0 == strcmp(obj->sensorObj.sensor_name, SENSOR_OV2312_UB953_LI))
+        {
+            /*OV2312 raw frame has 1600 width, moving the frame to middle of 1920 width display*/
+            ptr1 += (1920-1600)/2;
+            rect.end_x = 1600;
+            memset(ptr1, 0x00000000, buffer_size[0]*buffer_size[1]);
+        }
+
+        vxMapImagePatch(display_image,
+            &rect,
+            0,
+            &map_id1,
+            &image_addr,
+            &data_ptr1,
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            VX_NOGAP_X
+            );
+
+        if(!data_ptr1)
+        {
+            printf("data_ptr1 is NULL \n");
+            return -1;
+        }
+
+        imgaddr_width  = image_addr.dim_x;
+        imgaddr_height = image_addr.dim_y;
+        imgaddr_stride = image_addr.stride_y;
+
+        for(i=0;i<height;i++)
+        {
+            memcpy(ptr1, data_ptr1, imgaddr_width*num_bytes_per_4pixels/4);
+            data_ptr1 += imgaddr_stride;
+            ptr1 += (buf_stride1);
+        }
+        vxUnmapImagePatch(display_image, map_id1);
+
+        if(VX_DF_IMAGE_NV12 == df || TIVX_DF_IMAGE_NV12_P12 == df)
+        {
+            vxMapImagePatch(display_image,
+                &rect,
+                1,
+                &map_id2,
+                &image_addr,
+                &data_ptr2,
+                VX_WRITE_ONLY,
+                VX_MEMORY_TYPE_HOST,
+                VX_NOGAP_X
+                );
+
+            if(!data_ptr2)
+            {
+                printf("data_ptr2 is NULL \n");
+                return -1;
+            }
+
+            imgaddr_width  = image_addr.dim_x;
+            imgaddr_height = image_addr.dim_y;
+            imgaddr_stride = image_addr.stride_y;
+
+            for(i=0;i<imgaddr_height/2;i++)
+            {
+                memcpy(ptr1, data_ptr2, imgaddr_width*num_bytes_per_4pixels/4);
+                data_ptr2 += imgaddr_stride;
+                ptr1 += buf_stride1;
+            }
+            vxUnmapImagePatch(display_image, map_id2);
+        }
+
+        err = screen_post_window(screen_win, screen_buf[0], 0, NULL, 0);
+        if(err != 0) {
+            printf("Failed to post window\n");
+        }
+
+        if(obj->stop_screen_task == 1) {
+            break;
+        }
+    }
+
+    return err;
+}
 #endif
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
@@ -221,6 +418,45 @@ static void app_run_task_delete(AppObj *obj)
     tivxTaskDelete(&obj->task);
 }
 
+#if defined(SOC_AM62A) && defined(QNX)
+static void app_run_screen_task(void *app_var)
+{
+    AppObj *obj = (AppObj *)app_var;
+
+    app_run_screen(obj);
+
+    obj->stop_screen_task_done = 1; 
+}
+
+static int32_t app_screen_task_create(AppObj *obj)
+{
+    tivx_task_create_params_t params;
+    int32_t status;
+
+    tivxTaskSetDefaultCreateParams(&params);
+    params.task_main = app_run_screen_task;
+    params.app_var = obj;
+
+    obj->stop_screen_task_done = 0;
+    obj->stop_screen_task = 0;
+    status = tivxTaskCreate(&obj->screen_task, &params);
+
+    return status;
+}
+
+static void app_run_screen_task_delete(AppObj *obj)
+{
+    while(obj->stop_screen_task_done==0)
+    {
+         tivxTaskWaitMsecs(100);
+    }
+
+    screen_destroy_window(screen_win);
+    screen_destroy_context(screen_ctx);
+    tivxTaskDelete(&obj->screen_task);
+}
+#endif
+
 static vx_status app_run_graph_interactive(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
@@ -278,11 +514,17 @@ static vx_status app_run_graph_interactive(AppObj *obj)
 #endif
                 case 'x':
                     obj->stop_task = 1;
+#if defined(SOC_AM62A) && defined(QNX)
+                    obj->stop_screen_task = 1;
+#endif
                     done = 1;
                     break;
             }
         }
         app_run_task_delete(obj);
+#if defined(SOC_AM62A) && defined(QNX)
+        app_run_screen_task_delete(obj);
+#endif
     }
     return status;
 }
@@ -372,6 +614,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     strcpy(obj->tidlObj.network_file_path, token);
                 }
             }
+#if !(defined(SOC_AM62A) && defined(QNX))
             else
             if(strcmp(token, "num_top_results")==0)
             {
@@ -384,6 +627,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 g_num_top_results = obj->postProcObj.params.num_top_results;
                 printf("g_num_top_results %d\n", g_num_top_results);
             }
+#endif
             else
             if(strcmp(token, "test_mode")==0)
             {
@@ -645,7 +889,9 @@ vx_status app_tidl_cam_main(vx_int32 argc, vx_char* argv[])
 static vx_status app_init(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
+#if !(defined(SOC_AM62A) && defined(QNX))
     app_grpx_init_prms_t grpx_prms;
+#endif
 
     /* Create OpenVx Context */
     obj->context = vxCreateContext();
@@ -660,7 +906,11 @@ static vx_status app_init(AppObj *obj)
         tivxHwaLoadKernels(obj->context);
         tivxVideoIOLoadKernels(obj->context);
         tivxImagingLoadKernels(obj->context);
+#if defined(SOC_AM62A) && defined(QNX)
+        tivxEdgeaiImgProcLoadKernels(obj->context);
+#else
         tivxImgProcLoadKernels(obj->context);
+#endif
         tivxTIDLLoadKernels(obj->context);
         tivxFileIOLoadKernels(obj->context);
         APP_PRINTF("Kernel loading done!\n");
@@ -754,13 +1004,15 @@ static vx_status app_init(AppObj *obj)
         status = app_init_display(obj->context, &obj->displayObj, "display_obj");
         APP_PRINTF("Display init done!\n");
     }
-    #ifndef x86_64
+    #if !(defined(SOC_AM62A) && defined(QNX))
+    #ifndef x86_64 
     if(obj->displayObj.display_option == 1)
     {
         appGrpxInitParamsInit(&grpx_prms, obj->context);
         grpx_prms.draw_callback = app_draw_graphics;
         appGrpxInit(&grpx_prms);
     }
+    #endif
     #endif
 
     appPerfPointSetName(&obj->total_perf , "TOTAL");
@@ -815,7 +1067,11 @@ static void app_deinit(AppObj *obj)
     tivxHwaUnLoadKernels(obj->context);
     tivxVideoIOUnLoadKernels(obj->context);
     tivxImagingUnLoadKernels(obj->context);
+#if defined(SOC_AM62A) && defined(QNX)
+    tivxEdgeaiImgProcUnLoadKernels(obj->context);
+#else
     tivxImgProcUnLoadKernels(obj->context);
+#endif
     tivxFileIOUnLoadKernels(obj->context);
     APP_PRINTF("Kernels unload done!\n");
 
@@ -919,7 +1175,11 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
+#if defined(SOC_AM62A) && defined(QNX)
+        status = app_create_graph_post_proc(obj->graph, &obj->postProcObj, obj->tidlObj.out_args_arr, obj->tidlObj.output_tensor_arr[0], obj->ldcObj.output_arr);
+#else
         status = app_create_graph_post_proc(obj->graph, &obj->postProcObj, obj->tidlObj.out_args_arr, obj->tidlObj.output_tensor_arr[0]);
+#endif
         APP_PRINTF("Post proc graph done!\n");
     }
 
@@ -936,8 +1196,10 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
+#if !(defined(SOC_AM62A) && defined(QNX))
         status = app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);
         APP_PRINTF("Display graph done!\n");
+#endif
     }
 
     if(status == VX_SUCCESS)
@@ -949,13 +1211,15 @@ static vx_status app_create_graph(AppObj *obj)
         graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
         graph_parameters_queue_params_list[graph_parameter_index].refs_list = (vx_reference*)&obj->captureObj.raw_image_arr[0];
         graph_parameter_index++;
-
+		
+#if !(defined(SOC_AM62A) && defined(QNX))
         add_graph_parameter_by_node_index(obj->graph, obj->postProcObj.node, 3);
         obj->postProcObj.graph_parameter_index = graph_parameter_index;
         graph_parameters_queue_params_list[graph_parameter_index].graph_parameter_index = graph_parameter_index;
         graph_parameters_queue_params_list[graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
         graph_parameters_queue_params_list[graph_parameter_index].refs_list = (vx_reference*)&obj->postProcObj.results[0];
         graph_parameter_index++;
+#endif        
 
         if(obj->test_mode == 1)
         {
@@ -1062,16 +1326,20 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     appPerfPointBegin(&obj->total_perf);
 
     CaptureObj *captureObj = &obj->captureObj;
+#if !(defined(SOC_AM62A) && defined(QNX))
     PostProcObj *postProcObj = &obj->postProcObj;
+#endif
     ImgMosaicObj *imgMosaicObj = &obj->imgMosaicObj;
 
     if(obj->pipeline < 0)
     {
         /* Enqueue inputs during pipeup dont execute */
+#if !(defined(SOC_AM62A) && defined(QNX))
         if(status == VX_SUCCESS)
         {
             status = vxGraphParameterEnqueueReadyRef(obj->graph, postProcObj->graph_parameter_index, (vx_reference*)&postProcObj->results[obj->enqueueCnt], 1);
         }
+#endif
         if(status == VX_SUCCESS)
         {
             status = vxGraphParameterEnqueueReadyRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&captureObj->raw_image_arr[obj->enqueueCnt], 1);
@@ -1087,10 +1355,12 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 
     if(obj->pipeline == 0)
     {
+#if !(defined(SOC_AM62A) && defined(QNX))
         if(status == VX_SUCCESS)
         {
             status = vxGraphParameterEnqueueReadyRef(obj->graph, postProcObj->graph_parameter_index, (vx_reference*)&postProcObj->results[obj->enqueueCnt], 1);
         }
+#endif
         /* Execute 1st frame */
         if(status == VX_SUCCESS)
         {
@@ -1108,7 +1378,9 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     if(obj->pipeline > 0)
     {
         vx_image capture_input_image;
+#if !(defined(SOC_AM62A) && defined(QNX))
         vx_user_data_object results;
+#endif
         uint32_t num_refs;
         vx_image test_output;
 
@@ -1117,6 +1389,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         {
             status = vxGraphParameterDequeueDoneRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_image, 1, &num_refs);
         }
+#if !defined(SOC_AM62A) && !defined(QNX)
         /* Dequeue output */
         if(status == VX_SUCCESS)
         {
@@ -1143,10 +1416,12 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
                 g_update_result = 1;
             }
         }
+#endif
         if((status == VX_SUCCESS) && (obj->test_mode == 1))
         {
             status = vxGraphParameterDequeueDoneRef(obj->graph, imgMosaicObj->graph_parameter_index, (vx_reference*)&test_output, 1, &num_refs);
         }
+#if !defined(SOC_AM62A) && !defined(QNX)
         vx_uint32 expected_idx = frame_id - TEST_BUFFER;
         if((status == VX_SUCCESS) && (obj->test_mode == 1)
             && (expected_idx < (sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0])))
@@ -1173,10 +1448,12 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             populate_gatherer(0, expected_idx, img_checksum_actual);
             populate_gatherer(1, expected_idx, results_checksum_actual);
         }
+#endif
         if((status == VX_SUCCESS) && (obj->test_mode == 1))
         {
             status = vxGraphParameterEnqueueReadyRef(obj->graph, imgMosaicObj->graph_parameter_index, (vx_reference*)&test_output, 1);
         }
+#if !defined(SOC_AM62A) && !defined(QNX)
         if(status == VX_SUCCESS)
         {
             vxUnmapUserDataObject(results, map_id_results);
@@ -1187,7 +1464,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         {
             status = vxGraphParameterEnqueueReadyRef(obj->graph, postProcObj->graph_parameter_index, (vx_reference*)&results, 1);
         }
-
+#endif
         /* Enqueue input - start execution */
         if(status == VX_SUCCESS)
         {
@@ -1223,6 +1500,14 @@ static vx_status app_run_graph(AppObj *obj)
     }
     status = appStartImageSensor(sensorObj->sensor_name, ch_mask);
     APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
+
+#if defined(SOC_AM62A) && defined(QNX)
+    status = app_screen_task_create(obj);
+    if(status!=0)
+    {
+        printf("ERROR: Unable to create screen task\n");
+    }
+#endif
 
     for(frame_id = 0; frame_id < obj->num_frames_to_run; frame_id++)
     {
@@ -1262,7 +1547,9 @@ static vx_status app_run_graph(AppObj *obj)
     vxWaitGraph(obj->graph);
 
     obj->stop_task = 1;
-
+#if defined(SOC_AM62A) && defined(QNX)
+    obj->stop_screen_task = 1;
+#endif
     status = appStopImageSensor(obj->sensorObj.sensor_name, ch_mask);
 
     return status;
@@ -1376,6 +1663,7 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
     vxReleaseParameter(&parameter);
 }
 
+#if !(defined(SOC_AM62A) && defined(QNX))
 #ifndef x86_64
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
@@ -1416,4 +1704,5 @@ static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufIn
 
     return;
 }
+#endif
 #endif

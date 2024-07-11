@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017 Texas Instruments Incorporated
+ * Copyright (c) 2017-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -62,13 +62,127 @@
 
 #include "app_pre_proc_module.h"
 
+#if defined(SOC_AM62A) && defined(QNX)
+#include <vx_internal.h>
+#define EDGEAI_KERNELS_APP_MAX_TENSOR_DIMS    4
+#define CLIP_255(x) ((x)<0?0:(((x)>255)?255:(x)))
+tivxDLPreProcArmv8Params *local_preproc_config = NULL;
+#endif
+
 static void createOutputTensors(vx_context context, vx_user_data_object config, vx_tensor output_tensors[]);
 static inline vx_enum get_vx_tensor_datatype(int32_t tidl_datatype);
+
+#if defined(SOC_AM62A) && defined(QNX)
+static vx_size getTensorDataType(vx_int32 tidl_type)
+{
+    vx_size openvx_type = VX_TYPE_INVALID;
+
+    if (tidl_type == TIDL_UnsignedChar)
+    {
+        openvx_type = VX_TYPE_UINT8;
+    }
+    else if(tidl_type == TIDL_SignedChar)
+    { 
+        openvx_type = VX_TYPE_INT8;
+    }
+    else if(tidl_type == TIDL_UnsignedShort)
+    {
+        openvx_type = VX_TYPE_UINT16;
+    } 
+    else if(tidl_type == TIDL_SignedShort)
+    {
+        openvx_type = VX_TYPE_INT16;
+    }
+    else if(tidl_type == TIDL_UnsignedWord)
+    {
+        openvx_type = VX_TYPE_UINT32;
+    }
+    else if(tidl_type == TIDL_SignedWord)
+    {
+        openvx_type = VX_TYPE_INT32;
+    }
+    else if(tidl_type == TIDL_SinglePrecFloat)
+    {
+        openvx_type = VX_TYPE_FLOAT32;
+    }
+
+    return openvx_type;
+}
+
+static vx_uint32 get_bit_depth(vx_enum data_type)
+{
+    vx_uint32 size = 0;
+
+    if((data_type == VX_TYPE_UINT8) || (data_type == VX_TYPE_INT8))
+    {
+        size = sizeof(vx_uint8);
+    }
+    else if((data_type == VX_TYPE_UINT16) || (data_type == VX_TYPE_INT16))
+    {
+        size = sizeof(vx_uint16);
+    }
+    else if((data_type == VX_TYPE_UINT32) || (data_type == VX_TYPE_INT32))
+    {
+        size = sizeof(vx_uint32);
+    }
+    else if(data_type == VX_TYPE_FLOAT32)
+    {
+        size = sizeof(vx_float32);
+    }
+
+    return size;
+}
+#endif
 
 vx_status app_init_pre_proc(vx_context context, PreProcObj *preProcObj, char *objName)
 {
     vx_status status = VX_SUCCESS;
 
+#if defined(SOC_AM62A) && defined(QNX)
+    uint32_t i =0;
+    local_preproc_config = tivxMemAlloc(sizeof(tivxDLPreProcArmv8Params), TIVX_MEM_EXTERNAL);
+    if(local_preproc_config == NULL) {
+        printf("ERROR: Unable to allocate memory for local_preproc_config \n");
+        status = -1;
+        return status;
+    }
+
+    local_preproc_config->skip_flag = 0;
+    for(i = 0 ; i < 3; i++)
+    {
+        local_preproc_config->scale[i] = 1;
+        local_preproc_config->mean[i] = 0;
+    }
+    local_preproc_config->channel_order = 0; /* 0-NCHW */
+
+    sTIDL_IOBufDesc_t *ioBufDesc = &preProcObj->params.ioBufDesc;
+    vx_size data_type = getTensorDataType(ioBufDesc->inElementType[0]);
+
+    if((data_type == VX_TYPE_INT8) || (data_type == VX_TYPE_UINT8))
+    {
+        if(ioBufDesc->inDataFormat[0] == 1) {
+            local_preproc_config->tensor_format = 0; /* RGB */
+        } else {
+            local_preproc_config->tensor_format = 1; /* BGR */
+        }
+    }
+    else if((data_type == VX_TYPE_INT16) || (data_type == VX_TYPE_UINT16))
+    {
+        if(ioBufDesc->inDataFormat[0] == 1) {
+            local_preproc_config->tensor_format = 0; /* RGB */
+        } else {
+            local_preproc_config->tensor_format = 1; /* BGR */
+        }
+    }
+
+    for(i = 0 ; i < 4; i++)
+    {
+        local_preproc_config->crop[i] = 0;
+    }
+
+    preProcObj->config = vxCreateUserDataObject(context, "PreProcConfig", sizeof(tivxDLPreProcArmv8Params), local_preproc_config);
+    status = vxGetStatus((vx_reference)preProcObj->config);
+#else
     preProcObj->config = vxCreateUserDataObject(context, "PreProcConfig", sizeof(tivxOCPreProcParams), NULL);
     status = vxGetStatus((vx_reference)preProcObj->config);
 
@@ -77,6 +191,7 @@ vx_status app_init_pre_proc(vx_context context, PreProcObj *preProcObj, char *ob
         status = vxCopyUserDataObject(preProcObj->config, 0, sizeof(tivxOCPreProcParams),\
                   &preProcObj->params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
     }
+#endif
 
     if(preProcObj->en_out_pre_proc_write == 1)
     {
@@ -151,6 +266,12 @@ void app_deinit_pre_proc(PreProcObj *preProcObj)
         vxReleaseArray(&preProcObj->file_prefix);
         vxReleaseUserDataObject(&preProcObj->write_cmd);
     }
+#if defined(AM62A) && defined(QNX)
+    if (local_preproc_config)
+    {
+        tivxMemFree(local_preproc_config, sizeof(tivxDLPreProcArmv8Params), TIVX_MEM_EXTERNAL);
+    }
+#endif
 }
 
 void app_delete_pre_proc(PreProcObj *preProcObj)
@@ -172,6 +293,229 @@ vx_status app_create_graph_pre_proc(vx_graph graph, PreProcObj *preProcObj, vx_o
     vx_image  input   = (vx_image)vxGetObjectArrayItem((vx_object_array)input_arr, 0);
     vx_tensor output  = (vx_tensor)vxGetObjectArrayItem((vx_object_array)preProcObj->output_tensor_arr[0], 0);
 
+#if defined(SOC_AM62A) && defined(QNX)
+    /*For Image Classification, TIDL node expects input image resolution of 224*224*/
+    vx_uint32 in_width, in_height, dl_width, dl_height; 
+    uint32_t in_stride;
+    sTIDL_IOBufDesc_t *ioBufDesc;
+    vx_rectangle_t rect;
+    vx_df_image df;
+    vx_map_id map_id1, map_id2;
+    vx_imagepatch_addressing_t image_addr;
+    void* in_img_target_ptr[2];
+    tivx_obj_desc_tensor_t *out_tensor_desc;
+    void *out_tensor_target_ptr;
+    vx_size num_dims;
+    vx_map_id map_id;
+    vx_size start[EDGEAI_KERNELS_APP_MAX_TENSOR_DIMS];
+    vx_size tensor_strides[EDGEAI_KERNELS_APP_MAX_TENSOR_DIMS];
+    vx_size tensor_sizes[EDGEAI_KERNELS_APP_MAX_TENSOR_DIMS];
+    vx_enum data_type;
+
+    /*Exisitng width and height of input image*/
+    vxQueryImage(input, VX_IMAGE_WIDTH, &in_width, sizeof(vx_uint32));
+    vxQueryImage(input, VX_IMAGE_HEIGHT, &in_height, sizeof(vx_uint32)); 
+    vxQueryImage(input, VX_IMAGE_FORMAT, &df, sizeof(vx_df_image));
+    ioBufDesc = &preProcObj->params.ioBufDesc;
+
+    /*Required width and height for TIDL node*/
+    dl_width = ioBufDesc->inWidth[0];
+    dl_height = ioBufDesc->inHeight[0];
+
+    rect.start_x = 0;
+    rect.start_y = 0;
+    rect.end_x = in_width;
+    rect.end_y = in_height;
+
+    vxMapImagePatch(input,
+            &rect,
+            0,
+            &map_id1,
+            &image_addr,
+            &in_img_target_ptr[0],
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            VX_NOGAP_X
+            );
+
+    vxUnmapImagePatch(input, map_id1);
+    in_stride = image_addr.stride_y;
+
+    in_img_target_ptr[1]  = NULL;
+    if(VX_DF_IMAGE_NV12 == df || TIVX_DF_IMAGE_NV12_P12 == df) {
+        vxMapImagePatch(input,
+            &rect,
+            1,
+            &map_id2,
+            &image_addr,
+            &in_img_target_ptr[1],
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            VX_NOGAP_X
+            );
+    }
+    vxUnmapImagePatch(input, map_id2);
+
+    vxQueryTensor(output, VX_TENSOR_NUMBER_OF_DIMS, &num_dims, sizeof(vx_size));
+    vxQueryTensor(output, VX_TENSOR_DATA_TYPE, &data_type, sizeof(vx_enum));
+    vx_uint32 bit_depth = get_bit_depth(data_type);
+
+    vxQueryTensor(output, VX_TENSOR_DIMS, tensor_sizes, num_dims * sizeof(vx_size));
+    start[0] = start[1] = start[2] = 0;
+    tensor_strides[0] = bit_depth;
+    tensor_strides[1] = tensor_sizes[0] * tensor_strides[0];
+    tensor_strides[2] = tensor_sizes[1] * tensor_strides[1];
+
+    status = tivxMapTensorPatch(output, 
+                    num_dims, 
+                    start, 
+                    tensor_sizes, 
+                    &map_id, 
+                    tensor_strides, 
+                    &out_tensor_target_ptr, 
+                    VX_READ_ONLY, 
+                    VX_MEMORY_TYPE_HOST);
+
+    tivxUnmapTensorPatch(output, map_id);
+    out_tensor_desc = (tivx_obj_desc_tensor_t *)output->base.obj_desc;
+
+    vx_int32 out_row_stride  = out_tensor_desc->stride[1];
+    vx_int32 out_ch_stride   = out_tensor_desc->stride[2];
+
+    /*Check if resizing of input image is neded*/
+    if((in_width >= dl_width) && (in_height >= dl_height))
+    {
+        vx_int32 start_x = (in_width - dl_width) / 2;
+        vx_int32 start_y = (in_height - dl_height) / 2;
+
+        vx_uint8 *pY = (vx_uint8 *)in_img_target_ptr[0] + (start_y * in_stride) + start_x;
+        vx_uint8 *pC = (vx_uint8 *)in_img_target_ptr[1] + ((start_y >> 1) * in_stride) + ((start_x >> 1)<<1);
+
+        vx_int32 start_offset;
+        vx_size data_type = getTensorDataType(ioBufDesc->inElementType[0]);
+
+        if((data_type == VX_TYPE_INT8) || (data_type == VX_TYPE_UINT8))
+        {
+            vx_uint8 *pR = NULL;
+            vx_uint8 *pG = NULL;
+            vx_uint8 *pB = NULL;
+
+            if(ioBufDesc->inDataFormat[0] == 1) /* RGB */
+                {
+                    start_offset = (0 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pR = (vx_uint8 *)out_tensor_target_ptr + start_offset;
+
+                    start_offset = (1 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pG = (vx_uint8 *)out_tensor_target_ptr + start_offset;
+
+                    start_offset = (2 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pB = (vx_uint8 *)out_tensor_target_ptr + start_offset;
+                }
+                else /* BGR */
+                {
+                    start_offset = (0 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pB = (vx_uint8 *)out_tensor_target_ptr + start_offset;
+
+                    start_offset = (1 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pG = (vx_uint8 *)out_tensor_target_ptr + start_offset;
+
+                    start_offset = (2 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pR = (vx_uint8 *)out_tensor_target_ptr + start_offset;
+                }
+
+                vx_int32 col, row;
+                for(row = 0; row < dl_height; row++)
+                {
+                    for(col = 0; col < dl_width; col++)
+                    {
+                        vx_uint8 Y  = pY[(row * in_stride) + col];
+                        vx_uint8 Cb = pC[((row>>1) * in_stride) + ((col>>1)<<1) + 1];
+                        vx_uint8 Cr = pC[((row>>1) * in_stride) + ((col>>1)<<1)];
+
+                        vx_int32 Y_  = Y - 16;
+                        vx_int32 Cb_ = Cb - 128;
+                        vx_int32 Cr_ = Cr - 128;
+
+                        vx_int32 R = ((298 * Y_) + (409 * Cr_) + 128) >> 8;
+                        vx_int32 G = ((298 * Y_) - (100 * Cb_) - (208 * Cr_) + 128) >> 8;
+                        vx_int32 B = ((298 * Y_) + (516 * Cb_) + 128) >> 8;
+
+                        pR[col] = (vx_uint8)CLIP_255(R);
+                        pG[col] = (vx_uint8)CLIP_255(G);
+                        pB[col] = (vx_uint8)CLIP_255(B);
+                    }
+                    pR += out_row_stride;
+                    pG += out_row_stride;
+                    pB += out_row_stride;
+                }
+            }
+            if((data_type == VX_TYPE_INT16) || (data_type == VX_TYPE_UINT16))
+            {
+                vx_uint16 *pR = NULL;
+                vx_uint16 *pG = NULL;
+                vx_uint16 *pB = NULL;
+
+                if(ioBufDesc->inDataFormat[0] == 1) /* RGB */
+                {
+                    start_offset = (0 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pR = (vx_uint16 *)((vx_uint8 *)out_tensor_target_ptr + start_offset);
+
+                    start_offset = (1 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pG = (vx_uint16 *)((vx_uint8 *)out_tensor_target_ptr + start_offset);
+
+                    start_offset = (2 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pB = (vx_uint16 *)((vx_uint8 *)out_tensor_target_ptr + start_offset);
+                }
+                else /* BGR */
+                {
+                    start_offset = (0 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pB = (vx_uint16 *)((vx_uint8 *)out_tensor_target_ptr + start_offset);
+
+                    start_offset = (1 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pG = (vx_uint16 *)((vx_uint8 *)out_tensor_target_ptr + start_offset);
+
+                    start_offset = (2 * out_ch_stride) + (ioBufDesc->inPadT[0] * out_row_stride) + ioBufDesc->inPadL[0];
+                    pR = (vx_uint16 *)((vx_uint8 *)out_tensor_target_ptr + start_offset);
+                }
+
+                vx_int32 col, row;
+                for(row = 0; row < dl_height; row++)
+                {
+                    for(col = 0; col < dl_width; col++)
+                    {
+                        vx_uint8 Y  = pY[(row * in_stride) + col];
+                        vx_uint8 Cb = pC[((row>>1) * in_stride) + ((col>>1)<<1) + 1];
+                        vx_uint8 Cr = pC[((row>>1) * in_stride) + ((col>>1)<<1)];
+
+                        vx_int32 Y_  = Y - 16;
+                        vx_int32 Cb_ = Cb - 128;
+                        vx_int32 Cr_ = Cr - 128;
+
+                        vx_int32 R = ((298 * Y_) + (409 * Cr_) + 128) >> 8;
+                        vx_int32 G = ((298 * Y_) - (100 * Cb_) - (208 * Cr_) + 128) >> 8;
+                        vx_int32 B = ((298 * Y_) + (516 * Cb_) + 128) >> 8;
+
+                        pR[col] = CLIP_255(R);
+                        pG[col] = CLIP_255(G);
+                        pB[col] = CLIP_255(B);
+                    }
+                    pR += (out_row_stride / sizeof(vx_uint16));
+                    pG += (out_row_stride / sizeof(vx_uint16));
+                    pB += (out_row_stride / sizeof(vx_uint16));
+                }
+            }     
+    }
+    vxQueryImage(input, VX_IMAGE_WIDTH, &in_width, sizeof(vx_uint32));
+    vxQueryImage(input, VX_IMAGE_HEIGHT, &in_height, sizeof(vx_uint32));
+
+    preProcObj->node = tivxDLPreProcArmv8Node(graph,
+                                         preProcObj->config,
+                                         input,
+                                         output);
+
+    APP_ASSERT_VALID_REF(preProcObj->node);
+    status = vxSetNodeTarget(preProcObj->node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
+#else
     preProcObj->node = tivxOCPreProcNode(graph,
                                          preProcObj->config,
                                          input,
@@ -180,6 +524,7 @@ vx_status app_create_graph_pre_proc(vx_graph graph, PreProcObj *preProcObj, vx_o
     APP_ASSERT_VALID_REF(preProcObj->node);
 
     status = vxSetNodeTarget(preProcObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP1);
+#endif
     vxSetReferenceName((vx_reference)preProcObj->node, "pre_proc_node");
 
     vx_bool replicate[] = {vx_false_e, vx_true_e, vx_true_e};

@@ -73,8 +73,12 @@ LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/$(BUILD_PROFI
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 ifeq ($(TARGET_PLATFORM), AM62A)
+BUILD_PROFILE_EDGEAI_REL = Release
+
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/csirxlld/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/fvid2lld/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(EDGEAI_UTILS_PATH)/QNX/lib/$(BUILD_PROFILE_EDGEAI_REL)
+LDIRS       += $(EDGEAI_KERNELS_PATH)/QNX/lib/$(BUILD_PROFILE_EDGEAI_REL)
 endif
 
 SHARED_LIBS += sharedmemallocator$(BUILD_PROFILE_QNX_SUFFIX)
@@ -87,6 +91,8 @@ ifeq ($(TARGET_PLATFORM), AM62A)
 SHARED_LIBS += ti-csirxlld$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-fvid2lld$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += screen
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
 endif
 
 endif # ifeq ($(TARGET_OS), QNX)
