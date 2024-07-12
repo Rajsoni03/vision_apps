@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017 Texas Instruments Incorporated
+ * Copyright (c) 2017-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -62,6 +62,49 @@
 
 #include "app_pre_proc_module.h"
 
+#if defined(SOC_AM62A) && defined(QNX)
+#include <vx_internal.h>
+#define CLIP_255(x) ((x)<0?0:(((x)>255)?255:(x)))
+#define EDGEAI_KERNELS_APP_MAX_TENSOR_DIMS          4
+tivxDLPreProcArmv8Params *local_preproc_config = NULL;
+
+static vx_size getTensorDataType(vx_int32 tidl_type)
+{
+    vx_size openvx_type = VX_TYPE_INVALID;
+
+    if (tidl_type == TIDL_UnsignedChar)
+    {
+        openvx_type = VX_TYPE_UINT8;
+    }
+    else if(tidl_type == TIDL_SignedChar)
+    {
+        openvx_type = VX_TYPE_INT8;
+    }
+    else if(tidl_type == TIDL_UnsignedShort)
+    {
+        openvx_type = VX_TYPE_UINT16;
+    }
+    else if(tidl_type == TIDL_SignedShort)
+    {
+        openvx_type = VX_TYPE_INT16;
+    }
+    else if(tidl_type == TIDL_UnsignedWord)
+    {
+        openvx_type = VX_TYPE_UINT32;
+    }
+    else if(tidl_type == TIDL_SignedWord)
+    {
+        openvx_type = VX_TYPE_INT32;
+    }
+    else if(tidl_type == TIDL_SinglePrecFloat)
+    {
+        openvx_type = VX_TYPE_FLOAT32;
+    }
+
+    return openvx_type;
+}
+#endif
+
 static void createOutputTensors(vx_context context, vx_user_data_object config, vx_tensor output_tensors[]);
 static vx_enum get_vx_tensor_datatype(int32_t tidl_datatype);
 
@@ -69,6 +112,45 @@ vx_status app_init_pre_proc(vx_context context, PreProcObj *preProcObj, char *ob
 {
     vx_status status = VX_SUCCESS;
 
+#if defined(SOC_AM62A) && defined(QNX)
+    local_preproc_config = tivxMemAlloc(sizeof(tivxDLPreProcArmv8Params), TIVX_MEM_EXTERNAL);
+    if(local_preproc_config == NULL) {
+        printf("ERROR: Unable to allocate memory for local_preproc_config\n");
+        status = -1;
+        return status;
+    }
+    local_preproc_config->skip_flag = 0;
+    int i =0;
+    for(i = 0 ; i < 3; i++)
+    {
+        local_preproc_config->scale[i] = 1;
+        local_preproc_config->mean[i] = 0;
+    }
+    local_preproc_config->channel_order = 0; //0-NCHW
+
+    sTIDL_IOBufDesc_t *ioBufDesc = &preProcObj->params.ioBufDesc;
+    vx_size data_type = getTensorDataType(ioBufDesc->inElementType[0]);
+    if((data_type == VX_TYPE_INT8) || (data_type == VX_TYPE_UINT8))
+    {
+        if(ioBufDesc->inDataFormat[0] == 1)
+            local_preproc_config->tensor_format = 0; //RGB
+        else local_preproc_config->tensor_format = 1; //BGR
+    }
+    else if((data_type == VX_TYPE_INT16) || (data_type == VX_TYPE_UINT16))
+    {
+        if(ioBufDesc->inDataFormat[0] == 1)
+            local_preproc_config->tensor_format = 0; //RGB
+        else local_preproc_config->tensor_format = 1; //BGR
+    }
+
+    for(i = 0 ; i < 4; i++)
+    {
+        local_preproc_config->crop[i] = 0;
+    }
+
+    preProcObj->config = vxCreateUserDataObject(context, "PreProcConfig", sizeof(tivxDLPreProcArmv8Params), local_preproc_config);
+    status = vxGetStatus((vx_reference)preProcObj->config);
+#else
     vx_enum config_type = VX_TYPE_INVALID;
     config_type = vxRegisterUserStruct(context, sizeof(tivxImgPreProcParams));
     APP_ASSERT(config_type >= VX_TYPE_USER_STRUCT_START && config_type <= VX_TYPE_USER_STRUCT_END);
@@ -80,14 +162,14 @@ vx_status app_init_pre_proc(vx_context context, PreProcObj *preProcObj, char *ob
     vxAddArrayItems(preProcObj->config, 1, &preProcObj->params, sizeof(tivxImgPreProcParams));
     snprintf(ref_name, APP_MAX_FILE_PATH, "%s_config", objName);
     vxSetReferenceName((vx_reference)preProcObj->config, ref_name);
-
+#endif
     return status;
 }
 
 vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_user_data_object config, vx_int32 num_cameras)
 {
     vx_status status = VX_SUCCESS;
-
+#if !(defined(SOC_AM62A) && defined(QNX))
     vx_map_id map_id_config;
     sTIDL_IOBufDesc_t *ioBufDesc;
     tivxTIDLJ7Params *tidlParams;
@@ -124,6 +206,21 @@ vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_use
     {
         preProcObj->params.color_conv_flag = TIADALG_COLOR_CONV_YUV420_BGR;
     }
+#else
+    vx_map_id map_id_config;
+    sTIDL_IOBufDesc_t *ioBufDesc;
+    tivxTIDLJ7Params *tidlParams;
+    vx_tensor output_tensors[APP_MAX_TENSORS];
+    vx_int32 i;
+
+    vxMapUserDataObject(config, 0, sizeof(tivxTIDLJ7Params), &map_id_config,
+                    (void **)&tidlParams, VX_READ_ONLY, VX_MEMORY_TYPE_HOST, 0);
+
+    ioBufDesc = (sTIDL_IOBufDesc_t *)&tidlParams->ioBufDesc;
+    memcpy(&preProcObj->params.ioBufDesc, ioBufDesc, sizeof(sTIDL_IOBufDesc_t));
+
+    vxUnmapUserDataObject(config, map_id_config);
+#endif
 
     preProcObj->num_input_tensors = ioBufDesc->numInputBuf;
     preProcObj->num_output_tensors = ioBufDesc->numOutputBuf;
@@ -142,11 +239,21 @@ vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_use
 void app_deinit_pre_proc(PreProcObj *preProcObj)
 {
     vx_int32 i;
+    #if defined(SOC_AM62A) && defined(QNX)
+    vxReleaseUserDataObject(&preProcObj->config);
+    #else
     vxReleaseArray(&preProcObj->config);
+    #endif
     for(i = 0; i < preProcObj->num_input_tensors; i++)
     {
         vxReleaseObjectArray(&preProcObj->output_tensor_arr[i]);
     }
+    #if defined(SOC_AM62A) && defined(QNX)
+    if(local_preproc_config)
+    {
+        tivxMemFree(local_preproc_config, sizeof(tivxDLPreProcArmv8Params), TIVX_MEM_EXTERNAL);
+    }
+    #endif
 }
 
 void app_delete_pre_proc(PreProcObj *preProcObj)
@@ -164,6 +271,15 @@ vx_status app_create_graph_pre_proc(vx_graph graph, PreProcObj *preProcObj, vx_o
     vx_image  input   = (vx_image)vxGetObjectArrayItem((vx_object_array)input_arr, 0);
     vx_tensor output  = (vx_tensor)vxGetObjectArrayItem((vx_object_array)preProcObj->output_tensor_arr[0], 0);
 
+#if defined(SOC_AM62A) && defined(QNX)
+    preProcObj->node = tivxDLPreProcArmv8Node(graph,
+                                          preProcObj->config,
+                                          input,
+                                          output);
+
+    APP_ASSERT_VALID_REF(preProcObj->node);
+    status = vxSetNodeTarget(preProcObj->node, VX_TARGET_STRING, TIVX_TARGET_MPU_0);
+#else
     preProcObj->node = tivxImgPreProcNode(graph,
                                           preProcObj->config,
                                           input,
@@ -172,6 +288,7 @@ vx_status app_create_graph_pre_proc(vx_graph graph, PreProcObj *preProcObj, vx_o
     APP_ASSERT_VALID_REF(preProcObj->node);
 
     status = vxSetNodeTarget(preProcObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP1);
+#endif
     vxSetReferenceName((vx_reference)preProcObj->node, "PreProcNode");
 
     vx_bool replicate[] = {vx_false_e, vx_true_e, vx_true_e};

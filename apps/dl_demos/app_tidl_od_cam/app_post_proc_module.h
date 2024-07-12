@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017-2024 Texas Instruments Incorporated
+ * Copyright (c) 2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,53 +59,40 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef _APP_COMMON
-#define _APP_COMMON
+#ifndef _APP_POST_PROC_MODULE
+#define _APP_POST_PROC_MODULE
 
-#include <TI/tivx.h>
-#include <TI/tivx_task.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_kernels_host_utils.h"
+#include "app_common.h"
+#include "itidl_ti.h"
+#include "app_display_module.h"
 
-#include <TI/j7_tidl.h>
-#include <tivx_utils_file_rd_wr.h>
-#include <tivx_utils_graph_perf.h>
-#include <utils/iss/include/app_iss.h>
-#include <TI/tivx_img_proc.h>
-#include <TI/tivx_fileio.h>
-#if defined(SOC_AM62A) && defined(QNX)
-#include <edgeai_tiovx_nodes.h>
-#include <edgeai_tiovx_target_kernels.h>
-#endif
+typedef struct {
+    vx_node  node;
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <sys/stat.h>
-#include <float.h>
-#include <math.h>
+    vx_user_data_object config;
+    tivxOCPostProcParams params;
+    tivxOCPostProcOutput post_proc_out;
 
-//#define APP_DEBUG
-#define APP_USE_FILEIO
+    vx_uint32 num_input_tensors;
+    vx_uint32 num_output_tensors;
 
-#define APP_MAX_FILE_PATH           (256u)
-#define APP_ASSERT(x)               assert((x))
-#define APP_ASSERT_VALID_REF(ref)   (APP_ASSERT(vxGetStatus((vx_reference)(ref))==VX_SUCCESS));
+    vx_uint32 num_top_results;
 
-#define APP_MAX_TENSORS             (4u)
-#define APP_MAX_TENSOR_DIMS         (4u)
-#define APP_TIDL_MAX_PARAMS         (16u)
+    vx_object_array output_arr[APP_MAX_BUFQ_DEPTH];
+    vx_kernel kernel;
+    vx_image results[APP_MAX_BUFQ_DEPTH];
+    vx_int32 graph_parameter_index;
 
-#define ABS_FLT(a) ((a) > 0)?(a):(-(a))
+    vx_char objName[APP_MAX_FILE_PATH];
 
-#define APP_MAX_BUFQ_DEPTH (8)
+} PostProcObj;
 
-#ifdef APP_DEBUG
-#define APP_PRINTF(f_, ...) printf((f_), ##__VA_ARGS__)
-#else
-#define APP_PRINTF(f_, ...)
-#endif
+vx_status app_update_post_proc(vx_context context, PostProcObj *postProcObj, vx_user_data_object config);
+vx_status app_init_post_proc(vx_context context, PostProcObj *postProcObj, char *objName, vx_int32 num_cameras, vx_int32 bufq_depth);
+void app_deinit_post_proc(PostProcObj *obj, vx_int32 bufq_depth);
+void app_delete_post_proc(PostProcObj *obj);
+vx_status app_create_graph_post_proc(vx_graph graph, PostProcObj *postProcObj, vx_object_array in_args_arr, vx_object_array in_tensor_arr, vx_object_array input_img_arr);
+vx_status writePostProcOutput(char* file_name, PostProcObj *postProcObj);
 
 #endif
+

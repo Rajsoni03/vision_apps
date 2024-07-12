@@ -8,6 +8,12 @@ CSOURCES    := main.c
 CSOURCES    += app_pre_proc_module.c
 CSOURCES    += app_draw_detections_module.c
 
+ifeq ($(SOC),$(filter $(SOC), am62a))
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
+CSOURCES    += app_post_proc_module.c
+endif
+endif
+
 ifeq ($(HOST_COMPILER),GCC_LINUX)
 CFLAGS += -Wno-unused-function
 endif
@@ -56,6 +62,13 @@ IDIRS += $(IMAGING_IDIRS)
 IDIRS += $(VISION_APPS_PATH)/kernels/img_proc/include
 IDIRS += $(VISION_APPS_PATH)/kernels/fileio/include
 IDIRS += $(VISION_APPS_PATH)/modules/include
+
+ifeq ($(SOC),$(filter $(SOC), am62a))
+ifeq ($(TARGET_OS),$(filter $(TARGET_OS), QNX))
+IDIRS += $(EDGEAI_KERNELS_PATH)/include
+IDIRS += $(TIOVX_PATH)/source/include
+endif
+endif
 
 STATIC_LIBS += $(TIADALG_LIBS)
 STATIC_LIBS += vx_app_modules

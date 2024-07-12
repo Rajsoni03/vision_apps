@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2020-2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -80,9 +80,19 @@
 #include "app_draw_detections_module.h"
 #include "app_img_mosaic_module.h"
 #include "app_display_module.h"
+#if defined(SOC_AM62A) && defined(QNX)
+#include "app_post_proc_module.h"
+#include <screen/screen.h>
+#endif
 
 #define APP_BUFFER_Q_DEPTH   (4)
 #define APP_PIPELINE_DEPTH   (7)
+
+#if defined(SOC_AM62A) && defined(QNX)
+/*AM62A: QNX to use screen package for displaying frames on A53*/
+screen_context_t screen_ctx = NULL;
+screen_window_t screen_win = NULL;
+#endif
 
 typedef struct {
 
@@ -94,7 +104,11 @@ typedef struct {
     ScalerObj         scalerObj;
     PreProcObj        preProcObj;
     TIDLObj           tidlObj;
+#if !(defined(SOC_AM62A) && defined(QNX))
     DrawDetectionsObj drawDetectionsObj;
+#else
+    PostProcObj       postProcObj;
+#endif
     ImgMosaicObj      imgMosaicObj;
     DisplayObj        displayObj;
 
@@ -126,6 +140,11 @@ typedef struct {
     int32_t dequeueCnt;
 
     int32_t write_file;
+#if defined(SOC_AM62A) && defined(QNX)
+    tivx_task screen_task;
+    uint32_t stop_screen_task;
+    uint32_t stop_screen_task_done;
+#endif
 
 } AppObj;
 
@@ -143,11 +162,182 @@ static void app_default_param_set(AppObj *obj);
 static void app_update_param_set(AppObj *obj);
 static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 node_parameter_index);
 static void app_pipeline_params_defaults(AppObj *obj);
+#if !(defined(SOC_AM62A) && defined(QNX))
 #ifndef x86_64
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
 #endif
+#endif
 
 static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 frame_id);
+
+#if defined(SOC_AM62A) && defined(QNX)
+int32_t app_run_screen(AppObj *obj)
+{
+    int32_t err = 0;
+    int usage = SCREEN_USAGE_READ | SCREEN_USAGE_WRITE;
+    int screenFormat = SCREEN_FORMAT_NV12;
+    screen_context_t screen_ctx = NULL;
+    screen_window_t screen_win = NULL;
+    vx_uint32 width, height;
+    vx_df_image df;
+    vx_imagepatch_addressing_t image_addr;
+    vx_rectangle_t rect;
+    vx_map_id map_id1, map_id2;
+    void *data_ptr1 = NULL, *data_ptr2 = NULL;
+    vx_uint32 num_bytes_per_4pixels;
+    vx_uint32 imgaddr_width, imgaddr_height, imgaddr_stride;
+    uint32_t i;
+
+    /* connect to screen */
+    err = screen_create_context(&screen_ctx, SCREEN_APPLICATION_CONTEXT);
+    if(err != 0) {
+        printf("Failed to create screen context\n");
+    }
+
+    /* create a window */
+    err = screen_create_window(&screen_win, screen_ctx);
+    if(err != 0) {
+        printf("Failed to create screen window\n");
+    }
+
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_USAGE, &usage);
+    if(err != 0) {
+        printf("Failed to set usage property\n");
+    }
+    err = screen_set_window_property_iv(screen_win, SCREEN_PROPERTY_FORMAT, &screenFormat);
+    if(err != 0) {
+        printf("Failed to set format prpoerty\n");
+    }
+
+    /* create screen buffers */
+    int nbuffers = 2;
+    err = screen_create_window_buffers(screen_win, nbuffers);
+    if(err != 0) {
+        printf("Failed to create window buffer\n");
+    }
+
+    while(1) {
+        int buffer_size[2];
+        err = screen_get_window_property_iv(screen_win, SCREEN_PROPERTY_BUFFER_SIZE, buffer_size);
+        if(err != 0) {
+            printf("Failed to get window buffer size\n");
+        }
+
+        screen_buffer_t screen_buf[2];
+        err = screen_get_window_property_pv(screen_win, SCREEN_PROPERTY_RENDER_BUFFERS, (void **)&screen_buf);
+        if(err != 0) {
+            printf("Failed to get window buffer\n");
+        }
+
+        /* obtain pointers to the buffers */
+        void *ptr1 = NULL;
+        err = screen_get_buffer_property_pv(screen_buf[0], SCREEN_PROPERTY_POINTER, (void **)&ptr1);
+        if(err != 0) {
+            printf("Failed to get buffer pointer\n");
+        }
+
+        int buf_stride1 = 0;
+        err = screen_get_buffer_property_iv(screen_buf[0], SCREEN_PROPERTY_STRIDE, &buf_stride1);
+        if(err != 0) {
+           printf("Failed to get buffer stride1\n");
+        }
+
+        /* copy frames from OVX buffer to screen buffer*/
+        vx_image display_image = (vx_image)vxGetObjectArrayItem((vx_object_array)obj->postProcObj.output_arr[0], 0);
+        vxQueryImage(display_image, VX_IMAGE_WIDTH, &width, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
+        vxQueryImage(display_image, VX_IMAGE_FORMAT, &df, sizeof(vx_df_image));
+
+        if(VX_DF_IMAGE_NV12 == df) {
+            num_bytes_per_4pixels = 4;
+        } else if(TIVX_DF_IMAGE_NV12_P12 == df) {
+            num_bytes_per_4pixels = 6;
+        } else {
+            num_bytes_per_4pixels = 8;
+        }
+        rect.start_x = 0;
+        rect.start_y = 0;
+        rect.end_x = width;
+        rect.end_y = height;
+
+        if (0 == strcmp(obj->sensorObj.sensor_name, SENSOR_OV2312_UB953_LI)) {
+            /*OV2312 raw frame has 1600 width, moving the frame to middle of 1920 width display*/
+            ptr1 += (1920-1600)/2;
+            rect.end_x = 1600;
+            memset(ptr1, 0x00000000, buffer_size[0]*buffer_size[1]);
+        }
+
+        vxMapImagePatch(display_image,
+            &rect,
+            0,
+            &map_id1,
+            &image_addr,
+            &data_ptr1,
+            VX_WRITE_ONLY,
+            VX_MEMORY_TYPE_HOST,
+            VX_NOGAP_X
+            );
+
+        if(!data_ptr1) {
+            printf("data_ptr1 is NULL \n");
+            return -1;
+        }
+
+        imgaddr_width  = image_addr.dim_x;
+        imgaddr_height = image_addr.dim_y;
+        imgaddr_stride = image_addr.stride_y;
+
+        for(i=0;i<height;i++)
+        {
+            memcpy(ptr1, data_ptr1, imgaddr_width*num_bytes_per_4pixels/4);
+            data_ptr1 += imgaddr_stride;
+            ptr1 += (buf_stride1);
+        }
+        vxUnmapImagePatch(display_image, map_id1);
+
+        if(VX_DF_IMAGE_NV12 == df || TIVX_DF_IMAGE_NV12_P12 == df) {
+            vxMapImagePatch(display_image,
+                &rect,
+                1,
+                &map_id2,
+                &image_addr,
+                &data_ptr2,
+                VX_WRITE_ONLY,
+                VX_MEMORY_TYPE_HOST,
+                VX_NOGAP_X
+                );
+
+            if(!data_ptr2) {
+                printf("data_ptr2 is NULL \n");
+                return -1;
+            }
+
+            imgaddr_width  = image_addr.dim_x;
+            imgaddr_height = image_addr.dim_y;
+            imgaddr_stride = image_addr.stride_y;
+
+            for(i=0;i<imgaddr_height/2;i++)
+            {
+                memcpy(ptr1, data_ptr2, imgaddr_width*num_bytes_per_4pixels/4);
+                data_ptr2 += imgaddr_stride;
+                ptr1 += buf_stride1;
+            }
+            vxUnmapImagePatch(display_image, map_id2);
+        }
+
+        err = screen_post_window(screen_win, screen_buf[0], 0, NULL, 0);
+        if(err != 0) {
+            printf("Failed to post window\n");
+        }
+
+        if(obj->stop_screen_task == 1) {
+            break;
+        }
+    }
+
+    return err;
+}
+#endif
 
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
@@ -216,6 +406,45 @@ static void app_run_task_delete(AppObj *obj)
     tivxTaskDelete(&obj->task);
 }
 
+#if defined(SOC_AM62A) && defined(QNX)
+static void app_run_screen_task(void *app_var)
+{
+    AppObj *obj = (AppObj *)app_var;
+
+    app_run_screen(obj);
+
+    obj->stop_screen_task_done = 1;
+}
+
+static int32_t app_screen_task_create(AppObj *obj)
+{
+    tivx_task_create_params_t params;
+    int32_t status;
+
+    tivxTaskSetDefaultCreateParams(&params);
+    params.task_main = app_run_screen_task;
+    params.app_var = obj;
+
+    obj->stop_screen_task_done = 0;
+    obj->stop_screen_task = 0;
+    status = tivxTaskCreate(&obj->screen_task, &params);
+
+    return status;
+}
+
+static void app_run_screen_task_delete(AppObj *obj)
+{
+    while(obj->stop_screen_task_done==0)
+    {
+         tivxTaskWaitMsecs(100);
+    }
+
+    screen_destroy_window(screen_win);
+    screen_destroy_context(screen_ctx);
+    tivxTaskDelete(&obj->screen_task);
+}
+#endif
+
 static vx_status app_run_graph_interactive(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
@@ -274,11 +503,17 @@ static vx_status app_run_graph_interactive(AppObj *obj)
 #endif
                 case 'x':
                     obj->stop_task = 1;
+#if defined(SOC_AM62A) && defined(QNX)
+                    obj->stop_screen_task = 1;
+#endif
                     done = 1;
                     break;
             }
         }
         app_run_task_delete(obj);
+#if defined(SOC_AM62A) && defined(QNX)
+        app_run_screen_task_delete(obj);
+#endif
     }
     return status;
 }
@@ -415,6 +650,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     }
                 }
             }
+#if !(defined(SOC_AM62A) && defined(QNX))
             else
             if(strcmp(token, "viz_th")==0)
             {
@@ -433,6 +669,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     obj->drawDetectionsObj.params.num_classes = atoi(token);
                 }
             }
+#endif
             else
             if(strcmp(token, "display_option")==0)
             {
@@ -653,8 +890,9 @@ vx_status app_tidl_od_cam_main(vx_int32 argc, vx_char* argv[])
 static vx_status app_init(AppObj *obj)
 {
     vx_status status = VX_SUCCESS;
+#if !(defined(SOC_AM62A) && defined(QNX))
     app_grpx_init_prms_t grpx_prms;
-
+#endif
     /* Create OpenVx Context */
     obj->context = vxCreateContext();
     status = vxGetStatus((vx_reference) obj->context);
@@ -664,7 +902,11 @@ static vx_status app_init(AppObj *obj)
         tivxHwaLoadKernels(obj->context);
         tivxVideoIOLoadKernels(obj->context);
         tivxImagingLoadKernels(obj->context);
+#if defined(SOC_AM62A) && defined(QNX)
+        tivxEdgeaiImgProcLoadKernels(obj->context);
+#else
         tivxImgProcLoadKernels(obj->context);
+#endif
         tivxTIDLLoadKernels(obj->context);
         tivxFileIOLoadKernels(obj->context);
     }
@@ -687,6 +929,16 @@ static vx_status app_init(AppObj *obj)
     app_init_ldc(obj->context, &obj->ldcObj, &obj->sensorObj, "ldc_obj", obj->sensorObj.num_cameras_enabled);
     APP_PRINTF("LDC init done!\n");
 
+#if defined(SOC_AM62A) && defined(QNX)
+    obj->scalerObj.output[0].width  = obj->ldcObj.table_width / 2;
+    obj->scalerObj.output[0].height = obj->ldcObj.table_height / 2;
+
+    /*For Object Detection, TIDL expects input image of resolution 1024x512
+      Resizing 1920x1080 to 1024*512 */
+    obj->scalerObj.output[1].width  = obj->ldcObj.table_width / 1.875;
+    obj->scalerObj.output[1].height = obj->ldcObj.table_height / 2.109;
+#endif
+
     printf("Scaler output1 width   = %d\n", obj->scalerObj.output[0].width);
     printf("Scaler output1 height  = %d\n", obj->scalerObj.output[0].height);
     printf("Scaler output2 width   = %d\n", obj->scalerObj.output[1].width);
@@ -706,19 +958,28 @@ static vx_status app_init(AppObj *obj)
     app_init_pre_proc(obj->context, &obj->preProcObj, "pre_proc_obj");
     APP_PRINTF("Pre Proc Init Done! \n");
 
+#if !(defined(SOC_AM62A) && defined(QNX))
     /* Update ioBufDesc in draw detections object */
     app_update_draw_detections(&obj->drawDetectionsObj, obj->tidlObj.config);
     APP_PRINTF("Draw detections Update Done! \n");
 
     app_init_draw_detections(obj->context, &obj->drawDetectionsObj, "draw_detections_obj", obj->sensorObj.num_cameras_enabled);
     APP_PRINTF("Draw Detections Init Done! \n");
+#else
+    /* Update post-proc parameters with TIDL config before calling init */
+    app_update_post_proc(obj->context, &obj->postProcObj, obj->tidlObj.config);
+    APP_PRINTF("Post Proc Update Done! \n");
 
+    status = app_init_post_proc(obj->context, &obj->postProcObj, "post_proc_obj", obj->sensorObj.num_cameras_enabled, APP_BUFFER_Q_DEPTH);
+    APP_PRINTF("Post Proc Init Done! \n");
+#endif
     app_init_img_mosaic(obj->context, &obj->imgMosaicObj, "img_mosaic_obj", APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Img Mosaic init done!\n");
 
     app_init_display(obj->context, &obj->displayObj, "display_obj");
     APP_PRINTF("Display init done!\n");
 
+#if !(defined(SOC_AM62A) && defined(QNX))
     #ifndef x86_64
     if(obj->displayObj.display_option == 1)
     {
@@ -727,6 +988,7 @@ static vx_status app_init(AppObj *obj)
         appGrpxInit(&grpx_prms);
     }
     #endif
+#endif
 
     appPerfPointSetName(&obj->total_perf , "TOTAL");
     appPerfPointSetName(&obj->fileio_perf, "FILEIO");
@@ -760,8 +1022,13 @@ static void app_deinit(AppObj *obj)
     app_deinit_tidl(&obj->tidlObj);
     APP_PRINTF("TIDL deinit done!\n");
 
+#if defined(SOC_AM62A) && defined(QNX)
+    app_deinit_post_proc(&obj->postProcObj, APP_BUFFER_Q_DEPTH);
+    APP_PRINTF("Post proc deinit done!\n");
+#else
     app_deinit_draw_detections(&obj->drawDetectionsObj);
     APP_PRINTF("Draw detections deinit done!\n");
+#endif
 
     app_deinit_img_mosaic(&obj->imgMosaicObj, APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Img Mosaic deinit done!\n");
@@ -780,7 +1047,11 @@ static void app_deinit(AppObj *obj)
     tivxHwaUnLoadKernels(obj->context);
     tivxVideoIOUnLoadKernels(obj->context);
     tivxImagingUnLoadKernels(obj->context);
+#if defined(SOC_AM62A) && defined(QNX)
+    tivxEdgeaiImgProcUnLoadKernels(obj->context);
+#else
     tivxImgProcUnLoadKernels(obj->context);
+#endif
     tivxFileIOUnLoadKernels(obj->context);
     APP_PRINTF("Kernels unload done!\n");
 
@@ -811,8 +1082,13 @@ static void app_delete_graph(AppObj *obj)
     app_delete_tidl(&obj->tidlObj);
     APP_PRINTF("TIDL delete done!\n");
 
+#if defined(SOC_AM62A) && defined(QNX)
+    app_delete_post_proc(&obj->postProcObj);
+    APP_PRINTF("Post Proc delete done!\n");
+#else
     app_delete_draw_detections(&obj->drawDetectionsObj);
     APP_PRINTF("Post Proc delete done!\n");
+#endif
 
     app_delete_img_mosaic(&obj->imgMosaicObj);
     APP_PRINTF("Img Mosaic delete done!\n");
@@ -867,7 +1143,11 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
+#if !(defined(SOC_AM62A) && defined(QNX))
         app_create_graph_pre_proc(obj->graph, &obj->preProcObj, obj->scalerObj.output[0].arr);
+#else
+        app_create_graph_pre_proc(obj->graph, &obj->preProcObj, obj->scalerObj.output[1].arr);
+#endif
         APP_PRINTF("Pre proc graph done!\n");
     }
 
@@ -879,12 +1159,21 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
+#if defined(SOC_AM62A) && defined(QNX)
+        status = app_create_graph_post_proc(obj->graph, &obj->postProcObj, obj->tidlObj.out_args_arr, obj->tidlObj.output_tensor_arr[0], obj->ldcObj.output_arr);
+        APP_PRINTF("Post proc graph done!\n");
+#else
         app_create_graph_draw_detections(obj->graph, &obj->drawDetectionsObj, obj->tidlObj.output_tensor_arr[0], obj->scalerObj.output[1].arr);
         APP_PRINTF("Draw detections graph done!\n");
+#endif
     }
 
     vx_int32 idx = 0;
+#if !(defined(SOC_AM62A) && defined(QNX))
     obj->imgMosaicObj.input_arr[idx++] = obj->drawDetectionsObj.output_image_arr;
+#else
+    obj->imgMosaicObj.input_arr[idx++] = obj->scalerObj.output[0].arr;
+#endif
     obj->imgMosaicObj.num_inputs = idx;
 
     if(status == VX_SUCCESS)
@@ -895,8 +1184,10 @@ static vx_status app_create_graph(AppObj *obj)
 
     if(status == VX_SUCCESS)
     {
+#if !(defined(SOC_AM62A) && defined(QNX))
         status = app_create_graph_display(obj->graph, &obj->displayObj, obj->imgMosaicObj.output_image[0]);
         APP_PRINTF("Display graph done!\n");
+#endif
     }
 
     if(status == VX_SUCCESS)
@@ -930,7 +1221,9 @@ static vx_status app_create_graph(AppObj *obj)
 
         tivxSetNodeParameterNumBufByIndex(obj->tidlObj.node, 7, APP_BUFFER_Q_DEPTH);
 
+#if !(defined(SOC_AM62A) && defined(QNX))
         tivxSetNodeParameterNumBufByIndex(obj->drawDetectionsObj.node, 3, APP_BUFFER_Q_DEPTH);
+#endif
 
         tivxSetNodeParameterNumBufByIndex(obj->imgMosaicObj.node, 1, APP_BUFFER_Q_DEPTH);
 
@@ -1041,6 +1334,14 @@ static vx_status app_run_graph(AppObj *obj)
     status = appStartImageSensor(sensorObj->sensor_name, ch_mask);
     APP_PRINTF("appStartImageSensor returned with status: %d\n", status);
 
+#if defined(SOC_AM62A) && defined(QNX)
+    status = app_screen_task_create(obj);
+    if(status!=0)
+    {
+        printf("ERROR: Unable to create screen task\n");
+    }
+#endif
+
     for(frame_id = 0; frame_id < obj->num_frames_to_run; frame_id++)
     {
 #ifdef APP_WRITE_INTERMEDIATE_OUTPUTS
@@ -1079,6 +1380,10 @@ static vx_status app_run_graph(AppObj *obj)
     vxWaitGraph(obj->graph);
 
     obj->stop_task = 1;
+
+#if defined(SOC_AM62A) && defined(QNX)
+    obj->stop_screen_task = 1;
+#endif
 
     status = appStopImageSensor(obj->sensorObj.sensor_name, ch_mask);
 
@@ -1121,6 +1426,7 @@ static void set_scaler_defaults(ScalerObj *scalerObj)
     scalerObj->color_format = VX_DF_IMAGE_NV12;
 }
 
+#if !(defined(SOC_AM62A) && defined(QNX))
 static void set_pre_proc_defaults(PreProcObj *preProcObj)
 {
     vx_int32 i;
@@ -1141,6 +1447,7 @@ static void set_pre_proc_defaults(PreProcObj *preProcObj)
     /* Number of time to clear the output buffer before it gets reused */
     preProcObj->params.clear_count  = 4;
 }
+#endif
 
 static void app_default_param_set(AppObj *obj)
 {
@@ -1148,8 +1455,9 @@ static void app_default_param_set(AppObj *obj)
 
     set_scaler_defaults(&obj->scalerObj);
 
+#if !(defined(SOC_AM62A) && defined(QNX))
     set_pre_proc_defaults(&obj->preProcObj);
-
+#endif
     set_display_defaults(&obj->displayObj);
 
     app_pipeline_params_defaults(obj);
@@ -1160,6 +1468,7 @@ static void app_default_param_set(AppObj *obj)
     obj->num_frames_to_run = 1000000000;
 }
 
+#if !(defined(SOC_AM62A) && defined(QNX))
 static vx_int32 calc_grid_size(vx_uint32 ch)
 {
     if(0==ch)
@@ -1257,13 +1566,44 @@ static void update_draw_detections_defaults(AppObj *obj, DrawDetectionsObj *draw
         drawDetectionsObj->params.color_map[i][2] = (vx_uint8)(rand() % 256);
     }
 }
+#else
+static void set_img_mosaic_params(AppObj *obj, ImgMosaicObj *imgMosaicObj)
+{
+    vx_int32 idx;
+
+    imgMosaicObj->out_width    = DISPLAY_WIDTH;
+    imgMosaicObj->out_height   = DISPLAY_HEIGHT;
+    imgMosaicObj->num_inputs   = 1;
+
+    tivxImgMosaicParamsSetDefaults(&imgMosaicObj->params);
+
+    idx = 0;
+
+    imgMosaicObj->params.windows[idx].startX  = 100;
+    imgMosaicObj->params.windows[idx].startY  = 200;
+    imgMosaicObj->params.windows[idx].width   = obj->scalerObj.output[0].width;
+    imgMosaicObj->params.windows[idx].height  = obj->scalerObj.output[0].height;
+    imgMosaicObj->params.windows[idx].input_select   = 0;
+    imgMosaicObj->params.windows[idx].channel_select = 0;
+    idx++;
+
+    imgMosaicObj->params.num_windows  = idx;
+
+    /* Number of time to clear the output buffer before it gets reused */
+    imgMosaicObj->params.clear_count  = APP_BUFFER_Q_DEPTH;
+}
+#endif
 
 static void app_update_param_set(AppObj *obj)
 {
     obj->sensorObj.sensor_index = 0; /* App works only for IMX390 2MP cameras */
 
+#if !(defined(SOC_AM62A) && defined(QNX))
     update_draw_detections_defaults(obj, &obj->drawDetectionsObj);
     update_img_mosaic_defaults(&obj->imgMosaicObj, obj->scalerObj.output[1].width, obj->scalerObj.output[1].height, obj->sensorObj.num_cameras_enabled);
+#else
+    set_img_mosaic_params(obj, &obj->imgMosaicObj);
+#endif
 }
 
 /*
@@ -1277,6 +1617,7 @@ static void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_u
     vxReleaseParameter(&parameter);
 }
 
+#if !(defined(SOC_AM62A) && defined(QNX))
 #ifndef x86_64
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
@@ -1292,4 +1633,5 @@ static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufIn
 
     return;
 }
+#endif
 #endif
