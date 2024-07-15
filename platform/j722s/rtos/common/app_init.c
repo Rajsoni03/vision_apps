@@ -753,7 +753,7 @@ static void appRegisterOpenVXTargetKernels()
             app_c7x_target_kernel_img_add_register();
         }
         tivxRegisterTIDLTargetKernels();
-        /* tivxRegisterTVMTargetKernels(); */
+        tivxRegisterTVMTargetKernels();
         tivxRegisterStereoTargetKernels();
         #endif
 
@@ -812,7 +812,7 @@ static void appUnRegisterOpenVXTargetKernels()
             }
             tivxUnRegisterTIDLTargetKernels();
         tivxUnRegisterStereoTargetKernels();
-        /* tivxUnRegisterTVMTargetKernels(); */
+        tivxUnRegisterTVMTargetKernels();
         /* tivxUnRegisterImgProcTargetC71Kernels(); */
         #endif
 
