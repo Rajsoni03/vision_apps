@@ -1,3 +1,7 @@
+# This file contains a list of extension kernel specific static libraries
+# to be included in the PC executables.  It is put in this separate file
+# to make it easier to add/extend kernels without needing to modify
+# several concerto.mak files which depend on kernel libraries.
 
 ifeq ($(TARGET_CPU),x86_64)
 
@@ -35,6 +39,7 @@ VISION_APPS_STEREO_KERNELS_IDIRS =
 VISION_APPS_STEREO_KERNELS_IDIRS += $(VISION_APPS_PATH)/kernels/stereo/include
 
 LDIRS       += $(VISION_APPS_PATH)/out/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS       += $(APP_UTILS_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIOVX_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(IMAGING_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIADALG_PATH)/lib/$(TARGET_CPU)/$(TARGET_BUILD)
@@ -42,6 +47,7 @@ LDIRS       += $(CGT7X_ROOT)/host_emulation
 LDIRS       += $(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS       += $(TIDL_PATH)/ti_dl/lib/$(TARGET_SOC)/$(TARGET_PLATFORM)/algo/$(TARGET_BUILD)
 
 ifeq ($(RTOS_SDK), mcu_plus_sdk)
 LDIRS+= $(MCU_PLUS_SDK_PATH)/source/drivers/dmautils/lib/
@@ -58,22 +64,20 @@ CFLAGS += -Wno-unused-result
 CFLAGS += -Wno-maybe-uninitialized
 
 TIOVX_LIBS  =
-TIOVX_LIBS += vx_vxu vx_framework
+TIOVX_LIBS += vx_framework
 TIOVX_LIBS += vx_kernels_host_utils vx_kernels_target_utils
 TIOVX_LIBS += vx_platform_pc
 TIOVX_LIBS += vx_kernels_openvx_core vx_target_kernels_openvx_core
 TIOVX_LIBS += vx_kernels_openvx_ext vx_target_kernels_openvx_ext
-TIOVX_LIBS += vx_target_kernels_dsp
 TIOVX_LIBS += vx_target_kernels_tutorial
 TIOVX_LIBS += vx_app_c7x_target_kernel
 TIOVX_LIBS += vx_utils
 TIOVX_LIBS += vx_kernels_tidl vx_nested_kernels_tidl
+TIOVX_LIBS += vx_target_kernels_tidl vx_target_kernels_ivision_common
 
 IMAGING_LIBS = vx_kernels_imaging
-IMAGING_LIBS += app_utils_iss
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
-IMAGING_LIBS += ti_imaging_dcc
 ifneq ($(SOC), am62a)
 IMAGING_LIBS += vx_target_kernels_imaging_aewb
 endif
@@ -145,15 +149,10 @@ VISION_APPS_STEREO_LIBS += vx_kernels_stereo
 VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 
 TEST_LIBS =
-TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_engine vx_conformance_tests_testmodule
+TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_tests_testmodule
 TEST_LIBS += vx_kernels_openvx_ext_tests
-TEST_LIBS += vx_kernels_video_io_tests
 TEST_LIBS += vx_tiovx_tidl_tests
-TEST_LIBS += vx_kernels_test_kernels_tests
-TEST_LIBS += vx_kernels_test_kernels
-TEST_LIBS += vx_target_kernels_source_sink
 ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
-TEST_LIBS += vx_kernels_hwa_tests 
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
 endif
@@ -162,6 +161,13 @@ MMA_LIBS =
 MMA_LIBS += mmalib_cn_x86_64
 MMA_LIBS += mmalib_x86_64
 MMA_LIBS += common_x86_64
+
+TIDL_LIBS =
+TIDL_LIBS += tidl_algo
+TIDL_LIBS += tidl_priv_algo
+TIDL_LIBS += tidl_obj_algo
+TIDL_LIBS += tidl_custom
+TIDL_LIBS += tidl_avx_kernels
 
 PDK_LIBS =
 ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
@@ -184,8 +190,9 @@ endif
 ADDITIONAL_STATIC_LIBS += $(PDK_LIBS)
 ADDITIONAL_STATIC_LIBS += $(MCU_PLUS_SDK_LIBS)
 
-STATIC_LIBS += $(MMA_LIBS)
+STATIC_LIBS = $(MMA_LIBS)
 STATIC_LIBS += $(TIOVX_LIBS)
+STATIC_LIBS += $(TIDL_LIBS)
 STATIC_LIBS += vxlib_$(TARGET_CPU) c6xsim_$(TARGET_CPU)_C66
 STATIC_LIBS += $(VISION_APPS_UTILS_LIBS)
 
@@ -195,14 +202,12 @@ else
 STATIC_LIBS += $(C7X_VERSION)-host-emulation
 endif
 
-include $(TIOVX_PATH)/conformance_tests/kernels/concerto_inc.mak
+SYS_SHARED_LIBS += dl png z stdc++ m rt
 
-include $(VISION_APPS_PATH)/apps/concerto_inc.mak
+include $(TIOVX_PATH)/conformance_tests/kernels/concerto_inc.mak
 include $(IMAGING_PATH)/build_flags.mak
 include $(IMAGING_PATH)/kernels/concerto_inc.mak
 include $(VIDEO_IO_PATH)/build_flags.mak
 include $(VIDEO_IO_PATH)/kernels/concerto_inc.mak
-
-SYS_SHARED_LIBS += stdc++ m rt
 
 endif
