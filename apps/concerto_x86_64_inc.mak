@@ -129,12 +129,14 @@ VISION_APPS_OPENGL_UTILS_LIBS += app_utils_opengl
 
 VISION_APPS_KERNELS_LIBS  =
 VISION_APPS_KERNELS_LIBS += vx_kernels_img_proc
-VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c66
-VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c71
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_a72
-VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_r5f
 VISION_APPS_KERNELS_LIBS += vx_kernels_fileio
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
+ifneq ($(SOC), am62a)
+VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c66
+VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c71
+VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_r5f
+endif
 
 VISION_APPS_MODULES_LIBS  =
 VISION_APPS_MODULES_LIBS += vx_app_modules
