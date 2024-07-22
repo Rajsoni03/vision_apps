@@ -70,14 +70,12 @@ MEMORY
     R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000040
     /* R5F_TCMA [ size 29.94 KB ] */
     R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x000077C0
-    /* R5F_TCMA_TRACE_BUFF [ size 2 KB ] */
-    R5F_TCMA_TRACE_BUFF      ( RWIX ) : ORIGIN = 0x00007800 LENGTH = 0x0000800
+    /* R5F_TCMA_TRACE_BUFF [ size  2.00 KB ] */
+    R5F_TCMA_TRACE_BUFF      ( RWIX ) : ORIGIN = 0x00007800 , LENGTH = 0x00000800
     /* R5F_TCMB0_VECS [ size 64 B ] */
     R5F_TCMB0_VECS           ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00000040
     /* R5F_TCMB0 [ size 29.94 KB ] */
     R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010040 , LENGTH = 0x000077C0
-    /* R5F_TCMB0_TRACE_BUFF [ size 2 KB ] */
-    R5F_TCMB0_TRACE_BUFF      ( RWIX ) : ORIGIN = 0x41017800 LENGTH = 0x0000800
     /* DDR for DM R5F for Linux IPC [ size 1024.00 KB ] */
     DDR_DM_R5F_IPC           ( RWIX ) : ORIGIN = 0x9C800000 , LENGTH = 0x00100000
     /* DDR for DM R5F for Linux resource table [ size 1024 B ] */
@@ -85,9 +83,9 @@ MEMORY
     /* DDR for DM R5F for Linux IPC tracebuffer [ size 1023.00 KB ] */
     DDR_DM_R5F_IPC_TRACEBUF  ( RWIX ) : ORIGIN = 0x9C900400 , LENGTH = 0x000FFC00
     /* DDR for FS Stub binary [ size 32.00 KB ] */
-    DDR_FS_STUB              ( RWIX ) : ORIGIN = 0x9CA00000 LENGTH = 0x00008000
-    /* DDR for DM R5F for code/data [ size 28.00 MB ] */
-    DDR_DM_R5F               ( RWIX ) : ORIGIN = 0x9CA08000 , LENGTH = 0x01C00000
+    DDR_FS_STUB              ( RWIX ) : ORIGIN = 0x9CA00000 , LENGTH = 0x00008000
+    /* DDR for DM R5F for code/data [ size 28.97 MB ] */
+    DDR_DM_R5F               ( RWIX ) : ORIGIN = 0x9CA08000 , LENGTH = 0x01CF8000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
     IPC_VRING_MEM                     : ORIGIN = 0xA0000000 , LENGTH = 0x01000000
     /* Memory for remote core logging [ size 256.00 KB ] */
