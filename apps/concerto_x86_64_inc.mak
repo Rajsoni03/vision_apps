@@ -132,7 +132,7 @@ VISION_APPS_KERNELS_LIBS += vx_kernels_img_proc
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_a72
 VISION_APPS_KERNELS_LIBS += vx_kernels_fileio
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
-ifneq ($(SOC), am62a)
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c66
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c71
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_r5f
