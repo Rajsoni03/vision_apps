@@ -122,16 +122,16 @@ mmu_armv86.size              = 0x100000;
 mmu_armv86.attribute         = "MAIR0";
 
 /**
- * C7X_2 L2 MAIN
+ * C7X_1 L2 MAIN + C7X_2 L2 MAIN
  * Region start: 0x7E000000
- * Region end: 0x7E200000
+ * Region end: 0x7E400000
  * Read and write for both privileged and user modes.
  * Attribute is MAIR0.
  */
 mmu_armv87.$name             = "C7X_2_L2_MAIN";
-mmu_armv87.vAddr             = 0x7E200000;
-mmu_armv87.pAddr             = 0x7E200000;
-mmu_armv87.size              = 0x1000000;
+mmu_armv87.vAddr             = 0x7E000000;
+mmu_armv87.pAddr             = 0x7E000000;
+mmu_armv87.size              = 0x400000;
 mmu_armv87.attribute         = "MAIR0";
 
 /**
@@ -144,7 +144,7 @@ mmu_armv87.attribute         = "MAIR0";
 mmu_armv88.$name             = "C7X_2_L2_AUX";
 mmu_armv88.vAddr             = 0x7F800000;
 mmu_armv88.pAddr             = 0x7F800000;
-mmu_armv88.size              = 0x1000000;
+mmu_armv88.size              = 0x80000;
 mmu_armv88.attribute         = "MAIR0";
 
 /**
