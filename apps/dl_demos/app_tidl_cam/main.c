@@ -1378,7 +1378,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     if(obj->pipeline > 0)
     {
         vx_image capture_input_image;
-#if !(defined(SOC_AM62A) && defined(QNX))
+#if !defined(SOC_AM62A) && !defined(QNX)
         vx_user_data_object results;
 #endif
         uint32_t num_refs;
