@@ -344,7 +344,7 @@ vx_status app_create_graph_scaler(vx_context context, vx_graph graph, ScalerObj 
         vxSetReferenceName((vx_reference)scalerObj->node, "scaler_node");
         vxSetNodeTarget(scalerObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
 
-        vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e};
+        vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e};
 
         if(output1 == NULL)
             replicate[1] = vx_false_e;
@@ -357,7 +357,7 @@ vx_status app_create_graph_scaler(vx_context context, vx_graph graph, ScalerObj 
         if(output4 == NULL)
             replicate[5] = vx_false_e;
 
-        vxReplicateNode(graph, scalerObj->node, replicate, 6);
+        vxReplicateNode(graph, scalerObj->node, replicate, 12);
 
         if(scalerObj->en_out_scaler_write == 1)
         {
