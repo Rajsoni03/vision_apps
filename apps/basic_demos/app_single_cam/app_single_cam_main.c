@@ -639,13 +639,11 @@ vx_status app_create_graph(AppObj *obj)
             sensor_gain_control_enabled = 1;
         }
 
-        #if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
         if(ISS_SENSOR_FEATURE_CFG_UC1 == (sensor_features_supported & ISS_SENSOR_FEATURE_CFG_UC1))
         {
             APP_PRINTF("CMS Usecase is supported \n");
             sensor_features_enabled |= ISS_SENSOR_FEATURE_CFG_UC1;
         }
-        #endif
 
         switch(sensorParams.sensorInfo.aewbMode)
         {
