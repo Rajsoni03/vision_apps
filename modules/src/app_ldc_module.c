@@ -434,8 +434,8 @@ vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array i
             vxSetReferenceName((vx_reference)ldcObj->node, "ldc_node");
             vxSetNodeTarget(ldcObj->node, VX_TARGET_STRING, target);
 
-            vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e};
-            vxReplicateNode(graph, ldcObj->node, replicate, 9);
+            vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e};
+            vxReplicateNode(graph, ldcObj->node, replicate, 12);
         }
         else
         {
@@ -463,8 +463,8 @@ vx_status app_create_graph_ldc(vx_graph graph, LDCObj *ldcObj, vx_object_array i
             vxSetReferenceName((vx_reference)ldcObj->node, "ldc_node");
             vxSetNodeTarget(ldcObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_LDC1);
 
-            vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e};
-            vxReplicateNode(graph, ldcObj->node, replicate, 9);
+            vx_bool replicate[] = { vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_true_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e};
+            vxReplicateNode(graph, ldcObj->node, replicate, 12);
         }
         else
         {
