@@ -138,9 +138,7 @@ static vx_status app_run_pyramid_for_first_frame(AppObj *obj);
 static vx_status app_load_vximage_from_bin_or_yuv_file(char *filename, vx_image image, uint16_t file_format);
 static vx_status add_graph_parameter_by_node_index(vx_graph graph, vx_node node,vx_uint32 node_parameter_index);
 static void app_find_image_array_index(vx_image image_array[], vx_reference ref, vx_int32 array_size, vx_int32 *array_idx);
-#ifndef SOC_J722S
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
-#endif
 
 AppObj gAppObj;
 
@@ -281,9 +279,7 @@ static vx_status app_save_vximage_to_file(char *filename, vx_image img, uint16_t
 
 static vx_status app_init(AppObj *obj)
 {
-    #ifndef SOC_J722S
     app_grpx_init_prms_t grpx_prms;
-    #endif
     vx_status status = VX_SUCCESS;
 
     obj->context = vxCreateContext();
@@ -315,17 +311,17 @@ static vx_status app_init(AppObj *obj)
     }
     if(status == VX_SUCCESS)
     {
+        #ifndef SOC_J722S
         status = app_init_display2( obj->context, &obj->displayObj , "display2Obj");
+        #endif
     }
 
-#ifndef SOC_J722S
     if (1 == obj->displayObj.display_option)
     {
         appGrpxInitParamsInit(&grpx_prms, obj->context);
         grpx_prms.draw_callback = app_draw_graphics;
         appGrpxInit(&grpx_prms);
     }
-#endif
 
     return status;
 }
@@ -337,14 +333,14 @@ static void app_deinit(AppObj *obj)
     app_deinit_dofviz(&obj->dofvizObj);
 
     app_deinit_display1(&obj->displayObj);
+    #ifndef SOC_J722S
     app_deinit_display2(&obj->displayObj);
+    #endif
 
-#ifndef SOC_J722S
     if (1 == obj->displayObj.display_option)
     {
         appGrpxDeInit();
     }
-#endif
 
     tivxVideoIOUnLoadKernels(obj->context);
     tivxHwaUnLoadKernels(obj->context);
@@ -387,9 +383,11 @@ static vx_status app_create_graph(AppObj *obj)
     status = vxGetStatus((vx_reference) obj->graph);
     if(status == VX_SUCCESS)
     {
+        #ifndef SOC_J722S
         status = app_create_graph_display2(obj->graph,
                                             &obj->displayObj,
                                             obj->pyramidObj.input_img[0]);
+        #endif
     }
     if (status == VX_SUCCESS)
     {
@@ -501,7 +499,9 @@ static void app_delete_graph(AppObj *obj)
     app_delete_dofproc(&obj->dofprocObj);
     app_delete_dofviz(&obj->dofvizObj);
     app_delete_display1(&obj->displayObj);
+    #ifndef SOC_J722S
     app_delete_display2(&obj->displayObj);
+    #endif
     vxReleaseGraph(&obj->graph);
 }
 
@@ -1288,11 +1288,7 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                 token = strtok(NULL, s);
                 if (NULL != token)
                 {
-                    #if defined(SOC_J722S)
-                    obj->displayObj.display_option = 0;
-                    #else
                     obj->displayObj.display_option = atoi(token);
-                    #endif
                 }
             }
             else
@@ -1428,7 +1424,6 @@ static void app_find_image_array_index(vx_image image_array[], vx_reference ref,
   }
 }
 
-#ifndef SOC_J722S
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type)
 {
   AppObj *obj = &gAppObj;
@@ -1476,7 +1471,6 @@ static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufIn
 
   return;
 }
-#endif
 
 static void update_pre_proc_params_pyramid( AppObj *obj, PyramidObj *pyramidObj)
 {
