@@ -142,8 +142,8 @@ vx_status app_create_graph_scaler(vx_context context, vx_graph graph, ScalerObj 
     vxSetNodeTarget(scalerObj->node, VX_TARGET_STRING, TIVX_TARGET_VPAC_MSC1);
     vxSetReferenceName((vx_reference)scalerObj->node, "ScalerNode");
 
-    vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e, vx_false_e};
-    vxReplicateNode(graph, scalerObj->node, replicate, 12);
+    vx_bool replicate[] = { vx_true_e, vx_true_e, vx_true_e, vx_true_e, vx_false_e, vx_false_e};
+    vxReplicateNode(graph, scalerObj->node, replicate, 6);
 
     vxReleaseImage(&input);
     vxReleaseImage(&output_1);
