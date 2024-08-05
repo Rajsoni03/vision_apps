@@ -83,12 +83,12 @@ vx_status app_init_post_proc(vx_context context, PostProcObj *postProcObj, char 
     local_postproc_config->num_input_tensors = postProcObj->num_input_tensors;
 
     if(local_postproc_config->od_prms.ioBufDesc->outWidth[0] == 1001) {
-        for(int32_t i=0; i < TIVX_DL_POST_PROC_CLASSNAMES; i++)
+        for(int32_t i=0; i < TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES; i++)
         {
            local_postproc_config->od_prms.labelOffset[i] = 0;
         }
     }else if(local_postproc_config->od_prms.ioBufDesc->outWidth[0] == 1000) {
-        for(int32_t i=0; i < TIVX_DL_POST_PROC_CLASSNAMES; i++)
+        for(int32_t i=0; i < TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES; i++)
         {
            local_postproc_config->od_prms.labelOffset[i] = 1; 
         }
