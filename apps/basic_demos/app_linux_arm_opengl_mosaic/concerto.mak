@@ -35,13 +35,6 @@ IDIRS += $(VISION_APPS_SAMPLE_IDIRS)
 STATIC_LIBS += $(VISION_APPS_SAMPLE_LIBS)
 STATIC_LIBS += $(VISION_APPS_OPENGL_UTILS_LIBS)
 
-ifeq ($(SOC),j722s)
-ifeq ($(TARGET_OS),QNX)
-# Skipping only for QNX while screen package is not enabled on J722S
-SKIPBUILD=1
-endif
-endif
-
 include $(FINALE)
 
 endif
