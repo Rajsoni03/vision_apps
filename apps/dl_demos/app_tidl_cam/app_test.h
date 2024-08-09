@@ -141,7 +141,7 @@ static void print_new_checksum_structs()
     printf("};\n\n");
 }
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
 static void populate_gatherer(vx_uint32 set_idx, vx_uint32 sample_idx, vx_uint32 calculated_checksum)
 {
     checksums_gatherer[set_idx][sample_idx] = calculated_checksum;

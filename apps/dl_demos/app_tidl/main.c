@@ -1346,7 +1346,7 @@ static vx_status app_verify_graph(AppObj *obj)
 
     APP_PRINTF("app_tidl: Verifying graph ... Done.\n");
 
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
     if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (obj->display_option == 1))
 #else
     if(obj->display_option == 1)

@@ -1378,7 +1378,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     if(obj->pipeline > 0)
     {
         vx_image capture_input_image;
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
         vx_user_data_object results;
 #endif
         uint32_t num_refs;
@@ -1389,7 +1389,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         {
             status = vxGraphParameterDequeueDoneRef(obj->graph, captureObj->graph_parameter_index, (vx_reference*)&capture_input_image, 1, &num_refs);
         }
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
         /* Dequeue output */
         if(status == VX_SUCCESS)
         {
@@ -1421,7 +1421,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         {
             status = vxGraphParameterDequeueDoneRef(obj->graph, imgMosaicObj->graph_parameter_index, (vx_reference*)&test_output, 1, &num_refs);
         }
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
         vx_uint32 expected_idx = frame_id - TEST_BUFFER;
         if((status == VX_SUCCESS) && (obj->test_mode == 1)
             && (expected_idx < (sizeof(checksums_expected[0])/sizeof(checksums_expected[0][0])))
@@ -1453,7 +1453,7 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         {
             status = vxGraphParameterEnqueueReadyRef(obj->graph, imgMosaicObj->graph_parameter_index, (vx_reference*)&test_output, 1);
         }
-#if !defined(SOC_AM62A) && !defined(QNX)
+#if !(defined(SOC_AM62A) && defined(QNX))
         if(status == VX_SUCCESS)
         {
             vxUnmapUserDataObject(results, map_id_results);
