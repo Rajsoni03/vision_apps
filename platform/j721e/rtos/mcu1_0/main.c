@@ -79,7 +79,11 @@
 
 /* Sciserver Init Task stack */
 static uint8_t  gSciserverInitTskStack[APP_SCISERVER_INIT_TSK_STACK]
+#if defined(SAFERTOS)
+__attribute__ ((aligned(APP_SCISERVER_INIT_TSK_STACK)));
+#else
 __attribute__ ((aligned(8192)));
+#endif
 
 static void appMain(void* arg0, void* arg1)
 {
@@ -123,9 +127,16 @@ void StartupEmulatorWaitFxn (void)
     }while (enableDebug);
 }
 
-static uint8_t gTskStackMain[64*1024]
+/**< SCI Server Init Task stack size */
+#define APP_MCU1_0_TASK_STACK        (64U * 1024U)
+
+static uint8_t gTskStackMain[APP_MCU1_0_TASK_STACK]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+#if defined(SAFERTOS)
+__attribute__ ((aligned(APP_MCU1_0_TASK_STACK)));
+#else
+__attribute__ ((aligned(8192)));
+#endif
     ;
 
 int main(void)

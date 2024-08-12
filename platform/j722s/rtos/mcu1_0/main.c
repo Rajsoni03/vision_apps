@@ -85,7 +85,11 @@
 
 /* Sciserver Init Task stack */
 static uint8_t  gSciserverInitTskStack[APP_SCISERVER_INIT_TSK_STACK]
+#if defined(SAFERTOS)
+__attribute__ ((aligned(APP_SCISERVER_INIT_TSK_STACK)));
+#else
 __attribute__ ((aligned(8192)));
+#endif
 
 extern void vTaskStartScheduler( void );
 
@@ -145,9 +149,16 @@ void StartupEmulatorWaitFxn (void)
     }while (enableDebug);
 }
 
-static uint8_t gTskStackMain[64*1024]
+/**< SCI Server Init Task stack size */
+#define APP_MCU1_0_TASK_STACK        (64U * 1024U)
+
+static uint8_t gTskStackMain[APP_MCU1_0_TASK_STACK]
 __attribute__ ((section(".bss:taskStackSection")))
-__attribute__ ((aligned(8192)))
+#if defined(SAFERTOS)
+__attribute__ ((aligned(APP_MCU1_0_TASK_STACK)));
+#else
+__attribute__ ((aligned(8192)));
+#endif
     ;
 
 int main(void)
@@ -159,6 +170,12 @@ int main(void)
     /* Relocate FreeRTOS Reset Vectors from BTCM*/
     void _vectors (void);
     memcpy((void *)0x0, (void *)_vectors, 0x40);
+#endif
+
+#if defined SAFERTOS
+    /* Relocate SafeRTOS Reset Vectors from BTCM*/
+    void _axSafeRTOSresetVectors (void);
+    memcpy((void *)0x0, (void *)_axSafeRTOSresetVectors, 0x40);
 #endif
 
     /* This is for debug purpose - see the description of function header */
