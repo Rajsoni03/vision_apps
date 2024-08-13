@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 09.02.00</h2>
+<h2 align='center'>Version: 10.00.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -208,7 +208,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <li>General stability, performance, documentation improvements</li>
 <li>Memory map updated to accomodate increase of DDR_SHARED_MEM to 1GB. Please check vision_apps/platform/j784s4/rtos/system_memory_map.html for more details</li>
 <li>All included MCU tasks are split between MCU2_0 (ETHFW, VPAC0 HWA), MCU2_1 (DMPAC HWA), MCU4_0 (VPAC1 HWA) leaving MCU3_0, MCU3_1, MCU4_1 free on the main island</li>
-<li><b>VISS Node Optimizations and performance related bug fixes</b>
+<li>VISS Node Optimizations and performance related bug fixes
   <ul>
   <li>[Optimization] Moved VISS configuration memory to cache write-through region to save 125us of configuration time per camera frame (eliminating cache write-back maintenance operation time)</li>
   <li>[Perf Bug Fix] Removed unnecessary cache invalidate maintenance operation on the VISS configuration memory to save 125us of configuration time per camera frame</li>
@@ -253,52 +253,12 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-6232</td>
-<td align="left"><span>Missing global build defines for QNX build</span></td>
+<td align="center">ADASVISION-6323</td>
+<td align="left"><span>Wrongly mapping of Main & MCU CPSW2G in EVM Setup</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6204</td>
-<td align="left"><span>CSI-TX throughput does not meet 30 fps at 1500 Mbps lanespeed for 4 channels</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6192</td>
-<td align="left"><span>Removal of APP_ENABLE_REMOTE_SERVICE_RECEIVE_TASK in app_remote_service_linux.c</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6180</td>
-<td align="left"><span>qos: j784s4: QoS settings not applied in u-boot in the Linux SDK (ADAS/EDGEAI)</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6178</td>
-<td align="left"><span>Search function not working on all Linux SDK pages</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6157</td>
-<td align="left"><span>sdk_builder/setup_psdk_rtos: core-secdev-k3 repo clone should not use git protocol</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6147</a></td>
-<td align="left"><span>gen_linker_mem_map.py generation is inconsistent with memory map</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6145</a></td>
-<td align="left"><span>Make uboot in linux installer causes boot issues</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6124</a></td>
-<td align="left"><span>File IO utility results in bus error for fwrite operation in certain scenarios </span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6121</a></td>
-<td align="left"><span>app_mem.h uses #if defined(C7120) instead of #if defined(__C7120__) </span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6090</a></td>
-<td align="left"><span>Perf Stats can not print full list of task loads</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10525">ADASVISION-4039</a></td>
-<td align="left"><span>Frame drops in 8 camera, 30 fps demo</span></td>
+<td align="center">ADASVISION-6279</td>
+<td align="left"><span>SDK documentation require update for vision_apps memory map</span></td>
 </tr>
 </tbody>
 </table>
@@ -315,6 +275,14 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+  <tr class="odd">
+<td align="center">ADASVISION-6346</td>
+<td align="left"><span>Vision_apps QNXSDP 800 NFS Boot fails with 10.0 ADAS Linux SDK</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6266</td>
+<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
+</tr>
 <tr class="odd">
 <td align="center">ADASVISION-6258</td>
 <td align="left"><span>Display pipe used for graphics overlay is not coherent with A72 CPU core</span></td>
@@ -324,16 +292,20 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>MACRO RGB888_TO_RGB565 should be RGB888_TO_BGR565 in the Draw2D utility</span></td>
 </tr>
 <tr class="odd">
+<td align="center">ADASVISION-6209</td>
+<td align="left"><span> The vision apps multicam codec application is not working</span></td>
+</tr>
+<tr class="even">
 <td align="center">ADASVISION-6199</td>
 <td align="left"><span>Race Conditions with c7x-mma-tidl and tiadalg builds</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6196</td>
+<td align="left"><span>dtsi generated from the memory map generation python script not aligned with Linux dtsi</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-6108</td>
 <td align="left"><span>Fix False Positive in QNX SPL with MCU1_0 Enabled</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6092</td>
-<td align="left"><span>J784S4: K3 ResPart Tool Firewall data is missing</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-6064</td>
@@ -431,10 +403,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">JACINTOREQ-6650</a></td>
-<td align="left"><span>Defer BAM enablement on J7 to SDK 10.0</span></td>
-<td align="left"><span>09.01.00</span></td>
+<td align="center">JACINTOREQ-7629</a></td>
+<td align="left"><span>Descope BAM enablement on J7</span></td>
 <td align="left"><span>10.00.00</span></td>
+<td align="left"><span>DESCOPE</span></td>
 </tr>
 </tbody>
 </table>

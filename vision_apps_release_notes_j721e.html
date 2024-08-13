@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 09.02.00</h2>
+<h2 align='center'>Version: 10.00.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -216,7 +216,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <li>Profiling, logging and other utility APIs</li>
 <li>General stability, performance, documentation improvements</li>
 <li>All included MCU tasks are split between MCU2_0 (ETHFW, VPAC HWA) and MCU2_1 (DMPAC HWA), leaving MCU3_0 and MCU3_1 free on main island</li>
-<li><b>VISS Node Optimizations and performance related bug fixes</b>
+<li>VISS Node Optimizations and performance related bug fixes
   <ul>
   <li>[Optimization] Moved VISS configuration memory to cache write-through region to save 125us of configuration time per camera frame (eliminating cache write-back maintenance operation time)</li>
   <li>[Perf Bug Fix] Removed unnecessary cache invalidate maintenance operation on the VISS configuration memory to save 125us of configuration time per camera frame</li>
@@ -256,52 +256,8 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-6232</td>
-<td align="left"><span>Missing global build defines for QNX build</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6204</td>
-<td align="left"><span>CSI-TX throughput does not meet 30 fps at 1500 Mbps lanespeed for 4 channels</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6198</td>
-<td align="left"><span>PSDK Linux ADAS Fails to Build HS-SE and HS-FS Binaries</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6192</td>
-<td align="left"><span>Removal of APP_ENABLE_REMOTE_SERVICE_RECEIVE_TASK in app_remote_service_linux.c</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6178</td>
-<td align="left"><span>Search function not working on all Linux SDK pages</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6157</td>
-<td align="left"><span>sdk_builder/setup_psdk_rtos: core-secdev-k3 repo clone should not use git protocol</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6145</a></td>
-<td align="left"><span>Make uboot in linux installer causes boot issues</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6124</td>
-<td align="left"><span>sFile IO utility results in bus error for fwrite operation in certain scenarios</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6123</a></td>
-<td align="left"><span>Vision_apps: AVP/AVP3 fails exactly after 32 times</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6090</td>
-<td align="left"><span>Perf Stats can not print full list of task loads</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6041</a></td>
-<td align="left"><span>Wrong TIFS version number in RTOS SDK Manifest</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10525">ADASVISION-4039</a></td>
-<td align="left"><span>Frame drops in 8 camera, 30 fps demo</span></td>
+<td align="center">ADASVISION-6279</td>
+<td align="left"><span>SDK documentation require update for vision_apps memory map</span></td>
 </tr>
 </tbody>
 </table>
@@ -318,9 +274,17 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr class="even">
+<td align="center">ADASVISION-6266</td>
+<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
+</tr>
+  <tr class="odd">
 <td align="center">ADASVISION-6212</td>
 <td align="left"><span>MACRO RGB888_TO_RGB565 should be RGB888_TO_BGR565 in the Draw2D utility</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6209</td>
+<td align="left"><span>The vision apps multicam codec application is not working</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-6199</td>
@@ -346,10 +310,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="center">ADASVISION-5912</td>
 <td align="left"><span>Fix False Results on Vision Apps Init Test Scriplet</span></td>
 </tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11429">ADASVISION-5955</a></td>
-<td align="left"><span>eDP to HDMI adaptors are failing</span></td>
-</tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11431">ADASVISION-5918</a></td>
 <td align="left"><span>Codec app compiler warnings with GCC 11.3</span></td>
@@ -358,25 +318,13 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11432">ADASVISION-5892</a></td>
 <td align="left"><span>Remove unnecessary files from SafeRTOS build</span></td>
 </tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11430">ADASVISION-5849</a></td>
-<td align="left"><span>[J784s4] Graph hangs in delete callback of tidl node in C7x when multiple graphs are created and deleted</span></td>
-</tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11084">ADASVISION-5798</a></td>
 <td align="left"><span>HDMI display from infotainment board not rendering image</span></td>
 </tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11079">ADASVISION-5774</a></td>
-<td align="left"><span>Glitches seen on stereo app for J784S4 with safertos</span></td>
-</tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11078">ADASVISION-5758</a></td>
 <td align="left"><span>Enable en_out_ldc_write cause freeze in Multi Cam Demo</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11003">ADASVISION-5734</a></td>
-<td align="left"><span>App_multi_cam_codec decode framerate drops for more than 2 channels</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11433">ADASVISION-5726</a></td>
@@ -389,10 +337,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10992">ADASVISION-5669</a></td>
 <td align="left"><span>SCIserver should use UART logs instead of appLogPrintf</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-5575</td>
-<td align="left"><span>Graphics bar not rendering properly for all CPU's on J7AHP</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
@@ -409,10 +353,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="odd">
 <td align="center">ADASVISION-5034</td>
 <td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10504">ADASVISION-4924</a></td>
-<td align="left"><span>EtherCAT Slave Demo is not working</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
@@ -467,6 +407,7 @@ Send die ID to TI. </span></td>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10521">ADASVISION-4199</a></td>
 <td align="left"><span>HDMI Display error with ethernet firmware</span></td>
+<td align="left"><span>- </span></td>
 </tr>
 </tbody>
 </table>
@@ -483,10 +424,10 @@ Send die ID to TI. </span></td>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">JACINTOREQ-6650</a></td>
-<td align="left"><span>Defer BAM enablement on J7 to SDK 10.0</span></td>
-<td align="left"><span>09.01.00</span></td>
+<td align="center">JACINTOREQ-7629</a></td>
+<td align="left"><span>Descope BAM enablement on J7</span></td>
 <td align="left"><span>10.00.00</span></td>
+<td align="left"><span>DESCOPE</span></td>
 </tr>
 </tbody>
 </table>

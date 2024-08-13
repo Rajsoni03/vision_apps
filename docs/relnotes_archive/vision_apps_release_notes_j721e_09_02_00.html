@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 10.00.00</h2>
+<h2 align='center'>Version: 09.02.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -136,9 +136,9 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li> Free RTOS and Safe RTOS C7x and R5F and Linux or QNX on A72</li>
-    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
-    <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, SD card</li>
+    <li> Free RTOS and Safe RTOS on C7x, C6x on R5F and Linux or QNX on A72</li>
+    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C6x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
+    <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
     </ul>
 </li>
 
@@ -179,6 +179,13 @@ New features in this release are highlighted in <strong>bold</strong>
     </ul>
 </li>
 
+<li>3D Surround view + AVP2 demo running simultaneously
+    <ul>
+    <li>3D surround view using GPU on 4x 2MP 30fps live camera input</li>
+    <li>3 channel, 3 algo mode (combined network for parking spot and vehicle detect)</li>
+    </ul>
+</li>
+
 <li>ADAS/Vision demos
     <ul>
     <li>Dense optical flow (DOF) demo</li>
@@ -199,15 +206,17 @@ New features in this release are highlighted in <strong>bold</strong>
     <ul>
     <li>image pre-processing (YUV 2 RGB) nodes for DL demos</li>
     <li>image post-processing and visualization nodes for deep learning, DOF, Stereo demos</li>
+    <li>lidar, radar, camera SFM nodes for PTK demos</li>
     <li>OpenGL nodes for surround view</li>
     <li>Multi-threading support in MSC mosaic node</li>
+    <li>Block based processing example kernel on C66x using UDMA/DRU</li>
     </ul>
 </li>
 
 <li>Profiling, logging and other utility APIs</li>
 <li>General stability, performance, documentation improvements</li>
 <li>All included MCU tasks are split between MCU2_0 (ETHFW, VPAC HWA) and MCU2_1 (DMPAC HWA), leaving MCU3_0 and MCU3_1 free on main island</li>
-<li>VISS Node Optimizations and performance related bug fixes
+<li><b>VISS Node Optimizations and performance related bug fixes</b>
   <ul>
   <li>[Optimization] Moved VISS configuration memory to cache write-through region to save 125us of configuration time per camera frame (eliminating cache write-back maintenance operation time)</li>
   <li>[Perf Bug Fix] Removed unnecessary cache invalidate maintenance operation on the VISS configuration memory to save 125us of configuration time per camera frame</li>
@@ -221,28 +230,7 @@ New features in this release are highlighted in <strong>bold</strong>
 <p>
 <h2><a class="anchor" name="Compatibility"></a>Upgrade and Compatibility Information</h2>
 <p>
-
-<table frame="box" rules="all" cellspacing="0" width="100%" border="1" cellpadding="3">
-<tr bgcolor="lightgrey">
-<td align="center"> <b>File</b> </td>
-<td align="center"><b>Change description</b></td>
-<td align="center"><b>User application change required</b></td>
-<td align="center"><b>User application recompile required</b></td>
-</tr>
-
-<tr>
-<td align="center"> kernels_j7\include\TI\j7.h </td>
-<td align="center"> This file is deprecated and removed in this SDK.
-</td>
-<td align="center"> YES </td>
-<td align="center"> YES </td>
-</tr>
-
-</table>
-
-The J721S2 SPL powers on only the peripherals required during boot.  This is a change from the J721E SPL which powers on additional peripherals beyond what
-what is used during boot.  Therefore, if additional peripherals need to be accessed (e.g., I2C, SPI, GPIO's), they must be powered on prior to access.
-
+No upgrade and compatibility changes since previous release.
 <p>
 <hr>
 <p>
@@ -267,10 +255,53 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="center">ADASVISION-6232</td>
+<td align="left"><span>Missing global build defines for QNX build</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6204</td>
+<td align="left"><span>CSI-TX throughput does not meet 30 fps at 1500 Mbps lanespeed for 4 channels</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6279</td>
-<td align="left"><span>SDK documentation require update for vision_apps memory map</span></td>
+<td align="center">ADASVISION-6198</td>
+<td align="left"><span>PSDK Linux ADAS Fails to Build HS-SE and HS-FS Binaries</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6192</td>
+<td align="left"><span>Removal of APP_ENABLE_REMOTE_SERVICE_RECEIVE_TASK in app_remote_service_linux.c</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6178</td>
+<td align="left"><span>Search function not working on all Linux SDK pages</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6157</td>
+<td align="left"><span>sdk_builder/setup_psdk_rtos: core-secdev-k3 repo clone should not use git protocol</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6145</a></td>
+<td align="left"><span>Make uboot in linux installer causes boot issues</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6124</td>
+<td align="left"><span>sFile IO utility results in bus error for fwrite operation in certain scenarios</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6123</a></td>
+<td align="left"><span>Vision_apps: AVP/AVP3 fails exactly after 32 times</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6090</td>
+<td align="left"><span>Perf Stats can not print full list of task loads</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6041</a></td>
+<td align="left"><span>Wrong TIFS version number in RTOS SDK Manifest</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10525">ADASVISION-4039</a></td>
+<td align="left"><span>Frame drops in 8 camera, 30 fps demo</span></td>
 </tr>
 </tbody>
 </table>
@@ -288,32 +319,32 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">ADASVISION-6266</td>
-<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6258</td>
-<td align="left"><span>Display pipe used for graphics overlay is not coherent with A72 CPU core</span></td>
-</tr>
-<tr class="odd">
 <td align="center">ADASVISION-6212</td>
 <td align="left"><span>MACRO RGB888_TO_RGB565 should be RGB888_TO_BGR565 in the Draw2D utility</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6209</td>
-<td align="left"><span>The vision apps multicam codec application is not working</span></td>
+<td align="center">ADASVISION-6199</td>
+<td align="left"><span>Race Conditions in c7x-mma-tidl and tiadalg builds</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6199</td>
-<td align="left"><span>Race Conditions with c7x-mma-tidl and tiadalg builds</span></td>
+<td align="center">ADASVISION-6136</td>
+<td align="left"><span>libC7120-host-emulation not used for x86 emulation</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-6108</td>
 <td align="left"><span>Fix False Positive in QNX SPL with MCU1_0 Enabled</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6080</td>
-<td align="left"><span>Multi Cam application capture error</span></td>
+<td align="center">ADASVISION-6064</td>
+<td align="left"><span>[J784s4] MSMC Cache reserve region is not considered in gen_linker_mem_map.py </span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-5968</td>
+<td align="left"><span>Lower Than Expected Decoder Performance on Multi-Cam Codec Test App</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5912</td>
+<td align="left"><span>Fix False Results on Vision Apps Init Test Scriplet</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11429">ADASVISION-5955</a></td>
@@ -326,6 +357,18 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11432">ADASVISION-5892</a></td>
 <td align="left"><span>Remove unnecessary files from SafeRTOS build</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11430">ADASVISION-5849</a></td>
+<td align="left"><span>[J784s4] Graph hangs in delete callback of tidl node in C7x when multiple graphs are created and deleted</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11084">ADASVISION-5798</a></td>
+<td align="left"><span>HDMI display from infotainment board not rendering image</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11079">ADASVISION-5774</a></td>
+<td align="left"><span>Glitches seen on stereo app for J784S4 with safertos</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11078">ADASVISION-5758</a></td>
@@ -348,24 +391,44 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>SCIserver should use UART logs instead of appLogPrintf</span></td>
 </tr>
 <tr class="odd">
+<td align="center">ADASVISION-5575</td>
+<td align="left"><span>Graphics bar not rendering properly for all CPU's on J7AHP</span></td>
+</tr>
+<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
 <td align="left"><span>SDE disparity artifacts on EVM</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
 <td align="left"><span>AVP4 freezes in first second of running</span></td>
 </tr>
 <tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
+<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
+</tr>
+<tr class="odd">
 <td align="center">ADASVISION-5034</td>
-<td align="left"><span>Details about 8-channels/camera usecase incorrect</span></td>
+<td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
 </tr>
 <tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10504">ADASVISION-4924</a></td>
+<td align="left"><span>EtherCAT Slave Demo is not working</span></td>
+</tr>
+<tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
 <td align="left"><span>Single cam error on ports other than port 1 after running multi cam</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10520">ADASVISION-4386</a></td>
 <td align="left"><span>QNX SBL debug binaries not working on R5F</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10523">ADASVISION-4196</a></td>
+<td align="left"><span>SRV crash occasionally observed</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10524">ADASVISION-4080</a></td>
+<td align="left"><span>QNX: SRV File I/O failing with specific car model</span></td>
 </tr>
 </tbody>
 </table>
@@ -383,10 +446,27 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10713">ADASVISION-5060</a></td>
+<td align="left"><span>Long duration run of vision apps tidl object detection demo hangs at high usage of A72</span></td>
+<td align="left"><span> 1. Ask customers to have TI review board design<br>2. Determine if sample has gone through full TMS production testing from die ID.
+<br>
+Ask die ID using:<br>
+devmem2 0x43000020 – for die id 0<br>
+devmem2 0x43000024 – for die id 1<br>
+devmem2 0x43000028 – for die id 2<br>
+devmem2 0x4300002C – for die id 3<br>
+
+Send die ID to TI. </span></td>
+</tr>
 <tr class="even">
 <td align="center">ADASVISION-4345</td>
 <td align="left"><span>SteamFIFO overflow observed in long run > 6hrs when using D3 IMX390 CM cameras </span></td>
 <td align="left"><span>Upgrade to D3 IMX390 RCM cameras </span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10521">ADASVISION-4199</a></td>
+<td align="left"><span>HDMI Display error with ethernet firmware</span></td>
 </tr>
 </tbody>
 </table>
@@ -403,10 +483,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">JACINTOREQ-7629</a></td>
-<td align="left"><span>Descope BAM enablement on J7</span></td>
+<td align="center">JACINTOREQ-6650</a></td>
+<td align="left"><span>Defer BAM enablement on J7 to SDK 10.0</span></td>
+<td align="left"><span>09.01.00</span></td>
 <td align="left"><span>10.00.00</span></td>
-<td align="left"><span>DESCOPE</span></td>
 </tr>
 </tbody>
 </table>
