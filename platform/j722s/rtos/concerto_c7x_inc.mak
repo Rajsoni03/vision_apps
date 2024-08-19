@@ -65,6 +65,7 @@ TIOVX_LIBS += vx_target_kernels_tutorial
 TIOVX_LIBS += vx_target_kernels_openvx_core
 TIOVX_LIBS += vx_target_kernels_dsp
 TIOVX_LIBS += vx_target_kernels_j7_arm
+TIOVX_LIBS += vx_target_kernels_source_sink
 
 TIDL_LIBS =
 TIDL_LIBS += common_C7524
