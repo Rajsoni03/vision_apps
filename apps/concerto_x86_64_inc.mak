@@ -83,7 +83,7 @@ IMAGING_LIBS += vx_target_kernels_imaging_aewb
 endif
 
 TIADALG_LIBS  =
-ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
 TIADALG_LIBS += tiadalg_fisheye_transformation
 TIADALG_LIBS += tiadalg_image_preprocessing
 TIADALG_LIBS += tiadalg_dof_plane_seperation
@@ -108,7 +108,7 @@ VISION_APPS_UTILS_LIBS += app_utils_perf_stats
 VISION_APPS_UTILS_LIBS += app_utils_console_io
 VISION_APPS_UTILS_LIBS += app_utils_file_io
 VISION_APPS_UTILS_LIBS += app_utils_init
-ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
 VISION_APPS_UTILS_LIBS += app_utils_grpx
 VISION_APPS_UTILS_LIBS += app_utils_hwa
 endif
@@ -132,7 +132,7 @@ VISION_APPS_KERNELS_LIBS += vx_kernels_img_proc
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_a72
 VISION_APPS_KERNELS_LIBS += vx_kernels_fileio
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_fileio
-ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c66
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_c71
 VISION_APPS_KERNELS_LIBS += vx_target_kernels_img_proc_r5f
@@ -154,7 +154,7 @@ TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_tests_testmodule
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_tiovx_tidl_tests
-ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
 endif
@@ -172,7 +172,7 @@ TIDL_LIBS += tidl_custom
 TIDL_LIBS += tidl_avx_kernels
 
 PDK_LIBS =
-ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
 PDK_LIBS += dmautils.lib
 PDK_LIBS += udma.lib
 PDK_LIBS += sciclient.lib

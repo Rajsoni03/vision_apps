@@ -236,7 +236,7 @@ TEST_LIBS += vx_target_kernels_source_sink vx_kernels_hwa_tests
 TEST_LIBS += vx_kernels_video_io_tests
 TEST_LIBS += vx_tiovx_tidl_tests
 
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J721S2 J784S4))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J721S2 J784S4 J742S2))
 TEST_LIBS += vx_tiovx_tvm_tests
 TEST_LIBS += vx_kernels_srv_tests
 TEST_LIBS += vx_applib_tests
