@@ -60,6 +60,7 @@ SYS_STATIC_LIBS += $(PTK_LIBS)
 
 TIOVX_LIBS =
 TIOVX_LIBS += vx_target_kernels_tidl
+TIOVX_LIBS += vx_target_kernels_dsp
 TIOVX_LIBS += vx_target_kernels_tvm
 TIOVX_LIBS += vx_target_kernels_tvm_dynload
 TIOVX_LIBS += vx_target_kernels_ivision_common
