@@ -269,18 +269,6 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-    
     /* DDR Scratch non cacheable */
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_1_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == UFALSE)
@@ -289,18 +277,6 @@ void appMmuMap(Bool is_secure)
     }
 
     retVal = Mmu_map(DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_2_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_3_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_ADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, DDR_C7X_4_SCRATCH_NON_CACHEABLE_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == UFALSE)
     {
         goto mmu_exit;
@@ -324,7 +300,7 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(0x70000000U, 0x70000000U, 0x00800000U, &attrs, is_secure); /* MSMC - 8MB */
+    retVal = Mmu_map(0x70000000U, 0x70000000U, 0x00400000U, &attrs, is_secure); /* MSMC - 4MB */
     if(retVal == UFALSE)
     {
         goto mmu_exit;
@@ -366,19 +342,6 @@ void appMmuMap(Bool is_secure)
         goto mmu_exit;
     }
 
-    retVal = Mmu_map(DDR_C7X_1_3_LOCAL_HEAP_ADDR, DDR_C7X_3_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_3_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_4_LOCAL_HEAP_ADDR, DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, DDR_C7X_4_LOCAL_HEAP_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-
     /* DDR scratch */
     retVal = Mmu_map(DDR_C7X_1_SCRATCH_ADDR, DDR_C7X_1_SCRATCH_PHYS_ADDR, DDR_C7X_1_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == UFALSE)
@@ -387,18 +350,6 @@ void appMmuMap(Bool is_secure)
     }
 
     retVal = Mmu_map(DDR_C7X_1_2_SCRATCH_ADDR, DDR_C7X_2_SCRATCH_PHYS_ADDR, DDR_C7X_2_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_3_SCRATCH_ADDR, DDR_C7X_3_SCRATCH_PHYS_ADDR, DDR_C7X_3_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
-    if(retVal == UFALSE)
-    {
-        goto mmu_exit;
-    }
-
-    retVal = Mmu_map(DDR_C7X_1_4_SCRATCH_ADDR, DDR_C7X_4_SCRATCH_PHYS_ADDR, DDR_C7X_4_SCRATCH_SIZE, &attrs, is_secure); /* ddr            */
     if(retVal == UFALSE)
     {
         goto mmu_exit;
@@ -546,37 +497,21 @@ uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
             (uint64_t) DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
         convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_2_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
             (uint64_t) DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
 
         convertVirt2Phys(virtAddr, (uint64_t) DDR_C7X_1_LOCAL_HEAP_ADDR, 
             (uint64_t) DDR_C7X_1_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
         convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_2_LOCAL_HEAP_ADDR, 
             (uint64_t) DDR_C7X_2_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_3_LOCAL_HEAP_ADDR, 
-            (uint64_t) DDR_C7X_3_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_4_LOCAL_HEAP_ADDR, 
-            (uint64_t) DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_PHYS_SIZE, &phyAddr);
 
         convertVirt2Phys(virtAddr, (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, 
             (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
         convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR, 
             (uint64_t) DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &phyAddr);
-        
+
         convertVirt2Phys(virtAddr, (uint64_t) DDR_C7X_1_SCRATCH_ADDR, 
             (uint64_t) DDR_C7X_1_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_PHYS_SIZE, &phyAddr);
         convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_2_SCRATCH_ADDR, 
             (uint64_t) DDR_C7X_2_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_3_SCRATCH_ADDR, 
-            (uint64_t) DDR_C7X_3_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_PHYS_SIZE, &phyAddr);
-        convertVirt2Phys(virtAddr, (uint64_t)DDR_C7X_1_4_SCRATCH_ADDR, 
-            (uint64_t) DDR_C7X_4_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_PHYS_SIZE, &phyAddr);
     }
     return phyAddr;
 }
@@ -641,37 +576,21 @@ uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
             (uint64_t) DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
         convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
             (uint64_t) DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
 
         convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_LOCAL_HEAP_ADDR, 
             (uint64_t) DDR_C7X_1_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_1_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
         convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_LOCAL_HEAP_ADDR, 
             (uint64_t) DDR_C7X_2_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_2_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_LOCAL_HEAP_ADDR, 
-            (uint64_t) DDR_C7X_3_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_3_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_LOCAL_HEAP_ADDR, 
-            (uint64_t) DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR, (uint64_t)DDR_C7X_4_LOCAL_HEAP_PHYS_SIZE, &target_ptr);
 
         convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR, 
             (uint64_t) DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
         convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR, 
             (uint64_t) DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_ADDR, 
-            (uint64_t) DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_SIZE, &target_ptr);
-        
+
         convertPhys2Virt(shared_ptr, (uint64_t) DDR_C7X_1_SCRATCH_ADDR, 
             (uint64_t) DDR_C7X_1_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_1_SCRATCH_PHYS_SIZE, &target_ptr);
         convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_2_SCRATCH_ADDR, 
             (uint64_t) DDR_C7X_2_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_2_SCRATCH_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_3_SCRATCH_ADDR, 
-            (uint64_t) DDR_C7X_3_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_3_SCRATCH_PHYS_SIZE, &target_ptr);
-        convertPhys2Virt(shared_ptr, (uint64_t)DDR_C7X_1_4_SCRATCH_ADDR, 
-            (uint64_t) DDR_C7X_4_SCRATCH_PHYS_ADDR, (uint64_t)DDR_C7X_4_SCRATCH_PHYS_SIZE, &target_ptr);
     }
     return target_ptr;
 }

@@ -81,7 +81,6 @@
 #define ENABLE_IPC_C7x_1
 #define ENABLE_IPC_C7x_2
 #define ENABLE_IPC_C7x_3
-#define ENABLE_IPC_C7x_4
 
 #define ENABLE_UDMA
 #define ENABLE_UDMA_COPY

@@ -146,7 +146,9 @@
 #endif
 
 #ifdef C7120
+#if defined(CPU_c7x_1) || defined(CPU_c7x_2)
 #include <TI/dl_kernels.h>
+#endif
 #endif
 
 #endif /* #if defined(ENABLE_TIOVX) */
@@ -427,12 +429,6 @@ int32_t appInit()
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
     fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
     #endif
-    #ifdef ENABLE_IPC_C7x_4
-    ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_C7x_4;
-    ipc_init_prm.num_cpus++;
-    log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
-    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
-    #endif
     ipc_init_prm.tiovx_obj_desc_mem = (void*)g_tiovx_obj_desc_mem;
     ipc_init_prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_MEM_SIZE;
     ipc_init_prm.tiovx_log_rt_mem   = (void*)TIOVX_LOG_RT_MEM_ADDR;
@@ -472,9 +468,6 @@ int32_t appInit()
     #ifdef CPU_c7x_3
     ipc_init_prm.self_cpu_id = APP_IPC_CPU_C7x_3;
     #endif
-    #ifdef CPU_c7x_4
-    ipc_init_prm.self_cpu_id = APP_IPC_CPU_C7x_4;
-    #endif
     #endif
 
     log_init_prm.shared_mem = &g_app_log_shared_mem;
@@ -511,9 +504,6 @@ int32_t appInit()
     #endif
     #ifdef CPU_c7x_3
     strncpy(log_init_prm.self_cpu_name, "C7x_3" , APP_LOG_MAX_CPU_NAME);
-    #endif
-    #ifdef CPU_c7x_4
-    strncpy(log_init_prm.self_cpu_name, "C7x_4" , APP_LOG_MAX_CPU_NAME);
     #endif
     #ifdef ENABLE_UART
     log_init_prm.log_rd_max_cpus = APP_IPC_CPU_MAX;
@@ -555,7 +545,7 @@ int32_t appInit()
     status = appLogWrInit(&log_init_prm);
     APP_ASSERT_SUCCESS(status);
     
-    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3)
     status = appFileIOWrInit(&fileio_init_prm);
     APP_ASSERT_SUCCESS(status);
     #endif
@@ -936,7 +926,7 @@ void appDeInit()
     appLogCioDeInit();
     #endif
     appLogWrDeInit();
-    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3)
     appFileIOWrDeInit();
     #endif
 
@@ -1003,7 +993,7 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterVideoIOTargetDisplayM2MKernels();
         #endif
         #ifdef C7120
-        #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+        #if defined(CPU_c7x_1) || defined(CPU_c7x_2)
         {
             void app_c7x_target_kernel_img_add_register(void);
 
@@ -1058,7 +1048,7 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterVideoIOTargetCsitxKernels();
         #endif
         #ifdef C7120
-        #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+        #if defined(CPU_c7x_1) || defined(CPU_c7x_2)
         {
             void app_c7x_target_kernel_img_add_unregister(void);
 

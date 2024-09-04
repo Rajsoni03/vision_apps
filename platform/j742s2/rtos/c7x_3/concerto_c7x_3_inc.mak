@@ -53,17 +53,6 @@ STATIC_LIBS += vx_target_kernels_srv_c66
 STATIC_LIBS += vx_target_kernels_img_proc_c66
 STATIC_LIBS += vx_target_kernels_stereo
 
-TIDL_LIBS =
-TIDL_LIBS += common_C7120
-TIDL_LIBS += mmalib_C7120
-TIDL_LIBS += mmalib_cn_C7120
-TIDL_LIBS += tidl_algo
-TIDL_LIBS += tidl_priv_algo
-TIDL_LIBS += tidl_obj_algo
-TIDL_LIBS += tidl_custom
-
-SYS_STATIC_LIBS += $(TIDL_LIBS)
-
 ADDITIONAL_STATIC_LIBS += dmautils.ae71
 ADDITIONAL_STATIC_LIBS += libtiadalg_fisheye_transformation.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_image_preprocessing.a
