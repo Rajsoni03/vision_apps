@@ -231,10 +231,6 @@ static int32_t appCommonInitLocal()
         ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_C7x_3;
         ipc_init_prm.num_cpus++;
         #endif
-        #ifdef ENABLE_IPC_C7x_4
-        ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_C7x_4;
-        ipc_init_prm.num_cpus++;
-        #endif
         ipc_init_prm.tiovx_obj_desc_mem = (void*)TIOVX_OBJ_DESC_MEM_ADDR;
         ipc_init_prm.tiovx_obj_desc_mem_size = TIOVX_OBJ_DESC_MEM_SIZE;
         ipc_init_prm.tiovx_log_rt_mem   = (void*)TIOVX_LOG_RT_MEM_ADDR;
