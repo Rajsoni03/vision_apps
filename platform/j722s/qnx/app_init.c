@@ -164,7 +164,12 @@ static int32_t appCommonInitLocal()
     }
     if(status==0)
     {
-        status = appMemInit(NULL);
+        app_mem_init_prm_t mem_init_prm;
+
+        mem_init_prm.base = DDR_SHARED_MEM_PHYS_ADDR;
+        mem_init_prm.size = DDR_SHARED_MEM_PHYS_SIZE;
+
+        status = appMemInit(&mem_init_prm);
         if(status!=0)
         {
             printf("APP: ERROR: Memory init failed !!!\n");
