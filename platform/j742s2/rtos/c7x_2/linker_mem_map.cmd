@@ -92,8 +92,8 @@ MEMORY
     DDR_C7x_2_SECURE_VECS    ( RWIX ) : ORIGIN = 0xB4600000 , LENGTH = 0x00004000
     /* DDR for C7x_2 code/data section [ size 24.00 MB ] */
     DDR_C7x_2                ( RWIX ) : ORIGIN = 0xB4800000 , LENGTH = 0x01800000
-    /* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x3C000000
+    /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
     /* Virtual address of Non-cacheable DDR for c7x_2 for local heap [ size 128.00 MB ] */
     DDR_C7X_2_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of Cacheable DDR for c7x_2 for local heap [ size 128.00 MB ] */
@@ -104,26 +104,10 @@ MEMORY
     DDR_C7X_2_SCRATCH        ( RWIX ) : ORIGIN = 0x118000000 , LENGTH = 0x08000000
     /* Virtual address of non-cacheable DDR for c7x_1 for local heap wrt c7x_2 [ size 128.00 MB ] */
     DDR_C7X_2_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x120000000 , LENGTH = 0x08000000
-    /* Virtual address of non-cacheable DDR for c7x_3 for local heap wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_3_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x128000000 , LENGTH = 0x08000000
-    /* Virtual address of non-cacheable DDR for c7x_4 for local heap wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_4_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x130000000 , LENGTH = 0x08000000
     /* Virtual address of cacheable DDR for c7x_1 for local heap wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_1_LOCAL_HEAP   ( RWIX ) : ORIGIN = 0x138000000 , LENGTH = 0x08000000
-    /* Virtual address of cacheable DDR for c7x_3 for local heap wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_3_LOCAL_HEAP   ( RWIX ) : ORIGIN = 0x140000000 , LENGTH = 0x08000000
-    /* Virtual address of cacheable DDR for c7x_4 for local heap wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_4_LOCAL_HEAP   ( RWIX ) : ORIGIN = 0x148000000 , LENGTH = 0x08000000
+    DDR_C7X_2_1_LOCAL_HEAP   ( RWIX ) : ORIGIN = 0x128000000 , LENGTH = 0x08000000
     /* Virtual address of non-cacheable DDR for c7x_1 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_1_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x150000000 , LENGTH = 0x08000000
-    /* Virtual address of non-cacheable DDR for c7x_3 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_3_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x158000000 , LENGTH = 0x08000000
-    /* Virtual address of non-cacheable DDR for c7x_4 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_4_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x160000000 , LENGTH = 0x08000000
+    DDR_C7X_2_1_SCRATCH_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x130000000 , LENGTH = 0x08000000
     /* Virtual address of cacheable DDR for c7x_1 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_1_SCRATCH      ( RWIX ) : ORIGIN = 0x168000000 , LENGTH = 0x08000000
-    /* Virtual address of cacheable DDR for c7x_3 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_3_SCRATCH      ( RWIX ) : ORIGIN = 0x170000000 , LENGTH = 0x08000000
-    /* Virtual address of cacheable DDR for c7x_4 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-    DDR_C7X_2_4_SCRATCH      ( RWIX ) : ORIGIN = 0x178000000 , LENGTH = 0x08000000
+    DDR_C7X_2_1_SCRATCH      ( RWIX ) : ORIGIN = 0x138000000 , LENGTH = 0x08000000
 }

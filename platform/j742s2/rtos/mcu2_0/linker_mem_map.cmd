@@ -89,13 +89,13 @@ MEMORY
     /* Memory for remote core file operations [ size  4.00 MB ] */
     APP_FILEIO_MEM                    : ORIGIN = 0xB1000000 , LENGTH = 0x00400000
     /* DDR for MCU2_0 for local heap [ size  6.00 MB ] */
-    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xBB000000 , LENGTH = 0x00600000
+    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xB9000000 , LENGTH = 0x00600000
     /* VISS configuration memory. MUST be write through cache policy. [ size  2.00 MB ] */
-    DDR_MCU2_0_VISS_CONFIG_HEAP ( RWIX ) : ORIGIN = 0xBB600000 , LENGTH = 0x00200000
+    DDR_MCU2_0_VISS_CONFIG_HEAP ( RWIX ) : ORIGIN = 0xB9600000 , LENGTH = 0x00200000
     /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xBE000000 , LENGTH = 0x00800000
+    INTERCORE_ETH_DESC_MEM            : ORIGIN = 0xBC000000 , LENGTH = 0x00800000
     /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xBE800000 , LENGTH = 0x01800000
-    /* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x3C000000
+    INTERCORE_ETH_DATA_MEM            : ORIGIN = 0xBC800000 , LENGTH = 0x01800000
+    /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
 }

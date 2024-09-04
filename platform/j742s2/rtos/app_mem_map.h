@@ -103,14 +103,6 @@
 #define L1RAM_C7x_3_ADDR (0x66E00000u)
 #define L1RAM_C7x_3_SIZE (0x00004000u)
 
-/* L2 for C7x_4 [ size 448.00 KB ] */
-#define L2RAM_C7x_4_ADDR (0x67800000u)
-#define L2RAM_C7x_4_SIZE (0x00070000u)
-
-/* L1 for C7x_4 [ size 16.00 KB ] */
-#define L1RAM_C7x_4_ADDR (0x67E00000u)
-#define L1RAM_C7x_4_SIZE (0x00004000u)
-
 /* MSMC for C7x_1 [ size  3.00 MB ] */
 #define MSMC_C7x_1_ADDR (0x68000000u)
 #define MSMC_C7x_1_SIZE (0x00300000u)
@@ -122,10 +114,6 @@
 /* MSMC for C7x_3 [ size  3.00 MB ] */
 #define MSMC_C7x_3_ADDR (0x6A000000u)
 #define MSMC_C7x_3_SIZE (0x00300000u)
-
-/* MSMC for C7x_4 [ size  3.00 MB ] */
-#define MSMC_C7x_4_ADDR (0x6B000000u)
-#define MSMC_C7x_4_SIZE (0x00300000u)
 
 /* DDR for MCU1_0 for Linux IPC [ size 1024.00 KB ] */
 #define DDR_MCU1_0_IPC_ADDR (0xA0000000u)
@@ -235,65 +223,57 @@
 #define DDR_C7x_3_DTS_ADDR (0xB6100000u)
 #define DDR_C7x_3_DTS_SIZE (0x01F00000u)
 
-/* DDR for C7x_4 for Linux IPC [ size 1024.00 KB ] */
-#define DDR_C7x_4_IPC_ADDR (0xB8000000u)
-#define DDR_C7x_4_IPC_SIZE (0x00100000u)
-
-/* DDR for C7x_4 for all sections, used for reserving memory in DTS file [ size 31.00 MB ] */
-#define DDR_C7x_4_DTS_ADDR (0xB8100000u)
-#define DDR_C7x_4_DTS_SIZE (0x01F00000u)
-
 /* DDR for MCU1_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xBA000000u)
+#define DDR_MCU1_0_LOCAL_HEAP_ADDR (0xB8000000u)
 #define DDR_MCU1_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU1_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xBA800000u)
+#define DDR_MCU1_1_LOCAL_HEAP_ADDR (0xB8800000u)
 #define DDR_MCU1_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU2_0 for local heap [ size  6.00 MB ] */
-#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xBB000000u)
+#define DDR_MCU2_0_LOCAL_HEAP_ADDR (0xB9000000u)
 #define DDR_MCU2_0_LOCAL_HEAP_SIZE (0x00600000u)
 
 /* VISS configuration memory. MUST be write through cache policy. [ size  2.00 MB ] */
-#define DDR_MCU2_0_VISS_CONFIG_HEAP_ADDR (0xBB600000u)
+#define DDR_MCU2_0_VISS_CONFIG_HEAP_ADDR (0xB9600000u)
 #define DDR_MCU2_0_VISS_CONFIG_HEAP_SIZE (0x00200000u)
 
 /* DDR for MCU2_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xBB800000u)
+#define DDR_MCU2_1_LOCAL_HEAP_ADDR (0xB9800000u)
 #define DDR_MCU2_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU3_0 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xBC000000u)
+#define DDR_MCU3_0_LOCAL_HEAP_ADDR (0xBA000000u)
 #define DDR_MCU3_0_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU3_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xBC800000u)
+#define DDR_MCU3_1_LOCAL_HEAP_ADDR (0xBA800000u)
 #define DDR_MCU3_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* DDR for MCU4_0 for local heap [ size  6.00 MB ] */
-#define DDR_MCU4_0_LOCAL_HEAP_ADDR (0xBD000000u)
+#define DDR_MCU4_0_LOCAL_HEAP_ADDR (0xBB000000u)
 #define DDR_MCU4_0_LOCAL_HEAP_SIZE (0x00600000u)
 
 /* VISS configuration memory. MUST be write through cache policy. [ size  2.00 MB ] */
-#define DDR_MCU4_0_VISS_CONFIG_HEAP_ADDR (0xBD600000u)
+#define DDR_MCU4_0_VISS_CONFIG_HEAP_ADDR (0xBB600000u)
 #define DDR_MCU4_0_VISS_CONFIG_HEAP_SIZE (0x00200000u)
 
 /* DDR for MCU4_1 for local heap [ size  8.00 MB ] */
-#define DDR_MCU4_1_LOCAL_HEAP_ADDR (0xBD800000u)
+#define DDR_MCU4_1_LOCAL_HEAP_ADDR (0xBB800000u)
 #define DDR_MCU4_1_LOCAL_HEAP_SIZE (0x00800000u)
 
 /* Inter-core ethernet shared desc queues. MUST be non-cached or cache-coherent [ size  8.00 MB ] */
-#define INTERCORE_ETH_DESC_MEM_ADDR (0xBE000000u)
+#define INTERCORE_ETH_DESC_MEM_ADDR (0xBC000000u)
 #define INTERCORE_ETH_DESC_MEM_SIZE (0x00800000u)
 
 /* Inter-core ethernet shared data buffers. MUST be non-cached or cache-coherent [ size 24.00 MB ] */
-#define INTERCORE_ETH_DATA_MEM_ADDR (0xBE800000u)
+#define INTERCORE_ETH_DATA_MEM_ADDR (0xBC800000u)
 #define INTERCORE_ETH_DATA_MEM_SIZE (0x01800000u)
 
-/* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
-#define DDR_SHARED_MEM_ADDR (0xC0000000u)
-#define DDR_SHARED_MEM_SIZE (0x3C000000u)
+/* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
+#define DDR_SHARED_MEM_ADDR (0xBE000000u)
+#define DDR_SHARED_MEM_SIZE (0x20000000u)
 
 /* Uboot DDR relocation memory [ size 64.00 MB ] */
 #define UBOOT_RELOC_MEM_ADDR (0xFC000000u)
@@ -311,10 +291,6 @@
 #define DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x100000000u)
 #define DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
 
-/* Virtual address of Non-cacheable DDR for c7x_4 for local heap [ size 128.00 MB ] */
-#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x100000000u)
-#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
 /* Virtual address of cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */
 #define DDR_C7X_1_LOCAL_HEAP_ADDR (0x108000000u)
 #define DDR_C7X_1_LOCAL_HEAP_SIZE (0x08000000u)
@@ -326,10 +302,6 @@
 /* Virtual address of Cacheable DDR for c7x_3 for local heap [ size 128.00 MB ] */
 #define DDR_C7X_3_LOCAL_HEAP_ADDR (0x108000000u)
 #define DDR_C7X_3_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of Cacheable DDR for c7x_4 for local heap [ size 128.00 MB ] */
-#define DDR_C7X_4_LOCAL_HEAP_ADDR (0x108000000u)
-#define DDR_C7X_4_LOCAL_HEAP_SIZE (0x08000000u)
 
 /* Virtual address of non-cacheable DDR for c7x_1 for Scratch Memory [ size 128.00 MB ] */
 #define DDR_C7X_1_SCRATCH_NON_CACHEABLE_ADDR (0x110000000u)
@@ -343,10 +315,6 @@
 #define DDR_C7X_3_SCRATCH_NON_CACHEABLE_ADDR (0x110000000u)
 #define DDR_C7X_3_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
 
-/* Virtual address of Non-cacheable DDR for c7x_4 for Scratch Memory [ size 128.00 MB ] */
-#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_ADDR (0x110000000u)
-#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
 /* Virtual address of cacheable DDR for c7x_1 for Scratch Memory [ size 128.00 MB ] */
 #define DDR_C7X_1_SCRATCH_ADDR (0x118000000u)
 #define DDR_C7X_1_SCRATCH_SIZE (0x08000000u)
@@ -359,10 +327,6 @@
 #define DDR_C7X_3_SCRATCH_ADDR (0x118000000u)
 #define DDR_C7X_3_SCRATCH_SIZE (0x08000000u)
 
-/* Virtual address of cacheable DDR for c7x_4 for Scratch Memory [ size 128.00 MB ] */
-#define DDR_C7X_4_SCRATCH_ADDR (0x118000000u)
-#define DDR_C7X_4_SCRATCH_SIZE (0x08000000u)
-
 /* Virtual address of non-cacheable DDR for c7x_2 for local heap wrt c7x_1 [ size 128.00 MB ] */
 #define DDR_C7X_1_2_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x120000000u)
 #define DDR_C7X_1_2_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
@@ -371,189 +335,29 @@
 #define DDR_C7X_2_1_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x120000000u)
 #define DDR_C7X_2_1_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
 
-/* Virtual address of non-cacheable DDR for c7x_1 for local heap wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_1_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x120000000u)
-#define DDR_C7X_3_1_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_1 for local heap wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_1_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x120000000u)
-#define DDR_C7X_4_1_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_3 for local heap wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x128000000u)
-#define DDR_C7X_1_3_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_3 for local heap wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_3_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x128000000u)
-#define DDR_C7X_2_3_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_2 for local heap wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_2_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x128000000u)
-#define DDR_C7X_3_2_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_2 for local heap wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_2_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x128000000u)
-#define DDR_C7X_4_2_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_4 for local heap wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x130000000u)
-#define DDR_C7X_1_4_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_4 for local heap wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_4_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x130000000u)
-#define DDR_C7X_2_4_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_4 for local heap wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_4_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x130000000u)
-#define DDR_C7X_3_4_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_3 for local heap wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_3_LOCAL_HEAP_NON_CACHEABLE_ADDR (0x130000000u)
-#define DDR_C7X_4_3_LOCAL_HEAP_NON_CACHEABLE_SIZE (0x08000000u)
-
 /* Virtual address of cacheable DDR for c7x_2 for local heap wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_2_LOCAL_HEAP_ADDR (0x138000000u)
+#define DDR_C7X_1_2_LOCAL_HEAP_ADDR (0x128000000u)
 #define DDR_C7X_1_2_LOCAL_HEAP_SIZE (0x08000000u)
 
 /* Virtual address of cacheable DDR for c7x_1 for local heap wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_1_LOCAL_HEAP_ADDR (0x138000000u)
+#define DDR_C7X_2_1_LOCAL_HEAP_ADDR (0x128000000u)
 #define DDR_C7X_2_1_LOCAL_HEAP_SIZE (0x08000000u)
 
-/* Virtual address of cacheable DDR for c7x_1 for local heap wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_1_LOCAL_HEAP_ADDR (0x138000000u)
-#define DDR_C7X_3_1_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_1 for local heap wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_1_LOCAL_HEAP_ADDR (0x138000000u)
-#define DDR_C7X_4_1_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_3 for local heap wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_3_LOCAL_HEAP_ADDR (0x140000000u)
-#define DDR_C7X_1_3_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_3 for local heap wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_3_LOCAL_HEAP_ADDR (0x140000000u)
-#define DDR_C7X_2_3_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_2 for local heap wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_2_LOCAL_HEAP_ADDR (0x140000000u)
-#define DDR_C7X_3_2_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_2 for local heap wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_2_LOCAL_HEAP_ADDR (0x140000000u)
-#define DDR_C7X_4_2_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_4 for local heap wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_4_LOCAL_HEAP_ADDR (0x148000000u)
-#define DDR_C7X_1_4_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_4 for local heap wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_4_LOCAL_HEAP_ADDR (0x148000000u)
-#define DDR_C7X_2_4_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_4 for local heap wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_4_LOCAL_HEAP_ADDR (0x148000000u)
-#define DDR_C7X_3_4_LOCAL_HEAP_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_3 for local heap wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_3_LOCAL_HEAP_ADDR (0x148000000u)
-#define DDR_C7X_4_3_LOCAL_HEAP_SIZE (0x08000000u)
-
 /* Virtual address of non-cacheable DDR for c7x_2 for Scratch Memory wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR (0x150000000u)
+#define DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_ADDR (0x130000000u)
 #define DDR_C7X_1_2_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
 
 /* Virtual address of non-cacheable DDR for c7x_1 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_1_SCRATCH_NON_CACHEABLE_ADDR (0x150000000u)
+#define DDR_C7X_2_1_SCRATCH_NON_CACHEABLE_ADDR (0x130000000u)
 #define DDR_C7X_2_1_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
 
-/* Virtual address of non-cacheable DDR for c7x_1 for Scratch Memory wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_1_SCRATCH_NON_CACHEABLE_ADDR (0x150000000u)
-#define DDR_C7X_3_1_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_1 for Scratch Memory wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_1_SCRATCH_NON_CACHEABLE_ADDR (0x150000000u)
-#define DDR_C7X_4_1_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_3 for Scratch Memory wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_ADDR (0x158000000u)
-#define DDR_C7X_1_3_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_3 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_3_SCRATCH_NON_CACHEABLE_ADDR (0x158000000u)
-#define DDR_C7X_2_3_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_2 for Scratch Memory wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_2_SCRATCH_NON_CACHEABLE_ADDR (0x158000000u)
-#define DDR_C7X_3_2_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_2 for Scratch Memory wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_2_SCRATCH_NON_CACHEABLE_ADDR (0x158000000u)
-#define DDR_C7X_4_2_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_4 for Scratch Memory wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_ADDR (0x160000000u)
-#define DDR_C7X_1_4_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_4 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_4_SCRATCH_NON_CACHEABLE_ADDR (0x160000000u)
-#define DDR_C7X_2_4_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_4 for Scratch Memory wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_4_SCRATCH_NON_CACHEABLE_ADDR (0x160000000u)
-#define DDR_C7X_3_4_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
-/* Virtual address of non-cacheable DDR for c7x_3 for Scratch Memory wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_3_SCRATCH_NON_CACHEABLE_ADDR (0x160000000u)
-#define DDR_C7X_4_3_SCRATCH_NON_CACHEABLE_SIZE (0x08000000u)
-
 /* Virtual address of cacheable DDR for c7x_2 for Scratch Memory wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_2_SCRATCH_ADDR (0x168000000u)
+#define DDR_C7X_1_2_SCRATCH_ADDR (0x138000000u)
 #define DDR_C7X_1_2_SCRATCH_SIZE (0x08000000u)
 
 /* Virtual address of cacheable DDR for c7x_1 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_1_SCRATCH_ADDR (0x168000000u)
+#define DDR_C7X_2_1_SCRATCH_ADDR (0x138000000u)
 #define DDR_C7X_2_1_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_1 for Scratch Memory wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_1_SCRATCH_ADDR (0x168000000u)
-#define DDR_C7X_3_1_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_1 for Scratch Memory wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_1_SCRATCH_ADDR (0x168000000u)
-#define DDR_C7X_4_1_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_3 for Scratch Memory wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_3_SCRATCH_ADDR (0x170000000u)
-#define DDR_C7X_1_3_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_3 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_3_SCRATCH_ADDR (0x170000000u)
-#define DDR_C7X_2_3_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_2 for Scratch Memory wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_2_SCRATCH_ADDR (0x170000000u)
-#define DDR_C7X_3_2_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_2 for Scratch Memory wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_2_SCRATCH_ADDR (0x170000000u)
-#define DDR_C7X_4_2_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_4 for Scratch Memory wrt c7x_1 [ size 128.00 MB ] */
-#define DDR_C7X_1_4_SCRATCH_ADDR (0x178000000u)
-#define DDR_C7X_1_4_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_4 for Scratch Memory wrt c7x_2 [ size 128.00 MB ] */
-#define DDR_C7X_2_4_SCRATCH_ADDR (0x178000000u)
-#define DDR_C7X_2_4_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_4 for Scratch Memory wrt c7x_3 [ size 128.00 MB ] */
-#define DDR_C7X_3_4_SCRATCH_ADDR (0x178000000u)
-#define DDR_C7X_3_4_SCRATCH_SIZE (0x08000000u)
-
-/* Virtual address of cacheable DDR for c7x_3 for Scratch Memory wrt c7x_4 [ size 128.00 MB ] */
-#define DDR_C7X_4_3_SCRATCH_ADDR (0x178000000u)
-#define DDR_C7X_4_3_SCRATCH_SIZE (0x08000000u)
 
 /* Physical address of non-cacheable DDR for c7x_1 for local heap [ size 128.00 MB ] */
 #define DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR (0x880000000u)
@@ -603,25 +407,9 @@
 #define DDR_C7X_3_SCRATCH_PHYS_ADDR (0x8D8000000u)
 #define DDR_C7X_3_SCRATCH_PHYS_SIZE (0x08000000u)
 
-/* Physical address of Non-cacheable DDR for c7x_4 for local heap physical addr [ size 128.00 MB ] */
-#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_ADDR (0x8E0000000u)
-#define DDR_C7X_4_LOCAL_HEAP_NON_CACHEABLE_PHYS_SIZE (0x08000000u)
-
-/* Physical address of Cacheable DDR for c7x_4 for local heap [ size 128.00 MB ] */
-#define DDR_C7X_4_LOCAL_HEAP_PHYS_ADDR (0x8E8000000u)
-#define DDR_C7X_4_LOCAL_HEAP_PHYS_SIZE (0x08000000u)
-
-/* Physical address of Non-cacheable DDR for c7x_4 for Scratch Memory [ size 128.00 MB ] */
-#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_ADDR (0x8F0000000u)
-#define DDR_C7X_4_SCRATCH_NON_CACHEABLE_PHYS_SIZE (0x08000000u)
-
-/* Physical address of cacheable DDR for c7x_4 for Scratch Memory [ size 128.00 MB ] */
-#define DDR_C7X_4_SCRATCH_PHYS_ADDR (0x8F8000000u)
-#define DDR_C7X_4_SCRATCH_PHYS_SIZE (0x08000000u)
-
-/* Physical address of memory for shared memory buffers in DDR [ size 960.00 MB ] */
-#define DDR_SHARED_MEM_PHYS_ADDR (0x900000000u)
-#define DDR_SHARED_MEM_PHYS_SIZE (0x3C000000u)
+/* Physical address of memory for shared memory buffers in DDR [ size 512.00 MB ] */
+#define DDR_SHARED_MEM_PHYS_ADDR (0x8E0000000u)
+#define DDR_SHARED_MEM_PHYS_SIZE (0x20000000u)
 
 /* Main OCRAM Physical Address for MCU2_0 [ size 256.00 KB ] */
 #define MAIN_OCRAM_MCU2_0_PHYS_ADDR (0x4F02000000u)

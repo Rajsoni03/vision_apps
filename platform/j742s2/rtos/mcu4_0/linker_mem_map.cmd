@@ -87,9 +87,9 @@ MEMORY
     /* Memory for remote core file operations [ size  4.00 MB ] */
     APP_FILEIO_MEM                    : ORIGIN = 0xB1000000 , LENGTH = 0x00400000
     /* DDR for MCU4_0 for local heap [ size  6.00 MB ] */
-    DDR_MCU4_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xBD000000 , LENGTH = 0x00600000
+    DDR_MCU4_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xBB000000 , LENGTH = 0x00600000
     /* VISS configuration memory. MUST be write through cache policy. [ size  2.00 MB ] */
-    DDR_MCU4_0_VISS_CONFIG_HEAP ( RWIX ) : ORIGIN = 0xBD600000 , LENGTH = 0x00200000
-    /* Memory for shared memory buffers in DDR [ size 960.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x3C000000
+    DDR_MCU4_0_VISS_CONFIG_HEAP ( RWIX ) : ORIGIN = 0xBB600000 , LENGTH = 0x00200000
+    /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
 }
