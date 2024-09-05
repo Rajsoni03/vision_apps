@@ -61,11 +61,6 @@ extern "C" {
 #define BUILD_C7X
 #endif
 
-#if defined(CPU_c7x_4)
-#define BUILD_C7X_4
-#define BUILD_C7X
-#endif
-
 #include <ti/drv/ipc/include/ipc_rsctypes.h>
 #include <app_mem_map.h>
 
@@ -155,15 +150,12 @@ const Ipc_ResourceTable ti_ipc_remoteproc_ResourceTable __attribute__ ((section 
 #elif defined (CPU_c7x_3)
     { RPMSG_VRING_ADDR_ANY, 4096U, C7X_RPMSG_VQ0_SIZE, 1U, 0U },
     { RPMSG_VRING_ADDR_ANY, 4096U, C7X_RPMSG_VQ1_SIZE, 2U, 0U },
-#elif defined (CPU_c7x_4)
-    { RPMSG_VRING_ADDR_ANY, 4096U, C7X_RPMSG_VQ0_SIZE, 1U, 0U },
-    { RPMSG_VRING_ADDR_ANY, 4096U, C7X_RPMSG_VQ1_SIZE, 2U, 0U },
 #else
     #error CPU_<cpu name> not defined
 #endif 
 
     {
-#if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+#if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3)
         (TRACE_INTS_VER1 | TYPE_TRACE), TRACEBUFADDR, 0x80000, 0, "trace:r5f0",
 #else
         (TRACE_INTS_VER0 | TYPE_TRACE), TRACEBUFADDR, 0x80000, 0, "trace:r5f0",

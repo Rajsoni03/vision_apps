@@ -63,11 +63,6 @@ extern "C" {
 #define BUILD_C7X
 #endif
 
-#if defined(CPU_c7x_4)
-#define BUILD_C7X_4
-#define BUILD_C7X
-#endif
-
 void *appGetIpcResourceTable()
 {
     return NULL;
