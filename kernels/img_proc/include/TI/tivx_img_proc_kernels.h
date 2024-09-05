@@ -186,7 +186,7 @@ extern "C" {
 /*For depth tensor output is U08, which makes for each value one different color has to be assigned, so each value is treated as different class*/
 #define TIVX_PIXEL_VIZ_MAX_CLASS  (256U)
 
-#if defined(SOC_J784S4)
+#if defined(SOC_J784S4) || defined(SOC_J742S2)
 #define TIVX_IMG_MOSAIC_MAX_INPUTS    (16U)
 #else
 #define TIVX_IMG_MOSAIC_MAX_INPUTS    (8U)
