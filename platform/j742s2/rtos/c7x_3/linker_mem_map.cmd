@@ -93,7 +93,7 @@ MEMORY
     /* DDR for C7x_3 code/data section [ size 24.00 MB ] */
     DDR_C7x_3                ( RWIX ) : ORIGIN = 0xB6800000 , LENGTH = 0x01800000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* Virtual address of Non-cacheable DDR for c7x_3 for local heap [ size 128.00 MB ] */
     DDR_C7X_3_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0x100000000 , LENGTH = 0x08000000
     /* Virtual address of Cacheable DDR for c7x_3 for local heap [ size 128.00 MB ] */

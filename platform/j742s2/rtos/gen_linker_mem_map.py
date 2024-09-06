@@ -287,7 +287,7 @@ ddr_intercore_eth_data_addr = ddr_intercore_eth_desc_addr + ddr_intercore_eth_de
 ddr_intercore_eth_data_size = 24*MB;
 
 # Shared memory for DMA Buf FD carveout
-ddr_shared_mem_addr     = ddr_intercore_eth_data_addr + ddr_intercore_eth_data_size;
+ddr_shared_mem_addr     = 0xC0000000; # This will be the virtual address used for R5F's / C7X's
 ddr_shared_mem_size     = 512*MB;
 
 # C7x 1 Persistent DDR
@@ -365,7 +365,7 @@ c7x_2_1_ddr_scratch_non_cacheable_addr = c7x_2_1_ddr_local_heap_addr + c7x_1_ddr
 c7x_2_1_ddr_scratch_addr = c7x_2_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
 
 # Shared memory for DMA Buf FD carveout (located in high mem)
-ddr_shared_mem_addr_phys  = c7x_3_ddr_scratch_addr_phys + c7x_3_ddr_scratch_size;
+ddr_shared_mem_addr_phys  = 0x900000000;
 
 #
 # Create memory section based on addr and size defined above, including

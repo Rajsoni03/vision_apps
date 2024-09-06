@@ -599,12 +599,7 @@ int32_t appInit()
     /* Only programming RAT if the physical address is in high mem */
     if (DDR_SHARED_MEM_PHYS_ADDR > 0xFFFFFFFF)
     {
-        /* Making the DDR_SHARED_MEM size aligned to 1GB by adding the UBOOT_RELOC_MEM_SIZE.                        */
-        /* The UBOOT_RELOC_MEM_SIZE was subtracted from DDR_SHARED_MEM size while creating the memory map for J784S4*/
-        /* This was done because the 1GB DDR_SHARED_MEM size was overlapping the UBOOT_RELOC_MEM_ADDR at the end of */
-        /* low 2GB memory. For more details on this, please refer to 3.1.1.1.6. Available RAM for image download    */
-        /* section in processor-sdk-linux documentation                                                             */
-        ddr_mem_rat_prm.size              = DDR_SHARED_MEM_SIZE + UBOOT_RELOC_MEM_SIZE;
+        ddr_mem_rat_prm.size              = DDR_SHARED_MEM_SIZE;
         ddr_mem_rat_prm.baseAddress       = DDR_SHARED_MEM_ADDR;
         ddr_mem_rat_prm.translatedAddress = DDR_SHARED_MEM_PHYS_ADDR;
 

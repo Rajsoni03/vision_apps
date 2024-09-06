@@ -89,5 +89,5 @@ MEMORY
     /* DDR for MCU4_1 for local heap [ size  8.00 MB ] */
     DDR_MCU4_1_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xBB800000 , LENGTH = 0x00800000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
 }

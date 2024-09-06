@@ -272,7 +272,7 @@
 #define INTERCORE_ETH_DATA_MEM_SIZE (0x01800000u)
 
 /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-#define DDR_SHARED_MEM_ADDR (0xBE000000u)
+#define DDR_SHARED_MEM_ADDR (0xC0000000u)
 #define DDR_SHARED_MEM_SIZE (0x20000000u)
 
 /* Uboot DDR relocation memory [ size 64.00 MB ] */
@@ -408,7 +408,7 @@
 #define DDR_C7X_3_SCRATCH_PHYS_SIZE (0x08000000u)
 
 /* Physical address of memory for shared memory buffers in DDR [ size 512.00 MB ] */
-#define DDR_SHARED_MEM_PHYS_ADDR (0x8E0000000u)
+#define DDR_SHARED_MEM_PHYS_ADDR (0x900000000u)
 #define DDR_SHARED_MEM_PHYS_SIZE (0x20000000u)
 
 /* Main OCRAM Physical Address for MCU2_0 [ size 256.00 KB ] */

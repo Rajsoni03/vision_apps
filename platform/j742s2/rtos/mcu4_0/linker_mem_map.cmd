@@ -91,5 +91,5 @@ MEMORY
     /* VISS configuration memory. MUST be write through cache policy. [ size  2.00 MB ] */
     DDR_MCU4_0_VISS_CONFIG_HEAP ( RWIX ) : ORIGIN = 0xBB600000 , LENGTH = 0x00200000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xBE000000 , LENGTH = 0x20000000
+    DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
 }
