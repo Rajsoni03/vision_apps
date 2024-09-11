@@ -160,6 +160,8 @@
 #include <ti/drv/uart/UART_stdio.h>
 #endif
 
+extern app_perf_registration_t * perf_fxns_list;
+
 app_log_shared_mem_t g_app_log_shared_mem
 __attribute__ ((section(".bss:app_log_mem")))
 __attribute__ ((aligned(4096)))
@@ -459,7 +461,7 @@ int32_t appInit()
     fileio_init_prm.self_cpu_index = ipc_init_prm.self_cpu_id;
     strncpy(fileio_init_prm.self_cpu_name, log_init_prm.self_cpu_name, APP_LOG_MAX_CPU_NAME);
 
-    appPerfStatsInit();
+    appPerfStatsInitRegister(perf_fxns_list);
 
     #ifdef ENABLE_BOARD
     {
