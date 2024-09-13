@@ -497,6 +497,8 @@ c7x_4_3_ddr_scratch_addr = c7x_4_2_ddr_scratch_addr + c7x_2_ddr_scratch_size;
 ddr_shared_mem_addr_phys  = c7x_4_ddr_scratch_addr_phys + c7x_4_ddr_scratch_size;
 ddr_shared_mem_size       = SHARED_MEM_SIZE - uboot_reloc_mem_size;
 
+assert ddr_shared_mem_addr_phys & (SHARED_MEM_SIZE - 1) == 0
+assert ddr_shared_mem_addr & (SHARED_MEM_SIZE - 1) == 0
 #
 # Create memory section based on addr and size defined above, including
 # any CPU specific internal memories

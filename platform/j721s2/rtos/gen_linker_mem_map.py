@@ -129,6 +129,7 @@ main_ocram_mem_addr_phys = 0x4F02000000;
 #
 linux_ddr_ipc_size = 1*MB;
 linux_ddr_resource_table_size = 1*KB;
+SHARED_MEM_SIZE = 512*MB;
 
 #
 # MSMC memory allocation for various CPUs
@@ -260,7 +261,7 @@ mcu3_1_ddr_local_heap_size  = 8*MB;
 
 # Shared memory for DMA Buf FD carveout
 ddr_shared_mem_addr     = 0xC0000000; # This will be the virtual address used for R5F's / C7X's
-ddr_shared_mem_size     = 512*MB;
+ddr_shared_mem_size     = SHARED_MEM_SIZE;
 
 c7x_1_ddr_scratch_addr     = ddr_mem_addr_hi;
 c7x_1_ddr_scratch_size     = 368*MB;
@@ -275,7 +276,10 @@ c7x_2_ddr_scratch_size    = 64*MB;
 
 # Shared memory for DMA Buf FD carveout (located in high mem)
 ddr_shared_mem_addr_phys  = 0x900000000; # TODO: Clean this up
-ddr_shared_mem_size       = 512*MB;
+ddr_shared_mem_size       = SHARED_MEM_SIZE;
+
+assert ddr_shared_mem_addr_phys & (SHARED_MEM_SIZE - 1) == 0
+assert ddr_shared_mem_addr & (SHARED_MEM_SIZE - 1) == 0
 
 #
 # Create memory section based on addr and size defined above, including
