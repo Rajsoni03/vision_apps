@@ -66,6 +66,11 @@
 #include <ti/board/src/j784s4_evm/include/board_cfg.h>
 #include <ti/board/src/j784s4_evm/include/board_pinmux.h>
 #include <ti/board/src/j784s4_evm/include/board_i2c_io_exp.h>
+#elif defined (SOC_J742S2)
+#include <ti/board/src/j742s2_evm/include/board_control.h>
+#include <ti/board/src/j742s2_evm/include/board_cfg.h>
+#include <ti/board/src/j742s2_evm/include/board_pinmux.h>
+#include <ti/board/src/j742s2_evm/include/board_i2c_io_exp.h>
 #endif
 
 /* ========================================================================== */

@@ -1,5 +1,5 @@
 ifeq ($(BUILD_ENABLE_ETHFW),yes)
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J784S4))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J784S4 J742S2))
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS),SYSBIOS FREERTOS SAFERTOS))
 ifeq ($(TARGET_CPU),R5F)
 ifeq ($(BUILD_CPU_MCU2_0),yes)
@@ -20,7 +20,11 @@ IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/config
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-port/config/$(SOC)
 IDIRS += $(PDK_PATH)/packages/ti/transport/lwip/lwip-stack/contrib
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/portable/TI_CGT/r5f
-IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
+ifeq ($(TARGET_PLATFORM),J742S2)
+  IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/config/j784s4/r5f
+else
+  IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/config/$(SOC)/r5f
+endif
 IDIRS += $(PDK_PATH)/packages/ti/kernel/freertos/FreeRTOS-LTS/FreeRTOS-Kernel/include
 ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
     IDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack

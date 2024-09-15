@@ -130,7 +130,7 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
                                              CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_5) | \
                                              CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_6) | \
                                              CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_7))
-#elif defined(SOC_J784S4)
+#elif defined(SOC_J784S4) || defined(SOC_J742S2)
 #define ETHAPP_DFLT_PORT_MASK               (CPSW_ALE_HOST_PORT_MASK | \
                                              CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
                                              CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_4))
@@ -175,7 +175,7 @@ static Enet_MacPort gEthAppPorts[] =
     ENET_MAC_PORT_6, /* QSGMII sub */
     ENET_MAC_PORT_7, /* QSGMII sub */
 #endif
-#elif defined(SOC_J784S4)
+#elif defined(SOC_J784S4) || defined(SOC_J742S2)
     ENET_MAC_PORT_1, /* QSGMII main */
     ENET_MAC_PORT_3, /* QSGMII sub */
     ENET_MAC_PORT_4, /* QSGMII sub */
@@ -195,7 +195,7 @@ static Enet_MacPort gEthAppSwitchPorts[]=
 #endif
 #endif
 
-#if defined(SOC_J784S4)
+#if defined(SOC_J784S4) || defined(SOC_J742S2)
     ENET_MAC_PORT_3,
     ENET_MAC_PORT_5,
 #endif
@@ -523,7 +523,7 @@ int32_t appEthFwInit()
 #if defined(ENABLE_QSGMII_PORTS)
     flags |= ETHFW_BOARD_QENET_ENABLE;
 #endif
-#elif defined(SOC_J784S4)
+#elif defined(SOC_J784S4) || defined(SOC_J742S2)
     flags |= (ETHFW_BOARD_QENET_ENABLE | ETHFW_BOARD_SERDES_CONFIG);
 #endif
 
@@ -700,7 +700,7 @@ static int32_t EthApp_initEthFw(void)
 #if defined(SOC_J721E) || defined (SOC_J7200)
         ethFwCfg.ppsConfig.tsrIn = CSLR_TIMESYNC_INTRTR0_IN_CPSW0_CPTS_GENF0_0;
         ethFwCfg.ppsConfig.tsrOut = ETHAPP_PPS_TIMESYNC_INTR_SYNC2_OUT_PIN;
-#elif defined(SOC_J784S4)
+#elif defined(SOC_J784S4) || defined(SOC_J742S2)
         ethFwCfg.ppsConfig.tsrIn = CSLR_TIMESYNC_INTRTR0_IN_CPSW_9XUSSM0_CPTS_GENF0_0;
         ethFwCfg.ppsConfig.tsrOut = ETHAPP_PPS_TIMESYNC_INTR_SYNC3_OUT_PIN;
 #else
