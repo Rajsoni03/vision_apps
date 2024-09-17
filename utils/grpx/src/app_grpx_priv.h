@@ -76,7 +76,7 @@
 #define APP_GRPX_LOAD_PAD_Y           (5u)
 #define APP_GRPX_LOAD_BAR_NUM_CHAR    (4u)
 
-#if defined(SOC_J784S4)
+#if defined(SOC_J784S4) || defined(SOC_J742S2)
 #define APP_GRPX_LOAD_BAR_WIDTH_FACTOR    (6u)
 #else
 #define APP_GRPX_LOAD_BAR_WIDTH_FACTOR    (8u)

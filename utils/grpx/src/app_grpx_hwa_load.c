@@ -208,7 +208,7 @@ void appGrpxGetHwaLoad(app_grpx_obj_t *obj)
             }
         }
     }
-    #if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4)
+    #if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_J742S2)
     status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU2_1, &hwa_load);
     if(status==0)
     {
@@ -232,7 +232,7 @@ void appGrpxGetHwaLoad(app_grpx_obj_t *obj)
         }
     }
     #endif
-    #if defined(SOC_J784S4)
+    #if defined(SOC_J784S4) || defined(SOC_J742S2)
     status = appPerfStatsHwaStatsGet(APP_IPC_CPU_MCU4_0, &hwa_load);
     if(status==0)
     {
