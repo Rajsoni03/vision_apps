@@ -26,7 +26,7 @@ CFLAGS      += -DBUILD_CT_TIOVX_VIDEO_IO_CAPTURE_TESTS
 CFLAGS      += -DBUILD_CT_TIOVX_VIDEO_IO_DISPLAY_TESTS
 CFLAGS      += -DBUILD_CSITX
 
-ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4))
+ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
 CFLAGS      += -DBUILD_DISPLAY_M2M
 endif
 
