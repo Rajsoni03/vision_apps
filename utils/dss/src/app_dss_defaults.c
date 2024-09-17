@@ -362,8 +362,8 @@ int32_t appDctrlDefaultInit(app_dss_default_obj_t *obj)
     {
         retVal = appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_IS_DP_CONNECTED, &isDpConnected, sizeof(isDpConnected), 0U);
     }
-    #elif defined(SOC_J721E) || defined(SOC_J784S4)
-    /* The DP initialization should occur on J721E/J784S4 regardless of if it is connected or not */
+    #elif defined(SOC_J721E) || defined(SOC_J784S4) || defined(SOC_J742S2)
+    /* The DP initialization should occur on J721E/J784S4/J742S2 regardless of if it is connected or not */
     isDpConnected = true;
     #endif
 

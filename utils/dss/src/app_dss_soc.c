@@ -193,7 +193,7 @@ uint8_t gI2cDsiBridgeCfg[][3] = {
 static int32_t appDssDsiInitI2c();
 #if defined (SOC_J721E)
 static int32_t appDssDsiSetBoardMux();
-#elif defined (SOC_J721S2) || defined (SOC_J784S4)
+#elif defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
 static uint32_t DispApp_ErrorRegRead();
 #endif
 
@@ -209,7 +209,7 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
     /* power on DSS */
     #if defined (SOC_J721E)
         SET_DEVICE_STATE_ON(TISCI_DEV_DSS0);
-    #elif defined (SOC_J721S2) || defined (SOC_J784S4)
+    #elif defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
         SET_DEVICE_STATE(TISCI_DEV_DSS0, TISCI_MSG_VALUE_DEVICE_SW_STATE_AUTO_OFF);
     #endif
 
@@ -256,7 +256,7 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_16_HSDIVOUT0_CLK);
         SET_CLOCK_FREQ (TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK, prm->timings.pixelClock);
         SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_0_IN_2X_CLK, 0, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
-        #elif defined (SOC_J721S2) || defined (SOC_J784S4)
+        #elif defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
         SET_DEVICE_STATE_ON(TISCI_DEV_SERDES_10G0);
         SET_DEVICE_STATE_ON(TISCI_DEV_DSS_EDP0);
         SET_DEVICE_STATE_OFF(TISCI_DEV_DSS0);
@@ -289,7 +289,7 @@ void appDssConfigurePm(app_dss_default_prm_t *prm)
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_18_HSDIVOUT0_CLK);
         SET_CLOCK_FREQ (TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, prm->timings.pixelClock);
         SET_CLOCK_STATE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, 0, TISCI_MSG_VALUE_CLOCK_SW_STATE_REQ);
-        #elif defined (SOC_J721S2) || defined (SOC_J784S4)
+        #elif defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
         SET_DEVICE_STATE_OFF(TISCI_DEV_DSS0);
         SET_CLOCK_PARENT(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_17_HSDIVOUT0_CLK);
         SET_CLOCK_FREQ_ALLOW_CHANGE(TISCI_DEV_DSS0, TISCI_DEV_DSS0_DSS_INST0_DPI_2_IN_2X_CLK_PARENT_HSDIV1_16FFT_MAIN_17_HSDIVOUT0_CLK, prm->timings.pixelClock);
@@ -324,7 +324,7 @@ void appDssConfigureBoard(app_dss_default_prm_t *prm)
     }
 #endif
 
-#if defined(SOC_J721S2) || defined(SOC_J784S4)
+#if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_J742S2)
     if(prm->display_type == APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {
         if ((prm->timings.width       == 1920U  &&
@@ -354,7 +354,7 @@ void appDssConfigureDP(void)
 
     #if defined (SOC_J721E)
     ioExpCfg.i2cInst     = 1U;
-    #elif defined (SOC_J721S2) || defined (SOC_J784S4)
+    #elif defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
     ioExpCfg.i2cInst     = 4U;
     #endif
     ioExpCfg.socDomain   = BOARD_SOC_DOMAIN_MAIN;
@@ -367,7 +367,7 @@ void appDssConfigureDP(void)
 
     b_status = Board_control(BOARD_CTRL_CMD_SET_IO_EXP_PIN_OUT, (void *)(&ioExpCfg));
 
-    #if defined (SOC_J721S2) || defined (SOC_J784S4)
+    #if defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
     appLogWaitMsecs(500u);
     #endif
 
@@ -397,7 +397,7 @@ static int32_t appDssDsiInitI2c()
     Board_fpdUb941GetI2CAddr(&domain, &i2cInst, &slaveAddr);
 #else
     i2cInst = 4;
-    #if defined (SOC_J784S4)
+    #if defined (SOC_J784S4) || defined (SOC_J742S2)
         /* For J784S4, linux does not have ownership of GPIOExp that enables DSI to eDP bridge. 
          * Remote core must take full ownership of the I2C, enable the bridge, and configure it as well.
          * For J721S2, Linux uBoot hogs up the GPIO expander pin that enables the DSI to eDP bridge.
@@ -502,7 +502,7 @@ static int32_t appDssDsiSetBoardMux()
 }
 #endif
 
-#if defined (SOC_J721S2) || defined (SOC_J784S4)
+#if defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
 uint32_t appDssSN65DsiErrorRegRead(void)
 {
     uint32_t i, retVal = 0U;
