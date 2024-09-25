@@ -82,7 +82,7 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
     {
         num_capt_instances = 2;
     }
-    #if defined(SOC_J784S4)
+    #if defined(SOC_J784S4) || defined(SOC_J742S2)
     else if ((ch_mask > 0xFF) && (ch_mask <= 0xFFF))
     {
         num_capt_instances = 3;

@@ -1371,7 +1371,7 @@ static vx_status app_create_graph(AppObj *obj)
     {
         if(status == VX_SUCCESS)
         {
-            #if defined(SOC_J784S4)
+            #if defined(SOC_J784S4) || defined(SOC_J742S2)
             status = app_create_graph_viss(obj->graph, &obj->vissObj1, obj->objArrSplitObj.output1_arr, TIVX_TARGET_VPAC2_VISS1);
             #elif defined(SOC_AM62A) && defined(QNX)
             if (strcmp(obj->sensorObj.sensor_name,"OV2312-UB953_LI")==0) {
@@ -1409,7 +1409,7 @@ static vx_status app_create_graph(AppObj *obj)
             }
             if (status == VX_SUCCESS)
             {
-                #if defined(SOC_J784S4)
+                #if defined(SOC_J784S4) || defined(SOC_J742S2)
                 status = app_create_graph_ldc(obj->graph, &obj->ldcObj1, ldc_in_arr, TIVX_TARGET_VPAC2_LDC1);
                 #else
                 status = app_create_graph_ldc(obj->graph, &obj->ldcObj1, ldc_in_arr, TIVX_TARGET_VPAC_LDC1);

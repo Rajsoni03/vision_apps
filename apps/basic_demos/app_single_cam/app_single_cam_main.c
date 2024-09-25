@@ -380,7 +380,7 @@ vx_status app_init(AppObj *obj)
                 if(ch == '0')
                 {
                     uint8_t num_sensors_detected = 0;
-                    uint8_t channel_mask = (1<<obj->selectedCam);
+                    uint32_t channel_mask = (1<<obj->selectedCam);
 
                     status = appDetectImageSensor(detectedSensors, &num_sensors_detected, channel_mask);
                     if(0 == status)
@@ -577,7 +577,7 @@ vx_status app_create_graph(AppObj *obj)
     vx_image ldc_in_image = NULL;
     vx_image capt_yuv_image = NULL;
 
-    uint8_t channel_mask = (1<<obj->selectedCam);
+    uint32_t channel_mask = (1<<obj->selectedCam);
 
     vx_uint32 params_list_depth = 1;
     if(obj->test_mode == 1)
@@ -774,6 +774,8 @@ Sensor driver does not support metadata yet.
 
 #if defined(SOC_AM62A)
     local_capture_config.numInst  = 1U;/* Single instance for AM62A */
+#elif defined(SOC_J784S4) || defined(SOC_J742S2)
+    local_capture_config.numInst  = 3U;/* Configure three instances */
 #else
     local_capture_config.numInst  = 2U;/* Configure both instances */
 #endif
@@ -1432,7 +1434,7 @@ vx_status app_run_graph(AppObj *obj)
     vx_object_array out_capture_frames;
     int graph_parameter_num = 0;
 
-    uint8_t channel_mask = (1<<obj->selectedCam);
+    uint32_t channel_mask = (1<<obj->selectedCam);
 
     if(NULL == obj->sensor_name)
     {
@@ -1634,7 +1636,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
     char ch;
     FILE *fp;
     app_perf_point_t *perf_arr[1];
-    uint8_t channel_mask = (1<<obj->selectedCam);
+    uint32_t channel_mask = (1<<obj->selectedCam);
 
     status = app_run_task_create(obj);
     if(status!=0)
