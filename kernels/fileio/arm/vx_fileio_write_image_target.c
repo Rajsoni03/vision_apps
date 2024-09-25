@@ -262,7 +262,6 @@ static vx_status VX_CALLBACK tivxKernelWriteImageProcess
     if (VX_SUCCESS == status)
     {
         tivx_obj_desc_image_t *in_img_desc;
-        void* in_img_target_ptr[2];
 
         tivx_obj_desc_array_t* file_path_desc;
         void * file_path_target_ptr = NULL;
@@ -271,14 +270,6 @@ static vx_status VX_CALLBACK tivxKernelWriteImageProcess
         void * file_prefix_target_ptr = NULL;
 
         in_img_desc  = (tivx_obj_desc_image_t *)obj_desc[TIVX_KERNEL_WRITE_IMAGE_INPUT_IDX];
-        in_img_target_ptr[0]  = tivxMemShared2TargetPtr(&in_img_desc->mem_ptr[0]);
-        tivxMemBufferMap(in_img_target_ptr[0], in_img_desc->mem_size[0], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
-        in_img_target_ptr[1]  = NULL;
-        if(in_img_desc->mem_ptr[1].shared_ptr != 0)
-        {
-            in_img_target_ptr[1]  = tivxMemShared2TargetPtr(&in_img_desc->mem_ptr[1]);
-            tivxMemBufferMap(in_img_target_ptr[1], in_img_desc->mem_size[1], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
-        }
 
         file_path_desc = (tivx_obj_desc_array_t *)obj_desc[TIVX_KERNEL_WRITE_IMAGE_FILE_PATH_IDX];
         if(file_path_desc != NULL)
@@ -349,28 +340,27 @@ static vx_status VX_CALLBACK tivxKernelWriteImageProcess
             }
             else
             {
-                uint32_t width  = in_img_desc->imagepatch_addr[0].dim_x;
-                uint32_t height = in_img_desc->imagepatch_addr[0].dim_y;
-                uint32_t stride = in_img_desc->imagepatch_addr[0].stride_y;
-                uint8_t *pData  = in_img_target_ptr[0];
-                int32_t i;
-
-                for(i = 0; i < height; i++)
+                for (int32_t j = 0; j < in_img_desc->planes; j++)
                 {
-                    fwrite(pData, 1, width, fp);
-                    pData += stride;
-                }
+                    void *in_img_target_ptr = tivxMemShared2TargetPtr(&in_img_desc->mem_ptr[j]);
+                    uint32_t width  = in_img_desc->imagepatch_addr[j].dim_x;
+                    uint32_t height = in_img_desc->imagepatch_addr[j].dim_y;
+                    uint32_t stride_y = in_img_desc->imagepatch_addr[j].stride_y;
+                    uint32_t stride_x = in_img_desc->imagepatch_addr[j].stride_x;
+                    uint32_t step_y = in_img_desc->imagepatch_addr[j].step_y;
+                    uint32_t step_x = in_img_desc->imagepatch_addr[j].step_x;
+                    uint8_t *pData  = in_img_target_ptr;
 
-                if(in_img_target_ptr[1] != NULL)
-                {
-                    pData = in_img_target_ptr[1];
-                    height = height / 2;
-                    for(i = 0; i < height; i++)
+                    tivxMemBufferMap(in_img_target_ptr, in_img_desc->mem_size[j], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
+
+                    for(int32_t i = 0; i < height/step_y; i++)
                     {
-                        fwrite(pData, 1, width, fp);
-                        pData += stride;
+                        fwrite(pData, stride_x, width/step_x, fp);
+                        pData += stride_y;
                     }
+                    tivxMemBufferUnmap(in_img_target_ptr, in_img_desc->mem_size[j], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
                 }
+
                 fflush(fp);
                 fclose(fp);
             }
@@ -381,10 +371,6 @@ static vx_status VX_CALLBACK tivxKernelWriteImageProcess
         prms->skip_counter = prms->skip_counter % (prms->cmd.num_skip + 1);
         prms->frame_counter++;
 
-        tivxMemBufferUnmap(in_img_target_ptr[0], in_img_desc->mem_size[0], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
-        if (in_img_target_ptr[1] != NULL){
-          tivxMemBufferUnmap(in_img_target_ptr[1], in_img_desc->mem_size[1], VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
-        }
         if(file_path_target_ptr != NULL)
         {
             tivxMemBufferUnmap(file_path_target_ptr, file_path_desc->mem_size, VX_MEMORY_TYPE_HOST, VX_READ_ONLY);
