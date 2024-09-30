@@ -125,6 +125,7 @@ ddr_mem_size_hi = 256*MB;
 msmc_mem_addr = 0x70000000;
 main_ocram_mem_addr = 0x60000000; # Note: uses RAT to translate to proper address
 main_ocram_mem_addr_phys = 0x4F02000000;
+msmc_size = 8*MB
 
 codec_carveout_size = 2*GB;
 
@@ -142,10 +143,12 @@ linux_ddr_resource_table_size = 1*KB;
 dmsc_msmc_size   = 64*KB;
 mpu1_msmc_addr   = msmc_mem_addr;
 mpu1_msmc_size   = 128*KB;
+reserved_cache_size   = 1*MB;
 msmc_placeholder_addr  = mpu1_msmc_addr + mpu1_msmc_size;
 misc_msmc_stack_size = 32*KB;
-msmc_placeholder_size  = 8*MB - mpu1_msmc_size - dmsc_msmc_size - misc_msmc_stack_size;
+msmc_placeholder_size  = 8*MB - mpu1_msmc_size - dmsc_msmc_size - misc_msmc_stack_size - reserved_cache_size;
 dmsc_msmc_addr   = msmc_placeholder_addr + msmc_placeholder_size + misc_msmc_stack_size;
+reserved_cache_addr = msmc_mem_addr + msmc_size - reserved_cache_size;
 
 #
 # C7x L1, L2 memory allocation
@@ -516,6 +519,7 @@ mcu_r5f_tcmb0        = MemSection("R5F_TCMB0", "RWIX", 0x41010040, (32*KB) - (KB
 # MSMC memory sections
 mpu1_msmc   = MemSection("MSMC_MPU1", "RWIX", mpu1_msmc_addr  , mpu1_msmc_size  , "MSMC reserved for MPU1 for ATF");
 dmsc_msmc  = MemSection("MSMC_DMSC", "RWIX", dmsc_msmc_addr  , dmsc_msmc_size  , "MSMC reserved for DMSC IPC");
+cache_msmc  = MemSection("MSMC_CACHE", "RIX", reserved_cache_addr  , reserved_cache_size  , "MSMC reserved for Cache");
 
 # C7x L1/L2 memory sections
 c7x_1_l2   = MemSection("L2RAM_C7x_1", "RWIX", c7x_1_l2_addr  , c7x_1_l2_size  , "L2 for C7x_1");
@@ -1116,6 +1120,7 @@ html_mmap.addMemSection( c7x_2_msmc         );
 html_mmap.addMemSection( c7x_3_msmc         );
 html_mmap.addMemSection( c7x_4_msmc         );
 html_mmap.addMemSection( dmsc_msmc          );
+html_mmap.addMemSection( cache_msmc          );
 html_mmap.addMemSection( mcu1_0_ddr_ipc     );
 html_mmap.addMemSection( mcu1_0_ddr_resource_table      );
 html_mmap.addMemSection( mcu1_0_ddr         );
