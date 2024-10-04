@@ -419,7 +419,7 @@ ddr_shared_mem.setOriginTag(False);
 ddr_shared_mem.splitOrigin(True)
 
 ddr_shared_mem_high  = MemSection("DDR_SHARED_MEM_PHYS"    , "", ddr_shared_mem_addr_phys  , ddr_shared_mem_size    , "memory for shared memory buffers in high DDR");
-ddr_shared_mem_high.setDtsName("vision_apps_shared_region_high", "vision_apps_shared-memories-high");
+ddr_shared_mem_high.setDtsName("vision_apps_shared_region", "vision_apps_shared-memories");
 ddr_shared_mem_high.setCompatibility("dma-heap-carveout");
 ddr_shared_mem_high.setNoMap(False);
 ddr_shared_mem_high.setOriginTag(False);
