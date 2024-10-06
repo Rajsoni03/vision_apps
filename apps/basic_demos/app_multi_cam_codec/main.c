@@ -1809,14 +1809,13 @@ static vx_status delete_array_image_buffers(vx_object_array arr)
 static vx_status assign_array_image_buffers(vx_object_array arr, void* data_ptr[CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES], vx_uint32 sizes[CODEC_MAX_NUM_PLANES])
 {
     vx_status status = VX_SUCCESS;
-    vx_size num_ch, num_planes;
+    vx_size num_ch, num_planes = 1;
     void* empty_data_ptr[CODEC_MAX_NUM_PLANES] = {NULL};
 
     status = vxQueryObjectArray(arr, VX_OBJECT_ARRAY_NUMITEMS, &num_ch, sizeof(num_ch));
     for (vx_uint32 ch = 0; status==VX_SUCCESS && ch<num_ch; ch++)
     {
         vx_image image = (vx_image)vxGetObjectArrayItem(arr, ch);
-        status = vxQueryImage(image, VX_IMAGE_PLANES, &num_planes, sizeof(num_planes));
 
         if (status == VX_SUCCESS)
         {
@@ -2184,8 +2183,7 @@ static void set_ref_pool_defaults(AppGraphParamRefPool *poolObj)
     poolObj->num_planes     = 2;
     poolObj->num_channels   = 1;
     poolObj->bufq_depth     = 1;
-    poolObj->plane_sizes[0] = poolObj->width*poolObj->height;
-    poolObj->plane_sizes[1] = poolObj->width*poolObj->height/2;
+    poolObj->plane_sizes[0] = poolObj->width*poolObj->height*3/2;
 }
 
 static void app_default_param_set(AppObj *obj)
@@ -2499,10 +2497,8 @@ static void app_update_param_set(AppObj *obj)
         obj->dec_pool.height = 1300;
     }
 #endif /* QNX && SOC_AM62A */
-    obj->enc_pool.plane_sizes[0] = obj->enc_pool.width * obj->enc_pool.height;
-    obj->enc_pool.plane_sizes[1] = obj->enc_pool.width * obj->enc_pool.height/2;
-    obj->dec_pool.plane_sizes[0] = obj->dec_pool.width * obj->dec_pool.height;
-    obj->dec_pool.plane_sizes[1] = obj->dec_pool.width * obj->dec_pool.height/2;
+    obj->enc_pool.plane_sizes[0] = obj->enc_pool.width * obj->enc_pool.height * 3/2;
+    obj->dec_pool.plane_sizes[0] = obj->dec_pool.width * obj->dec_pool.height * 3/2;
 
     set_codec_pipe_params(obj);
 }
