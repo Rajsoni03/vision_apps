@@ -2204,6 +2204,7 @@ static void app_default_param_set(AppObj *obj)
     obj->encode     = 1;
     obj->decode     = 1;
     obj->downscale  = 0;
+    obj->num_ch     = 1;
 
     obj->enc_pool.bufq_depth    = APP_ENC_BUFFER_Q_DEPTH;
     obj->dec_pool.bufq_depth    = APP_DEC_BUFFER_Q_DEPTH;
@@ -2413,19 +2414,6 @@ static void set_codec_pipe_params(AppObj *obj)
 #if defined(LINUX)
     uint8_t srcType     = 0;
     uint8_t sinkType    = 0;
-
-    /* DMABUF-IMPORT feature not currently supported by decoder on J721S2/J784S4.
-       This will necessarily cause data copy from decoder to tivx-allocated memory
-       for respective devices. */
-    #if defined(SOC_J721E)
-    sinkType    = 0;
-    #endif /* SOC_J721E */
-    #if defined(SOC_J721S2) || defined(SOC_AM62A)
-    sinkType    = 3;
-    #endif /* SOC_J721S2 or SOC_AM62A */
-    #if defined(SOC_J784S4)
-    sinkType    = 3;
-    #endif /* SOC_J784S4 */
 
     if (obj->encode==0) srcType = 1;
     if (obj->decode==0) sinkType = 1;
