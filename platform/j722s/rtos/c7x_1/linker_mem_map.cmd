@@ -4,7 +4,7 @@
  */ 
 /* 
  * 
- * Copyright (c) 2018 Texas Instruments Incorporated 
+ * Copyright (c) 2024 Texas Instruments Incorporated 
  * 
  * All rights reserved not granted herein. 
  * 
@@ -73,27 +73,27 @@ MEMORY
     /* L1 for C7x_1 [ size 16.00 KB ] */
     L2RAM_C7x_1_AUX_AS_L1    ( RWIX ) : ORIGIN = 0x7F03C000 , LENGTH = 0x00004000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xA5000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xA6000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xA7000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xA8000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA7040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA8040000 , LENGTH = 0x03FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
-    APP_FILEIO_MEM                    : ORIGIN = 0xAB000000 , LENGTH = 0x00400000
+    APP_FILEIO_MEM                    : ORIGIN = 0xAC000000 , LENGTH = 0x00400000
     /* DDR for C7x_1 for Linux IPC [ size 1024.00 KB ] */
-    DDR_C7x_1_IPC            ( RWIX ) : ORIGIN = 0xAD000000 , LENGTH = 0x00100000
+    DDR_C7x_1_IPC            ( RWIX ) : ORIGIN = 0xAE000000 , LENGTH = 0x00100000
     /* DDR for C7x_1 for Linux resource table [ size 1024 B ] */
-    DDR_C7x_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xAD100000 , LENGTH = 0x00000400
+    DDR_C7x_1_RESOURCE_TABLE ( RWIX ) : ORIGIN = 0xAE100000 , LENGTH = 0x00000400
     /* DDR for C7x_1 for Linux IPC trace [ size 1023.00 KB ] */
-    DDR_C7x_1_IPC_TRACE      ( RWIX ) : ORIGIN = 0xAD100400 , LENGTH = 0x000FFC00
+    DDR_C7x_1_IPC_TRACE      ( RWIX ) : ORIGIN = 0xAE100400 , LENGTH = 0x000FFC00
     /* DDR for C7x_1 for boot section [ size 1024 B ] */
-    DDR_C7x_1_BOOT           ( RWIX ) : ORIGIN = 0xAD200000 , LENGTH = 0x00000400
+    DDR_C7x_1_BOOT           ( RWIX ) : ORIGIN = 0xAE200000 , LENGTH = 0x00000400
     /* DDR for C7x_1 for vecs section [ size 16.00 KB ] */
-    DDR_C7x_1_VECS           ( RWIX ) : ORIGIN = 0xAD400000 , LENGTH = 0x00004000
+    DDR_C7x_1_VECS           ( RWIX ) : ORIGIN = 0xAE400000 , LENGTH = 0x00004000
     /* DDR for C7x_1 for secure vecs section [ size 16.00 KB ] */
-    DDR_C7x_1_SECURE_VECS    ( RWIX ) : ORIGIN = 0xAD600000 , LENGTH = 0x00004000
+    DDR_C7x_1_SECURE_VECS    ( RWIX ) : ORIGIN = 0xAE600000 , LENGTH = 0x00004000
     /* DDR for C7x_1 for code/data [ size 57.98 MB ] */
-    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xAD604000 , LENGTH = 0x039FC000
+    DDR_C7x_1                ( RWIX ) : ORIGIN = 0xAE604000 , LENGTH = 0x039FC000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
     /* DDR for c7x_1 for non cacheable local heap [ size 16.00 MB ] */

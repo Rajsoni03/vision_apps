@@ -4,7 +4,7 @@
  */ 
 /* 
  * 
- * Copyright (c) 2018 Texas Instruments Incorporated 
+ * Copyright (c) 2024 Texas Instruments Incorporated 
  * 
  * All rights reserved not granted herein. 
  * 
@@ -81,15 +81,15 @@ MEMORY
     /* DDR for MCU2_0 for code/data [ size 30.00 MB ] */
     DDR_MCU2_0               ( RWIX ) : ORIGIN = 0xA2200000 , LENGTH = 0x01E00000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 32.00 MB ] */
-    IPC_VRING_MEM                     : ORIGIN = 0xA5000000 , LENGTH = 0x02000000
+    IPC_VRING_MEM                     : ORIGIN = 0xA6000000 , LENGTH = 0x02000000
     /* Memory for remote core logging [ size 256.00 KB ] */
-    APP_LOG_MEM                       : ORIGIN = 0xA7000000 , LENGTH = 0x00040000
+    APP_LOG_MEM                       : ORIGIN = 0xA8000000 , LENGTH = 0x00040000
     /* Memory for TI OpenVX shared memory. MUST be non-cached or cache-coherent [ size 63.75 MB ] */
-    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA7040000 , LENGTH = 0x03FC0000
+    TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA8040000 , LENGTH = 0x03FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
-    APP_FILEIO_MEM                    : ORIGIN = 0xAB000000 , LENGTH = 0x00400000
+    APP_FILEIO_MEM                    : ORIGIN = 0xAC000000 , LENGTH = 0x00400000
     /* DDR for MCU2_0 for local heap [ size 32.00 MB ] */
-    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xB5800000 , LENGTH = 0x02000000
+    DDR_MCU2_0_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xB6800000 , LENGTH = 0x02000000
     /* Memory for shared memory buffers in DDR [ size 512.00 MB ] */
     DDR_SHARED_MEM                    : ORIGIN = 0xC0000000 , LENGTH = 0x20000000
 }
