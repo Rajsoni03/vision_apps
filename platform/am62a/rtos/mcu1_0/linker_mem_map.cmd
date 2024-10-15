@@ -69,13 +69,13 @@ MEMORY
     /* R5F_TCMA_VECS [ size 64 B ] */
     R5F_TCMA_VECS            (    X ) : ORIGIN = 0x00000000 , LENGTH = 0x00000040
     /* R5F_TCMA [ size 29.94 KB ] */
-    R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x000077C0
-    /* R5F_TCMA_TRACE_BUFF [ size  2.00 KB ] */
-    R5F_TCMA_TRACE_BUFF      ( RWIX ) : ORIGIN = 0x00007800 , LENGTH = 0x00000800
+    R5F_TCMA                 (    X ) : ORIGIN = 0x00000040 , LENGTH = 0x00007FC0
     /* R5F_TCMB0_VECS [ size 64 B ] */
     R5F_TCMB0_VECS           ( RWIX ) : ORIGIN = 0x41010000 , LENGTH = 0x00000040
     /* R5F_TCMB0 [ size 29.94 KB ] */
-    R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010040 , LENGTH = 0x000077C0
+    R5F_TCMB0                ( RWIX ) : ORIGIN = 0x41010040 , LENGTH = 0x00007FC0
+    /* WKUP_SRAM_TRACE_BUFF [size 2 KB ] */
+    WKUP_SRAM_TRACE_BUFF     ( RWIX ) : ORIGIN = 0x41880000 , LENGTH = 0x00000800
     /* DDR for DM R5F for Linux IPC [ size 1024.00 KB ] */
     DDR_DM_R5F_IPC           ( RWIX ) : ORIGIN = 0x9C800000 , LENGTH = 0x00100000
     /* DDR for DM R5F for Linux resource table [ size 1024 B ] */

@@ -98,7 +98,7 @@ SECTIONS
     }  load = R5F_TCMB0, run = R5F_TCMA
 
     /* Trace buffer used during low power mode */
-    .lpm_trace_buf : (NOLOAD) {} > R5F_TCMA_TRACE_BUFF
+    .lpm_trace_buf : (NOLOAD) {} > WKUP_SRAM_TRACE_BUFF
 
     .bss:ddr_local_mem      (NOLOAD) : {} > DDR_DM_R5F_LOCAL_HEAP
     .bss:app_log_mem        (NOLOAD) : {} > APP_LOG_MEM
