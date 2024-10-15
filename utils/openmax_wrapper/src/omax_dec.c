@@ -2,24 +2,24 @@
  * Copyright (c) 2016-2022 The Khronos Group Inc.
  * Copyright 2022, QNX Software Systems.
  * Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com/
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish,
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject
- * to the following conditions: 
+ * to the following conditions:
  * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software. 
- * 
+ * in all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
  * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -412,7 +412,7 @@ static int h264_parse_sps(const uint8_t *rawps, uint32_t pslen, decoder_info_t *
 	}
 
 	info->height = (pic_height_in_map_units_minus1 + 1) * (avc1->frame_mbs_only_flag ? 1 : 2) * 16;
-        
+
 	/* direct_8x8_inference_flag */
 	mmf_bitstremgetbit(&psb);
 	/* frame_cropping_flag */
@@ -777,7 +777,7 @@ int32_t loadConfig(OmxilVideoEncDec_t *encH)
     {
         /* detect SPS/PPS/Frame data */
         sps_pps_found = 0;
-        
+
     #ifdef WRAPPER_DEBUG_MODE
         int nal_type = H264CheckNalType((buf + DIM(sc)), &sps_pps_found, &frame_found);
     #else
@@ -844,10 +844,10 @@ int32_t loadConfig(OmxilVideoEncDec_t *encH)
     WRAPPER_PRINTF("\n%s get config(%u) input buffer(encH->currPtr=%p, encH->large_input_buf_data_size=%d)", __func__,
             encH->config_size, encH->currPtr, encH->large_input_buf_data_size);
 
-#if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
+#if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_J742S2) || defined(SOC_AM62A)
     /* Return the read pointer back to beginning of the file */
     lseek(encH->in_fd, 0, SEEK_SET);
-#endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
+#endif /* SOC_J721S2 or SOC_J784S4 or SOC_J742S2 or SOC_AM62A */
 
     return err;
 }

@@ -25,7 +25,7 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/img/qnx/OpenMAXIL/khronos/openmaxil/
 endif
 
-ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J721S2 AM62A))
+ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J784S4 J742S2 J721S2 AM62A))
 IDIRS += $(PSDK_QNX_PATH)/qnx/codec/vpu/OpenMAXIL/khronos/openmaxil/
 endif
 

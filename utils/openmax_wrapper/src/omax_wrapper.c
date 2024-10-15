@@ -2,24 +2,24 @@
  * Copyright (c) 2016-2022 The Khronos Group Inc.
  * Copyright 2022, QNX Software Systems.
  * Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com/
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
  * without limitation the rights to use, copy, modify, merge, publish,
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject
- * to the following conditions: 
+ * to the following conditions:
  * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software. 
- * 
+ * in all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
  * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -497,7 +497,7 @@ static OMX_ERRORTYPE FillBufferDone(
             }
         }
     }
-       
+
     pthread_cond_signal(&encH->cond);
     pthread_mutex_unlock(&encH->mutex);
 
@@ -575,7 +575,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
             }
         }
     #endif /* !(defined(SOC_AM62A) && defined(QNX)) */
-        
+
         /* Allocate output port buffers */
         WRAPPER_PRINTF("\nOmxilEnc=> AllocatePortBuffers allocating %u output buffers of %u size",
                     encH->nOutputBufs, encH->outputPortBufSize);
@@ -632,7 +632,7 @@ static OMX_ERRORTYPE AllocatePortBuffers(OmxilVideoEncDec_t *encH)
                 OMAX_qPush(encH, omxil_true_e, i);
             }
         }
-        
+
         /* Allocate output port buffers */
         WRAPPER_PRINTF("\nOmxilDec=> AllocatePortBuffers using %u output buffers of %u size",
                     encH->nOutputBufs, encH->outputPortBufSize);
@@ -679,7 +679,7 @@ static OMX_ERRORTYPE FreeOutPortBuffers(OmxilVideoEncDec_t *encH)
     OMX_U32 i;
     app_omax_wrapper_obj_t* p_omax_pipe_obj = &g_app_omax_wrapper_obj;
 
-    pthread_mutex_lock(&encH->mutex);  
+    pthread_mutex_lock(&encH->mutex);
     if(p_omax_pipe_obj->params.appEncode == 1 && p_omax_pipe_obj->params.appDecode == 0)
     {
         while(nBufFreed < encH->nOutputBufs)
@@ -699,9 +699,9 @@ static OMX_ERRORTYPE FreeOutPortBuffers(OmxilVideoEncDec_t *encH)
             nBufFreed++;
             OMAX_qPop(encH, omxil_false_e);
         }
-    }   
+    }
     else if(p_omax_pipe_obj->params.appEncode == 0 && p_omax_pipe_obj->params.appDecode == 1)
-    {    
+    {
         for(i = 0; i < encH->nOutputBufs; i++)
         {
             while(encH->outBufFull[i] == omxil_true_e && encH->sentOutBuf[i] == omxil_true_e)
@@ -725,7 +725,7 @@ static OMX_ERRORTYPE FreeInPortBuffers(OmxilVideoEncDec_t *encH)
 {
     OMX_U32 i;
     OMX_ERRORTYPE omxErr = OMX_ErrorNone;
-    
+
     pthread_mutex_lock(&encH->mutex);
     for(i = 0; i < encH->nInputBufs; i++)
     {
@@ -832,9 +832,9 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
     OMX_PORT_PARAM_TYPE portParam;
     OMX_PARAM_PORTDEFINITIONTYPE inPortParam;
     OMX_PARAM_PORTDEFINITIONTYPE outPortParam;
-    #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_J742S2) || defined(SOC_AM62A)
     OMX_VENDOR_TIVPU_PARAM_TYPE vpuParam = { 0 };
-    #endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
+    #endif /* SOC_J721S2 or SOC_J784S4 or SOC_J742S2 or SOC_AM62A */
 
     /* Create the OMX component */
     OMX_STRING comp_name = (OMX_STRING)QNX_ENC_COMP_NAME;
@@ -856,12 +856,12 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             return omxErr;
         }
 
-    #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
+    #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_J742S2) || defined(SOC_AM62A)
         /* Get number of VPU cores */
         omxErr = OMX_GetParameter(encH->compHandleArray[ch].compHandle,
                     (OMX_INDEXTYPE)OMX_VendorTIVPUConfigCoreIndex,
                     &vpuParam);
-        if(omxErr != OMX_ErrorNone) 
+        if(omxErr != OMX_ErrorNone)
         {
             WRAPPER_ERROR("\nOmxilEnc=> ERROR: Component OMX_GetParameter() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
             return omxErr;
@@ -878,7 +878,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
             WRAPPER_ERROR("\nOmxilEnc=> ERROR: Component OMX_SetParameter() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
             return omxErr;
         }
-    #endif /* SOC_J721S2 or SOC_J784S4 or SOC_AM62A */
+    #endif /* SOC_J721S2 or SOC_J784S4 or SOC_J742S2 or SOC_AM62A */
 
         /* Get component ports info and prepare internal port contexts. */
         SET_OMAX_VERSION_SIZE(portParam, sizeof(OMX_PORT_PARAM_TYPE));
@@ -1115,7 +1115,7 @@ static OMX_ERRORTYPE InitEncComp(app_omax_wrapper_obj_t *encH)
         encH->compHandleArray[ch].compError = OMX_ErrorNone;
         omxErr = OMX_ErrorNone;
     }
-    
+
     WRAPPER_PRINTF("\nOmxilEnc=>%s video created successfully", __func__);
     return omxErr;
 }
@@ -1127,16 +1127,16 @@ static OMX_ERRORTYPE InitDecComp(app_omax_wrapper_obj_t *encH)
     OMX_PARAM_PORTDEFINITIONTYPE inPortParam;
     OMX_PARAM_PORTDEFINITIONTYPE outPortParam;
     OMX_STRING comp_name = (OMX_STRING)QNX_DEC_COMP_NAME;
-    
+
     /* Obtain an instance of video decoder component */
     static OMX_CALLBACKTYPE callbacks = { &EventHandler,
                                           &EmptyBufferDone,
                                           &FillBufferDone };
-    
+
     for (uint8_t ch = 0; ch < encH->params.in_num_channels && omxErr == OMX_ErrorNone; ch++)
     {
         loadConfig(&encH->compHandleArray[ch]);
-        
+
         omxErr = OMX_GetHandle(&encH->compHandleArray[ch].compHandle,
                             (OMX_STRING)comp_name,
                             (OMX_PTR) &encH->compHandleArray[ch],
@@ -1323,7 +1323,7 @@ static OMX_ERRORTYPE InitDecComp(app_omax_wrapper_obj_t *encH)
         encH->compHandleArray[ch].compError = OMX_ErrorNone;
         omxErr = OMX_ErrorNone;
     }
-    
+
     WRAPPER_PRINTF("\nOmxilDec=>%s video created successfully", __func__);
     return omxErr;
 }
@@ -1404,12 +1404,12 @@ static OMX_ERRORTYPE StartVencVdec(OmxilVideoEncDec_t *encH)
             encH->compHandle, encH->inPortIndex, iBufHdr, iBufHdr->pBuffer, iBufHdr->nAllocLen);
 
             omxErr = OMX_EmptyThisBuffer(encH->compHandle, iBufHdr);
-            if(omxErr != OMX_ErrorNone) 
+            if(omxErr != OMX_ErrorNone)
             {
                 WRAPPER_ERROR("\nOmxil=> ERROR: OMX_EmptyThisBuffer: return omxErr=%08x", omxErr);
                 return omxErr;
             }
-    
+
             OMAX_qPop(encH, omxil_true_e);
         }
     #endif /* SOC_J721E */
@@ -1551,7 +1551,7 @@ static void *codec_file_push_thread(void *args)
 
                 WRAPPER_PRINTF("\nOmxil=> OMX_FillThisBuffer: %s:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
                     encH->compHandle, encH->outPortIndex, oBufHdr, oBufHdr->pBuffer, oBufHdr->nAllocLen);
-                
+
                 omxErr = OMX_FillThisBuffer(encH->compHandle, oBufHdr);
                 if(omxErr != OMX_ErrorNone)
                 {
@@ -1570,17 +1570,17 @@ static void *codec_file_push_thread(void *args)
 
                 WRAPPER_PRINTF("\nOmxil=> OMX_FillThisBuffer: %s:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
                     encH->compHandle, encH->outPortIndex, oBufHdr, oBufHdr->pBuffer, oBufHdr->nAllocLen);
-                
+
                 omxErr = OMX_FillThisBuffer(encH->compHandle, oBufHdr);
                 if(omxErr != OMX_ErrorNone)
                 {
                     WRAPPER_ERROR("\nOmxil=> ERROR: OMX_FillThisBuffer: return omxErr=%08x", omxErr);
                     break;
                 }
-                
+
                 OMAX_qPop(encH, omxil_false_e);
             }
-            
+
             while(encH->qInputBufHdrFirstIdx != -1 && encH->eos_sent == omxil_false_e)
             {
                 OMX_BUFFERHEADERTYPE *iBufHdr = OMAX_qPeek(encH, omxil_true_e);
@@ -1627,12 +1627,12 @@ static void *codec_file_push_thread(void *args)
                     encH->compHandle, encH->inPortIndex, iBufHdr, iBufHdr->pBuffer, iBufHdr->nAllocLen);
 
                     omxErr = OMX_EmptyThisBuffer(encH->compHandle, iBufHdr);
-                    if(omxErr != OMX_ErrorNone) 
+                    if(omxErr != OMX_ErrorNone)
                     {
                         WRAPPER_ERROR("\nOmxil=> ERROR: OMX_EmptyThisBuffer: return omxErr=%08x", omxErr);
                         break;
                     }
-            
+
                     OMAX_qPop(encH, omxil_true_e);
                 }
                 else
@@ -1653,7 +1653,7 @@ int32_t appOMXInit(app_codec_wrapper_params_t* params)
     app_omax_wrapper_obj_t* p_omax_pipe_obj = &g_app_omax_wrapper_obj;
 
     p_omax_pipe_obj->params = *params;
-    
+
     if (strcmp(params->in_format, "NV12") || strcmp(params->out_format, "NV12"))
     {
         WRAPPER_ERROR("\nomax_wrapper: Error: Only NV12 format supported!");
@@ -1670,7 +1670,7 @@ int32_t appOMXInit(app_codec_wrapper_params_t* params)
             PROCMGR_AOP_ALLOW | PROCMGR_ADN_NONROOT | PROCMGR_AID_MEM_PHYS,
             PROCMGR_AOP_ALLOW | PROCMGR_ADN_NONROOT | PROCMGR_AID_PRIORITY,
             PROCMGR_AOP_DENY  | PROCMGR_ADN_NONROOT | PROCMGR_AOP_LOCK      | PROCMGR_AID_EOL);
-        
+
             if (status != 0)
             {
                 WRAPPER_ERROR("\nUnable to gain procmgr abilities for nonroot operation.");
@@ -1741,14 +1741,14 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
     p_omax_pipe_obj->push_count = 0;
 
     p_omax_pipe_obj->pdataPtr = data_ptr;
-    
+
     for (uint8_t ch = 0; ch < p_omax_pipe_obj->params.in_num_channels && status==0; ch++)
     {
         p_omax_pipe_obj->compHandleArray[ch].bitrate = OMAX_DEFAULT_BITRATE;
         p_omax_pipe_obj->compHandleArray[ch].idr_period = OMAX_DEFAULT_IDR_PERIOD;
         p_omax_pipe_obj->compHandleArray[ch].frame_rate = OMAX_DEFAULT_FRAME_RATE;
         p_omax_pipe_obj->compHandleArray[ch].rcmode = (int32_t)OMAX_DEFAULT_RATE_CONTROL_MODE;
-        
+
         p_omax_pipe_obj->compHandleArray[ch].output_buf_num = p_omax_pipe_obj->params.out_buffer_depth;
         p_omax_pipe_obj->compHandleArray[ch].input_buf_num = p_omax_pipe_obj->params.in_buffer_depth;
         p_omax_pipe_obj->compHandleArray[ch].channelIdx = ch;
@@ -1763,7 +1763,7 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
     #endif /* SOC_J721E */
         p_omax_pipe_obj->compHandleArray[ch].frame_size = p_omax_pipe_obj->compHandleArray[ch].src_stride * p_omax_pipe_obj->compHandleArray[ch].aligned_height * 3 / 2; /* default yuv420 format. */
         snprintf(p_omax_pipe_obj->compHandleArray[ch].out_path, OMAX_MAX_FILE_PATH, "/tmp/output_video_%d.264", ch);
-        
+
         if(p_omax_pipe_obj->params.appEncode == 1 && p_omax_pipe_obj->params.appDecode == 0)
         {
             p_omax_pipe_obj->compHandleArray[ch].out_fd = open(p_omax_pipe_obj->compHandleArray[ch].out_path, O_WRONLY | O_CREAT);
@@ -1783,7 +1783,7 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
             off64_t offset = 0;
 
             p_omax_pipe_obj->compHandleArray[ch].input_bufs[idx] = (OmxilBuffer_t *)malloc(sizeof(OmxilBuffer_t));
-            
+
             /* JB: HACK: use special area of memory to keep buffers in low mem region */
             status = mem_offset64(pointer, NOFD, 1, &offset, NULL);
             if (offset == 0)
@@ -1807,7 +1807,7 @@ int32_t appOMXEncInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
         WRAPPER_ERROR("\nOmxilEnc=> ERROR: Component OMX_Init() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
         return omxErr;
     }
-    
+
     if((InitEncComp(p_omax_pipe_obj)) != OMX_ErrorNone)
     {
         WRAPPER_ERROR("\nFailed to create encoder:");
@@ -1829,9 +1829,9 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
     app_omax_wrapper_obj_t* p_omax_pipe_obj = &g_app_omax_wrapper_obj;
 
     p_omax_pipe_obj->pull_count = 0;
-    
+
     p_omax_pipe_obj->pdataPtr = data_ptr;
-    
+
     for (uint8_t ch = 0; ch < p_omax_pipe_obj->params.out_num_channels && status==0; ch++)
     {
         p_omax_pipe_obj->compHandleArray[ch].frame_rate = OMAX_DEFAULT_FRAME_RATE;
@@ -1851,7 +1851,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
         p_omax_pipe_obj->compHandleArray[ch].src_stride = ALIGN64(p_omax_pipe_obj->compHandleArray[ch].src_width);
         p_omax_pipe_obj->compHandleArray[ch].frame_size = p_omax_pipe_obj->compHandleArray[ch].src_width * p_omax_pipe_obj->compHandleArray[ch].src_height * 3 / 2; /* default yuv420 format. */
         snprintf(p_omax_pipe_obj->compHandleArray[ch].in_path, OMAX_MAX_FILE_PATH, "/tmp/test_data.264");
-        
+
         if(p_omax_pipe_obj->params.appEncode == 0 && p_omax_pipe_obj->params.appDecode == 1)
         {
             const char *ext = strrchr(p_omax_pipe_obj->compHandleArray[ch].in_path, '.');
@@ -1866,7 +1866,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
                     p_omax_pipe_obj->isH265 = omxil_true_e;
                 }
             }
-            
+
             if (p_omax_pipe_obj->isH264 == omxil_true_e || p_omax_pipe_obj->isH265 == omxil_true_e)
             {
                 p_omax_pipe_obj->compHandleArray[ch].in_fd = open(p_omax_pipe_obj->compHandleArray[ch].in_path, O_RDONLY);
@@ -1906,7 +1906,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
             off64_t offset = 0;
 
             p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx] = (OmxilBuffer_t *)malloc(sizeof(OmxilBuffer_t));
-            
+
             /* JB: HACK: use special area of memory to keep buffers in low mem region */
             status = mem_offset64(pointer, NOFD, 1, &offset, NULL);
             if (offset == 0)
@@ -1918,7 +1918,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
             p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]->addr = pointer;
 
             p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]->size = p_omax_pipe_obj->compHandleArray[ch].frame_size;
-            
+
             p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]->offset = offset;
             WRAPPER_PRINTF("\nGet frame size for ch = %d output_bufs[%d]: %d, %p, %lx", ch, idx,  p_omax_pipe_obj->compHandleArray[ch].output_bufs[idx]->size, pointer, offset);
             p_omax_pipe_obj->compHandleArray[ch].outBufFull[idx] = omxil_false_e;
@@ -1933,7 +1933,7 @@ int32_t appOMXDecInit(void* data_ptr[CODEC_MAX_BUFFER_DEPTH][CODEC_MAX_NUM_CHANN
         WRAPPER_ERROR("\nOmxil=> ERROR: Component OMX_Init() returned 0x%08x:'%s'", omxErr, OmxErrorTypeToStr(omxErr));
         return omxErr;
     }
-    
+
     if((InitDecComp(p_omax_pipe_obj)) != OMX_ErrorNone)
     {
         WRAPPER_ERROR("\nFailed to create decoder:");
@@ -1952,7 +1952,7 @@ int32_t appOMXStart()
 {
     int32_t status = 0;
     app_omax_wrapper_obj_t* p_omax_pipe_obj = &g_app_omax_wrapper_obj;
-    
+
     for (uint8_t ch = 0; ch < p_omax_pipe_obj->params.in_num_channels; ch++)
     {
         status = StartVencVdec(&p_omax_pipe_obj->compHandleArray[ch]);
@@ -1996,7 +1996,7 @@ int32_t appOMXEnqAppEnc(uint8_t idx)
 
         OMX_BUFFERHEADERTYPE *buffer = NULL;
         if(p_omax_pipe_obj->compHandleArray[ch].eos_sent == omxil_false_e)
-        {    
+        {
             buffer = p_omax_pipe_obj->compHandleArray[ch].inputBufHdrList[idx];
             buffer->nFilledLen = buffer->nAllocLen;
             p_omax_pipe_obj->compHandleArray[ch].input_frame_cnt++;
@@ -2017,7 +2017,7 @@ int32_t appOMXEnqAppEnc(uint8_t idx)
             WRAPPER_PRINTF("\nOmxilEnc=> OMX_EmptyThisBuffer: %s:%d comp %p, port %u, bufHdr 0x%p, bufPtr 0x%p, size %u", __func__, __LINE__,
                 p_omax_pipe_obj->compHandleArray[ch].compHandle, p_omax_pipe_obj->compHandleArray[ch].inPortIndex, buffer, buffer->pBuffer, buffer->nAllocLen);
             status = OMX_EmptyThisBuffer(p_omax_pipe_obj->compHandleArray[ch].compHandle, buffer);
-            if(status != OMX_ErrorNone) 
+            if(status != OMX_ErrorNone)
             {
                 WRAPPER_ERROR("\nOmxilEnc=> ERROR: OMX_EmptyThisBuffer: return omxErr=%08x", status);
                 pthread_mutex_unlock(&(p_omax_pipe_obj->compHandleArray[ch].mutex));
@@ -2052,7 +2052,7 @@ int32_t appOMXDeqAppEnc(uint8_t idx)
     {
         inBufEmptyArray[ch] = p_omax_pipe_obj->compHandleArray[ch].inBufEmpty[idx];
     }
-    
+
     while(allChannelsEmpty == omxil_false_e)
     {
         if(chanIdx == p_omax_pipe_obj->params.in_num_channels)
@@ -2109,7 +2109,7 @@ int32_t appOMXEnqEosAppEnc()
 
         OMX_BUFFERHEADERTYPE *buffer = NULL;
         if(p_omax_pipe_obj->compHandleArray[ch].eos_sent == omxil_false_e)
-        {    
+        {
             buffer = OMAX_qPop(&(p_omax_pipe_obj->compHandleArray[ch]), omxil_true_e);
             buffer->nFilledLen = buffer->nAllocLen;
             p_omax_pipe_obj->compHandleArray[ch].input_frame_cnt++;
@@ -2121,7 +2121,7 @@ int32_t appOMXEnqEosAppEnc()
             p_omax_pipe_obj->compHandleArray[ch].eos_sent = omxil_true_e;
 
             status = OMX_EmptyThisBuffer(p_omax_pipe_obj->compHandleArray[ch].compHandle, buffer);
-            if(status != OMX_ErrorNone) 
+            if(status != OMX_ErrorNone)
             {
                 WRAPPER_ERROR("\nOmxilEnc=> ERROR: OMX_EmptyThisBuffer: return omxErr=%08x", status);
                 pthread_mutex_unlock(&(p_omax_pipe_obj->compHandleArray[ch].mutex));
@@ -2158,7 +2158,7 @@ int32_t appOMXDeqAppDec(uint8_t idx)
     for (ch = 0; ch < p_omax_pipe_obj->params.in_num_channels; ch++)
     {
         if(p_omax_pipe_obj->compHandleArray[ch].eos_received == omxil_true_e)
-        {    
+        {
             WRAPPER_PRINTF("\nOMXIL => eos_received");
             return 1;
         }
@@ -2212,7 +2212,7 @@ int32_t appOMXDeqAppDec(uint8_t idx)
                 p_omax_pipe_obj->compHandleArray[ch].qOutputBufReturnFirstIdx = -1;
             }
         }
-        
+
         WRAPPER_PRINTF("\nBuffer Done index = %d, Request buffer index=%d", index, idx);
 
         if (index != idx && index != -1)
@@ -2314,7 +2314,7 @@ int32_t appOMXStop()
                 WRAPPER_ERROR("\nFailed to terminate encoder_player_push_thread! Error: %s", strerror(errno));
             }
         }
-        
+
         if(p_omax_pipe_obj->compHandleArray[ch].compHandle)
         {
             FlushVencVdec(&p_omax_pipe_obj->compHandleArray[ch]);
@@ -2323,7 +2323,7 @@ int32_t appOMXStop()
 
         pthread_mutex_destroy(&p_omax_pipe_obj->compHandleArray[ch].mutex);
         pthread_cond_destroy(&p_omax_pipe_obj->compHandleArray[ch].cond);
-        
+
         if(p_omax_pipe_obj->compHandleArray[ch].out_fd != -1)
         {
             close(p_omax_pipe_obj->compHandleArray[ch].out_fd);
@@ -2333,7 +2333,7 @@ int32_t appOMXStop()
         {
             close(p_omax_pipe_obj->compHandleArray[ch].in_fd);
             WRAPPER_PRINTF("\nClosed Input File\n");
-        }   
+        }
     }
 
     return status;
@@ -2367,7 +2367,7 @@ void appOMXDeInit()
             free(p_omax_pipe_obj->compHandleArray[ch].large_input_buf);
         }
     }
-    
+
     WRAPPER_PRINTF("\nOpenMAX IL enc destroyed, exiting.");
 }
 
