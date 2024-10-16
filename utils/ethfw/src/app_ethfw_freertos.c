@@ -352,11 +352,9 @@ static void EthApp_initPtp(void);
 
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH) || defined(ETHFW_VEPA_SUPPORT)
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
-                                        uint16_t vlanId,
                                         uint8_t hostId);
 
 static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
-                                        uint16_t vlanId,
                                         uint8_t hostId);
 
 /* Shared multicast address table */
@@ -374,45 +372,38 @@ static EthFwMcast_McastCfg gEthApp_sharedMcastCfgTable[] =
     {
         /* MCast IP ADDR: 224.0.0.1 */
         .macAddr      = {0x01, 0x00, 0x5E, 0x00, 0x00, 0x01},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         /* MCast IP ADDR: 224.0.0.251 */
         .macAddr      = {0x01, 0x00, 0x5E, 0x00, 0x00, 0xFB},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         /* MCast IP ADDR: 224.0.0.252 */
         .macAddr      = {0x01, 0x00, 0x5E, 0x00, 0x00, 0xFC},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         .macAddr      = {0x33, 0x33, 0x00, 0x00, 0x00, 0x01},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         .macAddr      = {0x33, 0x33, 0xFF, 0x1D, 0x92, 0xC2},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         .macAddr      = {0x01, 0x80, 0xC2, 0x00, 0x00, 0x00},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
     {
         .macAddr      = {0x01, 0x80, 0xC2, 0x00, 0x00, 0x03},
-        .vlanId       = 0U,
         .portMask     = ETHAPP_DFLT_PORT_MASK,
         .virtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK,
     },
@@ -1092,7 +1083,6 @@ static void EthApp_initPtp(void)
 /* Application callback function to handle addition of a shared mcast
  * address in the ALE */
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
-                                        uint16_t vlanId,
                                         uint8_t hostId)
 {
     uint8_t idx = 0;
@@ -1144,7 +1134,6 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
 /* Application callback function to handle deletion of a shared mcast
  * address from the ALE */
 static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
-                                        uint16_t vlanId,
                                         uint8_t hostId)
 {
     uint8_t idx = 0;
@@ -1202,7 +1191,6 @@ static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
 /* Application callback function to handle addition of a shared mcast
  * address in the ALE */
 static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
-                                        uint16_t vlanId,
                                         uint8_t hostId)
 {
     uint8_t idx = 0;
@@ -1237,7 +1225,6 @@ static void EthApp_filterAddMacSharedCb(const uint8_t *mac_address,
 /* Application callback function to handle deletion of a shared mcast
  * address from the ALE */
 static void EthApp_filterDelMacSharedCb(const uint8_t *mac_address,
-                                        uint16_t vlanId,
                                         uint8_t hostId)
 {
     uint8_t idx = 0;
