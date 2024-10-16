@@ -7,6 +7,7 @@ ifeq ($(BUILD_CPU_MCU2_0),yes)
 include $(PRELUDE)
 
 IDIRS       += $(ETHFW_PATH)
+IDIRS       += ${ETHFW_PATH}/utils/ethfw_abstract/jacinto
 IDIRS       += $(VISION_APPS_PATH)
 
 TARGET      := app_utils_ethfw
@@ -30,6 +31,8 @@ ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
     IDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack
     IDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack/tsn_combase/tilld/jacinto
 endif
+IDIRS += $(PDK_PATH)/packages/ti/drv/enet
+IDIRS += $(PDK_PATH)/packages/ti/drv/enet/lwipif/inc
 
 CSOURCES    := app_ethfw_freertos.c
 
@@ -47,6 +50,8 @@ IDIRS += $(SAFERTOS_KERNEL_INSTALL_PATH_r5f)/source_code_and_projects/SafeRTOS/k
 IDIRS += $(SAFERTOS_KERNEL_INSTALL_PATH_r5f)/source_code_and_projects/SafeRTOS/kernel/include_prv
 IDIRS += $(SAFERTOS_KERNEL_INSTALL_PATH_r5f)/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_r5f)
 IDIRS += $(SAFERTOS_KERNEL_INSTALL_PATH_r5f)/source_code_and_projects/SafeRTOS/portable/$(SAFERTOS_ISA_EXT_r5f)/$(SAFERTOS_COMPILER_EXT_r5f)
+IDIRS += $(PDK_PATH)/packages/ti/drv/enet
+IDIRS += $(PDK_PATH)/packages/ti/drv/enet/lwipif/inc
 
 CSOURCES    := app_ethfw_freertos.c
 
