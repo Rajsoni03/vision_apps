@@ -72,11 +72,13 @@ mmu_armv88.vAddr = 0x7E000000;
 mmu_armv88.pAddr = 0x7E000000;
 mmu_armv88.$name = "L2RAM_C7x_1_MAIN";
 mmu_armv88.size  = 0x1000000;
+mmu_armv88.attribute = "MAIR7";
 
 mmu_armv89.vAddr = 0x7F000000;
 mmu_armv89.pAddr = 0x7F000000;
 mmu_armv89.size  = 0x1000000;
 mmu_armv89.$name = "L2RAM_C7x_1_AUX";
+mmu_armv89.attribute = "MAIR7";
 
 mmu_armv810.attribute = "MAIR7";
 mmu_armv810.$name     = "DDR_C7x_1_DTS";
