@@ -437,6 +437,11 @@ static EthFwMcast_RsvdMcast gEthApp_rsvdMcastCfgTable[] =
     },
 };
 
+static EthFwPortMirroring_Cfg gEthApp_portMirCfg = 
+{
+    .mirroringType = DISABLE_PORT_MIRRORING
+};
+
 static struct netif netif;
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH)
 static struct netif netif_ic[ETHAPP_NETIF_IC_MAX_IDX];
@@ -747,6 +752,8 @@ static int32_t EthApp_initEthFw(void)
            gEthApp_remoteClientPrivVlanIdMap,
            sizeof(gEthApp_remoteClientPrivVlanIdMap));
 #endif
+
+    ethFwCfg.portMirCfg = &gEthApp_portMirCfg;
 
     /* Initialize the EthFw */
     if (status == ETHAPP_OK)
