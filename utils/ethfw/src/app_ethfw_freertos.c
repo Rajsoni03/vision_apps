@@ -476,6 +476,20 @@ static EthFwTrace_Cfg gEthApp_traceCfg =
     .extTraceFunc = NULL,
 };
 
+/* Test VLAN config */
+static EthFwVlan_VlanCfg gEthApp_vlanCfg[] =
+{
+    {
+        .vlanId              = 1024U,
+        .memberMask          = ETHAPP_DFLT_PORT_MASK,
+        .regMcastFloodMask   = ETHAPP_DFLT_PORT_MASK,
+        .unregMcastFloodMask = ETHAPP_DFLT_PORT_MASK,
+        .virtMemberMask      = ETHAPP_DFLT_VIRT_PORT_MASK,
+        .untagMask           = 0U,
+    },
+};
+
+
 void appEthFwEarlyInit()
 {
     app_rtos_semaphore_params_t semParams;
@@ -675,6 +689,13 @@ static int32_t EthApp_initEthFw(void)
     ethFwCfg.virtPortCfg  = &gEthApp_virtPortCfg[0];
     ethFwCfg.numVirtPorts = ARRAY_SIZE(gEthApp_virtPortCfg);
     ethFwCfg.isStaticTxChanAllocated = true;
+
+    /* Set static VLAN configuration parameters */
+    ethFwCfg.vlanCfg             = &gEthApp_vlanCfg[0];
+    ethFwCfg.numStaticVlans      = ARRAY_SIZE(gEthApp_vlanCfg);
+    ethFwCfg.defaultPortMask     = ETHAPP_DFLT_PORT_MASK;
+    ethFwCfg.defaultVirtPortMask = ETHAPP_DFLT_VIRT_PORT_MASK;
+    ethFwCfg.dVlanSwtFwdEn       = BTRUE;
 
     /* CPTS_RFT_CLK is sourced from MAIN_SYSCLK0 (500MHz) */
     cpswCfg->cptsCfg.cptsRftClkFreq = CPSW_CPTS_RFTCLK_FREQ_500MHZ;
