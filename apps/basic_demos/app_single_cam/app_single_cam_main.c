@@ -456,6 +456,8 @@ vx_status app_init(AppObj *obj)
     else
     {
         selectedSensor = obj->sensor_sel;
+        obj->sensor_name = sensor_list[selectedSensor];
+        obj->selectedCam = 0;
         if(selectedSensor > (num_sensors_found-1))
         {
             printf("Invalid sensor selection %d \n", selectedSensor);
