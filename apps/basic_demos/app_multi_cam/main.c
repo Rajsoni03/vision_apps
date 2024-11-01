@@ -1076,7 +1076,20 @@ static vx_status app_init(AppObj *obj)
         APP_PRINTF("VISS init done!\n");
         if((1 == obj->enable_aewb) && (status == VX_SUCCESS))
         {
-            status = app_init_aewb(obj->context, &obj->aewbObj1, &obj->sensorObj, "aewb_obj", obj->objArrSplitObj.output0_num_elements, obj->objArrSplitObj.output1_num_elements);
+            uint32_t strt_ch = 0;
+            uint32_t prev_ch = 0;
+            uint32_t ch_mask = obj->sensorObj.ch_mask;
+
+            while((ch_mask > 0) && (prev_ch < obj->objArrSplitObj.output0_num_elements))
+            {
+                if(ch_mask & 0x1)
+                {
+                    prev_ch++;
+                }
+                strt_ch++;
+                ch_mask = ch_mask >> 1;
+            }
+            status = app_init_aewb(obj->context, &obj->aewbObj1, &obj->sensorObj, "aewb_obj", strt_ch, obj->objArrSplitObj.output1_num_elements);
             APP_PRINTF("AEWB init done!\n");
         }
         if((obj->sensorObj.enable_ldc == 1) && (status == VX_SUCCESS))
