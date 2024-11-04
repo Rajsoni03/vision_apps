@@ -511,12 +511,16 @@ void appEthFwEarlyInit()
 int32_t appEthFwInit()
 {
     int32_t status = ETHAPP_OK;
+    EnetOsal_Cfg *osalPrms = NULL;
+    EnetUtils_Cfg *utilsPrms = NULL;
     uint32_t flags = 0U;
 
     appLogPrintf("ETHFW: Init ... !!!\n");
 
     gEthAppObj.coreId = EnetSoc_getCoreId();
 
+    Enet_init(osalPrms, utilsPrms);
+    
 #if defined(ETHFW_GPTP_SUPPORT)
     SemaphoreP_Params semParams;
 #endif
