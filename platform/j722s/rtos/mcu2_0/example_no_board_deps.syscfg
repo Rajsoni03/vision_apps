@@ -79,20 +79,20 @@ mpu_armv78.allowExecute        = false;
 mpu_armv78.$name               = "RESOURCE_TABLE_AND_TRACE";
 mpu_armv78.attributes          = "NonCached";
 
-mpu_armv79.baseAddr            = 0xA6000000;
-mpu_armv79.size                = 25; /* 32 MB */
+mpu_armv79.baseAddr            = 0xA5000000;
+mpu_armv79.size                = 24; /* 32 MB */
 mpu_armv79.allowExecute        = false;
 mpu_armv79.$name               = "RTOS_IPC_VRING";
 mpu_armv79.attributes          = "NonCached";
 
-mpu_armv710.baseAddr           = 0xA8000000;
-mpu_armv710.size               = 26;
+mpu_armv710.baseAddr           = 0xA7000000;
+mpu_armv710.size               = 24;
 mpu_armv710.allowExecute       = false;
 mpu_armv710.$name              = "TIOVX_RUN_TIME_LOGGING1";
 mpu_armv710.attributes         = "NonCached";
 
-mpu_armv711.baseAddr           = 0xAC000000;
-mpu_armv711.size               = 25;
+mpu_armv711.baseAddr           = 0xAB000000;
+mpu_armv711.size               = 24;
 mpu_armv711.allowExecute       = false;
 mpu_armv711.$name              = "TIOVX_RUN_TIME_LOGGING2";
 mpu_armv711.attributes         = "NonCached";
