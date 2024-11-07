@@ -476,15 +476,15 @@ uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
 
   /* Note: I think this is correct but needs review */
     if ( ((uint64_t)virtAddr >= (uint64_t)DDR_SHARED_MEM_ADDR) &&
-        ((uint64_t)virtAddr < ((uint64_t)DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
+        ((uint64_t)virtAddr < ((uint64_t)DDR_SHARED_MEM_ADDR + (uint64_t)DDR_SHARED_MEM_SIZE)) )
     {
-        if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
+        if ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR >= (uint64_t)DDR_SHARED_MEM_ADDR)
         {
-            phyAddr = (uint64_t)virtAddr + (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
+            phyAddr = (uint64_t)virtAddr + ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR - (uint64_t)DDR_SHARED_MEM_ADDR);
         }
         else
         {
-            phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+            phyAddr = (uint64_t)virtAddr - ((uint64_t)DDR_SHARED_MEM_ADDR - (uint64_t)DDR_SHARED_MEM_PHYS_ADDR);
         }
     }
     else
@@ -554,16 +554,16 @@ uint64_t appShared2TargetConversion(const uint64_t shared_ptr)
     uint64_t target_ptr = shared_ptr; /* Default : Return shared_ptr without any modification */
 
     /* Note: I think this is correct but needs review */
-    if ( ((uint64_t)shared_ptr >= DDR_SHARED_MEM_PHYS_ADDR) &&
-         ((uint64_t)shared_ptr < (DDR_SHARED_MEM_PHYS_ADDR+DDR_SHARED_MEM_PHYS_SIZE)) )
+    if ( ((uint64_t)shared_ptr >= (uint64_t)DDR_SHARED_MEM_PHYS_ADDR) &&
+         ((uint64_t)shared_ptr < ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR + (uint64_t)DDR_SHARED_MEM_PHYS_SIZE)) )
     {
-        if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
+        if ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR >= (uint64_t)DDR_SHARED_MEM_ADDR)
         {
-            target_ptr = (uint64_t)shared_ptr - (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
+            target_ptr = (uint64_t)shared_ptr - ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR - (uint64_t)DDR_SHARED_MEM_ADDR);
         }
         else
         {
-            target_ptr = (uint64_t)shared_ptr + (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+            target_ptr = (uint64_t)shared_ptr + ((uint64_t)DDR_SHARED_MEM_ADDR - (uint64_t)DDR_SHARED_MEM_PHYS_ADDR);
         }
     }
     else

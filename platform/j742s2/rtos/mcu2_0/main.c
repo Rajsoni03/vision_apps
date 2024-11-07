@@ -141,28 +141,28 @@ uint64_t appTarget2SharedConversion(const uint64_t virtAddr)
 {
   uint64_t phyAddr = (uint64_t)virtAddr;
 
-  if ( ((uint64_t)virtAddr >= DDR_SHARED_MEM_ADDR) &&
-       ((uint64_t)virtAddr < (DDR_SHARED_MEM_ADDR+DDR_SHARED_MEM_SIZE)) )
+  if ( ((uint64_t)virtAddr >= (uint64_t)DDR_SHARED_MEM_ADDR) &&
+       ((uint64_t)virtAddr < ((uint64_t)DDR_SHARED_MEM_ADDR + (uint64_t)DDR_SHARED_MEM_SIZE)) )
   {
-        if (DDR_SHARED_MEM_PHYS_ADDR >= DDR_SHARED_MEM_ADDR)
+        if ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR >= (uint64_t)DDR_SHARED_MEM_ADDR)
         {
-            phyAddr = (uint64_t)virtAddr + (DDR_SHARED_MEM_PHYS_ADDR - DDR_SHARED_MEM_ADDR);
+            phyAddr = (uint64_t)virtAddr + ((uint64_t)DDR_SHARED_MEM_PHYS_ADDR - (uint64_t)DDR_SHARED_MEM_ADDR);
         }
         else
         {
-            phyAddr = (uint64_t)virtAddr - (DDR_SHARED_MEM_ADDR - DDR_SHARED_MEM_PHYS_ADDR);
+            phyAddr = (uint64_t)virtAddr - ((uint64_t)DDR_SHARED_MEM_ADDR - (uint64_t)DDR_SHARED_MEM_PHYS_ADDR);
         }
   }
-  else if ( ((uint64_t)virtAddr >= MAIN_OCRAM_MCU2_0_ADDR) &&
-       ((uint64_t)virtAddr < (MAIN_OCRAM_MCU2_0_ADDR+L3_MEM_SIZE)) )
+  else if ( ((uint64_t)virtAddr >= (uint64_t)MAIN_OCRAM_MCU2_0_ADDR) &&
+       ((uint64_t)virtAddr < ((uint64_t)MAIN_OCRAM_MCU2_0_ADDR + (uint64_t)L3_MEM_SIZE)) )
   {
-        if (MAIN_OCRAM_MCU2_0_PHYS_ADDR >= MAIN_OCRAM_MCU2_0_ADDR)
+        if ((uint64_t)MAIN_OCRAM_MCU2_0_PHYS_ADDR >= (uint64_t)MAIN_OCRAM_MCU2_0_ADDR)
         {
-            phyAddr = (uint64_t)virtAddr + (MAIN_OCRAM_MCU2_0_PHYS_ADDR - MAIN_OCRAM_MCU2_0_ADDR);
+            phyAddr = (uint64_t)virtAddr + ((uint64_t)MAIN_OCRAM_MCU2_0_PHYS_ADDR - (uint64_t)MAIN_OCRAM_MCU2_0_ADDR);
         }
         else
         {
-            phyAddr = (uint64_t)virtAddr - (MAIN_OCRAM_MCU2_0_ADDR - MAIN_OCRAM_MCU2_0_PHYS_ADDR);
+            phyAddr = (uint64_t)virtAddr - ((uint64_t)MAIN_OCRAM_MCU2_0_ADDR - (uint64_t)MAIN_OCRAM_MCU2_0_PHYS_ADDR);
         }
   }
 
