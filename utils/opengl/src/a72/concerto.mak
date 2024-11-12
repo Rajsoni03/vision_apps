@@ -9,6 +9,7 @@ TARGETTYPE  := library
 ifeq ($(TARGET_OS),LINUX)
 IDIRS       += $(LINUX_FS_PATH)/usr/include
 IDIRS       += $(LINUX_FS_PATH)/usr/include/drm
+IDIRS       += $(LINUX_FS_PATH)/usr/include/libdrm
 
 CSOURCES    := app_gl_egl_utils_linux.c
 
