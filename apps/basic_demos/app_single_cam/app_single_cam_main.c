@@ -1937,7 +1937,7 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
 vx_status app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
 {
     vx_bool set_test_mode = vx_false_e;
-    vx_int8 sensor_override = 0xFF;
+    uint8_t sensor_override = 0xFF;
     app_set_cfg_default(obj);
 
     int i;
@@ -1989,6 +1989,10 @@ vx_status app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[])
         obj->test_mode = 1;
         obj->is_interactive = 0;
         obj->num_frames_to_run = NUM_FRAMES;
+
+        /* default to first sensor in sensor enumaration list */
+        obj->sensor_sel = 0;
+
         if (sensor_override != 0xFF)
         {
             obj->sensor_sel = sensor_override;

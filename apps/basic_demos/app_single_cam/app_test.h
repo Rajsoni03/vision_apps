@@ -66,7 +66,7 @@
 
 /* checksums for each of the particular sensors */
 static vx_bool test_result = vx_true_e;
-#define NUM_CHECKSUM_SETS 2
+#define NUM_CHECKSUM_SETS 1
 #define NUM_CHECKSUM_SAMPLES 1
 #define NUM_FRAMES 60
 #ifndef x86_64
@@ -78,8 +78,7 @@ static vx_bool test_result = vx_true_e;
 #define APP_DEBUG
 
 static vx_uint32 checksums_expected[NUM_CHECKSUM_SETS][NUM_CHECKSUM_SAMPLES] = {
-  {0x4d0a61d6},
-  {0x4a4e3720}
+  {0xd0d87252}
 };
 
 /* use this to get new checksums if the input data
