@@ -123,17 +123,17 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
 #define ETHAPP_MAC_ADDR_POOL_SIZE           (6U)
 
 #if defined(SOC_J721E)
-#define ETHAPP_DFLT_PORT_MASK               (CPSW_ALE_HOST_PORT_MASK | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_8) | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_2) | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_5) | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_6) | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_7))
+#define ETHAPP_DFLT_PORT_MASK                   (CPSW_ALE_HOST_PORT_MASK | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_2) | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_5) | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_6) | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_7) | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_8))
 #elif defined(SOC_J784S4) || defined(SOC_J742S2)
-#define ETHAPP_DFLT_PORT_MASK               (CPSW_ALE_HOST_PORT_MASK | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
-                                             CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_4))
+#define ETHAPP_DFLT_PORT_MASK                   (CPSW_ALE_HOST_PORT_MASK | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_3) | \
+                                                 CPSW_ALE_MACPORT_TO_PORTMASK(ENET_MAC_PORT_5))
 #endif
 
 #define ETHAPP_DFLT_VIRT_PORT_MASK          (ETHFW_BIT(ETHREMOTECFG_SWITCH_PORT_0) | \
@@ -520,7 +520,7 @@ int32_t appEthFwInit()
     gEthAppObj.coreId = EnetSoc_getCoreId();
 
     Enet_init(osalPrms, utilsPrms);
-    
+
 #if defined(ETHFW_GPTP_SUPPORT)
     SemaphoreP_Params semParams;
 #endif
