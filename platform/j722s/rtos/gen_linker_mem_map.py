@@ -220,34 +220,34 @@ ddr_shared_mem_size     = 512*MB;
 # C7x_1 Non-Cache sections
 c7x_1_ddr_local_heap_non_cacheable_addr       = ddr_mem_addr_hi;
 c7x_1_ddr_local_heap_non_cacheable_addr_phys  = ddr_mem_addr_hi_phys;
-c7x_1_ddr_local_heap_non_cacheable_size       = 16*MB;
+c7x_1_ddr_local_heap_non_cacheable_size       = 64*MB;
 c7x_1_ddr_scratch_non_cacheable_addr          = c7x_1_ddr_local_heap_non_cacheable_addr + c7x_1_ddr_local_heap_non_cacheable_size;
 c7x_1_ddr_scratch_non_cacheable_addr_phys     = c7x_1_ddr_local_heap_non_cacheable_addr_phys + c7x_1_ddr_local_heap_non_cacheable_size;
-c7x_1_ddr_scratch_non_cacheable_size          = 16*MB;
+c7x_1_ddr_scratch_non_cacheable_size          = 64*MB;
 
 # C7x_1 Cache sections
 c7x_1_ddr_local_heap_addr      = c7x_1_ddr_scratch_non_cacheable_addr + c7x_1_ddr_scratch_non_cacheable_size;
 c7x_1_ddr_local_heap_addr_phys = c7x_1_ddr_scratch_non_cacheable_addr_phys + c7x_1_ddr_scratch_non_cacheable_size;
-c7x_1_ddr_local_heap_size      = 112*MB;
+c7x_1_ddr_local_heap_size      = 64*MB;
 c7x_1_ddr_scratch_addr         = c7x_1_ddr_local_heap_addr + c7x_1_ddr_local_heap_size;
 c7x_1_ddr_scratch_addr_phys    = c7x_1_ddr_local_heap_addr_phys + c7x_1_ddr_local_heap_size;
-c7x_1_ddr_scratch_size         = 112*MB;
+c7x_1_ddr_scratch_size         = 64*MB;
 
 # C7x_2 Non-Cache sections
 c7x_2_ddr_local_heap_non_cacheable_addr       = c7x_1_ddr_scratch_addr + c7x_1_ddr_scratch_size;
 c7x_2_ddr_local_heap_non_cacheable_addr_phys  = c7x_1_ddr_scratch_addr_phys + c7x_1_ddr_scratch_size;
-c7x_2_ddr_local_heap_non_cacheable_size       = 16*MB;
+c7x_2_ddr_local_heap_non_cacheable_size       = 64*MB;
 c7x_2_ddr_scratch_non_cacheable_addr          = c7x_2_ddr_local_heap_non_cacheable_addr + c7x_2_ddr_local_heap_non_cacheable_size;
 c7x_2_ddr_scratch_non_cacheable_addr_phys     = c7x_2_ddr_local_heap_non_cacheable_addr_phys + c7x_2_ddr_local_heap_non_cacheable_size;
-c7x_2_ddr_scratch_non_cacheable_size          = 16*MB;
+c7x_2_ddr_scratch_non_cacheable_size          = 64*MB;
 
 # C7x_2 Cache sections
 c7x_2_ddr_local_heap_addr      = c7x_2_ddr_scratch_non_cacheable_addr + c7x_2_ddr_scratch_non_cacheable_size;
 c7x_2_ddr_local_heap_addr_phys = c7x_2_ddr_scratch_non_cacheable_addr_phys + c7x_2_ddr_scratch_non_cacheable_size;
-c7x_2_ddr_local_heap_size      = 112*MB;
+c7x_2_ddr_local_heap_size      = 64*MB;
 c7x_2_ddr_scratch_addr         = c7x_2_ddr_local_heap_addr + c7x_2_ddr_local_heap_size;
 c7x_2_ddr_scratch_addr_phys    = c7x_2_ddr_local_heap_addr_phys + c7x_2_ddr_local_heap_size;
-c7x_2_ddr_scratch_size         = 112*MB;
+c7x_2_ddr_scratch_size         = 64*MB;
 
 total_c7x_1_local_ddr   = c7x_1_ddr_local_heap_non_cacheable_size + c7x_1_ddr_local_heap_size;
 total_c7x_1_scratch_ddr = c7x_1_ddr_scratch_non_cacheable_size + c7x_1_ddr_scratch_size
