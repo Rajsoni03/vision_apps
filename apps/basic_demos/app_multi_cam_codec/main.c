@@ -2376,7 +2376,7 @@ static void construct_gst_strings(app_codec_wrapper_params_t* params, uint8_t sr
         if (sinkType == 0){
             snprintf(params->m_AppSinkNameArr[ch], CODEC_MAX_LEN_ELEM_NAME, "myAppSink%d", ch);
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s, stride-x-align=64 \n",
                                                                                         params->out_format);
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! appsink name=%s drop=true wait-on-eos=false max-buffers=4\n",params->m_AppSinkNameArr[ch]);
@@ -2387,7 +2387,7 @@ static void construct_gst_strings(app_codec_wrapper_params_t* params, uint8_t sr
         }
         else if (sinkType == 2){
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264dec capture-io-mode=dmabuf-import \n");
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s \n",
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! video/x-raw, format=(string)%s, stride-x-align=64 \n",
                                                                                         params->out_format);
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! tiovxmemalloc pool-size=15 \n");
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! fakesink \n");
