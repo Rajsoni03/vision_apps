@@ -1033,7 +1033,7 @@ static int app_create_graph(AppObj *obj)
     obj->param_obj = vxCreateUserDataObject(obj->context, "tivx_srv_params_t", sizeof(tivx_srv_params_t), &params);
     if(status == VX_SUCCESS)
     {
-        status = vxGetStatus((vx_reference) (obj->output_image));
+        status = vxGetStatus((vx_reference) (obj->param_obj));
     }
 
     img_exemplar = vxCreateImage(obj->context, in_width, in_height, VX_DF_IMAGE_NV12);
