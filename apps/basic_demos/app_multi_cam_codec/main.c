@@ -81,7 +81,7 @@
 #include "multi_cam_codec_scaler_module.h"
 #include "multi_cam_codec_img_mosaic_module.h"
 
-#define APP_BUFFER_Q_DEPTH   (4)
+#define APP_BUFFER_Q_DEPTH   (2)
 #define CODEC_ENC_BUFQ_DEPTH   (2)
 
 #if defined(QNX)
@@ -1631,27 +1631,30 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
     int8_t pull_status = -2;
 
 
-    if (status == VX_SUCCESS && obj->decode==1)
-    {
-        pull_status = appCodecDeqAppSink(obj->appsink_pull_id);
-        if (pull_status == 1)
-        {
-            obj->EOS=1;
-            obj->stop_task=1;
-            APP_PRINTF("\nCODEC=> EOS Recieved\n");
-            goto exit;
-        }
-        else if (pull_status != 0)
-        {
-            goto exit;
-        }
-    }
-
     if ( frame_id >= dec_pool->bufq_depth )
     {
         if (status == VX_SUCCESS)
         {
             status = vxGraphParameterDequeueDoneRef(obj->display_graph, imgMosaicObj->inputs[0].graph_parameter_index, (vx_reference*)&mosaic_input_arr, 1, &num_refs);
+            if (obj->decode==1)
+            {
+                appCodecEnqAppSink((obj->appsink_pull_id + 1) % obj->num_codec_bufs);
+            }
+        }
+        if (status == VX_SUCCESS && obj->decode==1)
+        {
+            pull_status = appCodecDeqAppSink(obj->appsink_pull_id);
+            if (pull_status == 1)
+            {
+                obj->EOS=1;
+                obj->stop_task=1;
+                APP_PRINTF("\nCODEC=> EOS Received\n");
+                goto exit;
+            }
+            else if (pull_status != 0)
+            {
+                goto exit;
+            }
         }
         if((obj->en_out_img_write == 1) || (obj->test_mode == 1))
         {
@@ -1713,6 +1716,22 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
     }
     else
     {
+        if (status == VX_SUCCESS && obj->decode==1)
+        {
+            pull_status = appCodecDeqAppSink(obj->appsink_pull_id);
+            if (pull_status == 1)
+            {
+                obj->EOS=1;
+                obj->stop_task=1;
+                APP_PRINTF("\nCODEC=> EOS Received\n");
+                goto exit;
+            }
+            else if (pull_status != 0)
+            {
+                goto exit;
+            }
+        }
+
         if(status==VX_SUCCESS && obj->decode==1)
         {
             status = assign_array_image_buffers(
@@ -1745,11 +1764,6 @@ static vx_status decode_display(AppObj* obj, vx_int32 frame_id)
     obj->appsink_pull_id    = (obj->appsink_pull_id  >= obj->num_codec_bufs)? 0 : obj->appsink_pull_id;
 
 exit:
-    if (obj->decode==1)
-    {
-        appCodecEnqAppSink(obj->appsink_pull_id);
-    }
-
     return status;
 }
 
