@@ -1962,7 +1962,7 @@ static vx_status app_run_graph(AppObj *obj)
 
     if ( obj->decode==1 )
     {
-        for(uint8_t x=0; x<obj->dec_pool.bufq_depth; x++)
+        for(uint8_t x=0; x<obj->dec_pool.bufq_depth - 1; x++)
         {
             vx_object_array mosaic_input_arr;
             uint32_t num_refs;
