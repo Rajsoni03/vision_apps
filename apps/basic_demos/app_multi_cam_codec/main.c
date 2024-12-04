@@ -2377,7 +2377,7 @@ static void construct_gst_strings(app_codec_wrapper_params_t* params, uint8_t sr
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"! v4l2h264enc extra-controls=\"controls, frame_level_rate_control_enable=1, video_bitrate=10000000\"\n");
         }
         else if (srcType == 1){
-            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"filesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.264 \n");
+            i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"multifilesrc location=/opt/vision_apps/test_data/psdkra/app_multi_cam_codec/test_video_1080p30.264 \n");
         }
         else if (srcType == 2){
             i += snprintf(&params->m_cmdString[i], CODEC_MAX_LEN_CMD_STR-i,"videotestsrc is-live=true do-timestamp=true num-buffers=%d \n",1800);
