@@ -90,7 +90,7 @@
 #define CODEC_DEC_BUFQ_DEPTH   (0)
 #endif
 
-#define APP_ENC_BUFFER_Q_DEPTH   (APP_BUFFER_Q_DEPTH + CODEC_ENC_BUFQ_DEPTH)
+#define APP_ENC_BUFFER_Q_DEPTH   (APP_BUFFER_Q_DEPTH + CODEC_ENC_BUFQ_DEPTH + 2)
 #define APP_DEC_BUFFER_Q_DEPTH   (APP_BUFFER_Q_DEPTH + CODEC_DEC_BUFQ_DEPTH)
 
 #if defined(QNX)
@@ -882,7 +882,7 @@ static vx_status app_init(AppObj *obj)
     if ((1 == obj->encode) && (status == VX_SUCCESS))
     {
         APP_PRINTF("Sensor init done!\n");
-        status = app_init_capture(obj->context, &obj->captureObj, &obj->sensorObj, "capture_obj", APP_BUFFER_Q_DEPTH);
+        status = app_init_capture(obj->context, &obj->captureObj, &obj->sensorObj, "capture_obj", APP_ENC_BUFFER_Q_DEPTH);
     }
 
     if((1 == obj->encode) && (1 == obj->enable_viss) && (status == VX_SUCCESS))
@@ -910,7 +910,7 @@ static vx_status app_init(AppObj *obj)
         vx_int32 q;
         if(status == VX_SUCCESS)
         {
-            for(q = 0; q < APP_BUFFER_Q_DEPTH; q++)
+            for(q = 0; q < APP_ENC_BUFFER_Q_DEPTH; q++)
             {
                 obj->ldc_out_arr_q[q] = vxCreateObjectArray(obj->context, (vx_reference)ldc_out_img, obj->num_ch);
                 status = vxGetStatus((vx_reference)obj->ldc_out_arr_q[q]);
@@ -1032,7 +1032,7 @@ static void app_deinit(AppObj *obj)
         app_deinit_sensor(&obj->sensorObj);
         APP_PRINTF("Sensor deinit done!\n");
 
-        app_deinit_capture(&obj->captureObj, APP_BUFFER_Q_DEPTH);
+        app_deinit_capture(&obj->captureObj, APP_ENC_BUFFER_Q_DEPTH);
         APP_PRINTF("Capture deinit done!\n");
 
         if(1 == obj->enable_viss)
@@ -1052,7 +1052,7 @@ static void app_deinit(AppObj *obj)
 
         if (obj->downscale == 1)
         {
-            for(vx_int32 i = 0; i < APP_BUFFER_Q_DEPTH; i++)
+            for(vx_int32 i = 0; i < APP_ENC_BUFFER_Q_DEPTH; i++)
             {
                 vxReleaseObjectArray(&obj->ldc_out_arr_q[i]);
             }
@@ -1259,7 +1259,7 @@ static vx_status app_create_graph(AppObj *obj)
             add_graph_parameter_by_node_index(obj->capture_graph, obj->captureObj.node, 1);
             obj->captureObj.graph_parameter_index = capt_graph_parameter_index;
             capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
-            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = APP_BUFFER_Q_DEPTH;
+            capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = APP_ENC_BUFFER_Q_DEPTH;
             capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->captureObj.raw_image_arr[0];
             capt_graph_parameter_index++;
 
@@ -1328,23 +1328,23 @@ static vx_status app_create_graph(AppObj *obj)
         }
         if((1 == obj->encode) && (obj->enable_viss == 1) && (status == VX_SUCCESS))
         {
-            status = tivxSetNodeParameterNumBufByIndex(obj->vissObj.node, 6, APP_BUFFER_Q_DEPTH);
+            status = tivxSetNodeParameterNumBufByIndex(obj->vissObj.node, 6, APP_ENC_BUFFER_Q_DEPTH);
 
             if (status == VX_SUCCESS)
             {
-                status = tivxSetNodeParameterNumBufByIndex(obj->vissObj.node, 9, APP_BUFFER_Q_DEPTH);
+                status = tivxSetNodeParameterNumBufByIndex(obj->vissObj.node, 9, APP_ENC_BUFFER_Q_DEPTH);
             }
         }
         if((1 == obj->encode) && (obj->enable_aewb == 1) && (status == VX_SUCCESS))
         {
             if (status == VX_SUCCESS)
             {
-                status = tivxSetNodeParameterNumBufByIndex(obj->aewbObj.node, 4, APP_BUFFER_Q_DEPTH);
+                status = tivxSetNodeParameterNumBufByIndex(obj->aewbObj.node, 4, APP_ENC_BUFFER_Q_DEPTH);
             }
         }
         if((1 == obj->encode) && (obj->downscale == 1) && (status == VX_SUCCESS))
         {
-            status = tivxSetNodeParameterNumBufByIndex(obj->ldcObj.node, 7, APP_BUFFER_Q_DEPTH);
+            status = tivxSetNodeParameterNumBufByIndex(obj->ldcObj.node, 7, APP_ENC_BUFFER_Q_DEPTH);
         }
         if((1 == obj->decode) && (obj->enable_mosaic == 1) && (status == VX_SUCCESS))
         {
@@ -1553,7 +1553,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
     vx_object_array ldc_output_arr;
     uint32_t num_refs;
 
-    if ( frame_id >= APP_BUFFER_Q_DEPTH )
+    if ( frame_id >= APP_ENC_BUFFER_Q_DEPTH )
     {
         if (status == VX_SUCCESS)
         {
@@ -1599,7 +1599,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
     obj->ldc_enq_id++;
     obj->ldc_enq_id         = (obj->ldc_enq_id  >= enc_pool->bufq_depth)? 0 : obj->ldc_enq_id;
     obj->capture_id++;
-    obj->capture_id         = (obj->capture_id  >= APP_BUFFER_Q_DEPTH)? 0 : obj->capture_id;
+    obj->capture_id         = (obj->capture_id  >= APP_ENC_BUFFER_Q_DEPTH)? 0 : obj->capture_id;
 
     return status;
 }
