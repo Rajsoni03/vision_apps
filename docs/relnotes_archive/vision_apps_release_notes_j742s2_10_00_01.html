@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 10.01.00</h2>
+<h2 align='center'>Version: 10.00.01</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -76,6 +76,10 @@
 <a href="#Fixed_Issues">Fixed Issues</a> </li>
 <li>
 <a href="#Open_Defects">Open Defects</a> </li>
+<li>
+<a href="#Known_Issues">Known Issues</a> </li>
+<li>
+<a href="#Change_Requests">Change Requests</a> </li>
 <li>
 <a href="#Support">Technical Support</a> </li>
 <li>
@@ -132,8 +136,8 @@ New features in this release are highlighted in <strong>bold</strong>
 <ul>
 <li>OpenVX based demos for ADAS, Vision, deep learning applications
     <ul>
-    <li> Free RTOS and Safe RTOS on C7x, C6x on R5F and Linux or QNX on A72</li>
-    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C6x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
+    <li> Free RTOS and Safe RTOS on C7x and R5F and Linux or QNX on A72</li>
+    <li>Integrates all major PSDK RTOS and PSDK Linux SW components like TIDL, MMALIB, PDK, OpenVX, ETHFW, OpenGL, C7x algorithms, imaging/sensors, IPC, Linux, TI-RTOS, SPL/uboot.</li>
     <li>Integrates all major HW components like CSI2 camera, eDP/HDMI display, UART, I2C, ethernet, SD card</li>
     </ul>
 </li>
@@ -175,13 +179,6 @@ New features in this release are highlighted in <strong>bold</strong>
     </ul>
 </li>
 
-<li>3D Surround view + AVP2 demo running simultaneously
-    <ul>
-    <li>3D surround view using GPU on 4x 2MP 30fps live camera input</li>
-    <li>3 channel, 3 algo mode (combined network for parking spot and vehicle detect)</li>
-    </ul>
-</li>
-
 <li>ADAS/Vision demos
     <ul>
     <li>Dense optical flow (DOF) demo</li>
@@ -202,16 +199,15 @@ New features in this release are highlighted in <strong>bold</strong>
     <ul>
     <li>image pre-processing (YUV 2 RGB) nodes for DL demos</li>
     <li>image post-processing and visualization nodes for deep learning, DOF, Stereo demos</li>
-    <li>lidar, radar, camera SFM nodes for PTK demos</li>
     <li>OpenGL nodes for surround view</li>
     <li>Multi-threading support in MSC mosaic node</li>
-    <li>Block based processing example kernel on C66x using UDMA/DRU</li>
     </ul>
 </li>
 
 <li>Profiling, logging and other utility APIs</li>
 <li>General stability, performance, documentation improvements</li>
-<li>All included MCU tasks are split between MCU2_0 (ETHFW, VPAC HWA) and MCU2_1 (DMPAC HWA), leaving MCU3_0 and MCU3_1 free on main island</li>
+<li>Memory map updated to accomodate increase of DDR_SHARED_MEM to 1GB. Please check vision_apps/platform/j784s4/rtos/system_memory_map.html for more details</li>
+<li>All included MCU tasks are split between MCU2_0 (ETHFW, VPAC0 HWA), MCU2_1 (DMPAC HWA), MCU4_0 (VPAC1 HWA) leaving MCU3_0, MCU3_1, MCU4_1 free on the main island</li>
 <li>VISS Node Optimizations and performance related bug fixes
   <ul>
   <li>[Optimization] Moved VISS configuration memory to cache write-through region to save 125us of configuration time per camera frame (eliminating cache write-back maintenance operation time)</li>
@@ -224,12 +220,18 @@ New features in this release are highlighted in <strong>bold</strong>
 <p>
 <hr>
 <p>
+<!--
 <h2><a class="anchor" name="Compatibility"></a>Upgrade and Compatibility Information</h2>
 <p>
-No upgrade and compatibility changes since previous release.
+
+<ul>
+<li> - </li>
+</ul>
+
 <p>
 <hr>
 <p>
+-->
 <h2><a class="anchor" name="Device_Support"></a>Device Support</h2>
 
 Refer Processor SDK RTOS release notes <a href="../psdk_rtos/docs/user_guide/release_notes.html" target="_blank">[HTML]</a>
@@ -251,51 +253,19 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="even">
-<td align="center">ADASVISION-6266</td>
-<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
-</tr>
 <tr class="odd">
-<td align="center">ADASVISION-6209</td>
-<td align="left"><span>The vision apps multicam codec application is not working</span></td>
+<td align="center">-</td>
+<td align="left"><span>-</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6136</td>
-<td align="left"><span>libC7120-host-emulation not used for x86 emulation</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6108</td>
-<td align="left"><span>Fix False Positive in QNX SPL with MCU1_0 Enabled</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5912</td>
-<td align="left"><span>Fix False Results on Vision Apps Init Test Scriplet</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6408</td>
-<td align="left"><span>Test mode in single cam and multi-cam vision_apps demo is broken</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6404</td>
-<td align="left"><span>Multi-cam non-interactive mode fails to start when channel mask does not include port 0</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6397</td>
-<td align="left"><span>[Addr-Map]: reduced size of macro in comparison statement in appTarget2SharedConversion API</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6350</td>
-<td align="left"><span>PSDK RTOS should use the toolchain from PSDK Linux installer</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6014</td>
-<td align="left"><span>[CSIRX]: CSIRX short frame error with erroneous frame is observed in high BW usecase</span></td>
+<td align="center">-</td>
+<td align="left"><span>-</span></td>
 </tr>
 </tbody>
 </table>
 
-<p>
 <hr>
+<p>
 <h2><a class="anchor" name="Open_Defects"></a>Open Defects</h2>
 <p>
 <table>
@@ -306,77 +276,59 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="even">
-<td align="center">ADASVISION-6453</td>
-<td align="left"><span>SRV + AVP demo not working</span></td>
-</tr>
 <tr class="odd">
-<td align="center">ADASVISION-6451</td>
-<td align="left"><span>mailbox queue overflowing while running vx_app_arm_ipc.out</span></td>
+<td align="center">-</td>
+<td align="left"><span>-</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6436</td>
-<td align="left"><span>Extend multicam support to any channel mask instead of contiguous</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6420</td>
-<td align="left"><span>Perf_stats does not caculate CPU load for A72 on QNX</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4919">ADASVISION-6387</a></td>
-<td align="left"><span>No option to set vpParams->scanFmt in the dss utility from vision_apps</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4909">ADASVISION-5497</a></td>
-<td align="left"><span>J721e: Ethernet driver crash while running iperf3 after about 20 minutes</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11431">ADASVISION-5918</a></td>
-<td align="left"><span>Codec app compiler warnings with GCC 11.3</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10993">ADASVISION-5673</a></td>
-<td align="left"><span>Permission issue can occur when running the vision apps script incorrectly</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10992">ADASVISION-5669</a></td>
-<td align="left"><span>SCIserver should use UART logs instead of appLogPrintf</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
-<td align="left"><span>SDE disparity artifacts on EVM</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
-<td align="left"><span>AVP4 freezes in first second of running</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
-<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5034</td>
-<td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
-<td align="left"><span>Single cam error on ports other than port 1 after running multi cam</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10523">ADASVISION-4196</a></td>
-<td align="left"><span>SRV crash occasionally observed</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10524">ADASVISION-4080</a></td>
-<td align="left"><span>QNX: SRV File I/O failing with specific car model</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6199</td>
-<td align="left"><span>Race Conditions in c7x-mma-tidl and tiadalg builds</span></td>
+<td align="center">-</td>
+<td align="left"><span>-</span></td>
 </tr>
 </tbody>
 </table>
 
+<p>
+<hr>
+<h2><a class="anchor" name="Known_Issues"></a>Known Issues</h2>
+<p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="left">Summary</th>
+<th align="left">Workaround</th>
+</tr>
+</thead>
+<tbody>
+<tr class="even">
+<td align="center">ADASVISION-4345</td>
+<td align="left"><span>SteamFIFO overflow observed in long run > 6hrs when using D3 IMX390 CM cameras </span></td>
+<td align="left"><span>Upgrade to D3 IMX390 RCM cameras </span></td>
+</tr>
+</tbody>
+</table>
+</table>
+<!--
+<h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="center">ID</th>
+<th align="left">Headline</th>
+<th align="left">Original Fix Version</th>
+<th align="left">New Fix Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">JACINTOREQ-7629</a></td>
+<td align="left"><span>Descope BAM enablement on J7</span></td>
+<td align="left"><span>10.00.00</span></td>
+<td align="left"><span>DESCOPE</span></td>
+</tr>
+</tbody>
+</table>
+-->
 <p>
 <hr>
 <p>

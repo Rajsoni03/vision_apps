@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 10.00.00</h2>
+<h2 align='center'>Version: 10.01.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -76,10 +76,6 @@
 <a href="#Fixed_Issues">Fixed Issues</a> </li>
 <li>
 <a href="#Open_Defects">Open Defects</a> </li>
-<li>
-<a href="#Known_Issues">Known Issues</a> </li>
-<li>
-<a href="#Change_Requests">Change Requests</a> </li>
 <li>
 <a href="#Support">Technical Support</a> </li>
 <li>
@@ -268,9 +264,37 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 </tr>
+<tr class="even">
+<td align="center">ADASVISION-6266</td>
+<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
+</tr>
 <tr class="odd">
-<td align="center">ADASVISION-6279</td>
-<td align="left"><span>SDK documentation require update for vision_apps memory map</span></td>
+<td align="center">ADASVISION-6209</td>
+<td align="left"><span>The vision apps multicam codec application is not working</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6108</td>
+<td align="left"><span>Fix False Positive in QNX SPL with MCU1_0 Enabled</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-5912</td>
+<td align="left"><span>Fix False Results on Vision Apps Init Test Scriplet</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6408</td>
+<td align="left"><span>Test mode in single cam and multi-cam vision_apps demo is broken</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6404</td>
+<td align="left"><span>Multi-cam non-interactive mode fails to start when channel mask does not include port 0</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6397</td>
+<td align="left"><span>[Addr-Map]: reduced size of macro in comparison statement in appTarget2SharedConversion API</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6350</td>
+<td align="left"><span>PSDK RTOS should use the toolchain from PSDK Linux installer</span></td>
 </tr>
 </tbody>
 </table>
@@ -287,37 +311,25 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="center">ADASVISION-6266</td>
-<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
-</tr>
 <tr class="even">
-<td align="center">ADASVISION-6258</td>
-<td align="left"><span>Display pipe used for graphics overlay is not coherent with A72 CPU core</span></td>
+<td align="center">ADASVISION-6453</td>
+<td align="left"><span>SRV + AVP demo not working</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6212</td>
-<td align="left"><span>MACRO RGB888_TO_RGB565 should be RGB888_TO_BGR565 in the Draw2D utility</span></td>
+<td align="center">ADASVISION-6451</td>
+<td align="left"><span>mailbox queue overflowing while running vx_app_arm_ipc.out</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6209</td>
-<td align="left"><span>The vision apps multicam codec application is not working</span></td>
+<td align="center">ADASVISION-6436</td>
+<td align="left"><span>Extend multicam support to any channel mask instead of contiguous</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6199</td>
-<td align="left"><span>Race Conditions with c7x-mma-tidl and tiadalg builds</span></td>
+<td align="center">ADASVISION-6420</td>
+<td align="left"><span>Perf_stats does not caculate CPU load for A72 on QNX</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6108</td>
-<td align="left"><span>Fix False Positive in QNX SPL with MCU1_0 Enabled</span></td>
-</tr>
-<tr class="odd">
-<td align="center">ADASVISION-6080</td>
-<td align="left"><span>Multi Cam application capture error</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11429">ADASVISION-5955</a></td>
-<td align="left"><span>eDP to HDMI adaptors are failing</span></td>
+    <td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4919">ADASVISION-6387</a></td>
+<td align="left"><span>No option to set vpParams->scanFmt in the dss utility from vision_apps</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11431">ADASVISION-5918</a></td>
@@ -326,18 +338,6 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11432">ADASVISION-5892</a></td>
 <td align="left"><span>Remove unnecessary files from SafeRTOS build</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11078">ADASVISION-5758</a></td>
-<td align="left"><span>Enable en_out_ldc_write cause freeze in Multi Cam Demo</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11003">ADASVISION-5734</a></td>
-<td align="left"><span>App_multi_cam_codec decode framerate drops for more than 2 channels</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11433">ADASVISION-5726</a></td>
-<td align="left"><span>CPU is hitting 100% when using gst-launch for both encode and decode using appsink, appsrc</span></td>
 </tr>
 <tr class="odd">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10993">ADASVISION-5673</a></td>
@@ -355,61 +355,45 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
 <td align="left"><span>AVP4 freezes in first second of running</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="center">ADASVISION-5034</td>
-<td align="left"><span>Details about 8-channels/camera usecase incorrect</span></td>
+<td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
 <td align="left"><span>Single cam error on ports other than port 1 after running multi cam</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10520">ADASVISION-4386</a></td>
-<td align="left"><span>QNX SBL debug binaries not working on R5F</span></td>
+<td align="center">ADASVISION-6199</td>
+<td align="left"><span>Race Conditions in c7x-mma-tidl and tiadalg builds</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6470</td>
+<td align="left"><span>Dual Display with both DP ports is failing for J721S2 with LInux+RTOS</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4720">ADASVISION-6386</a></td>
+<td align="left"><span>QoS Settings cause artifacts in DSS M2M output</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6258</td>
+<td align="left"><span>Display pipe used for graphics overlay is not coherent with A72 CPU core</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4755">ADASVISION-6080</a></td>
+<td align="left"><span>Incomplete frame error in multi cam application</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11432">ADASVISION-5892</a></td>
+<td align="left"><span>Remove unnecessary files from SafeRTOS build</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXTSYNC-3651">ADASVISION-5734</a></td>
+<td align="left"><span>App_multi_cam_codec decode framerate drops for more than 2 channels</span></td>
 </tr>
 </tbody>
 </table>
 
-<p>
-<hr>
-<h2><a class="anchor" name="Known_Issues"></a>Known Issues</h2>
-<p>
-<table>
-<thead>
-<tr class="header">
-<th align="center">ID</th>
-<th align="left">Summary</th>
-<th align="left">Workaround</th>
-</tr>
-</thead>
-<tbody>
-<tr class="even">
-<td align="center">ADASVISION-4345</td>
-<td align="left"><span>SteamFIFO overflow observed in long run > 6hrs when using D3 IMX390 CM cameras </span></td>
-<td align="left"><span>Upgrade to D3 IMX390 RCM cameras </span></td>
-</tr>
-</tbody>
-</table>
-</table>
-<h2><a class="anchor" name="Change_Requests"></a>Change Requests</h2>
-<table>
-<thead>
-<tr class="header">
-<th align="center">ID</th>
-<th align="left">Headline</th>
-<th align="left">Original Fix Version</th>
-<th align="left">New Fix Version</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">JACINTOREQ-7629</a></td>
-<td align="left"><span>Descope BAM enablement on J7</span></td>
-<td align="left"><span>10.00.00</span></td>
-<td align="left"><span>DESCOPE</span></td>
-</tr>
-</tbody>
-</table>
 <p>
 <hr>
 <p>
