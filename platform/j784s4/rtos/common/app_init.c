@@ -385,6 +385,7 @@ int32_t appInit()
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_MCU2_0;
     ipc_init_prm.num_cpus++;
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU2_1
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_MCU2_1;
@@ -557,7 +558,8 @@ int32_t appInit()
     status = appLogWrInit(&log_init_prm);
     APP_ASSERT_SUCCESS(status);
     
-    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || \
+    defined(CPU_c7x_4) || defined(CPU_mcu2_0)
     status = appFileIOWrInit(&fileio_init_prm);
     APP_ASSERT_SUCCESS(status);
     #endif
@@ -938,7 +940,8 @@ void appDeInit()
     appLogCioDeInit();
     #endif
     appLogWrDeInit();
-    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || defined(CPU_c7x_4)
+    #if defined(CPU_c7x_1) || defined(CPU_c7x_2) || defined(CPU_c7x_3) || \
+    defined(CPU_c7x_4) || defined(CPU_mcu2_0)
     appFileIOWrDeInit();
     #endif
 

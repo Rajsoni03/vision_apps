@@ -148,12 +148,16 @@ int main(void)
     log_init_prm.device_write = app_log_device_send_string;
 
     appLogRdInit(&log_init_prm);
-#if defined(ENABLE_IPC_C7x_1) || defined(ENABLE_IPC_C7x_2) || defined(ENABLE_IPC_C7x_3) || defined(ENABLE_IPC_C7x_4)
+#if defined(ENABLE_IPC_C7x_1) || defined(ENABLE_IPC_C7x_2) || defined(ENABLE_IPC_C7x_3) || \
+    defined(ENABLE_IPC_C7x_4) || defined(ENABLE_IPC_MCU2_0)
     /*******************  Create task for file io ***************/
     app_fileio_init_prm_t fileio_init_prm;
 
     appFileIOInitPrmSetDefault(&fileio_init_prm);
 
+    #ifdef ENABLE_IPC_MCU2_0
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
+    #endif
     #ifdef ENABLE_IPC_C7x_1
     fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
     #endif

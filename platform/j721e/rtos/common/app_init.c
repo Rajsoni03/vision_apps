@@ -360,6 +360,7 @@ int32_t appInit()
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_MCU2_0;
     ipc_init_prm.num_cpus++;
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU2_1
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_MCU2_1;
