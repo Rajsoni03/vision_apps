@@ -29,6 +29,16 @@ ifeq ($(RTOS),FREERTOS)
 		LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_freertos_mcuplus.cmd
 	endif
 endif
+ifeq ($(RTOS),THREADX)
+        CSOURCES += generated/ti_board_config.c
+        CSOURCES += generated/ti_board_open_close.c
+        CSOURCES += generated/ti_dpl_config.c
+        CSOURCES += generated/ti_drivers_config.c
+        CSOURCES += generated/ti_drivers_open_close.c
+        CSOURCES += generated/ti_pinmux_config.c
+        CSOURCES += generated/ti_power_clock_config.c
+        LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/$(SOC)_linker_threadx_mcuplus.cmd
+endif
 
 LINKER_CMD_FILES +=  $($(_MODULE)_SDIR)/linker_mem_map.cmd
 
@@ -49,6 +59,8 @@ else
 	IDIRS+=$(VISION_APPS_PATH)/platform/$(SOC)/rtos/mcu1_0/generated
 	ifeq ($(RTOS),FREERTOS)
 		LDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/freertos/lib/
+	else ifeq ($(RTOS),THREADX)
+		LDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/threadx/lib/
 	endif
 
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/lib/
@@ -65,7 +77,7 @@ include $($(_MODULE)_SDIR)/../concerto_r5f_inc.mak
 # CPU instance specific libraries
 STATIC_LIBS += app_rtos_common_mcu1_0
 
-ifeq ($(RTOS),FREERTOS)
+ifeq ($(TARGET_OS), $(filter $(RTOS), FREERTOS THREADX))
 	STATIC_LIBS += app_rtos
 endif
 

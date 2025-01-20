@@ -81,18 +81,29 @@
 #else
 #include <kernel/dpl/DebugP.h>
 #include <drivers/hw_include/csl_types.h>
+#if !defined(THREADX)
 extern     void vTaskDelete( void* xTaskToDelete );
+#endif
 #endif
 #endif
 
 /* High Priority for SCI Server - must be higher than Low priority task */
+#if defined THREADX
+#define SETUP_SCISERVER_TASK_PRI_HIGH   (26)
+#else
 #define SETUP_SCISERVER_TASK_PRI_HIGH   (5)
+#endif
 /*
  * Low Priority for SCI Server - must be higher than IPC echo test tasks
  * to prevent delay in handling Sciserver requests when test is performing
  * multicore ping/pong.
  */
+#if defined THREADX
+#define SETUP_SCISERVER_TASK_PRI_LOW    (27)
+#else
 #define SETUP_SCISERVER_TASK_PRI_LOW    (4)
+
+#endif
 
 int32_t appSciserverSciclientInit()
 {
@@ -230,7 +241,7 @@ void appSciserverInit(void* arg0, void* arg1)
     }
     #endif
 
-    #if defined(MCU_PLUS_SDK)
+    #if defined(MCU_PLUS_SDK) && !defined(THREADX)
     vTaskDelete( NULL );
     #endif
 }

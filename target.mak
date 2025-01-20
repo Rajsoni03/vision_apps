@@ -80,7 +80,7 @@ ifeq ($(TARGET_PLATFORM), $(filter $(TARGET_PLATFORM), J721E J721S2 J784S4 J742S
         SYSLDIRS += $(ARP32CGT_ROOT)/lib
     endif
 
-    ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS SAFERTOS))
+    ifeq ($(TARGET_OS), $(filter $(TARGET_OS), FREERTOS SAFERTOS THREADX))
         ifeq ($(RTOS_SDK),pdk)
             SYSIDIRS += $(PDK_PATH)/packages
             SYSIDIRS += $(PDK_PATH)/packages/ti/osal

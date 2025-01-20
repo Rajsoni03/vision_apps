@@ -11,7 +11,10 @@ IDIRS+=$(PTK_PATH)/include
 IDIRS+=$(VISION_APPS_PATH)/kernels/stereo/include
 IDIRS+=$(IMAGING_PATH)/kernels/include
 IDIRS+=$(IMAGING_PATH)/sensor_drv/include
-
+ifeq ($(RTOS),THREADX)
+	IDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/threadx/threadx_src/common/inc
+	IDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/threadx/ports/ti_arm_gcc_clang_cortex_r5/inc
+endif
 
 ifeq ($(RTOS_SDK),pdk)
 	ifeq ($(RTOS),SYSBIOS)
@@ -33,6 +36,8 @@ ifeq ($(RTOS_SDK),pdk)
 else
 	ifeq ($(RTOS),FREERTOS)
 		LDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/freertos/lib/
+	else ifeq ($(RTOS),THREADX)
+		LDIRS += $(MCU_PLUS_SDK_PATH)/source/kernel/threadx/lib/
 	endif
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/board/lib/
 	LDIRS += $(MCU_PLUS_SDK_PATH)/source/drivers/lib/
@@ -96,6 +101,8 @@ else
 
 	ifeq ($(RTOS),FREERTOS)
 		ADDITIONAL_STATIC_LIBS += freertos.am62ax.r5f.ti-arm-clang.${TARGET_BUILD}.lib
+	else ifeq ($(RTOS),THREADX)
+		ADDITIONAL_STATIC_LIBS += threadx.am62ax.r5f.ti-arm-clang.${TARGET_BUILD}.lib
 	endif
 endif
 endif

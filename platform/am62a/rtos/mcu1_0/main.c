@@ -79,12 +79,19 @@
 #include "ti_board_open_close.h"
 #include <ipc_notify.h>
 #include <ipc_notify/v0/ipc_notify_v0.h>
+#if defined (THREADX)
+#include <tx_api.h>
+#endif
 #endif
 
 /**< SCI Server Init Task stack size */
 #define APP_SCISERVER_INIT_TSK_STACK        (32U * 1024U)
 /* SCI Server Init Task Priority - must be higher than High priority Sciserver task */
+#if defined (THREADX)
+#define INIT_SCISERVER_TASK_PRI         (25)
+#else
 #define INIT_SCISERVER_TASK_PRI         (6)
+#endif
 
 /* Sciserver Init Task stack */
 static uint8_t  gSciserverInitTskStack[APP_SCISERVER_INIT_TSK_STACK]
@@ -92,7 +99,13 @@ __attribute__ ((aligned(8192)));
 
 #if defined (MCU_PLUS_SDK)
 
+#if !defined (THREADX)
 extern void vTaskStartScheduler( void );
+#else
+#define TASK_PRI_MAIN_THREAD  (2)
+TX_THREAD main_thread;
+extern void tx_kernel_enter( void );
+#endif
 
 void IpcNotify_getConfig(IpcNotify_InterruptConfig **interruptConfig, uint32_t *interruptConfigNum)
 {
@@ -113,7 +126,12 @@ void StartupEmulatorWaitFxn (void)
     {
     }while (enableDebug);
 }
+
+#if defined (THREADX)
+static void appMain(ULONG arg)
+#else
 static void appMain(void* arg0, void* arg1)
+#endif
 {
     app_rtos_task_handle_t sciserverInitTask;
     app_rtos_task_params_t sciserverInitTaskParams;
@@ -144,8 +162,8 @@ static void appMain(void* arg0, void* arg1)
 #else
     if(NULL == sciserverInitTask)
     {
-        extern void vTaskEndScheduler( void );
-        vTaskEndScheduler();
+        extern void TaskP_endScheduler( void );
+        TaskP_endScheduler();
     }
 #endif
 
@@ -192,6 +210,7 @@ int main(void)
     Board_init(); 
 #endif
 
+#if !defined (THREADX)
     /* Initialize the task params */
     appRtosTaskParamsInit(&tskParams);
     /* Set the task priority higher than the default priority (1) */
@@ -200,7 +219,8 @@ int main(void)
     tskParams.stacksize    = sizeof (gTskStackMain);
     tskParams.taskfxn = &appMain;
     task = appRtosTaskCreate(&tskParams);
-    
+#endif
+
 #if !defined(MCU_PLUS_SDK)
     if(NULL == task)
     {
@@ -208,17 +228,40 @@ int main(void)
     }
     OS_start();
 #else
+    #if !defined (THREADX)
     DebugP_assert(task != NULL);
     vTaskStartScheduler();
     /* The following line should never be reached because vTaskStartScheduler()
     will only return if there was not enough FreeRTOS heap memory available to
     create the Idle and (if configured) Timer tasks.  Heap management, and
     techniques for trapping heap exhaustion, are described in the book text. */
+    #else
+    tx_kernel_enter();
+    #endif
     DebugP_assertNoLog(0);
 #endif
 
     return 0;
 }
+
+#if defined (THREADX)
+void tx_application_define(void *first_unused_memory)
+{
+    UINT status;
+    status = tx_thread_create(&main_thread,           /* Pointer to the main thread object. */
+                              "main_thread",          /* Name of the task for debugging purposes. */
+                              appMain,                /* Entry function for the main thread. */
+                              0,                      /* Arguments passed to the entry function. */
+                              gTskStackMain,          /* Main thread stack. */
+                              sizeof (gTskStackMain), /* Main thread stack size in bytes. */
+                              TASK_PRI_MAIN_THREAD,   /* Main task priority. */
+                              TASK_PRI_MAIN_THREAD,   /* Highest priority level of disabled preemption. */
+                              TX_NO_TIME_SLICE,       /* No time slice. */
+                              TX_AUTO_START);         /* Start immediately. */
+
+    DebugP_assertNoLog(status == TX_SUCCESS);
+}
+#endif
 
 uint32_t appGetDdrSharedHeapSize()
 {
