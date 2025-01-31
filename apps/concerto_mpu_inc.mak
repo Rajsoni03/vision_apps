@@ -139,7 +139,7 @@ endif
 
 TIOVX_LIBS += vx_vxu vx_framework
 TIOVX_LIBS += vx_kernels_host_utils vx_kernels_target_utils
-TIOVX_LIBS += vx_platform_psdk_j7
+TIOVX_LIBS += vx_platform_board_hlos
 TIOVX_LIBS += vx_kernels_openvx_core
 TIOVX_LIBS += vx_kernels_openvx_ext vx_target_kernels_openvx_ext
 TIOVX_LIBS += vx_utils
