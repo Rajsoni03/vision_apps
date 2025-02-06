@@ -69,6 +69,9 @@
     vx_node node1; //output
     vx_node node2; //input
 
+    uint32_t width;
+    uint32_t height;
+
     vx_user_data_object output_display_config;
     tivx_display_params_t output_display_params;
     vx_user_data_object input_display_config;

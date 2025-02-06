@@ -76,11 +76,19 @@ vx_status app_init_display1(vx_context context, DisplayObj *displayObj, char *ob
         vxSetReferenceName((vx_reference)displayObj->output_display_config, "OutputDisplayConfiguration");
 
         displayObj->output_display_params.opMode=TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
+        #if defined(SOC_J722S)
+        displayObj->output_display_params.pipeId = 1;
+        displayObj->output_display_params.outWidth = displayObj->width;
+        displayObj->output_display_params.outHeight = displayObj->height;
+        displayObj->output_display_params.posX = (1920-displayObj->width);
+        displayObj->output_display_params.posY = (1080-displayObj->height)/2 - 80;
+        #else
         displayObj->output_display_params.pipeId = 0;
         displayObj->output_display_params.outWidth = OUTPUT_DISPLAY_WIDTH;
         displayObj->output_display_params.outHeight = OUTPUT_DISPLAY_HEIGHT;
         displayObj->output_display_params.posX = (1920-OUTPUT_DISPLAY_WIDTH);
         displayObj->output_display_params.posY = (1080-OUTPUT_DISPLAY_HEIGHT)/2 - 80;
+        #endif
 
         status = vxCopyUserDataObject(displayObj->output_display_config, 0, sizeof(tivx_display_params_t), &displayObj->output_display_params, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
         APP_ASSERT(status==VX_SUCCESS);
@@ -104,7 +112,7 @@ vx_status app_init_display2(vx_context context, DisplayObj *displayObj, char *ob
 
         displayObj->input_display_params.opMode=TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
         #if defined(SOC_J722S)
-        displayObj->input_display_params.pipeId = 1;
+        displayObj->input_display_params.pipeId = 0;
         #else
         displayObj->input_display_params.pipeId = 2;
         #endif
