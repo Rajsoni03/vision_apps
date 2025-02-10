@@ -366,10 +366,8 @@ int32_t appInit()
     status = appLogWrInit(&log_init_prm);
     APP_ASSERT_SUCCESS(status);
 
-    #if defined(CPU_c7x_1)
     status = appFileIOWrInit(&fileio_init_prm);
     APP_ASSERT_SUCCESS(status);
-    #endif
 
     #ifdef ENABLE_PRINTF_REDIRECT
     status = appLogCioInit();
@@ -532,9 +530,7 @@ void appDeInit()
     appLogCioDeInit();
     #endif
     appLogWrDeInit();
-    #if defined(CPU_c7x_1)
     appFileIOWrDeInit();
-    #endif
     #ifdef ENABLE_UART
     appLogRdDeInit();
     appCliDeInit();

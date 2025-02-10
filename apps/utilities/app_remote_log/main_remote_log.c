@@ -94,51 +94,67 @@ void app_log_device_send_string(char *string, uint32_t max_size)
 
 int main(void)
 {
+    /*******************  Create tasks for log & file io ***************/
     app_log_init_prm_t log_init_prm;
+    app_fileio_init_prm_t fileio_init_prm;
 
     appLogInitPrmSetDefault(&log_init_prm);
+    appFileIOInitPrmSetDefault(&fileio_init_prm);
 
     #ifdef ENABLE_IPC_MPU1_0
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MPU1_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU1_0
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU1_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU1_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU2_0
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU2_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU2_1] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU2_1] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU3_0
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU3_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU3_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU3_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU3_1] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU3_1] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU4_0
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU4_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU4_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU4_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU4_1] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU4_1] = 1;
     #endif
     #ifdef ENABLE_IPC_C6x_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C6x_1] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C6x_1] = 1;
     #endif
     #ifdef ENABLE_IPC_C6x_2
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C6x_2] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C6x_2] = 1;
     #endif
     #ifdef ENABLE_IPC_C7x_1
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
     #endif
     #ifdef ENABLE_IPC_C7x_2
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_2] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_2] = 1;
     #endif
     #ifdef ENABLE_IPC_C7x_3
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
     #endif
     #ifdef ENABLE_IPC_C7x_4
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
     #endif
     
     log_init_prm.shared_mem = (app_log_shared_mem_t *)APP_LOG_MEM_ADDR;
@@ -147,37 +163,14 @@ int main(void)
     log_init_prm.log_rd_max_cpus = APP_IPC_CPU_MAX;
     log_init_prm.device_write = app_log_device_send_string;
 
-    appLogRdInit(&log_init_prm);
-#if defined(ENABLE_IPC_C7x_1) || defined(ENABLE_IPC_C7x_2) || defined(ENABLE_IPC_C7x_3) || \
-    defined(ENABLE_IPC_C7x_4) || defined(ENABLE_IPC_MCU2_0)
-    /*******************  Create task for file io ***************/
-    app_fileio_init_prm_t fileio_init_prm;
-
-    appFileIOInitPrmSetDefault(&fileio_init_prm);
-
-    #ifdef ENABLE_IPC_MCU2_0
-    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU2_0] = 1;
-    #endif
-    #ifdef ENABLE_IPC_C7x_1
-    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_1] = 1;
-    #endif
-    #ifdef ENABLE_IPC_C7x_2
-    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_2] = 1;
-    #endif
-    #ifdef ENABLE_IPC_C7x_3
-    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_3] = 1;
-    #endif
-    #ifdef ENABLE_IPC_C7x_4
-    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_C7x_4] = 1;
-    #endif
-
     fileio_init_prm.shared_mem = (app_fileio_shared_mem_t *)APP_FILEIO_MEM_ADDR;
     fileio_init_prm.self_cpu_index = APP_IPC_CPU_MPU1_0;
     strncpy(fileio_init_prm.self_cpu_name, "MPU1_0", APP_FILEIO_MAX_CPU_NAME);
     fileio_init_prm.fileio_rd_max_cpus = APP_IPC_CPU_MAX;
     
+    appLogRdInit(&log_init_prm);
     appFileIORdInit(&fileio_init_prm);
-#endif
+
     while(1)
     {
         appLogWaitMsecs(1000);

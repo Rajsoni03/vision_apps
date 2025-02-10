@@ -341,6 +341,7 @@ int32_t appInit()
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_MCU1_0;
     ipc_init_prm.num_cpus++;
     log_init_prm.log_rd_cpu_enable[APP_IPC_CPU_MCU1_0] = 1;
+    fileio_init_prm.fileio_rd_cpu_enable[APP_IPC_CPU_MCU1_0] = 1;
     #endif
     #ifdef ENABLE_IPC_MCU2_0
     ipc_init_prm.enabled_cpu_id_list[ipc_init_prm.num_cpus] = APP_IPC_CPU_MCU2_0;
@@ -419,10 +420,8 @@ int32_t appInit()
     status = appLogWrInit(&log_init_prm);
     APP_ASSERT_SUCCESS(status);
 
-    #if defined(CPU_c7x_1) || defined(CPU_c7x_2)
     status = appFileIOWrInit(&fileio_init_prm);
     APP_ASSERT_SUCCESS(status);
-    #endif
 
     #ifdef ENABLE_PRINTF_REDIRECT
     status = appLogCioInit();
@@ -677,9 +676,7 @@ void appDeInit()
     appLogCioDeInit();
     #endif
     appLogWrDeInit();
-    #if defined(CPU_c7x_1) || defined(CPU_c7x_2)
     appFileIOWrDeInit();
-    #endif
     #ifdef ENABLE_UART
     appLogRdDeInit();
     appCliDeInit();
