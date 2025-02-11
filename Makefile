@@ -125,19 +125,51 @@ ifeq ($(BUILD_EMULATION_MODE),yes)
   else
     ifeq ($(PROFILE), $(filter $(PROFILE), debug all))
         ifeq ($(BUILD_EMULATION_ARCH), $(filter $(BUILD_EMULATION_ARCH), x86_64 all))
-            TARGET_COMBOS += PC:LINUX:x86_64:1:debug:GCC_LINUX
+            ifeq ($(BUILD_IMAGING_OPENACC), yes)
+                ifeq ($(SOC), $(filter $(SOC), j721s2 j784s4 j742s2))
+                    TARGET_COMBOS += PC:LINUX:x86_64:1:debug:NVCPP_LINUX
+                else
+                    TARGET_COMBOS += PC:LINUX:x86_64:1:debug:GCC_LINUX
+                endif
+            else
+                TARGET_COMBOS += PC:LINUX:x86_64:1:debug:GCC_LINUX
+            endif
         endif
         ifeq ($(BUILD_EMULATION_ARCH), $(filter $(BUILD_EMULATION_ARCH), X86 all))
-            TARGET_COMBOS += PC:LINUX:X86:1:debug:GCC_LINUX
+            ifeq ($(BUILD_IMAGING_OPENACC), yes)
+                ifeq ($(SOC), $(filter $(SOC), j721s2 j784s4 j742s2))
+                    TARGET_COMBOS += PC:LINUX:X86:1:debug:NVCPP_LINUX
+                else
+                    TARGET_COMBOS += PC:LINUX:X86:1:debug:GCC_LINUX
+                endif    
+            else
+                TARGET_COMBOS += PC:LINUX:X86:1:debug:GCC_LINUX
+            endif
         endif
     endif
 
     ifeq ($(PROFILE), $(filter $(PROFILE), release all))
         ifeq ($(BUILD_EMULATION_ARCH), $(filter $(BUILD_EMULATION_ARCH), x86_64 all))
-            TARGET_COMBOS += PC:LINUX:x86_64:1:release:GCC_LINUX
+            ifeq ($(BUILD_IMAGING_OPENACC), yes)
+                ifeq ($(SOC), $(filter $(SOC), j721s2 j784s4 j742s2))
+                    TARGET_COMBOS += PC:LINUX:x86_64:1:release:NVCPP_LINUX
+                else
+                    TARGET_COMBOS += PC:LINUX:x86_64:1:release:GCC_LINUX
+                endif
+            else
+                TARGET_COMBOS += PC:LINUX:x86_64:1:release:GCC_LINUX
+            endif
         endif
         ifeq ($(BUILD_EMULATION_ARCH), $(filter $(BUILD_EMULATION_ARCH), X86 all))
-            TARGET_COMBOS += PC:LINUX:X86:1:release:GCC_LINUX
+            ifeq ($(BUILD_IMAGING_OPENACC), yes)
+                ifeq ($(SOC), $(filter $(SOC), j721s2 j784s4 j742s2))
+                    TARGET_COMBOS += PC:LINUX:X86:1:release:NVCPP_LINUX
+                else
+                    TARGET_COMBOS += PC:LINUX:X86:1:release:GCC_LINUX
+                endif
+            else
+                TARGET_COMBOS += PC:LINUX:X86:1:release:GCC_LINUX
+            endif
         endif
     endif
   endif
