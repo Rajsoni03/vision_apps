@@ -71,21 +71,17 @@
 typedef struct {
     vx_node  node;
 
-    vx_array config;
-    tivxImgPreProcParams params;
-
-    sTIDL_IOBufDesc_t ioBufDesc;
+    vx_user_data_object config;
+    tivxOCPreProcParams params;
 
     vx_uint32 num_input_tensors;
     vx_uint32 num_output_tensors;
 
     vx_object_array  output_tensor_arr[APP_PRE_PROC_MAX_TENSORS];
-
     vx_int32 graph_parameter_index;
-
-    vx_char objName[APP_MAX_FILE_PATH];
-
 } PreProcObj;
+
+
 
 vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_user_data_object config);
 vx_status app_init_pre_proc(vx_context context, PreProcObj *preProcObj, char *objName);

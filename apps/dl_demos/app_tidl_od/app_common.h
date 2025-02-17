@@ -72,6 +72,11 @@
 #include <tivx_utils_file_rd_wr.h>
 #include <tivx_utils_graph_perf.h>
 
+
+#include <edgeai_tiovx_nodes.h>
+#include <edgeai_tiovx_target_kernels.h>
+
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -80,7 +85,7 @@
 #include <float.h>
 #include <math.h>
 
-//#define APP_DEBUG
+// #define APP_DEBUG
 #define APP_USE_FILEIO
 
 #define APP_MAX_FILE_PATH           (256u)

@@ -75,10 +75,10 @@
 #include "app_scaler_module.h"
 #include "app_pre_proc_module.h"
 #include "app_tidl_module.h"
-#include "app_draw_detections_module.h"
 #include "app_img_mosaic_module.h"
 #include "app_display_module.h"
 #include "app_test.h"
+#include "app_post_proc_module.h"
 
 /* #define WRITE_INTERMEDIATE_OUTPUTS */
 
@@ -101,7 +101,7 @@ typedef struct {
     ScalerObj  scalerObj;
     PreProcObj preProcObj;
     TIDLObj    tidlObj;
-    DrawDetectionsObj drawDetectionsObj;
+    PostProcObj       postProcObj;
     ImgMosaicObj imgMosaicObj;
     DisplayObj displayObj;
     InputObj input;
@@ -165,6 +165,9 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 #else
 static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 frame_id);
 #endif
+
+static char img_labels[TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES][TIVX_DL_POST_PROC_MAX_SIZE_CLASSNAME] = {""};
+static int32_t label_offset3[TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES] = {0};
 
 static void app_show_usage(vx_int32 argc, vx_char* argv[])
 {
@@ -461,17 +464,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 token = strtok(NULL, s);
                 if(token != NULL)
                 {
-                    obj->drawDetectionsObj.params.viz_th = atof(token);
-                }
-            }
-            else
-            if(strcmp(token, "num_classes")==0)
-            {
-
-                token = strtok(NULL, s);
-                if(token != NULL)
-                {
-                    obj->drawDetectionsObj.params.num_classes = atoi(token);
+                    obj->postProcObj.params.od_prms.viz_th = atof(token);
                 }
             }
             else
@@ -691,6 +684,8 @@ static vx_status app_init(AppObj *obj)
         tivxHwaLoadKernels(obj->context);
         tivxVideoIOLoadKernels(obj->context);
         tivxImgProcLoadKernels(obj->context);
+        tivxEdgeaiImgProcLoadKernels(obj->context);
+    
         tivxTIDLLoadKernels(obj->context);
     }
 
@@ -741,17 +736,17 @@ static vx_status app_init(AppObj *obj)
         status = app_init_pre_proc(obj->context, &obj->preProcObj, "pre_proc_obj");
         APP_PRINTF("Pre Proc Init Done! \n");
     }
-    /* Update ioBufDesc in draw detections object */
     if(status == VX_SUCCESS)
     {
-        status = app_update_draw_detections(&obj->drawDetectionsObj, obj->tidlObj.config);
-        APP_PRINTF("Draw detections Update Done! \n");
+        status=app_update_post_proc(obj->context, &obj->postProcObj, obj->tidlObj.config);
+        APP_PRINTF("Post Proc Update Done! \n");
     }
     if(status == VX_SUCCESS)
     {
-        status = app_init_draw_detections(obj->context, &obj->drawDetectionsObj, "draw_detections_obj");
-        APP_PRINTF("Draw Detections Init Done! \n");
+        status = app_init_post_proc(obj->context, &obj->postProcObj, "post_proc_obj", APP_BUFFER_Q_DEPTH);
+        APP_PRINTF("Post Proc Init Done! \n");
     }
+
     if(status == VX_SUCCESS)
     {
         status = app_init_img_mosaic(obj->context, &obj->imgMosaicObj, "sw_mosaic_obj", APP_BUFFER_Q_DEPTH);
@@ -797,8 +792,8 @@ static void app_deinit(AppObj *obj)
     app_deinit_tidl(&obj->tidlObj);
     APP_PRINTF("TIDL deinit Done! \n");
 
-    app_deinit_draw_detections(&obj->drawDetectionsObj);
-    APP_PRINTF("Draw detections deinit Done! \n");
+    app_deinit_post_proc(&obj->postProcObj,APP_BUFFER_Q_DEPTH);
+    APP_PRINTF("Post proc deinit done!\n");
 
     app_deinit_img_mosaic(&obj->imgMosaicObj, APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Mosaic deinit Done! \n");
@@ -818,6 +813,7 @@ static void app_deinit(AppObj *obj)
     APP_PRINTF("TIDL unload Done! \n");
 
     tivxImgProcUnLoadKernels(obj->context);
+    tivxEdgeaiImgProcUnLoadKernels(obj->context);
     APP_PRINTF("ImgProc unload Done! \n");
 
     tivxVideoIOUnLoadKernels(obj->context);
@@ -838,7 +834,7 @@ static void app_delete_graph(AppObj *obj)
 
     app_delete_tidl(&obj->tidlObj);
 
-    app_delete_draw_detections(&obj->drawDetectionsObj);
+    app_delete_post_proc(&obj->postProcObj);
 
     app_delete_img_mosaic(&obj->imgMosaicObj);
 
@@ -874,10 +870,12 @@ static vx_status app_create_graph(AppObj *obj)
     }
     if(status == VX_SUCCESS)
     {
-        status = app_create_graph_draw_detections(obj->graph, &obj->drawDetectionsObj, obj->tidlObj.output_tensor_arr[0], obj->scalerObj.output[1].arr);
+         status = app_create_graph_post_proc(obj->graph, &obj->postProcObj,obj->tidlObj.output_tensor_arr[0], obj->scalerObj.output[1].arr);
     }
     vx_int32 idx = 0;
-    obj->imgMosaicObj.input_arr[idx++] = obj->drawDetectionsObj.output_image_arr;
+
+    obj->imgMosaicObj.input_arr[idx++] = obj->postProcObj.output_image_arr;
+
     obj->imgMosaicObj.num_inputs = idx;
 
     app_create_graph_img_mosaic(obj->graph, &obj->imgMosaicObj, NULL);
@@ -937,7 +935,7 @@ static vx_status app_create_graph(AppObj *obj)
     }
     if(status == VX_SUCCESS)
     {
-        status = tivxSetNodeParameterNumBufByIndex(obj->drawDetectionsObj.node, 3, 2);
+        status = tivxSetNodeParameterNumBufByIndex(obj->postProcObj.node, 2,APP_BUFFER_Q_DEPTH);
     }
     if(status == VX_SUCCESS)
     {
@@ -1269,29 +1267,6 @@ static void set_scaler_defaults(ScalerObj *scalerObj)
     scalerObj->color_format = VX_DF_IMAGE_NV12;
 }
 
-static void set_pre_proc_defaults(PreProcObj *preProcObj)
-{
-    vx_int32 i;
-    for(i = 0; i < 4; i++ )
-    {
-        preProcObj->params.pad_pixel[i] = 0;
-    }
-
-    for(i = 0; i< 3 ; i++)
-    {
-        preProcObj->params.scale_val[i] = 1.0;
-        preProcObj->params.mean_pixel[i] = 0.0;
-    }
-
-    preProcObj->params.ip_rgb_or_yuv = 1; /* YUV-NV12 default */
-    preProcObj->params.color_conv_flag = TIADALG_COLOR_CONV_YUV420_BGR;
-}
-
-static void update_pre_proc_params(AppObj *obj, PreProcObj *preProcObj)
-{
-
-}
-
 static void update_img_mosaic_defaults(AppObj *obj, ImgMosaicObj *imgMosaicObj)
 {
     vx_int32 idx = 0;
@@ -1315,20 +1290,42 @@ static void update_img_mosaic_defaults(AppObj *obj, ImgMosaicObj *imgMosaicObj)
     imgMosaicObj->params.clear_count  = 4;
 }
 
-static void update_draw_detections_defaults(AppObj *obj, DrawDetectionsObj *drawDetectionsObj)
-{
-    vx_int32 i;
 
-    drawDetectionsObj->params.width  = obj->scalerObj.output[1].width;
-    drawDetectionsObj->params.height = obj->scalerObj.output[1].height;
 
-    for(i = 0; i < drawDetectionsObj->params.num_classes; i++)
-    {
-        drawDetectionsObj->params.color_map[i][0] = (vx_uint8)(rand() % 256);
-        drawDetectionsObj->params.color_map[i][1] = (vx_uint8)(rand() % 256);
-        drawDetectionsObj->params.color_map[i][2] = (vx_uint8)(rand() % 256);
-    }
+static void set_post_proc_defaults_od(PostProcObj *postProcObj){
+
+    postProcObj->output_img_width = 768;
+    postProcObj->output_img_height = 384;
+
+    postProcObj->params.od_prms.scaleX = 1;
+    postProcObj->params.od_prms.scaleY = 1;
+
+    postProcObj->params.od_prms.formatter[0] = 0;
+    postProcObj->params.od_prms.formatter[1] = 1;
+    postProcObj->params.od_prms.formatter[2] = 2;
+    postProcObj->params.od_prms.formatter[3] = 3;
+    postProcObj->params.od_prms.formatter[4] = 5;
+    postProcObj->params.od_prms.formatter[5] = 4;
+
+    postProcObj->params.task_type = TIVX_DL_POST_PROC_DETECTION_TASK_TYPE;
+
+    postProcObj->params.od_prms.labelIndexOffset = 0;
+
+    postProcObj->params.od_prms.labelOffset = label_offset3;
+
+    postProcObj->params.od_prms.classnames = img_labels;
+
+    postProcObj->params.od_prms.viz_th = 0.6;
 }
+
+static void update_post_proc_params_od(AppObj *obj, PostProcObj *postProcObj)
+{  
+    postProcObj->output_img_width = obj->scalerObj.output[1].width;
+    postProcObj->output_img_height = obj->scalerObj.output[1].height;
+    postProcObj->params.od_prms.scaleX = postProcObj->output_img_width/416.0;
+    postProcObj->params.od_prms.scaleY = postProcObj->output_img_height/416.0;
+    postProcObj->params.od_prms.viz_th = postProcObj->viz_th; 
+} 
 
 static void set_display_defaults(DisplayObj *displayObj)
 {
@@ -1346,7 +1343,7 @@ static void app_default_param_set(AppObj *obj)
 {
     set_scaler_defaults(&obj->scalerObj);
 
-    set_pre_proc_defaults(&obj->preProcObj);
+    set_post_proc_defaults_od(&obj->postProcObj);
 
     set_display_defaults(&obj->displayObj);
 
@@ -1360,9 +1357,7 @@ static void app_default_param_set(AppObj *obj)
 
 static void app_update_param_set(AppObj *obj)
 {
-    update_pre_proc_params(obj, &obj->preProcObj);
-
-    update_draw_detections_defaults(obj, &obj->drawDetectionsObj);
+    update_post_proc_params_od(obj,&obj->postProcObj);
 
     update_img_mosaic_defaults(obj, &obj->imgMosaicObj);
 

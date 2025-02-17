@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2017 Texas Instruments Incorporated
+ * Copyright (c) 2024 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,17 +59,37 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef _APP_DRAW_DETECTIONS_MODULE
-#define _APP_DRAW_DETECTIONS_MODULE
+#ifndef _APP_POST_PROC_MODULE
+#define _APP_POST_PROC_MODULE
 
 #include "app_common.h"
 #include "itidl_ti.h"
+#include "app_display_module.h"
 
 typedef struct {
     vx_node  node;
 
     vx_user_data_object config;
-    tivxDrawBoxDetectionsParams params;
+
+    tivxDLPostProcParams params;
+
+    sTIDL_IOBufDesc_t ioBufDesc;
+
+    vx_uint32 num_input_tensors;
+
+    vx_uint32 num_output_tensors;
+
+
+    vx_uint32 output_img_width;
+
+    vx_uint32 output_img_height;
+
+
+    vx_float32 viz_th;
+
+    vx_uint32 num_top_results;
+
+    vx_kernel kernel;
 
     vx_object_array output_image_arr;
 
@@ -77,18 +97,14 @@ typedef struct {
 
     vx_char objName[APP_MAX_FILE_PATH];
 
-    vx_uint32 out_width;
-    vx_uint32 out_height;
+} PostProcObj;
 
-} DrawDetectionsObj;
+vx_status app_update_post_proc(vx_context context, PostProcObj *postProcObj, vx_user_data_object config);
+vx_status app_init_post_proc(vx_context context, PostProcObj *postProcObj, char *objName,vx_int32 bufq_depth);
+void app_deinit_post_proc(PostProcObj *obj, vx_int32 bufq_depth);
+void app_delete_post_proc(PostProcObj *obj);
+vx_status app_create_graph_post_proc(vx_graph graph, PostProcObj *postProcObj,vx_object_array in_tensor_arr, vx_object_array input_img_arr);
+vx_status writePostProcOutput(char* file_name, PostProcObj *postProcObj);
 
-vx_status app_update_draw_detections(DrawDetectionsObj *drawDetectionsObj, vx_user_data_object config);
-vx_status app_init_draw_detections(vx_context context, DrawDetectionsObj *drawDetectionsObj, char *objName);
-void app_deinit_draw_detections(DrawDetectionsObj *drawDetectionsObj);
-void app_delete_draw_detections(DrawDetectionsObj *drawDetectionsObj);
-vx_status app_create_graph_draw_detections(vx_graph graph,
-                                           DrawDetectionsObj *drawDetectionsObj,
-                                           vx_object_array    input_tensor_arr,
-                                           vx_object_array    output_image_arr);
 
 #endif
