@@ -56,6 +56,7 @@ APP_UTILS_LIBS += app_utils_console_io
 APP_UTILS_LIBS += app_utils_timer
 APP_UTILS_LIBS += app_utils_file_io
 APP_UTILS_LIBS += app_utils_ipc
+APP_UTILS_LIBS += app_utils_ipc_test
 APP_UTILS_LIBS += app_utils_remote_service
 APP_UTILS_LIBS += app_utils_misc
 APP_UTILS_LIBS += app_utils_perf_stats
