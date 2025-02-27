@@ -103,6 +103,7 @@
 #include <TI/hwa_vpac_viss.h>
 #include <TI/hwa_vpac_ldc.h>
 #include <TI/hwa_vpac_msc.h>
+#include <TI/hwa_vpac_fc.h>
 #endif
 
 #ifdef C7504
@@ -571,6 +572,7 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetVpacMscKernels();
         tivxRegisterHwaTargetVpacLdcKernels();
         tivxRegisterHwaTargetVpacVissKernels();
+        tivxRegisterHwaTargetVpacFcKernels();
         #endif
         #ifdef C7504
         {
@@ -599,6 +601,7 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterHwaTargetVpacMscKernels();
         tivxUnRegisterHwaTargetVpacLdcKernels();
         tivxUnRegisterHwaTargetVpacVissKernels();
+        tivxUnRegisterHwaTargetVpacFcKernels();
         #endif
         #ifdef C71
         {

@@ -122,6 +122,7 @@
 #include <TI/hwa_vpac_ldc.h>
 #include <TI/hwa_vpac_msc.h>
 #include <TI/hwa_vpac_nf.h>
+#include <TI/hwa_vpac_fc.h>
 #endif
 
 #if defined(ENABLE_VHWA_DMPAC)
@@ -991,6 +992,7 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetVpacLdcKernels();
         tivxRegisterHwaTargetVpacVissKernels();
         tivxRegisterHwaTargetVpacNfKernels();
+        tivxRegisterHwaTargetVpacFcKernels();
         #endif
         #ifdef ENABLE_VHWA_DMPAC
         tivxRegisterHwaTargetDmpacSdeKernels();
@@ -1046,6 +1048,7 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterHwaTargetVpacLdcKernels();
         tivxUnRegisterHwaTargetVpacNfKernels();
         tivxUnRegisterHwaTargetVpacVissKernels();
+        tivxUnRegisterHwaTargetVpacFcKernels();        
         #endif
         #ifdef ENABLE_VHWA_DMPAC
         tivxUnRegisterHwaTargetDmpacSdeKernels();
