@@ -12,10 +12,9 @@ include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 STATIC_LIBS     += $(TIADALG_LIBS)
 else
 include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
-STATIC_LIBS     += $(VISION_APPS_MODULES_LIBS)
 endif
 
-
+STATIC_LIBS     += $(VISION_APPS_MODULES_LIBS)
 STATIC_LIBS     += $(IMAGING_LIBS)
 STATIC_LIBS     += $(PTK_LIBS)
 STATIC_LIBS     += $(VISION_APPS_KERNELS_LIBS)

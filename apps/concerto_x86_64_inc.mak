@@ -38,6 +38,17 @@ PTK_IDIRS += $(PTK_PATH)/include
 VISION_APPS_STEREO_KERNELS_IDIRS =
 VISION_APPS_STEREO_KERNELS_IDIRS += $(VISION_APPS_PATH)/kernels/stereo/include
 
+# This section is for apps to link against tivision_apps library instead of static libs
+ifeq ($(LINK_SHARED_OBJ)$(TARGETTYPE),yesexe)
+
+#$(info $(TARGET) links against libtivision_apps.so)
+
+SHARED_LIBS += tivision_apps
+
+# This section is for apps to link against static libs instead of tivision_apps library
+# Also used to create tivision_apps library (so we can maintain lib list in one place
+else   # ifeq ($(LINK_SHARED_OBJ),yes)
+
 LDIRS       += $(VISION_APPS_PATH)/out/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(APP_UTILS_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIOVX_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -212,5 +223,7 @@ include $(IMAGING_PATH)/build_flags.mak
 include $(IMAGING_PATH)/kernels/concerto_inc.mak
 include $(VIDEO_IO_PATH)/build_flags.mak
 include $(VIDEO_IO_PATH)/kernels/concerto_inc.mak
+
+endif  # ifeq ($(LINK_SHARED_OBJ),yes)
 
 endif
