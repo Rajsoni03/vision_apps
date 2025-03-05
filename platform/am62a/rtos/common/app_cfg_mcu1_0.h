@@ -68,7 +68,6 @@
 #define DDR_HEAP_MEM_SIZE               (DDR_DM_R5F_LOCAL_HEAP_SIZE)
 #define ENABLE_SCISERVER
 
-#undef ENABLE_UDMA
 #undef ENABLE_UDMA_COPY
 #define ENABLE_TIOVX
 #define ENABLE_FVID2
