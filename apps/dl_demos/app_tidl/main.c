@@ -297,7 +297,7 @@ int32_t app_run_screen(AppObj *obj)
         vxQueryImage(display_image, VX_IMAGE_HEIGHT, &height, sizeof(vx_uint32));
         vxQueryImage(display_image, VX_IMAGE_FORMAT, &df, sizeof(vx_df_image));
 
-        if(VX_DF_IMAGE_NV12 == df) 
+        if(VX_DF_IMAGE_NV12 == df)
         {
             num_bytes_per_4pixels = 4;
         }
@@ -1165,14 +1165,14 @@ static void app_run_task(void *app_var)
     vx_status status = VX_SUCCESS;
     appPerfStatsCpuLoadResetAll();
 
-    while(!obj->stop_task)
+    if(!obj->stop_task)
     {
         status = app_run_graph(obj);
         if(status == VX_FAILURE)
         {
             printf("Error processing graph!\n");
-            obj->stop_task = 1;
         }
+        obj->stop_task = 1;
     }
     obj->stop_task_done = 1;
 }
@@ -1273,7 +1273,7 @@ static vx_status app_run_graph_interactive(AppObj *obj)
     else
     {
         appPerfStatsResetAll();
-        while((!done) && (status == VX_SUCCESS))
+        while((!done) && (status == VX_SUCCESS) && (!obj->stop_task_done))
         {
             printf(menu);
             ch = getchar();
