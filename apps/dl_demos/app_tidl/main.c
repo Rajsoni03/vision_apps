@@ -1591,7 +1591,7 @@ static vx_status app_run_graph(AppObj *obj)
     }
     for(cur_iteration=0; cur_iteration<obj->num_iterations; cur_iteration++)
     {
-        printf("Iteration %d of %d ... \n", cur_iteration, obj->num_iterations);
+        printf("Iteration %d of %d ... \n", cur_iteration+1, obj->num_iterations);
 
         test_case_file =  fopen(obj->input_file_list,"r");
         if(test_case_file==NULL)
