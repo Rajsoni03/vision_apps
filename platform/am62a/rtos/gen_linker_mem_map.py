@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (c) 2018 Texas Instruments Incorporated
+# Copyright (c) 2018-2025 Texas Instruments Incorporated
 #
 # All rights reserved not granted herein.
 #
@@ -83,7 +83,8 @@
 #
 #
 from ti_psdk_rtos_tools import *
-import math
+import math, os, sys, re
+from gen_dts_file import Org_dts_file
 
 def roundUp(x,y):
         return int(math.ceil(x / y)) * y
@@ -253,7 +254,7 @@ c7x_1_l1   = MemSection("L2RAM_C7x_1_AUX_AS_L1", "RWIX", c7x_1_l2_aux_as_l1_addr
 
 # CPU code/data memory sections in DDR
 mcu_r5f_ddr_ipc             = MemSection("DDR_MCU_R5F_IPC", "RWIX", mcu_r5f_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for MCU R5F for Linux IPC");
-mcu_r5f_ddr_ipc.setDtsName("edgeai_mcu_r5fss0_core0_dma_memory_region", "edgeai-dm-r5f-dma-memory");
+mcu_r5f_ddr_ipc.setDtsName("mcu_r5fss0_core0_dma_memory_region", "r5f-dma-memory");
 mcu_r5f_ddr_resource_table  = MemSection("DDR_MCU_R5F_RESOURCE_TABLE", "RWIX", mcu_r5f_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for MCU R5F for Linux resource table");
 mcu_r5f_ddr_ipc_tracebuf    = MemSection("DDR_MCU_R5F_IPC_TRACEBUF", "RWIX", mcu_r5f_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for MCU R5F for Linux IPC tracebuffer");
 mcu_r5f_ddr                 = MemSection("DDR_MCU_R5F", "RWIX", mcu_r5f_ddr_addr, mcu_r5f_ddr_size, "DDR for MCU R5F for code/data");
@@ -262,10 +263,10 @@ mcu_r5f_ddr_total           = MemSection("DDR_MCU_R5F_DTS", "", 0, 0, "DDR for M
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr_resource_table);
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr_ipc_tracebuf);
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr);
-mcu_r5f_ddr_total.setDtsName("edgeai_mcu_r5fss0_core0_memory_region", "edgeai-r5f-memory");
+mcu_r5f_ddr_total.setDtsName("mcu_r5fss0_core0_memory_region", "r5f-dma-memory");
 
 dm_r5f_ddr_ipc             = MemSection("DDR_DM_R5F_IPC", "RWIX", dm_r5f_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for DM R5F for Linux IPC");
-dm_r5f_ddr_ipc.setDtsName("edgeai_dm_r5fss0_core0_dma_memory_region", "edgeai-dm-r5f-dma-memory");
+dm_r5f_ddr_ipc.setDtsName("wkup_r5fss0_core0_dma_memory_region", "r5f-dma-memory");
 dm_r5f_ddr_resource_table  = MemSection("DDR_DM_R5F_RESOURCE_TABLE", "RWIX", dm_r5f_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for DM R5F for Linux resource table");
 dm_r5f_ddr_ipc_tracebuf    = MemSection("DDR_DM_R5F_IPC_TRACEBUF", "RWIX", dm_r5f_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for DM R5F for Linux IPC tracebuffer");
 linux_ddr_fs_stub          = MemSection("DDR_FS_STUB", "RWIX", linux_ddr_fs_stub_addr, linux_ddr_fs_stub_size, "DDR for FS Stub binary");
@@ -275,10 +276,10 @@ dm_r5f_ddr_total           = MemSection("DDR_DM_R5F_DTS", "", 0, 0, "DDR for DM 
 dm_r5f_ddr_total.concat(dm_r5f_ddr_resource_table);
 dm_r5f_ddr_total.concat(dm_r5f_ddr_ipc_tracebuf);
 dm_r5f_ddr_total.concat(dm_r5f_ddr);
-dm_r5f_ddr_total.setDtsName("edgeai_dm_r5fss0_core0_memory_region", "edgeai-r5f-memory");
+dm_r5f_ddr_total.setDtsName("wkup_r5fss0_core0_memory_region", "r5f-dma-memory");
 
 c7x_1_ddr_ipc             = MemSection("DDR_C7x_1_IPC", "RWIX", c7x_1_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for C7x_1 for Linux IPC");
-c7x_1_ddr_ipc.setDtsName("edgeai_c71_0_dma_memory_region", "edgeai-c71-dma-memory");
+c7x_1_ddr_ipc.setDtsName("c7x_0_dma_memory_region", "c7x-dma-memory");
 c7x_1_ddr_resource_table  = MemSection("DDR_C7x_1_RESOURCE_TABLE", "RWIX", c7x_1_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for C7x_1 for Linux resource table");
 c7x_1_ddr_ipc_tracebuf    = MemSection("DDR_C7X_1_IPC_TRACEBUF", "RWIX", c7x_1_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for C7X_1 for Linux IPC tracebuffer");
 c7x_1_ddr_boot            = MemSection("DDR_C7x_1_BOOT", "RWIX", c7x_1_ddr_boot_addr, c7x_1_ddr_boot_size, "DDR for C7x_1 for boot section");
@@ -294,7 +295,7 @@ c7x_1_ddr_total.concat(c7x_1_ddr_ipc_tracebuf);
 c7x_1_ddr_total.concat(c7x_1_ddr_boot);
 c7x_1_ddr_total.concat(c7x_1_ddr_vecs);
 c7x_1_ddr_total.concat(c7x_1_ddr);
-c7x_1_ddr_total.setDtsName("edgeai_c71_0_memory_region", "edgeai-c71-memory");
+c7x_1_ddr_total.setDtsName("c7x_0_memory_region", "c7x-memory");
 
 tifs_lpm_mem       = MemSection("TIFS_LPM_CTX"        , "", tifs_lpm_ctx_addr       , tifs_lpm_ctx_size       , "TIFS LPM context save memory");
 atf_mem            = MemSection("ATF_MEM"        , "", atf_addr       , atf_size       , "ARM Trusted Firmware");
@@ -478,4 +479,12 @@ HtmlMmapTable(html_mmap, "./system_memory_map.html").export();
 
 CHeaderFile(c_header_mmap, 0,0, "./app_mem_map.h").export();
 
-DtsFile(dts_mmap, "./k3-am62a7-sk.dts").export();
+def check_path():
+        ORG_DTS_PATH = os.environ.get("ORG_DTS_PATH")
+        if not ORG_DTS_PATH :
+                print("ERROR: ORG_DTS_PATH NOT SET, DTS CANNOT BE UPDATED")
+                sys.exit(1)
+        else:
+                Org_dts_file(dts_mmap).export();
+
+check_path();
