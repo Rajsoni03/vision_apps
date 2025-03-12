@@ -241,11 +241,11 @@ assert carveout_size <= ddr_mem_size_2
 
 # r5f local memory sections
 mcu_r5f_tcma_vecs            = MemSection("R5F_TCMA_VECS" , "X"   , 0x00000000, (KB >> 4));
-mcu_r5f_tcma                 = MemSection("R5F_TCMA" , "X"   , 0x00000040, (30*KB) - (KB >> 4));
-mcu_r5f_tcma_trace_buff      = MemSection("R5F_TCMA_TRACE_BUFF" , "RWIX"   , 0x00007800, (KB << 1));
+mcu_r5f_tcma                 = MemSection("R5F_TCMA" , "X"   , 0x00000040, (32*KB) - (KB >> 4));
+mcu_r5f_tcma_trace_buff      = MemSection("WKUP_SRAM_TRACE_BUFF" , "RWIX"   , 0x41880000, (KB << 1));
 
 mcu_r5f_tcmb0_vecs            = MemSection("R5F_TCMB0_VECS", "RWIX", 0x41010000, (KB >> 4));
-mcu_r5f_tcmb0                 = MemSection("R5F_TCMB0", "RWIX", 0x41010040, (30*KB) - (KB >> 4));
+mcu_r5f_tcmb0                 = MemSection("R5F_TCMB0", "RWIX", 0x41010040, (32*KB) - (KB >> 4));
 
 # C7x L1/L2/L3 memory sections
 c7x_1_l3   = MemSection("L2RAM_C7x_1_MAIN", "RWIX", c7x_1_l2_main_addr  , c7x_1_l2_main_size  , "L3 for C7x_1");
