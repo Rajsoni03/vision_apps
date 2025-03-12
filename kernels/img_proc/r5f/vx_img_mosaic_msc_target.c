@@ -1064,7 +1064,7 @@ static vx_status tivxKernelImgMosaicMscDrvSubmit(tivxImgMosaicMscInstObj *inst_o
 static void tivxKernelImgMosaicMscDrvWait(tivxImgMosaicMscInstObj *inst_obj)
 {
     /* Wait for Frame Completion */
-    tivxEventWait(inst_obj->wait_for_compl, TIVX_EVENT_TIMEOUT_WAIT_FOREVER);
+    tivxEventWait(inst_obj->wait_for_compl, VX_TIMEOUT_WAIT_FOREVER);
 }
 
 static vx_status tivxKernelImgMosaicMscDrvGetReq(tivxImgMosaicMscInstObj *inst_obj)
