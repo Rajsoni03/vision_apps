@@ -224,11 +224,6 @@ static void app_get_file_format_ext(uint16_t file_format, char *file_ext)
         strcpy(file_ext, "bmp");
     }
     else
-    if(file_format==APP_FILE_FORMAT_PNG)
-    {
-        strcpy(file_ext, "png");
-    }
-    else
     if(file_format==APP_FILE_FORMAT_BIN12B_UNPACKED)
     {
         strcpy(file_ext, "bin");
@@ -244,11 +239,6 @@ static vx_status app_load_vximage_from_file(vx_image img, char *filename, uint16
 {
     vx_status status = VX_SUCCESS;
 
-    if((file_format==APP_FILE_FORMAT_PNG) && (status == VX_SUCCESS))
-    {
-        status = tivx_utils_load_vximage_from_pngfile(img, filename, vx_true_e);
-    }
-    else
     if((file_format==APP_FILE_FORMAT_BMP) && (status == VX_SUCCESS))
     {
         status = tivx_utils_load_vximage_from_bmpfile(img, filename, vx_true_e);
@@ -265,11 +255,6 @@ static vx_status app_save_vximage_to_file(char *filename, vx_image img, uint16_t
 {
     vx_status status = VX_SUCCESS;
 
-    if((file_format==APP_FILE_FORMAT_PNG) && (status == VX_SUCCESS))
-    {
-        status = tivx_utils_save_vximage_to_pngfile(filename, img);
-    }
-    else
     if((file_format==APP_FILE_FORMAT_BMP) && (status == VX_SUCCESS))
     {
         status = tivx_utils_save_vximage_to_bmpfile(filename, img);
@@ -1190,11 +1175,6 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                         obj->in_file_format = APP_FILE_FORMAT_BMP;
                         obj->in_vx_df_image = VX_DF_IMAGE_U8;
                     }
-                    if(strcmp(token, "png")==0)
-                    {
-                        obj->in_file_format = APP_FILE_FORMAT_PNG;
-                        obj->in_vx_df_image = VX_DF_IMAGE_U8;
-                    }
                     if(strcmp(token, "bin12b")==0)
                     {
                         obj->in_file_format = APP_FILE_FORMAT_BIN12B_UNPACKED;
@@ -1218,10 +1198,6 @@ static void app_parse_cfg_file(AppObj *obj, char *cfg_file_name)
                     if(strcmp(token, "bmp")==0)
                     {
                         obj->out_file_format = APP_FILE_FORMAT_BMP;
-                    }
-                    if(strcmp(token, "png")==0)
-                    {
-                        obj->out_file_format = APP_FILE_FORMAT_PNG;
                     }
                     app_get_file_format_ext(obj->out_file_format, obj->out_file_ext);
                 }
