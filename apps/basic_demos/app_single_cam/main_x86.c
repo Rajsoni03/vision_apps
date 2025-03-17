@@ -65,9 +65,8 @@
 #include <TI/video_io_kernels.h>
 
 static AppObj g_AppObj;
-IssAeDynamicParams g_ae_dynPrms=
-{
-};
+
+extern IssAeDynamicParams g_ae_dynPrms;
 
 static void x86_app_parse_cmd_line_args(AppObj *obj, int argc, char *argv[]);
 static void x86_app_init(AppObj *obj);
