@@ -266,6 +266,21 @@ vx_status app_create_graph_tidl(vx_context context, vx_graph graph, TIDLObj *tid
     vxSetReferenceName((vx_reference)tidlObj->node, "tidl_node");
     vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_1);
 
+    #if defined(SOC_J784S4)
+    if (tidlObj->core_id == 1)
+    {
+        vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_2);
+    }
+    else if (tidlObj->core_id == 2)
+    {
+        vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_3);
+    }
+    else if (tidlObj->core_id == 3)
+    {
+        vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_4);
+    }
+    #endif
+
     vx_bool replicate[16];
     replicate[TIVX_KERNEL_TIDL_IN_CONFIG_IDX] = vx_false_e;
     replicate[TIVX_KERNEL_TIDL_IN_NETWORK_IDX] = vx_false_e;

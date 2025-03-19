@@ -111,6 +111,9 @@ typedef struct {
   /*! TIDL number of input tensors */
   vx_uint32 num_input_tensors;
 
+  /*! TIDL CPU Core_ID */
+  vx_uint32 core_id ;
+
   /*! TIDL number of output tensors */
   vx_uint32 num_output_tensors;
 

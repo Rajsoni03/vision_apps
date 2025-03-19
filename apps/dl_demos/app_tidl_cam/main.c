@@ -967,6 +967,11 @@ static vx_status app_init(AppObj *obj)
     /* Initialize TIDL first to get tensor I/O information from network */
     if(status == VX_SUCCESS)
     {
+        #if defined (SOC_J784S4)
+        obj->tidlObj.core_id = 2;
+        #else
+        obj->tidlObj.core_id = 0;
+        #endif
         status = app_init_tidl(obj->context, &obj->tidlObj, "tidl_obj", obj->sensorObj.num_cameras_enabled);
         APP_PRINTF("TIDL Init Done! \n");
     }

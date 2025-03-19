@@ -751,6 +751,11 @@ static vx_status app_init(AppObj *obj)
     app_init_scaler(obj->context, &obj->scalerObj, "scaler_obj", obj->sensorObj.num_cameras_enabled, 2);
     APP_PRINTF("Scaler init done!\n");
 
+    #if defined (SOC_J784S4)
+    obj->tidlObj.core_id = 2;
+    #else
+    obj->tidlObj.core_id = 0;
+    #endif
     /* Initialize TIDL first to get tensor I/O information from network */
     app_init_tidl(obj->context, &obj->tidlObj, "tidl_obj", obj->sensorObj.num_cameras_enabled);
     APP_PRINTF("TIDL Init Done! \n");
