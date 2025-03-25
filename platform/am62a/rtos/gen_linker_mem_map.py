@@ -85,6 +85,7 @@
 from ti_psdk_rtos_tools import *
 import math, os, sys, re
 from gen_dts_file import Org_dts_file
+from gen_c7x_1_syscfg import C7x_1_Syscfg
 
 def roundUp(x,y):
         return int(math.ceil(x / y)) * y
@@ -469,6 +470,24 @@ dts_mmap.addMemSection( ddr_shared_mem     );
 dts_mmap.addMemSection( edgeai_core_heaps );
 dts_mmap.checkOverlap();
 
+#Create Memory Sections required for example.syscfg under c7x_1
+c7x_1_syscfg = MemoryMap("Memory Map for example.syscfg under c7x_1");
+c7x_1_syscfg.addMemSection(c7x_1_l3);
+c7x_1_syscfg.addMemSection(c7x_1_l2);
+c7x_1_syscfg.addMemSection(c7x_1_ddr_total);
+c7x_1_syscfg.addMemSection(ddr_shared_mem );
+c7x_1_syscfg.addMemSection(c7x_1_ddr_local_heap);
+c7x_1_syscfg.addMemSection(c7x_1_ddr_scratch );
+c7x_1_syscfg.addMemSection(app_log_mem);
+c7x_1_syscfg.addMemSection(app_fileio_mem );
+c7x_1_syscfg.addMemSection(tiovx_obj_desc_mem);
+c7x_1_syscfg.addMemSection(ipc_vring_mem);
+c7x_1_syscfg.addMemSection(c7x_1_ddr_ipc);
+c7x_1_syscfg.addMemSection(tiovx_log_rt_mem );
+c7x_1_syscfg.addMemSection(c7x_1_ddr_local_heap_non_cacheable);
+c7x_1_syscfg.addMemSection(c7x_1_ddr_scratch_non_cacheable);
+c7x_1_syscfg.checkOverlap();
+
 #
 # Generate linker command files containing "MEMORY" definitions
 #
@@ -478,6 +497,9 @@ LinkerCmdFile(dm_r5f_mmap, "./mcu1_0/linker_mem_map.cmd").export();
 HtmlMmapTable(html_mmap, "./system_memory_map.html").export();
 
 CHeaderFile(c_header_mmap, 0,0, "./app_mem_map.h").export();
+
+#Update example.syscfg file for c7x_1
+C7x_1_Syscfg(c7x_1_syscfg).export();
 
 def check_path():
         ORG_DTS_PATH = os.environ.get("ORG_DTS_PATH")
