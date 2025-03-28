@@ -978,16 +978,12 @@ static vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         #if defined (SOC_J784S4)
-<<<<<<< HEAD
-        obj->tidlObj.core_id = 2;
-=======
         obj->tidlObj.core_id = obj->cpu_core_id;
         #elif defined (SOC_J722S)
         if(obj->cpu_core_id>0)
         {
             obj->tidlObj.core_id = 1;
         }
->>>>>>> d89a6507 (Adding Core_id support to run tidl node on any C7x Core in all TIDL Demos)
         #else
         obj->tidlObj.core_id = 0;
         #endif
