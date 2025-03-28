@@ -132,7 +132,7 @@ typedef struct {
     vx_uint32 delay_in_msecs;
     vx_uint32 num_iterations;
     vx_uint32 is_interactive;
-
+    vx_uint32 cpu_core_id;
     tivx_task task;
     vx_uint32 stop_task;
     vx_uint32 stop_task_done;
@@ -527,6 +527,16 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     obj->is_interactive = 1;
                 }
             }
+            else
+            if(strcmp(token, "cpu_core_id")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->cpu_core_id = atoi(token);
+                }
+            }
         }
     }
 
@@ -704,10 +714,23 @@ static vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
       #if defined (SOC_J784S4)
+<<<<<<< HEAD
       obj->tidlObj.core_id = 2;
       #else
       obj->tidlObj.core_id = 0;
       #endif
+=======
+      obj->tidlObj.core_id = obj->cpu_core_id;
+      #elif defined (SOC_J722S)
+      if(obj->cpu_core_id>0)
+      {
+        obj->tidlObj.core_id = 1;
+      }
+      #else
+      obj->tidlObj.core_id = 0;
+      #endif
+
+>>>>>>> d89a6507 (Adding Core_id support to run tidl node on any C7x Core in all TIDL Demos)
       status = app_init_tidl(obj->context, &obj->tidlObj, "tidl_obj", 1);
       APP_PRINTF("TIDL Init Done! \n");
     }

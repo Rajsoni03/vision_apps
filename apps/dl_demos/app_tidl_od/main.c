@@ -118,6 +118,7 @@ typedef struct {
 
     vx_int32 en_out_img_write;
     vx_int32 test_mode;
+    vx_uint32 cpu_core_id;
 
     vx_int32 start_frame;
     vx_int32 num_frames;
@@ -527,6 +528,16 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                         obj->is_interactive = 1;
                 }
             }
+            else
+            if(strcmp(token, "cpu_core_id")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->cpu_core_id = atoi(token);
+                }
+            }
         }
     }
 
@@ -706,7 +717,16 @@ static vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         #if defined (SOC_J784S4)
+<<<<<<< HEAD
         obj->tidlObj.core_id = 2;
+=======
+        obj->tidlObj.core_id = obj->cpu_core_id;
+        #elif defined (SOC_J722S)
+        if(obj->cpu_core_id>0)
+        {
+            obj->tidlObj.core_id = 1;
+        }
+>>>>>>> d89a6507 (Adding Core_id support to run tidl node on any C7x Core in all TIDL Demos)
         #else
         obj->tidlObj.core_id = 0;
         #endif

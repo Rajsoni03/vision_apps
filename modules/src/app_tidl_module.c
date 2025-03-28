@@ -279,6 +279,14 @@ vx_status app_create_graph_tidl(vx_context context, vx_graph graph, TIDLObj *tid
     {
         vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_4);
     }
+<<<<<<< HEAD
+=======
+    #elif defined(SOC_J22S2)
+    if (tidlObj->core_id == 1)
+    {
+        vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_2);
+    }
+>>>>>>> d89a6507 (Adding Core_id support to run tidl node on any C7x Core in all TIDL Demos)
     #endif
 
     vx_bool replicate[16];

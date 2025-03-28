@@ -131,7 +131,7 @@ typedef struct {
     app_perf_point_t total_perf;
     app_perf_point_t fileio_perf;
     app_perf_point_t draw_perf;
-
+    vx_uint32 cpu_core_id;
     int32_t pipeline;
 
     int32_t enqueueCnt;
@@ -748,6 +748,16 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                     obj->num_frames_to_skip = atoi(token);
                 }
             }
+            else
+            if(strcmp(token, "cpu_core_id")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->cpu_core_id = atoi(token);
+                }
+            }
 #endif
         }
         if (obj->test_mode == 1)
@@ -968,7 +978,16 @@ static vx_status app_init(AppObj *obj)
     if(status == VX_SUCCESS)
     {
         #if defined (SOC_J784S4)
+<<<<<<< HEAD
         obj->tidlObj.core_id = 2;
+=======
+        obj->tidlObj.core_id = obj->cpu_core_id;
+        #elif defined (SOC_J722S)
+        if(obj->cpu_core_id>0)
+        {
+            obj->tidlObj.core_id = 1;
+        }
+>>>>>>> d89a6507 (Adding Core_id support to run tidl node on any C7x Core in all TIDL Demos)
         #else
         obj->tidlObj.core_id = 0;
         #endif
