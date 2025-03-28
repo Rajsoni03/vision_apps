@@ -765,7 +765,7 @@ static vx_status app_init(AppObj *obj)
     #if defined (SOC_J784S4)
     obj->tidlObj.core_id = obj->cpu_core_id;
     #elif defined (SOC_J722S)
-    if(obj->cpu_core_id>0)
+    if(obj->cpu_core_id >0)
     {
         obj->tidlObj.core_id = 1;
     }

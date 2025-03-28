@@ -65,7 +65,7 @@
 
 static vx_user_data_object readConfig(vx_context context, vx_char *config_file, uint32_t *num_input_tensors, uint32_t *num_output_tensors, vx_uint8 *check_sum);
 static vx_user_data_object readNetwork(vx_context context, vx_char *network_file, vx_uint8 *check_sum);
-static vx_status setCreateParams(vx_context context, vx_user_data_object createParams);
+static vx_status setCreateParams(vx_context context, TIDLObj *tidlObj);
 static vx_status setInArgs(vx_context context, vx_user_data_object inArgs);
 static vx_status setOutArgs(vx_context context, vx_user_data_object outArgs);
 static void createOutputTensors(vx_context context, vx_user_data_object config, vx_tensor output_tensors[]);
@@ -113,7 +113,7 @@ vx_status app_init_tidl(vx_context context, TIDLObj *tidlObj, char *objName, vx_
      {
          capacity = sizeof(TIDL_CreateParams);
          tidlObj->createParams = vxCreateUserDataObject(context, "TIDL_CreateParams", capacity, NULL );
-         status = setCreateParams(context, tidlObj->createParams);
+         status = setCreateParams(context, tidlObj);
      }
 
      if(status == VX_SUCCESS)
@@ -279,14 +279,11 @@ vx_status app_create_graph_tidl(vx_context context, vx_graph graph, TIDLObj *tid
     {
         vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_4);
     }
-<<<<<<< HEAD
-=======
-    #elif defined(SOC_J22S2)
+    #elif defined(SOC_J722S)
     if (tidlObj->core_id == 1)
     {
         vxSetNodeTarget(tidlObj->node, VX_TARGET_STRING, TIVX_TARGET_DSP_C7_2);
     }
->>>>>>> d89a6507 (Adding Core_id support to run tidl node on any C7x Core in all TIDL Demos)
     #endif
 
     vx_bool replicate[16];
@@ -584,21 +581,21 @@ static vx_status updateChecksums(vx_user_data_object config, vx_uint8 *config_ch
 
   return status;
 }
-static vx_status setCreateParams(vx_context context, vx_user_data_object createParams)
+static vx_status setCreateParams(vx_context context, TIDLObj *tidlObj)
 {
     vx_status status = VX_SUCCESS;
     vx_map_id  map_id;
     vx_uint32  capacity;
     void *createParams_buffer = NULL;
 
-    status = vxGetStatus((vx_reference)createParams);
+    status = vxGetStatus((vx_reference)tidlObj->createParams);
 
     if(VX_SUCCESS == status)
     {
-        vxSetReferenceName((vx_reference)createParams, "tidl_node_createParams");
+        vxSetReferenceName((vx_reference)tidlObj->createParams, "tidl_node_createParams");
 
         capacity = sizeof(TIDL_CreateParams);
-        vxMapUserDataObject(createParams, 0, capacity, &map_id,
+        vxMapUserDataObject(tidlObj->createParams, 0, capacity, &map_id,
               (void **)&createParams_buffer, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST, 0);
 
         if(createParams_buffer)
@@ -607,6 +604,7 @@ static vx_status setCreateParams(vx_context context, vx_user_data_object createP
             //write create params here
             TIDL_createParamsInit(prms);
 
+            prms->coreId                        = tidlObj->core_id;
             prms->isInbufsPaded                 = 1;
             prms->quantRangeExpansionFactor     = 1.0;
             prms->quantRangeUpdateFactor        = 0.0;
@@ -618,7 +616,7 @@ static vx_status setCreateParams(vx_context context, vx_user_data_object createP
             printf("Unable to allocate memory for create time params! %d bytes\n", capacity);
         }
 
-        vxUnmapUserDataObject(createParams, map_id);
+        vxUnmapUserDataObject(tidlObj->createParams, map_id);
     }
 
     return status;
