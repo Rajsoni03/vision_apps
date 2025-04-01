@@ -68,6 +68,8 @@ ifeq ($(ETHFW_GPTP_BUILD_SUPPORT),yes)
 	LDIRS += $(PDK_PATH)/packages/ti/transport/tsn/lib/r5f/$(TARGET_BUILD)/
 	LDIRS += $(PDK_PATH)/packages/ti/drv/mmcsd/lib/r5f/$(TARGET_BUILD)/
     LDIRS += $(PDK_PATH)/packages/ti/fs/fatfs/lib/r5f/$(TARGET_BUILD)/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack/license_lib/
+    LDIRS += $(PDK_PATH)/packages/ti/transport/tsn/tsn-stack/eval_lib/
 endif
 endif
 
@@ -122,6 +124,8 @@ ADDITIONAL_STATIC_LIBS += tsn_combase.aer5f
 ADDITIONAL_STATIC_LIBS += tsn_unibase.aer5f
 ADDITIONAL_STATIC_LIBS += ti.drv.mmcsd.aer5f
 ADDITIONAL_STATIC_LIBS += ti.fs.fatfs.aer5f
+ADDITIONAL_STATIC_LIBS += yangemb-freertos.j721e_evm.r5f.ti-arm-clang.lib
+ADDITIONAL_STATIC_LIBS += tsn_lldp-freertos.j721e_evm.r5f.ti-arm-clang.lib
 endif
 
 ifeq ($(RTOS), $(filter $(RTOS), FREERTOS SAFERTOS))
