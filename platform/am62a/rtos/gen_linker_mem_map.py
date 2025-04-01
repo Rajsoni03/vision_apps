@@ -86,6 +86,7 @@ from ti_psdk_rtos_tools import *
 import math, os, sys, re
 from gen_dts_file import Org_dts_file
 from gen_c7x_1_syscfg import C7x_1_Syscfg
+from gen_mcu1_0_syscfg import Mcu1_0_Syscfg
 
 def roundUp(x,y):
         return int(math.ceil(x / y)) * y
@@ -488,6 +489,14 @@ c7x_1_syscfg.addMemSection(c7x_1_ddr_local_heap_non_cacheable);
 c7x_1_syscfg.addMemSection(c7x_1_ddr_scratch_non_cacheable);
 c7x_1_syscfg.checkOverlap();
 
+#Create Memory Sections required for example.syscfg under mcu1_0
+mcu1_0_syscfg = MemoryMap("Memory Map for example.syscfg under c7x_1");
+mcu1_0_syscfg.addMemSection(dm_r5f_ddr_ipc);
+mcu1_0_syscfg.addMemSection(ipc_vring_mem);
+mcu1_0_syscfg.addMemSection(app_log_mem);
+mcu1_0_syscfg.addMemSection(app_fileio_mem);
+mcu1_0_syscfg.checkOverlap();
+
 #
 # Generate linker command files containing "MEMORY" definitions
 #
@@ -500,6 +509,9 @@ CHeaderFile(c_header_mmap, 0,0, "./app_mem_map.h").export();
 
 #Update example.syscfg file for c7x_1
 C7x_1_Syscfg(c7x_1_syscfg).export();
+
+#Update example.syscfg file for mcu1_0
+Mcu1_0_Syscfg(mcu1_0_syscfg).export();
 
 def check_path():
         ORG_DTS_PATH = os.environ.get("ORG_DTS_PATH")
