@@ -12,6 +12,8 @@ endif
 
 ifeq ($(TARGET_CPU),x86_64)
 include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
+else
+CFLAGS += -DMPU
 endif
 
 IDIRS += ${TIOVX_PATH}
