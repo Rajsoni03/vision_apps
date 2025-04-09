@@ -87,6 +87,7 @@ import math, os, sys, re
 from gen_dts_file import Org_dts_file
 from gen_c7x_1_syscfg import C7x_1_Syscfg
 from gen_mcu1_0_syscfg import Mcu1_0_Syscfg
+from gen_qnx_bsp_carveout import QNX_BSP_UPDATE
 
 def roundUp(x,y):
         return int(math.ceil(x / y)) * y
@@ -146,7 +147,7 @@ c7x_1_l2_aux_as_l1_size  = 16*KB;
 #
 c7x_1_ddr_ipc_addr = ddr_mem_addr_1;
 c7x_1_ddr_resource_table_addr = c7x_1_ddr_ipc_addr + linux_ddr_ipc_size;
-c7x_1_ddr_ipc_tracebuf_addr = c7x_1_ddr_resource_table_addr + linux_ddr_resource_table_size
+c7x_1_ddr_ipc_tracebuf_addr = c7x_1_ddr_resource_table_addr + linux_ddr_resource_table_size;
 c7x_1_ddr_boot_addr = c7x_1_ddr_ipc_tracebuf_addr + linux_ddr_ipc_tracebuf_size;
 c7x_1_ddr_boot_addr = roundUp(c7x_1_ddr_boot_addr, 1*MB);
 c7x_1_ddr_boot_size = 1*KB;
@@ -497,6 +498,12 @@ mcu1_0_syscfg.addMemSection(app_log_mem);
 mcu1_0_syscfg.addMemSection(app_fileio_mem);
 mcu1_0_syscfg.checkOverlap();
 
+#Create Memory Sections to update QNX BSP carveout 
+qnx_bsp_carveout = MemoryMap("Carveout required for QNX BSP");
+qnx_bsp_carveout.addMemSection(c7x_1_ddr_boot); #This section denotes the start address
+qnx_bsp_carveout.addMemSection(c7x_1_ddr_scratch); #This section denotes the end segment in BSP Carveout 
+qnx_bsp_carveout.checkOverlap();
+
 #
 # Generate linker command files containing "MEMORY" definitions
 #
@@ -512,6 +519,10 @@ C7x_1_Syscfg(c7x_1_syscfg).export();
 
 #Update example.syscfg file for mcu1_0
 Mcu1_0_Syscfg(mcu1_0_syscfg).export();
+
+#Update qnx_bsp_carveout under psdkqa/qnx
+if os.path.isdir(os.path.join(os.path.dirname(__file__),'../../../../psdkqa')):
+	QNX_BSP_UPDATE(qnx_bsp_carveout).export();
 
 def check_path():
         ORG_DTS_PATH = os.environ.get("ORG_DTS_PATH")
