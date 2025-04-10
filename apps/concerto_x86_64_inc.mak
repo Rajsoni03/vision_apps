@@ -38,17 +38,6 @@ PTK_IDIRS += $(PTK_PATH)/include
 VISION_APPS_STEREO_KERNELS_IDIRS =
 VISION_APPS_STEREO_KERNELS_IDIRS += $(VISION_APPS_PATH)/kernels/stereo/include
 
-# This section is for apps to link against tivision_apps library instead of static libs
-ifeq ($(LINK_SHARED_OBJ)$(TARGETTYPE),yesexe)
-
-#$(info $(TARGET) links against libtivision_apps.so)
-
-SHARED_LIBS += tivision_apps
-
-# This section is for apps to link against static libs instead of tivision_apps library
-# Also used to create tivision_apps library (so we can maintain lib list in one place
-else   # ifeq ($(LINK_SHARED_OBJ),yes)
-
 LDIRS       += $(VISION_APPS_PATH)/out/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(APP_UTILS_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIOVX_PATH)/lib/PC/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -59,6 +48,17 @@ LDIRS       += $(MMALIB_PATH)/lib/$(C7X_VERSION)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIDL_PATH)/ti_dl/lib/$(TARGET_SOC)/$(TARGET_PLATFORM)/algo/$(TARGET_BUILD)
+
+# This section is for apps to link against tivision_apps library instead of static libs
+ifeq ($(LINK_SHARED_OBJ)$(TARGETTYPE),yesexe)
+
+#$(info $(TARGET) links against libtivision_apps.so)
+
+SHARED_LIBS += tivision_apps
+
+# This section is for apps to link against static libs instead of tivision_apps library
+# Also used to create tivision_apps library (so we can maintain lib list in one place
+else   # ifeq ($(LINK_SHARED_OBJ),yes)
 
 ifeq ($(RTOS_SDK), mcu_plus_sdk)
 LDIRS+= $(MCU_PLUS_SDK_PATH)/source/drivers/dmautils/lib/
