@@ -471,47 +471,38 @@ static void testGraphProcessing(int wflag, int port_idx[2], int sensor_idx[2], i
 #if !defined (CAPTURE_ONLY_MODE)
         /* Create DCC data for viss node input */
         {
-            char * fname_dcc[2] = {"dcc_csi0.bin", "dcc_csi1.bin"};
-            char * fdcc = fname_dcc[ci];
-            FILE * fp = fopen(fdcc, "rb");
+            int32_t dcc_buff_size = 0;
 
-            if (fp != NULL)
+            dcc_buff_size = appIssGetDCCSizeVISS(sensor_name[ci], 1);
+
+            dcc_config[ci] = vxCreateUserDataObject(context, "dcc_viss", dcc_buff_size, NULL);
+            status = vxGetStatus((vx_reference)dcc_config[ci]);
+
+            if (status == VX_SUCCESS)
             {
-                fseek(fp, 0L, SEEK_END);
-                vx_size dcc_buff_size = ftell(fp);
+                vx_map_id dcc_buf_map_id;
+                uint8_t *dcc_buf;
 
-                rewind(fp);
-                dcc_config[ci] = vxCreateUserDataObject(context, "dcc_viss", dcc_buff_size, NULL);
-                status = vxGetStatus((vx_reference)dcc_config[ci]);
+                vxMapUserDataObject(
+                    dcc_config[ci],
+                    0,
+                    dcc_buff_size,
+                    &dcc_buf_map_id,
+                    (void **)&dcc_buf,
+                    VX_WRITE_ONLY,
+                    VX_MEMORY_TYPE_HOST, 0);
 
-                if (status == VX_SUCCESS)
+                status = appIssGetDCCBuffVISS(sensor_name[ci], 1, dcc_buf, dcc_buff_size);
+                if(status != VX_SUCCESS)
                 {
-                    vx_map_id dcc_buf_map_id;
-                    uint8_t *dcc_buf;
-
-                    vxMapUserDataObject(
-                        dcc_config[ci], 0,
-                        dcc_buff_size,
-                        &dcc_buf_map_id,
-                        (void **)&dcc_buf,
-                        VX_WRITE_ONLY,
-                        VX_MEMORY_TYPE_HOST, 0);
-
-                    fread(dcc_buf, 1, dcc_buff_size, fp);
-                    fclose(fp);
-
-                    vxUnmapUserDataObject(dcc_config[ci], dcc_buf_map_id);
-                    printf("\n\nread bin file %s for dccId=%d with %ld bytes\n\n", fdcc, dcc_id[ci], dcc_buff_size);
+                    printf("Couldn't get VISS DCC buffer from sensor driver \n");
                 }
-                else
-                {
-                    printf("Unable to create DCC config object! \n");
-                }
+
+                vxUnmapUserDataObject(dcc_config[ci], dcc_buf_map_id);
             }
             else
             {
-                printf ("\n\n>>>> ERROR: cannot open this DCC bin file: %s \n\n", fdcc);
-                dcc_id[ci] = 0;
+                printf("Unable to create DCC config object! \n");
             }
         }
 
