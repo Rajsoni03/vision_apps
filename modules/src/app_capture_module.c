@@ -116,6 +116,11 @@ static vx_status configure_capture_params(vx_context context, CaptureObj *captur
             APP_PRINTF("captureObj->params.numDataLanes = %d \n", captureObj->params.instCfg[id].numDataLanes);
             captureObj->params.instCfg[id].laneBandSpeed        = sensorObj->sensorParams.sensorInfo.csi_laneBandSpeed;
 
+            if (0 == strcmp(sensorObj->sensorParams.name, SENSOR_SONY_IMX728_UB971_SONY))
+            {
+                captureObj->params.instCfg[id].numPixels = 1U;
+            }
+
             for (lane = 0; lane < captureObj->params.instCfg[id].numDataLanes; lane++)
             {
                 captureObj->params.instCfg[id].dataLanesMap[lane] = lane + 1;
