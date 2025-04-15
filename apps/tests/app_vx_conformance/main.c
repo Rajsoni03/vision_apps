@@ -106,7 +106,7 @@
 
 #undef CT_TESTCASE
 #define CT_TESTCASE(testcase) testcase##_register,
-CT_RegisterTestCaseFN g_testcase_register_fns[] = {
+CT_RegisterTestCaseFN g_testcase_full_conf_register_fns[] = {
     #include "kernels/test_kernels/test/test_main.h"
     #include "test_conformance/test_main.h"
     #include "test_tiovx/test_main.h"
@@ -121,12 +121,8 @@ CT_RegisterTestCaseFN g_testcase_register_fns[] = {
 void TestModuleRegister();
 void TestModuleUnRegister();
 int vision_apps_test_main(int argc, char* argv[]);
-int CT_main(int argc, char* argv[], const char* version_str);
+int CT_main(int argc, char* argv[], const char* version_str, CT_RegisterTestCaseFN register_fns[]);
 
-#ifdef SYSBIOS
-
-
-#else
 int main(int argc, char* argv[])
 {
     int status;
@@ -137,10 +133,9 @@ int main(int argc, char* argv[])
     appDeInit();
     return status;
 }
-#endif
 
 int vision_apps_test_main(int argc, char* argv[])
 {
-    return CT_main(argc, argv, VERSION_STR);
+    return CT_main(argc, argv, VERSION_STR, g_testcase_full_conf_register_fns);
 }
 
