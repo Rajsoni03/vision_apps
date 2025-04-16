@@ -36,7 +36,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#if defined(LINUX) || defined(QNX)
 #include <sys/stat.h>
+#endif
 
 #include <VX/vx.h>
 #include <TI/tivx.h>

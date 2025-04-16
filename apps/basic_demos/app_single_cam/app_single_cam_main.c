@@ -1761,7 +1761,6 @@ int save_debug_images(AppObj *obj)
     char h3a_image_fname[MAX_FNAME];
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = app_get_test_file_path();
-    struct stat s;
 
     if(NULL == test_data_path)
     {
@@ -1769,11 +1768,16 @@ int save_debug_images(AppObj *obj)
         test_data_path = failsafe_test_data_path;
     }
 
-    if (stat(test_data_path, &s))
+#if defined(LINUX) || defined(QNX)
     {
-        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
-        test_data_path = failsafe_test_data_path;
+        struct stat s;
+        if (stat(test_data_path, &s))
+        {
+            printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+            test_data_path = failsafe_test_data_path;
+        }
     }
+#endif
 
     if(NULL == obj->capt_yuv_image)
     {

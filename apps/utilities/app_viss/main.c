@@ -78,7 +78,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#if defined(LINUX) || defined(QNX)
 #include <sys/stat.h>
+#endif
 #include <float.h>
 #include <math.h>
 #include <unistd.h>
@@ -115,7 +117,6 @@ static int32_t ct_read_raw_image(tivx_raw_image image, const char* fileName, uin
     char file[APP_MAX_FILE_PATH];
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = get_test_file_path();
-    struct stat s;
 
     if (!fileName)
     {
@@ -129,11 +130,16 @@ static int32_t ct_read_raw_image(tivx_raw_image image, const char* fileName, uin
         test_data_path = failsafe_test_data_path;
     }
 
-    if (stat(test_data_path, &s))
+#if defined(LINUX) || defined(QNX)
     {
-        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
-        test_data_path = failsafe_test_data_path;
+        struct stat s;
+        if (stat(test_data_path, &s))
+        {
+            printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+            test_data_path = failsafe_test_data_path;
+        }
     }
+#endif
 
     sz = snprintf(file, APP_MAX_FILE_PATH, "%s/%s", test_data_path, fileName);
 

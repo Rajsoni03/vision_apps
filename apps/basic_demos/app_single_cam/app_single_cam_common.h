@@ -70,7 +70,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#if defined(LINUX) || defined (QNX)
 #include <sys/stat.h>
+#endif
 
 #include <iss_sensors.h>
 #include <iss_sensor_if.h>

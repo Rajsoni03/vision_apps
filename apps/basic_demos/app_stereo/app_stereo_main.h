@@ -73,7 +73,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#if defined(LINUX) || defined(QNX)
 #include <sys/stat.h>
+#endif
 
 #if defined(PC)
 #include <perception/perception.h>

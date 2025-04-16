@@ -75,7 +75,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#if defined(LINUX) || defined(QNX)
 #include <sys/stat.h>
+#endif
 
 #define APP_MAX_FILE_PATH           (512u)
 #define APP_ASSERT(x)               assert((x))

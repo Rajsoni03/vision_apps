@@ -35,7 +35,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(LINUX) || defined(QNX)
 #include <sys/stat.h>
+#endif
 #include <assert.h>
 
 #include <TI/tivx.h>
@@ -390,7 +392,6 @@ static void read_calmat_file( svCalmat_t *calmat, const char*fileName)
     uint32_t  read_size;
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = get_test_file_path();
-    struct stat s;
 
     printf ("Reading calmat file \n");
 
@@ -406,11 +407,16 @@ static void read_calmat_file( svCalmat_t *calmat, const char*fileName)
         test_data_path = failsafe_test_data_path;
     }
 
-    if (stat(test_data_path, &s))
+#if defined(LINUX) || defined(QNX)
     {
-        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
-        test_data_path = failsafe_test_data_path;
+        struct stat s;
+        if (stat(test_data_path, &s))
+        {
+            printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+            test_data_path = failsafe_test_data_path;
+        }
     }
+#endif
 
     sz = snprintf(file, MAXPATHLENGTH, "%s/%s", test_data_path, fileName);
     if (sz > MAXPATHLENGTH)
@@ -478,7 +484,6 @@ static void read_lut_file(ldc_lensParameters *ldcParams, const char*fileName)
     size_t sz;
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = get_test_file_path();
-    struct stat s;
 
     if (!fileName)
     {
@@ -492,11 +497,16 @@ static void read_lut_file(ldc_lensParameters *ldcParams, const char*fileName)
         test_data_path = failsafe_test_data_path;
     }
 
-    if (stat(test_data_path, &s))
+#if defined(LINUX) || defined(QNX)
     {
-        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
-        test_data_path = failsafe_test_data_path;
+        struct stat s;
+        if (stat(test_data_path, &s))
+        {
+            printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+            test_data_path = failsafe_test_data_path;
+        }
     }
+#endif
 
     sz = snprintf(file, MAXPATHLENGTH, "%s/%s", test_data_path, fileName);
     if (sz > MAXPATHLENGTH)

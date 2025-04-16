@@ -89,7 +89,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#if defined(LINUX) || defined(QNX)
 #include <sys/stat.h>
+#endif
 
 #include <srv_utils.h>
 
@@ -1998,7 +2000,6 @@ static void app_run_graph(SrvCalibAppObj *obj)
     uint8_t pause = 0, set_pause = 0;
     char failsafe_test_data_path[3] = "./";
     char * test_data_path = get_test_file_path();
-    struct stat s;
 
     if(NULL == test_data_path)
     {
@@ -2006,11 +2007,16 @@ static void app_run_graph(SrvCalibAppObj *obj)
         test_data_path = failsafe_test_data_path;
     }
 
-    if (stat(test_data_path, &s))
+#if defined(LINUX) || defined(QNX)
     {
-        printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
-        test_data_path = failsafe_test_data_path;
+        struct stat s;
+        if (stat(test_data_path, &s))
+        {
+            printf("Test data path %s does not exist. Defaulting to current folder \n", test_data_path);
+            test_data_path = failsafe_test_data_path;
+        }
     }
+#endif
 
     if(NULL == obj->sensor_name)
     {
