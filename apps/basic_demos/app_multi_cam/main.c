@@ -1937,7 +1937,7 @@ static void app_update_param_set(AppObj *obj)
     vx_uint16 resized_width, resized_height;
     appIssGetResizeParams(obj->sensorObj.image_width, obj->sensorObj.image_height, DISPLAY_WIDTH, DISPLAY_HEIGHT, &resized_width, &resized_height);
 
-    if ( (obj->sensorObj.num_cameras_enabled == 1))
+    if ( obj->sensorObj.num_cameras_enabled == 1 )
     {
         obj->objArrSplitObj.output0_num_elements = 1;
         obj->objArrSplitObj.output1_num_elements = 0;

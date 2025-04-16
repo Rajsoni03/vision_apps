@@ -83,7 +83,7 @@ static vx_status create_output_image(vx_context context, ObjArrSplitObj *objArrS
 
     if (total_input_elements != total_output_elements)
     {
-        printf("[OBJ-ARR-SPLIT-MODULE] Sum of all output num_elements (%d) does not equal the number of elements in objArrSplitObj->input_arr (%ld)\n", total_output_elements, total_input_elements);
+        printf("[OBJ-ARR-SPLIT-MODULE] Sum of all output num_elements (%d) does not equal the number of elements in objArrSplitObj->input_arr (%zd)\n", total_output_elements, total_input_elements);
         status = VX_FAILURE;
     }
 
