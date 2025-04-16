@@ -31,7 +31,6 @@ debug_log.enableSharedMemLog   = false;
 debug_log.enableLogZoneWarning = false;
 debug_log.enableLogZoneError   = false;
 debug_log.enableUartLog        = false;
-debug_log.enableCssLog         = false;
 
 
 mpu_armv71.baseAddr            = 0x0;
