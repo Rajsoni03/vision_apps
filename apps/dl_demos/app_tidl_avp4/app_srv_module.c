@@ -61,6 +61,7 @@
  */
 #include "app_srv_module.h"
 #include "app_display_module.h"
+#include <sys/stat.h>
 
 static void read_calmat_file( svCalmat_t *calmat, const char*fileName);
 vx_status app_create_graph_srv_write_output(vx_graph graph, SRVObj *srvObj);

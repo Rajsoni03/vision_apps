@@ -33,7 +33,6 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/time.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/procmgr.h>

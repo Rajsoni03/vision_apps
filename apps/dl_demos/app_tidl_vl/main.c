@@ -66,7 +66,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <sys/stat.h>
 #include <float.h>
 #include <math.h>
 

@@ -84,7 +84,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <sys/stat.h>
 #include <float.h>
 #include <math.h>
 

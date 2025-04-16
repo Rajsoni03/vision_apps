@@ -75,7 +75,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <sys/stat.h>
 #include <utils/draw2d/include/draw2d.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_get.h>

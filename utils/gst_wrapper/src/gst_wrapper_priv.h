@@ -40,7 +40,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <sys/stat.h>
 
 /* Third-party headers. */
 #include <gst/gst.h>
