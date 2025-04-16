@@ -1244,7 +1244,7 @@ static void app_run_screen_task_delete(AppObj *obj)
 }
 #endif
 
-static char menu[] = {
+static const char menu[] = {
     "\n"
     "\n ================================="
     "\n Demo : TIDL Object Classification"

@@ -171,7 +171,7 @@ static void app_show_usage(vx_int32 argc, vx_char* argv[])
     printf("\n");
 }
 
-static char menu[] = {
+static const char menu[] = {
     "\n"
     "\n ========================="
     "\n SFM Demo                 "

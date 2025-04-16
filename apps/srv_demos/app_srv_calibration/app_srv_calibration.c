@@ -2303,7 +2303,7 @@ static void app_run_task_delete(SrvCalibAppObj *obj)
     tivxTaskDelete(&obj->task);
 }
 
-static char menu[] = {
+static const char menu[] = {
     "\n"
     "\n =========================="
     "\n Demo : SRV Calibration"
