@@ -14,6 +14,10 @@ endif
 
 IDIRS += $(IMAGING_IDIRS)
 
+ifneq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j722s))
+SKIPBUILD=1
+endif
+
 include $(FINALE)
 
 endif
