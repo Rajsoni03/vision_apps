@@ -182,7 +182,7 @@ int32_t appSciserverSciclientDeInit()
         #endif
 
         #else
-        appLogPrintf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
+        printf("SCICLIENT: ERROR: Sciclient deinit failed !!!\n");
         #endif
     }
 
