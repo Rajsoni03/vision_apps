@@ -72,6 +72,7 @@ vx_status app_init_post_proc(vx_context context, PostProcObj *postProcObj, char 
     vx_status status = VX_SUCCESS;
 
 #if defined(SOC_AM62A) && defined(QNX)
+    uint32_t i = 0;
     local_postproc_config = tivxMemAlloc(sizeof(tivxDLPostProcParams), TIVX_MEM_EXTERNAL);
     if(local_postproc_config == NULL) {
         printf("ERROR: Unable to allocate memory for local_postproc_config\n");
@@ -92,7 +93,12 @@ vx_status app_init_post_proc(vx_context context, PostProcObj *postProcObj, char 
     {
         local_postproc_config->oc_prms.labelOffset = 1;
     }
-    memcpy(local_postproc_config->oc_prms.classnames, imgnet_labels, 1000*256);
+
+    local_postproc_config->oc_prms.classnames = tivxMemAlloc(TIVX_DL_POST_PROC_MAX_SIZE_CLASSNAME * TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES * sizeof(char), TIVX_MEM_EXTERNAL);
+    for(i = 0; i < TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES; i++)
+    {
+        strcpy(local_postproc_config->oc_prms.classnames[i], imgnet_labels[i]);
+    }
 
     postProcObj->config = vxCreateUserDataObject(context, "PostProcConfig", sizeof(tivxDLPostProcParams), local_postproc_config);
     status = vxGetStatus((vx_reference)postProcObj->config);
@@ -189,6 +195,10 @@ void app_deinit_post_proc(PostProcObj *postProcObj, vx_int32 bufq_depth)
     #if defined(SOC_AM62A) && defined(QNX)
     if(local_postproc_config)
     {
+       if (local_postproc_config->oc_prms.classnames)
+       {
+           tivxMemFree(local_postproc_config->oc_prms.classnames, sizeof(TIVX_DL_POST_PROC_MAX_SIZE_CLASSNAME * TIVX_DL_POST_PROC_MAX_NUM_CLASSNAMES * sizeof(char)), TIVX_MEM_EXTERNAL);
+       }
        tivxMemFree(local_postproc_config, sizeof(tivxDLPostProcParams), TIVX_MEM_EXTERNAL);
     }
     #endif
