@@ -1,5 +1,4 @@
-ifneq ($(TARGET_PLATFORM),PC)
-ifeq ($(TARGET_OS),$(filter $(TARGET_OS),LINUX QNX))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53 R5F))
 
 include $(PRELUDE)
 TARGET      := app_utils_grpx
@@ -12,7 +11,6 @@ CSOURCES    += app_grpx_ddr_load.c
 
 include $(FINALE)
 
-endif
 endif
 
 ifeq ($(TARGET_PLATFORM),PC)
