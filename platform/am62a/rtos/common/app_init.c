@@ -500,6 +500,33 @@ int32_t appInit()
     return status;
 }
 
+int32_t appResumeInit()
+{
+    int32_t status = 0;
+
+    #ifdef ENABLE_VHWA_VPAC
+    status = appVhwaVpacInit(0u);
+    APP_ASSERT_SUCCESS(status);
+    #endif
+
+    appLogPrintf("APP Resume: Init ... Done !!!\n");
+
+    return status;
+}
+
+int32_t appResumeDeInit()
+{
+    int32_t status = 0;
+
+    #ifdef ENABLE_VHWA_VPAC
+    appVhwaVpacDeInit();
+    #endif
+
+    appLogPrintf("APP Resume: DeInit ... Done !!!\n");
+
+    return status;
+}
+
 void appDeInit()
 {
     appLogPrintf("APP: Deinit ... !!!\n");

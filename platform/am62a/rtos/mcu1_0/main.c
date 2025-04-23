@@ -188,6 +188,18 @@ __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
 
+void appResume()
+{
+    appResumeInit();
+    return;
+}
+
+void appSuspend()
+{
+    appResumeDeInit();
+    return;
+}
+
 int main(void)
 {
     app_rtos_task_params_t tskParams;
@@ -211,6 +223,8 @@ int main(void)
     System_init();
     Board_init(); 
 #endif
+
+    Sciclient_initLPMSusResHook(appSuspend, appResume);
 
 #if !defined (THREADX)
     /* Initialize the task params */
