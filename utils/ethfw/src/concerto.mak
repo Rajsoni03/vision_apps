@@ -67,6 +67,10 @@ ifeq ($(TARGET_OS),$(filter $(TARGET_OS),FREERTOS SAFERTOS))
   DEFS += ENABLE_QSGMII_PORTS
 endif
 
+ifeq ($(ETHFW_IET_ENABLE),yes)
+  DEFS += ETHFW_IET_ENABLE
+endif
+
 # iperf server support
 ifeq ($(ETHFW_IPERF_SERVER_SUPPORT),yes)
   DEFS += ETHAPP_ENABLE_IPERF_SERVER

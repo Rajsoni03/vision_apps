@@ -153,6 +153,13 @@ static uint8_t gEthAppLwipStackBuf[ETHAPP_LWIP_TASK_STACKSIZE] __attribute__ ((s
 /* GenF generator instance index value */
 #define ETHAPP_PPS_TIMESYNC_GENF_INST_IDX                            (0U)
 
+/* Configurations for when IET is enabled */
+#if defined(ETHFW_IET_ENABLE)
+#define     MIN_FRAG_SIZE                            (1)
+#define     PREMPTIVE_TRAFFIC                        (1)
+#define     EXPRESS_TRAFFIC                          (0)
+#endif
+
 static EthAppObj gEthAppObj =
 {
     .enetType = ENET_CPSW_9G,
@@ -442,6 +449,28 @@ static EthFwPortMirroring_Cfg gEthApp_portMirCfg =
     .mirroringType = DISABLE_PORT_MIRRORING
 };
 
+#if defined(ETHFW_IET_ENABLE)
+static EthFwIET_Config gEthApp_IETCfg = {
+
+/* If enabled does IET verfication before enabling iet*/
+    .mac_verify_enable = BTRUE, 
+/* 0 -> Express Traffic and 1 -> Premptable Traffic*/
+    .queueMode = 
+    {
+    EXPRESS_TRAFFIC,
+    PREMPTIVE_TRAFFIC,
+    EXPRESS_TRAFFIC,
+    PREMPTIVE_TRAFFIC,
+    EXPRESS_TRAFFIC,
+    PREMPTIVE_TRAFFIC,
+    EXPRESS_TRAFFIC,
+    PREMPTIVE_TRAFFIC
+    },
+/* Set minimum fragment size */
+ .minFragSize =  MIN_FRAG_SIZE,
+};
+#endif
+
 static struct netif netif;
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH)
 static struct netif netif_ic[ETHAPP_NETIF_IC_MAX_IDX];
@@ -654,6 +683,18 @@ void LwipifEnetAppCb_releaseHandle(LwipifEnetAppIf_ReleaseHandleInfo *releaseInf
     EthFwCallbacks_lwipifCpswReleaseHandle(gEthAppObj.enetType, gEthAppObj.instId, releaseInfo);
 }
 
+void EthApp_portLinkStatusChangeCb(Enet_MacPort macPort,
+                                          bool isLinkUp,
+                                          void *appArg)
+{
+#if defined(ETHFW_GPTP_SUPPORT)
+    notify_linkchange();
+#endif
+#if defined(ETHFW_IET_ENABLE)
+    EthFwIET_notifyLinkChange(macPort,isLinkUp);
+#endif
+}
+
 static int32_t EthApp_initEthFw(void)
 {
     EthFw_Version ver;
@@ -741,6 +782,12 @@ static int32_t EthApp_initEthFw(void)
     EthHwInterVlan_setOpenPrms(&ethFwCfg.cpswCfg);
 #endif
 
+#if defined(ETHFW_BOOT_TIME_PROFILING)|| defined(ETHFW_GPTP_SUPPORT) || defined(ETHFW_IET_ENABLE)
+    /* Link-up timestamp */
+    cpswCfg->portLinkStatusChangeCb    = &EthApp_portLinkStatusChangeCb;
+    cpswCfg->portLinkStatusChangeCbArg = &gEthAppObj;
+#endif
+
 #if defined(ETHAPP_ENABLE_INTERCORE_ETH) || defined(ETHFW_VEPA_SUPPORT)
     if (ARRAY_SIZE(gEthApp_sharedMcastCfgTable) > ETHAPP_MAX_SHARED_MCAST_ADDR)
     {
@@ -776,6 +823,10 @@ static int32_t EthApp_initEthFw(void)
     memcpy(ethFwCfg.vepaCfg.privVlanId,
            gEthApp_remoteClientPrivVlanIdMap,
            sizeof(gEthApp_remoteClientPrivVlanIdMap));
+#endif
+
+#if defined(ETHFW_IET_ENABLE)
+    ethFwCfg.ietCfg = gEthApp_IETCfg;
 #endif
 
     ethFwCfg.portMirCfg = &gEthApp_portMirCfg;
