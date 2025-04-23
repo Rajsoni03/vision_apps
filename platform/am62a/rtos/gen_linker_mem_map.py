@@ -122,7 +122,7 @@ ddr_mem_size_2 = 515*MB
 linux_ddr_ipc_size = 1*MB;
 linux_ddr_resource_table_size = 1*KB;
 linux_ddr_ipc_tracebuf_size = 1*MB - linux_ddr_resource_table_size;
-linux_ddr_fs_stub_size = 32*KB
+linux_ddr_lpm_data_size = 640*KB
 
 #
 # MSMC memory allocation for various CPUs
@@ -168,8 +168,8 @@ mcu_r5f_ddr_size = 16*MB - (mcu_r5f_ddr_addr-mcu_r5f_ddr_ipc_addr);
 dm_r5f_ddr_ipc_addr = mcu_r5f_ddr_addr + mcu_r5f_ddr_size;
 dm_r5f_ddr_resource_table_addr = dm_r5f_ddr_ipc_addr + linux_ddr_ipc_size;
 dm_r5f_ddr_ipc_tracebuf_addr = dm_r5f_ddr_resource_table_addr + linux_ddr_resource_table_size
-linux_ddr_fs_stub_addr = dm_r5f_ddr_ipc_tracebuf_addr + linux_ddr_ipc_tracebuf_size
-dm_r5f_ddr_addr = linux_ddr_fs_stub_addr + linux_ddr_fs_stub_size;
+linux_ddr_lpm_data_addr = dm_r5f_ddr_ipc_tracebuf_addr + linux_ddr_ipc_tracebuf_size
+dm_r5f_ddr_addr = linux_ddr_lpm_data_addr + linux_ddr_lpm_data_size;
 dm_r5f_ddr_size = 31*MB - (dm_r5f_ddr_addr-dm_r5f_ddr_ipc_addr);
 
 tifs_lpm_ctx_addr = dm_r5f_ddr_addr + dm_r5f_ddr_size;
@@ -245,7 +245,7 @@ assert carveout_size <= ddr_mem_size_2
 # r5f local memory sections
 mcu_r5f_tcma_vecs            = MemSection("R5F_TCMA_VECS" , "X"   , 0x00000000, (KB >> 4));
 mcu_r5f_tcma                 = MemSection("R5F_TCMA" , "X"   , 0x00000040, (32*KB) - (KB >> 4));
-mcu_r5f_tcma_trace_buff      = MemSection("WKUP_SRAM_TRACE_BUFF" , "RWIX"   , 0x41880000, (KB << 1));
+mcu_r5f_tcma_trace_buff      = MemSection("WKUP_SRAM_TRACE_BUFF" , "RWIX"   , 0x41880000, KB << 1);
 
 mcu_r5f_tcmb0_vecs            = MemSection("R5F_TCMB0_VECS", "RWIX", 0x41010000, (KB >> 4));
 mcu_r5f_tcmb0                 = MemSection("R5F_TCMB0", "RWIX", 0x41010040, (32*KB) - (KB >> 4));
@@ -272,7 +272,7 @@ dm_r5f_ddr_ipc             = MemSection("DDR_DM_R5F_IPC", "RWIX", dm_r5f_ddr_ipc
 dm_r5f_ddr_ipc.setDtsName("wkup_r5fss0_core0_dma_memory_region", "r5f-dma-memory");
 dm_r5f_ddr_resource_table  = MemSection("DDR_DM_R5F_RESOURCE_TABLE", "RWIX", dm_r5f_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for DM R5F for Linux resource table");
 dm_r5f_ddr_ipc_tracebuf    = MemSection("DDR_DM_R5F_IPC_TRACEBUF", "RWIX", dm_r5f_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for DM R5F for Linux IPC tracebuffer");
-linux_ddr_fs_stub          = MemSection("DDR_FS_STUB", "RWIX", linux_ddr_fs_stub_addr, linux_ddr_fs_stub_size, "DDR for FS Stub binary");
+linux_ddr_lpm_data          = MemSection("DDR_LPM_DATA", "RWIX", linux_ddr_lpm_data_addr, linux_ddr_lpm_data_size, "DDR for LPM Data");
 dm_r5f_ddr                 = MemSection("DDR_DM_R5F", "RWIX", dm_r5f_ddr_addr, dm_r5f_ddr_size, "DDR for DM R5F for code/data");
 dm_r5f_ddr_local_heap      = MemSection("DDR_DM_R5F_LOCAL_HEAP", "RWIX", dm_r5f_ddr_local_heap_addr, dm_r5f_ddr_local_heap_size, "DDR for DM R5F for local heap");
 dm_r5f_ddr_total           = MemSection("DDR_DM_R5F_DTS", "", 0, 0, "DDR for DM R5F for all sections, used for reserving memory in DTS file");
@@ -367,7 +367,7 @@ dm_r5f_mmap.addMemSection( mcu_r5f_tcmb0        );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr_ipc       );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr_resource_table  );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr_ipc_tracebuf  );
-dm_r5f_mmap.addMemSection( linux_ddr_fs_stub  );
+dm_r5f_mmap.addMemSection( linux_ddr_lpm_data  );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr           );
 dm_r5f_mmap.addMemSection( app_log_mem          );
 dm_r5f_mmap.addMemSection( tiovx_obj_desc_mem   );

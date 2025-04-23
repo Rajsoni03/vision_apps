@@ -96,6 +96,7 @@
 /* Sciserver Init Task stack */
 static uint8_t  gSciserverInitTskStack[APP_SCISERVER_INIT_TSK_STACK]
 __attribute__ ((aligned(8192)));
+DM_LPMData_t gDMLPMData __attribute__((section(".lpm_data"), aligned(4)));
 
 #if defined (MCU_PLUS_SDK)
 
@@ -143,6 +144,7 @@ static void appMain(void* arg0, void* arg1)
 #else
     Drivers_open();
     Board_driversOpen();
+    Sciclient_initDeviceManagerLPMData(&gDMLPMData);
 #endif
 
     /* Initialize SCI Client Server */

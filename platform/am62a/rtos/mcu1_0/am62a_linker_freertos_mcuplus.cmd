@@ -45,7 +45,7 @@ SECTIONS
         .text.boot      : palign(8)
     } load = R5F_TCMB0, run = R5F_TCMA
     .mpu_cfg            : align = 8, load = R5F_TCMB0, run = R5F_TCMA
-    .fs_stub (NOLOAD)   : {} align(4)       > DDR_FS_STUB
+    .lpm_data (NOLOAD)  : {} align(4)       > DDR_LPM_DATA
     .text               : {} palign(8)      > DDR_DM_R5F
     .const              : {} palign(8)      > DDR_DM_R5F
     .rodata             : {} palign(8)      > DDR_DM_R5F
