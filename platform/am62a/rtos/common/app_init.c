@@ -572,7 +572,9 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetVpacMscKernels();
         tivxRegisterHwaTargetVpacLdcKernels();
         tivxRegisterHwaTargetVpacVissKernels();
+        #ifndef x86_64
         tivxRegisterHwaTargetVpacFcKernels();
+        #endif
         #endif
         #ifdef C7504
         {
@@ -601,7 +603,9 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterHwaTargetVpacMscKernels();
         tivxUnRegisterHwaTargetVpacLdcKernels();
         tivxUnRegisterHwaTargetVpacVissKernels();
+        #ifndef x86_64
         tivxUnRegisterHwaTargetVpacFcKernels();
+        #endif
         #endif
         #ifdef C71
         {

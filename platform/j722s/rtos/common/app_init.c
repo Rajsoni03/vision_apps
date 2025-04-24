@@ -720,7 +720,9 @@ static void appRegisterOpenVXTargetKernels()
         tivxRegisterHwaTargetVpacMscKernels();
         tivxRegisterHwaTargetVpacLdcKernels();
         tivxRegisterHwaTargetVpacVissKernels();
+        #ifndef x86_64
         tivxRegisterHwaTargetVpacFcKernels();
+        #endif
         #endif
 
         #ifdef ENABLE_VHWA_DMPAC
@@ -782,7 +784,9 @@ static void appUnRegisterOpenVXTargetKernels()
         tivxUnRegisterHwaTargetVpacMscKernels();
         tivxUnRegisterHwaTargetVpacLdcKernels();
         tivxUnRegisterHwaTargetVpacVissKernels();
-        tivxUnRegisterHwaTargetVpacFcKernels();        
+        #ifndef x86_64
+        tivxUnRegisterHwaTargetVpacFcKernels();
+        #endif     
         #endif
 
         #ifdef ENABLE_VHWA_DMPAC
