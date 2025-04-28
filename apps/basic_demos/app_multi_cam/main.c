@@ -1132,6 +1132,7 @@ static void app_deinit(AppObj *obj)
 
     if(1 == obj->enable_split_graph)
     {
+        obj->objArrSplitObj.input_arr = obj->captureObj.raw_image_arr[0];
         app_deinit_obj_arr_split(&obj->objArrSplitObj);
         APP_PRINTF("Object array splitter deinit done!\n");
     }

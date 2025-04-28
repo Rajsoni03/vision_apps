@@ -150,6 +150,8 @@ static vx_status create_output_image(vx_context context, ObjArrSplitObj *objArrS
                 {
                     vx_char name[VX_MAX_REFERENCE_NAME];
 
+                    status = vxReleaseReference(&exemplar);
+
                     snprintf(name, VX_MAX_REFERENCE_NAME, "obj_arr_split_node_output0_arr");
 
                     vxSetReferenceName((vx_reference)objArrSplitObj->output0_arr, name);
@@ -200,7 +202,6 @@ vx_status app_init_obj_arr_split(vx_context context, ObjArrSplitObj *objArrSplit
 
 void app_deinit_obj_arr_split(ObjArrSplitObj *objArrSplitObj)
 {
-    vxReleaseObjectArray(&objArrSplitObj->input_arr);
     vxReleaseObjectArray(&objArrSplitObj->output0_arr);
     vxReleaseObjectArray(&objArrSplitObj->output1_arr);
 
