@@ -1843,6 +1843,7 @@ static void app_default_param_set(AppObj *obj)
     app_pipeline_params_defaults(obj);
 
     obj->is_interactive = 1;
+    obj->stop_task = 0;
     obj->test_mode = 0;
     obj->write_file = 0;
     obj->bypass_split_graph = 0;
