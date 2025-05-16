@@ -35,6 +35,10 @@ PTK_IDIRS += $(PTK_PATH)/include
 VISION_APPS_STEREO_KERNELS_IDIRS =
 VISION_APPS_STEREO_KERNELS_IDIRS += $(VISION_APPS_PATH)/kernels/stereo/include
 
+EDGEAI_IDIRS =
+EDGEAI_IDIRS += $(EDGEAI_UTILS_PATH)/include
+EDGEAI_IDIRS += $(EDGEAI_KERNELS_PATH)/include
+
 ifeq ($(TARGET_OS),LINUX)
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/linux/mpu1
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/linux
@@ -60,11 +64,13 @@ endif
 
 CFLAGS+=-Wno-format-truncation
 
+
 ifeq ($(TARGET_OS), QNX)
 
 BUILD_PROFILE_QNX_SO = so.le
 BUILD_PROFILE_QNX_A = a.le
 BUILD_PROFILE_QNX_SUFFIX =
+BUILD_PROFILE_EDGEAI_REL = Release
 
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/pdk/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/sciclient/aarch64/$(BUILD_PROFILE_QNX_SO)
@@ -72,13 +78,11 @@ LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/udmalld/aarch64/$(BUILD_PROFILE_QNX
 LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
-ifeq ($(TARGET_PLATFORM), AM62A)
-BUILD_PROFILE_EDGEAI_REL = Release
-
-LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/csirxlld/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/fvid2lld/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(EDGEAI_UTILS_PATH)/QNX/lib/$(BUILD_PROFILE_EDGEAI_REL)
 LDIRS       += $(EDGEAI_KERNELS_PATH)/QNX/lib/$(BUILD_PROFILE_EDGEAI_REL)
+ifeq ($(TARGET_PLATFORM), AM62A)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/csirxlld/aarch64/$(BUILD_PROFILE_QNX_SO)
+LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/fvid2lld/aarch64/$(BUILD_PROFILE_QNX_SO)
 endif
 
 SHARED_LIBS += sharedmemallocator$(BUILD_PROFILE_QNX_SUFFIX)
@@ -87,12 +91,12 @@ SHARED_LIBS += tiudma-usr$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-pdk$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-sciclient$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-udmalld$(BUILD_PROFILE_QNX_SUFFIX)
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
 ifeq ($(TARGET_PLATFORM), AM62A)
 SHARED_LIBS += ti-csirxlld$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-fvid2lld$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += screen
-SHARED_LIBS += edgeai-apps-utils
-SHARED_LIBS += edgeai-tiovx-kernels
 endif
 
 endif # ifeq ($(TARGET_OS), QNX)
@@ -120,6 +124,7 @@ SHARED_LIBS += tivision_apps
 # Also used to create tivision_apps library (so we can maintain lib list in one place
 else   # ifeq ($(LINK_SHARED_OBJ),yes)
 
+BUILD_PROFILE_EDGEAI_REL = Release
 
 LDIRS       += $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(APP_UTILS_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -129,6 +134,8 @@ LDIRS       += $(IMAGING_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TA
 LDIRS       += $(ETHFW_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
+LDIRS       += $(EDGEAI_UTILS_PATH)/LINUX/lib/$(BUILD_PROFILE_EDGEAI_REL)
+LDIRS       += $(EDGEAI_KERNELS_PATH)/LINUX/lib/$(BUILD_PROFILE_EDGEAI_REL)
 ifeq ($(TARGET_OS), LINUX)
 LDIRS       += $(LINUX_FS_PATH)/usr/lib
 endif

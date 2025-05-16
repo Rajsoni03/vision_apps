@@ -7,7 +7,7 @@ TARGETTYPE  := library
 CSOURCES    := tivx_img_proc_node_api.c
 CSOURCES    += tivx_img_mosaic_host.c
 
-ifeq ($(SOC), $(filter $(SOC), j721e j721s2 j784s4 j742s2))
+ifeq ($(SOC), $(filter $(SOC), j721e j721s2 j784s4 j742s2 j722s))
 CSOURCES    += vx_kernels_img_proc_host.c
 CSOURCES    += tivx_dof_plane_seperation_host.c
 CSOURCES    += tivx_img_preprocessing_host.c
