@@ -73,6 +73,10 @@ endif
 STATIC_LIBS += $(TIADALG_LIBS)
 STATIC_LIBS += vx_app_modules
 
+IDIRS       += $(EDGEAI_IDIRS)
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
+
 ifeq ($(SOC),j722s)
 SKIPBUILD=1
 endif

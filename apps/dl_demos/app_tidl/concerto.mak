@@ -34,6 +34,10 @@ TARGETTYPE  := library
 endif
 endif
 
+IDIRS       += $(EDGEAI_IDIRS)
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
+
 include $(FINALE)
 
 endif

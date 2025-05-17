@@ -38,6 +38,10 @@ STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(VISION_APPS_MODULES_LIBS)
 STATIC_LIBS += $(TIADALG_LIBS)
 
+IDIRS       += $(EDGEAI_IDIRS)
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
+
 ifeq ($(SOC),j722s)
 SKIPBUILD=1
 endif

@@ -41,6 +41,10 @@ IDIRS += $(VISION_APPS_MODULES_IDIRS)
 IDIRS += $(VISION_APPS_APPLIBS_IDIRS)
 IDIRS += $(VISION_APPS_SRV_IDIRS)
 
+IDIRS       += $(EDGEAI_IDIRS)
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
+
 ifeq ($(SOC),j722s)
 SKIPBUILD=1
 endif

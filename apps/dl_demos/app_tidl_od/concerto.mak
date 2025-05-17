@@ -21,13 +21,10 @@ include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
 
 IDIRS       += $(VISION_APPS_KERNELS_IDIRS)
 IDIRS       += $(VISION_APPS_MODULES_IDIRS)
-IDIRS       += $(EDGEAI_IDIRS)
 
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(VISION_APPS_MODULES_LIBS)
 STATIC_LIBS += $(TIADALG_LIBS)
-SHARED_LIBS += edgeai-apps-utils
-SHARED_LIBS += edgeai-tiovx-kernels
 
 endif
 
@@ -42,15 +39,16 @@ include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
 IDIRS       += $(VISION_APPS_KERNELS_IDIRS)
 IDIRS       += $(VISION_APPS_MODULES_IDIRS)
-IDIRS       += $(EDGEAI_IDIRS)
 
 STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 STATIC_LIBS += $(VISION_APPS_MODULES_LIBS)
-SHARED_LIBS += edgeai-apps-utils
-SHARED_LIBS += edgeai-tiovx-kernels
 
 endif
 endif
+
+IDIRS       += $(EDGEAI_IDIRS)
+SHARED_LIBS += edgeai-apps-utils
+SHARED_LIBS += edgeai-tiovx-kernels
 
 include $(FINALE)
 
