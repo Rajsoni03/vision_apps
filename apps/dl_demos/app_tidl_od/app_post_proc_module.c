@@ -69,7 +69,6 @@ vx_status app_init_post_proc(vx_context context, PostProcObj *postProcObj, char 
 {
     vx_status status = VX_SUCCESS;
 
-    local_postproc_config = (tivxDLPostProcParams *)malloc(sizeof(tivxDLPostProcParams));
     local_postproc_config = tivxMemAlloc(sizeof(tivxDLPostProcParams), TIVX_MEM_EXTERNAL);
     if(local_postproc_config == NULL) {
         printf("ERROR: Unable to allocate memory for local_postproc_config\n");
@@ -120,13 +119,12 @@ vx_status app_update_post_proc(vx_context context, PostProcObj *postProcObj, vx_
     return status;
 }
 
-void app_deinit_post_proc(PostProcObj *postProcObj, vx_int32 bufq_depth)
+void app_deinit_post_proc(vx_context context, PostProcObj *postProcObj, vx_int32 bufq_depth)
 {
     vxReleaseUserDataObject(&postProcObj->config);
     vxReleaseObjectArray(&postProcObj->output_image_arr);
-    {
-        tivxMemFree(local_postproc_config, sizeof(tivxDLPostProcParams), TIVX_MEM_EXTERNAL);
-    }
+    tivxRemoveKernelDLPostProc(context);
+
 }
 
 void app_delete_post_proc(PostProcObj *postProcObj)

@@ -792,7 +792,7 @@ static void app_deinit(AppObj *obj)
     app_deinit_tidl(&obj->tidlObj);
     APP_PRINTF("TIDL deinit Done! \n");
 
-    app_deinit_post_proc(&obj->postProcObj,APP_BUFFER_Q_DEPTH);
+    app_deinit_post_proc(obj->context, &obj->postProcObj,APP_BUFFER_Q_DEPTH);
     APP_PRINTF("Post proc deinit done!\n");
 
     app_deinit_img_mosaic(&obj->imgMosaicObj, APP_BUFFER_Q_DEPTH);
