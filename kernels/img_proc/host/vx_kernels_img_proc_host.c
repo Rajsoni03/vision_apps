@@ -154,16 +154,20 @@ void tivxImgProcLoadKernels(vx_context context)
         /* These three lines only work on PC emulation mode ...
          * this will need to be updated when moving to target */
 
+        #if !defined (SOC_J722S)
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP1);
         tivxRegisterImgProcTargetC66Kernels();
+        #endif
 
         #if defined (SOC_J721E)
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP2);
         tivxRegisterImgProcTargetC66Kernels();
         #endif
 
+        #if !defined (SOC_J722S)
         tivxSetSelfCpuId(TIVX_CPU_ID_DSP_C7_1);
         tivxRegisterImgProcTargetC71Kernels();
+        #endif
 
         tivxSetSelfCpuId(TIVX_CPU_ID_VPAC1);
         tivxRegisterImgProcTargetR5FKernels();
@@ -187,8 +191,10 @@ void tivxImgProcUnLoadKernels(vx_context context)
         #ifdef x86_64
         /* These three lines only work on PC emulation mode ...
          * this will need to be updated when moving to target */
+        #if !defined (SOC_J722S)
         tivxUnRegisterImgProcTargetC66Kernels();
         tivxUnRegisterImgProcTargetC71Kernels();
+        #endif
         #endif
         tivxUnRegisterImgProcTargetA72Kernels();
         #endif

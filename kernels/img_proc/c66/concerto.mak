@@ -24,10 +24,6 @@ CSOURCES    += vx_dl_color_convert_target.c
 CSOURCES    += vx_dl_pre_proc_target.c
 CSOURCES    += vx_image_preprocessing_target.c
 
-ifeq ($(SOC),$(filter $(SOC), j722s))
-SKIPBUILD=1
-endif
-
 endif
 
 ifeq ($(TARGET_CPU), $(filter $(TARGET_CPU), C7120))
