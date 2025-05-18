@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 10.01.00</h2>
+<h2 align='center'>Version: 11.00.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -250,28 +250,36 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
-<td align="center">ADASVISION-6266</td>
-<td align="left"><span>tivxWriteImageNode incorrect save for YUV422 format</span></td>
+  <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12590">ADASVISION-6436</a></td>
+<td align="left"><span>Extend multicam support to any channel mask instead of contiguous</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6209</td>
-<td align="left"><span>The vision apps multicam codec application is not working</span></td>
+<td align="center">ADASVISION-6509</a></td>
+<td align="left"><span>Documentation link to SDL Release note is broken</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6350</td>
-<td align="left"><span>PSDK RTOS should use the toolchain from PSDK Linux installer</span></td>
+  <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12591">ADASVISION-6512</a></td>
+<td align="left"><span>Incorrect type of dmaBufFD in appMemCloseDmaBufFd()</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6408</td>
-<td align="left"><span>Test mode in single cam and multi-cam vision_apps demo is broken</span></td>
+  <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12593">ADASVISION-6606</a></td>
+<td align="left"><span>Multicam app doesn't run multiple times from the same process</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6404</td>
-<td align="left"><span>Multi-cam non-interactive mode fails to start when channel mask does not include port 0</span></td>
+  <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12592">ADASVISION-6607</a></td>
+<td align="left"><span>Multicam app has non-fatal reference bookeeping error prints</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6397</td>
-<td align="left"><span>[Addr-Map]: reduced size of macro in comparison statement in appTarget2SharedConversion API</span></td>
+  <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12589">ADASVISION-5034</a></td>
+<td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
+</tr>
+<tr class="even">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
+<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10992">ADASVISION-5669</a></td>
+<td align="left"><span>SCIserver should use UART logs instead of appLogPrintf</span></td>
 </tr>
 </tbody>
 </table>
@@ -289,72 +297,44 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
-<td align="center">ADASVISION-6453</td>
-<td align="left"><span>SRV + AVP demo not working</span></td>
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
+<td align="left"><span>Single cam error on ports other than port 1 after running multi cam</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6451</td>
-<td align="left"><span>mailbox queue overflowing while running vx_app_arm_ipc.out</span></td>
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
+<td align="left"><span>AVP4 freezes in first second of running</span></td>
 </tr>
 <tr class="even">
-<td align="center">ADASVISION-6436</td>
-<td align="left"><span>Extend multicam support to any channel mask instead of contiguous</span></td>
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
+<td align="left"><span>SDE disparity artifacts on EVM</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6420</td>
-<td align="left"><span>Perf_stats does not caculate CPU load for A72 on QNX</span></td>
+<td align="center">ADASVISION-6199</td>
+<td align="left"><span>Race Conditions in c7x-mma-tidl and tiadalg builds</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4919">ADASVISION-6387</a></td>
 <td align="left"><span>No option to set vpParams->scanFmt in the dss utility from vision_apps</span></td>
 </tr>
 <tr class="odd">
+<td align="center">ADASVISION-6451</td>
+<td align="left"><span>mailbox queue overflowing while running vx_app_arm_ipc.out</span></td>
+</tr>
+<tr class="even">
 <td align="center">ADASVISION-6452</td>
 <td align="left"><span>SFM demo failing on J784S4 and J742S2</span></td>
 </tr>
+<tr class="odd">
+<td align="center">ADASVISION-6453</td>
+<td align="left"><span>SRV + AVP demo not working</span></td>
+</tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-11431">ADASVISION-5918</a></td>
-<td align="left"><span>Codec app compiler warnings with GCC 11.3</span></td>
+<td align="center">ADASVISION-6488</td>
+<td align="left"><span>More than 1000% CPU Load for C7X & MCU</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10993">ADASVISION-5673</a></td>
-<td align="left"><span>Permission issue can occur when running the vision apps script incorrectly</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10992">ADASVISION-5669</a></td>
-<td align="left"><span>SCIserver should use UART logs instead of appLogPrintf</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10882">ADASVISION-5555</a></td>
-<td align="left"><span>SDE disparity artifacts on EVM</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
-<td align="left"><span>AVP4 freezes in first second of running</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
-<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-5034</td>
-<td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
-<td align="left"><span>Single cam error on ports other than port 1 after running multi cam</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10523">ADASVISION-4196</a></td>
-<td align="left"><span>SRV crash occasionally observed</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10524">ADASVISION-4080</a></td>
-<td align="left"><span>QNX: SRV File I/O failing with specific car model</span></td>
-</tr>
-<tr class="even">
-<td align="center">ADASVISION-6199</td>
-<td align="left"><span>Race Conditions in c7x-mma-tidl and tiadalg builds</span></td>
+<td align="center">ADASVISION-6520</td>
+<td align="left"><span>Apps killed with Cntrl^C do not do proper cleanup ... can't be run again</span></td>
 </tr>
 </tbody>
 </table>
