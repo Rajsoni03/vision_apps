@@ -50,6 +50,11 @@ endif
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos/common
 IDIRS       += $(VISION_APPS_PATH)/platform/$(SOC)/rtos
 
+BUILD_PROFILE_EDGEAI_REL = Release
+
+LDIRS       += $(EDGEAI_UTILS_PATH)/$(TARGET_OS)/lib/$(BUILD_PROFILE_EDGEAI_REL)
+LDIRS       += $(EDGEAI_KERNELS_PATH)/$(TARGET_OS)/lib/$(BUILD_PROFILE_EDGEAI_REL)
+
 # These rpath-link linker options are to provide directories for
 # secondary *.so file lookup
 ifeq ($(TARGET_OS),LINUX)
@@ -70,7 +75,6 @@ ifeq ($(TARGET_OS), QNX)
 BUILD_PROFILE_QNX_SO = so.le
 BUILD_PROFILE_QNX_A = a.le
 BUILD_PROFILE_QNX_SUFFIX =
-BUILD_PROFILE_EDGEAI_REL = Release
 
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/pdk/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/sciclient/aarch64/$(BUILD_PROFILE_QNX_SO)
@@ -78,8 +82,6 @@ LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/udmalld/aarch64/$(BUILD_PROFILE_QNX
 LDIRS       += $(PSDK_QNX_PATH)/qnx/sharedmemallocator/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/ipc_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/resmgr/udma_qnx_rsmgr/usr/aarch64/$(BUILD_PROFILE_QNX_SO)
-LDIRS       += $(EDGEAI_UTILS_PATH)/QNX/lib/$(BUILD_PROFILE_EDGEAI_REL)
-LDIRS       += $(EDGEAI_KERNELS_PATH)/QNX/lib/$(BUILD_PROFILE_EDGEAI_REL)
 ifeq ($(TARGET_PLATFORM), AM62A)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/csirxlld/aarch64/$(BUILD_PROFILE_QNX_SO)
 LDIRS       += $(PSDK_QNX_PATH)/qnx/pdk_libs/fvid2lld/aarch64/$(BUILD_PROFILE_QNX_SO)
@@ -122,8 +124,6 @@ SHARED_LIBS += tivision_apps
 # Also used to create tivision_apps library (so we can maintain lib list in one place
 else   # ifeq ($(LINK_SHARED_OBJ),yes)
 
-BUILD_PROFILE_EDGEAI_REL = Release
-
 LDIRS       += $(VISION_APPS_PATH)/out/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(APP_UTILS_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(VIDEO_IO_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
@@ -132,8 +132,6 @@ LDIRS       += $(IMAGING_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TA
 LDIRS       += $(ETHFW_PATH)/lib/$(TARGET_SOC)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(PTK_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 LDIRS       += $(TIDL_PATH)/arm-tidl/tiovx_kernels/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
-LDIRS       += $(EDGEAI_UTILS_PATH)/LINUX/lib/$(BUILD_PROFILE_EDGEAI_REL)
-LDIRS       += $(EDGEAI_KERNELS_PATH)/LINUX/lib/$(BUILD_PROFILE_EDGEAI_REL)
 ifeq ($(TARGET_OS), LINUX)
 LDIRS       += $(LINUX_FS_PATH)/usr/lib
 endif
