@@ -65,6 +65,7 @@
 #include <utils/timer/include/app_timer.h>
 #include <utils/misc/include/app_misc.h>
 #include <utils/rtos/include/app_rtos.h>
+#include <utils/ipc/include/app_ipc.h>
 #include <stdio.h>
 #include <string.h>
 #include <HwiP.h>
@@ -151,15 +152,22 @@ static void appMain(void* arg0, void* arg1)
 {
     Drivers_open();
     Board_driversOpen();
-
     appUtilsTaskInit();
     appInit();
     appRun();
     #if 1
-    while(1)
+    while(appIpcShutDownReceived() == 0)
     {
         appLogWaitMsecs(100u);
     }
+    
+    /*Close the drivers*/
+    Drivers_close();
+    Board_driversClose();
+    /*Deinit the system*/
+    System_deinit();
+    appIpcSendShutdownAck();
+    __asm(" IDLE");
     #else
     appDeInit();
     #endif
