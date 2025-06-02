@@ -188,16 +188,16 @@ __attribute__ ((section(".bss:taskStackSection")))
 __attribute__ ((aligned(8192)))
     ;
 
-void appResume()
+int appResume()
 {
     appResumeInit();
-    return;
+    return 0;
 }
 
-void appSuspend()
+int appSuspend()
 {
     appResumeDeInit();
-    return;
+    return 0;
 }
 
 int main(void)
