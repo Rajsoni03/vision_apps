@@ -258,7 +258,7 @@ ifeq ($(TARGET_OS),LINUX)
 SYS_SHARED_LIBS += stdc++ m rt pthread ti_rpmsg_char
 endif
 ifeq ($(TARGET_OS),QNX)
-SHARED_LIBS += c++
+SHARED_LIBS += c++ m
 endif
 
 endif  # ifeq ($(LINK_SHARED_OBJ),yes)

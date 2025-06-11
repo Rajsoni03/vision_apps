@@ -28,8 +28,6 @@ CFLAGS      += -Wno-maybe-uninitialized
 CSOURCES    := $(call all-c-files)
 CPPSOURCES  := $(filter-out PVRTPrint3D.cpp, $(call all-cpp-files))
 
-CPPFLAGS    += --std=c++11
-
 SKIPBUILD=0
 
 include $(FINALE)
