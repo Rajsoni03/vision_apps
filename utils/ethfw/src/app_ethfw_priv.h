@@ -96,6 +96,7 @@
 #if defined(ETHFW_GPTP_SUPPORT)
 /* Timesync header files */
 #include <tsn_buildconf/jacinto_buildconf.h>
+#include <tsn_combase/tilld/cb_lld_ethernet.h>
 #include <tsn_gptp/gptpconf/gptpgcfg.h>
 #include <tsn_gptp/gptpconf/xl4-extmod-xl4gptp.h>
 #include <ethremotecfg/server/include/ethfw_tsn.h>

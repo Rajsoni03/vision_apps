@@ -540,7 +540,6 @@ void appEthFwEarlyInit()
 int32_t appEthFwInit()
 {
     int32_t status = ETHAPP_OK;
-    EnetOsal_Cfg *osalPrms = NULL;
     EnetUtils_Cfg *utilsPrms = NULL;
     uint32_t flags = 0U;
 
@@ -548,7 +547,7 @@ int32_t appEthFwInit()
 
     gEthAppObj.coreId = EnetSoc_getCoreId();
 
-    Enet_init(osalPrms, utilsPrms);
+    Enet_init(utilsPrms);
 
 #if defined(ETHFW_GPTP_SUPPORT)
     SemaphoreP_Params semParams;
@@ -688,7 +687,7 @@ void EthApp_portLinkStatusChangeCb(Enet_MacPort macPort,
                                           void *appArg)
 {
 #if defined(ETHFW_GPTP_SUPPORT)
-    notify_linkchange();
+    cb_lld_notify_linkchange();
 #endif
 #if defined(ETHFW_IET_ENABLE)
     EthFwIET_notifyLinkChange(macPort,isLinkUp);
@@ -700,7 +699,7 @@ static int32_t EthApp_initEthFw(void)
     EthFw_Version ver;
     EthFw_Config ethFwCfg;
     Cpsw_Cfg *cpswCfg = &ethFwCfg.cpswCfg;
-    EnetUdma_Cfg dmaCfg;
+    EnetDma_Cfg dmaCfg;
     EnetRm_MacAddressPool *pool = &cpswCfg->resCfg.macList;
     EthFwMcast_SharedMcastCfg *sharedMcastCfg = &ethFwCfg.mcastCfg.sharedMcastCfg;
     EthFwMcast_RsvdMcastCfg *rsvdMcastCfg = &ethFwCfg.mcastCfg.rsvdMcastCfg;
@@ -719,7 +718,7 @@ static int32_t EthApp_initEthFw(void)
         appLogPrintf("ETHFW: ERROR: failed to open UDMA driver\n");
         status = -1;
     }
-    cpswCfg->dmaCfg = (void *)&dmaCfg;
+    cpswCfg->dmaCfg = &dmaCfg;
 
     /* Populate MAC address pool */
     poolSize = EnetUtils_min(ENET_ARRAYSIZE(pool->macAddress), ETHAPP_MAC_ADDR_POOL_SIZE);
