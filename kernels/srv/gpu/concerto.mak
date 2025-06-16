@@ -24,7 +24,7 @@ ifeq ($(TARGET_OS), QNX)
 IDIRS       += $(QNX_TARGET)/usr/include
 endif
 
-ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+ifeq ($(SOC),$(filter $(SOC), am62a))
 SKIPBUILD=1
 endif
 
@@ -49,7 +49,7 @@ CFLAGS      += -DGL_ES -DSTANDALONE
 
 DEFS += _HOST_BUILD _TMS320C6600 TMS320C66X HOST_EMULATION
 
-ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+ifeq ($(SOC),$(filter $(SOC), am62a))
 SKIPBUILD=1
 endif
 

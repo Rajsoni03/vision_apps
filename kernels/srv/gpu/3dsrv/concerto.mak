@@ -24,7 +24,7 @@ CFLAGS      += -Wno-int-to-pointer-cast
 CSOURCES    := $(call all-c-files)
 CPPSOURCES  := $(call all-cpp-files)
 
-ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+ifeq ($(SOC),$(filter $(SOC), am62a))
 SKIPBUILD=1
 endif
 
@@ -50,7 +50,7 @@ CFLAGS      += -Wno-strict-aliasing
 CSOURCES    := $(call all-c-files)
 CPPSOURCES  := $(call all-cpp-files)
 
-ifeq ($(SOC),$(filter $(SOC), j722s am62a))
+ifeq ($(SOC),$(filter $(SOC), am62a))
 SKIPBUILD=1
 endif
 
