@@ -96,7 +96,7 @@ SHARED_LIBS += ti-udmalld$(BUILD_PROFILE_QNX_SUFFIX)
 ifeq ($(TARGET_PLATFORM), AM62A)
 SHARED_LIBS += ti-csirxlld$(BUILD_PROFILE_QNX_SUFFIX)
 SHARED_LIBS += ti-fvid2lld$(BUILD_PROFILE_QNX_SUFFIX)
-SHARED_LIBS += screen
+SHARED_LIBS += screen c++ m
 endif
 
 endif # ifeq ($(TARGET_OS), QNX)
