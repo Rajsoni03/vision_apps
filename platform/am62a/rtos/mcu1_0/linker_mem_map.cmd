@@ -94,8 +94,10 @@ MEMORY
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA1040000 , LENGTH = 0x00FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
     APP_FILEIO_MEM                    : ORIGIN = 0xA2000000 , LENGTH = 0x00400000
-    /* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0B000000
+    /* Memory for shared memory buffers in DDR [ size 172.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0AC00000
+    /* Memory for storing DMA buffers for VISS configuration [ size 4.00 MB ] */
+    DDR_DM_R5F_VISS_CONFIG_HEAP  ( RW )     : ORIGIN = 0xADC00000 , LENGTH = 0x00400000
     /* DDR for DM R5F for local heap [ size 16.00 MB ] */
     DDR_DM_R5F_LOCAL_HEAP    ( RWIX ) : ORIGIN = 0xAF000000 , LENGTH = 0x01000000
 }

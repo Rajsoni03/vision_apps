@@ -87,7 +87,7 @@ mmu_armv810.size      = 0x1F00000;
 mmu_armv811.$name     = "DDR_SHARED_MEM";
 mmu_armv811.vAddr     = 0xA3000000;
 mmu_armv811.pAddr     = 0xA3000000;
-mmu_armv811.size      = 0xB000000;
+mmu_armv811.size      = 0xAC00000;
 mmu_armv811.attribute = "MAIR7";
 
 mmu_armv812.vAddr     = 0xB2000000;

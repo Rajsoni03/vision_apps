@@ -4,7 +4,7 @@
  */ 
 /* 
  * 
- * Copyright (c) 2018 Texas Instruments Incorporated 
+ * Copyright (c) 2024 Texas Instruments Incorporated 
  * 
  * All rights reserved not granted herein. 
  * 
@@ -92,8 +92,8 @@ MEMORY
     TIOVX_OBJ_DESC_MEM                : ORIGIN = 0xA1040000 , LENGTH = 0x00FC0000
     /* Memory for remote core file operations [ size  4.00 MB ] */
     APP_FILEIO_MEM                    : ORIGIN = 0xA2000000 , LENGTH = 0x00400000
-    /* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
-    DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0B000000
+    /* Memory for shared memory buffers in DDR [ size 172.00 MB ] */
+    DDR_SHARED_MEM                    : ORIGIN = 0xA3000000 , LENGTH = 0x0AC00000
     /* DDR for c7x_1 for non cacheable local heap [ size 16.00 MB ] */
     DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE ( RWIX ) : ORIGIN = 0xB0000000 , LENGTH = 0x01000000
     /* DDR for c7x_1 for non cacheable scratch Memory [ size 16.00 MB ] */

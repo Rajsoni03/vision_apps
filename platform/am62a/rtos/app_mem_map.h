@@ -4,7 +4,7 @@
  */ 
 /* 
  * 
- * Copyright (c) 2018 Texas Instruments Incorporated 
+ * Copyright (c) 2024 Texas Instruments Incorporated 
  * 
  * All rights reserved not granted herein. 
  * 
@@ -123,9 +123,13 @@
 #define TIOVX_LOG_RT_MEM_ADDR (0xA2400000u)
 #define TIOVX_LOG_RT_MEM_SIZE (0x00C00000u)
 
-/* Memory for shared memory buffers in DDR [ size 176.00 MB ] */
+/* Memory for shared memory buffers in DDR [ size 172.00 MB ] */
 #define DDR_SHARED_MEM_ADDR (0xA3000000u)
-#define DDR_SHARED_MEM_SIZE (0x0B000000u)
+#define DDR_SHARED_MEM_SIZE (0x0AC00000u)
+
+/* DDR for storing DMA buffers for VISS configuration [ size  4.00 MB ] */
+#define DDR_DM_R5F_VISS_CONFIG_HEAP_ADDR (0xADC00000u)
+#define DDR_DM_R5F_VISS_CONFIG_HEAP_SIZE (0x00400000u)
 
 /* DDR for MCU R5F for local heap [ size 16.00 MB ] */
 #define DDR_MCU_R5F_LOCAL_HEAP_ADDR (0xAE000000u)

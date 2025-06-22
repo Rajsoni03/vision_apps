@@ -208,10 +208,14 @@ carveout_size += tiovx_log_rt_mem_size
 
 # Shared memory for Buffers/ION allocator
 ddr_shared_mem_addr     = tiovx_log_rt_mem_addr + tiovx_log_rt_mem_size;
-ddr_shared_mem_size     = 176*MB;
+ddr_shared_mem_size     = 172*MB;
 carveout_size += ddr_shared_mem_size
 
-mcu_r5f_ddr_local_heap_addr  = ddr_shared_mem_addr + ddr_shared_mem_size;
+ddr_viss_config_heap_addr = ddr_shared_mem_addr + ddr_shared_mem_size;
+ddr_viss_config_heap_size = 4*MB;
+carveout_size += ddr_viss_config_heap_size
+
+mcu_r5f_ddr_local_heap_addr  = ddr_viss_config_heap_addr + ddr_viss_config_heap_size;
 mcu_r5f_ddr_local_heap_size  = 16*MB;
 carveout_size += mcu_r5f_ddr_local_heap_size
 
@@ -262,6 +266,7 @@ mcu_r5f_ddr_resource_table  = MemSection("DDR_MCU_R5F_RESOURCE_TABLE", "RWIX", m
 mcu_r5f_ddr_ipc_tracebuf    = MemSection("DDR_MCU_R5F_IPC_TRACEBUF", "RWIX", mcu_r5f_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for MCU R5F for Linux IPC tracebuffer");
 mcu_r5f_ddr                 = MemSection("DDR_MCU_R5F", "RWIX", mcu_r5f_ddr_addr, mcu_r5f_ddr_size, "DDR for MCU R5F for code/data");
 mcu_r5f_ddr_local_heap      = MemSection("DDR_MCU_R5F_LOCAL_HEAP", "RWIX", mcu_r5f_ddr_local_heap_addr, mcu_r5f_ddr_local_heap_size, "DDR for MCU R5F for local heap");
+ddr_viss_config_heap        = MemSection("DDR_DM_R5F_VISS_CONFIG_HEAP", "RW", ddr_viss_config_heap_addr, ddr_viss_config_heap_size, "DDR for storing DMA buffers for VISS configuration");
 mcu_r5f_ddr_total           = MemSection("DDR_MCU_R5F_DTS", "", 0, 0, "DDR for MCU R5F for all sections, used for reserving memory in DTS file");
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr_resource_table);
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr_ipc_tracebuf);
@@ -331,6 +336,7 @@ ddr_shared_mem.setNoMap(False);
 ddr_shared_mem.setOriginTag(False);
 
 edgeai_core_heaps = MemSection("DDR_EDGEAI_CORE_HEAPS_DTS", "", 0, 0, "EdgeAI Core Heaps in 32bit address range of DDR");
+edgeai_core_heaps.concat(ddr_viss_config_heap);
 edgeai_core_heaps.concat(mcu_r5f_ddr_local_heap);
 edgeai_core_heaps.concat(dm_r5f_ddr_local_heap);
 edgeai_core_heaps.concat(c7x_1_ddr_local_heap);
@@ -355,6 +361,7 @@ mcu_r5f_mmap.addMemSection( tiovx_obj_desc_mem   );
 mcu_r5f_mmap.addMemSection( app_fileio_mem          );
 mcu_r5f_mmap.addMemSection( ipc_vring_mem        );
 mcu_r5f_mmap.addMemSection( mcu_r5f_ddr_local_heap  );
+mcu_r5f_mmap.addMemSection( ddr_viss_config_heap  );
 mcu_r5f_mmap.addMemSection( ddr_shared_mem       );
 mcu_r5f_mmap.checkOverlap();
 
@@ -408,6 +415,7 @@ html_mmap.addMemSection( mcu_r5f_ddr_resource_table      );
 html_mmap.addMemSection( mcu_r5f_ddr_ipc_tracebuf      );
 html_mmap.addMemSection( mcu_r5f_ddr         );
 html_mmap.addMemSection( mcu_r5f_ddr_local_heap );
+html_mmap.addMemSection( ddr_viss_config_heap );
 html_mmap.addMemSection( dm_r5f_ddr_ipc     );
 html_mmap.addMemSection( dm_r5f_ddr_resource_table      );
 html_mmap.addMemSection( dm_r5f_ddr_ipc_tracebuf      );
@@ -446,6 +454,7 @@ c_header_mmap.addMemSection( dm_r5f_ddr_total     );
 c_header_mmap.addMemSection( c7x_1_ddr_total     );
 
 c_header_mmap.addMemSection( mcu_r5f_ddr_local_heap);
+c_header_mmap.addMemSection( ddr_viss_config_heap);
 c_header_mmap.addMemSection( dm_r5f_ddr_local_heap);
 c_header_mmap.addMemSection( c7x_1_ddr_local_heap_non_cacheable);
 c_header_mmap.addMemSection( c7x_1_ddr_scratch_non_cacheable);

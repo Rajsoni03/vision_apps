@@ -1,8 +1,9 @@
 /**
  * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
  * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
- * @cliArgs --device "AM62Ax" --package "AMB" --part "Default" --context "r5fss0-0" --product "MCU_PLUS_SDK@07.03.01"
- * @versions {"tool":"1.14.0+2667"}
+ * @cliArgs --device "AM62Ax" --part "Default" --package "AMB" --context "mcu-r5fss0-0" --product "MCU_PLUS_SDK@07.03.01"
+ * @v2CliArgs --device "AM62A7-Q1" --package "FCBGA (AMB)" --variant "AM62A74-M" --context "mcu-r5fss0-0" --product "MCU_PLUS_SDK@07.03.01"
+ * @versions {"tool":"1.23.0+4000"}
  */
 
 /**
@@ -20,6 +21,7 @@ const mpu_armv76 = mpu_armv7.addInstance();
 const mpu_armv77 = mpu_armv7.addInstance();
 const mpu_armv78 = mpu_armv7.addInstance();
 const mpu_armv79 = mpu_armv7.addInstance();
+const mpu_armv710 = mpu_armv7.addInstance();
 
 /**
  * Write custom configuration values to the imported modules.
@@ -97,6 +99,13 @@ mpu_armv79.isBufferable = false;
 mpu_armv79.tex          = 0;
 mpu_armv79.baseAddr     = 0xA2000000;
 mpu_armv79.size         = 24;
+
+mpu_armv710.$name        = "DDR_DM_R5F_VISS_CONFIG_HEAP";
+mpu_armv710.size         = 22;
+mpu_armv710.attributes   = "CUSTOM";
+mpu_armv710.tex          = 7;
+mpu_armv710.isBufferable = false;
+mpu_armv710.baseAddr     = 0xADC00000;
 
 /**
  * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future

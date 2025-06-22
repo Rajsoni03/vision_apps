@@ -105,6 +105,8 @@ SECTIONS
     .bss:app_fileio_mem     (NOLOAD) : {} > APP_FILEIO_MEM
     .bss:tiovx_obj_desc_mem (NOLOAD) : {} > TIOVX_OBJ_DESC_MEM
     .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
+    .bss:ipc_vring_mem      (NOLOAD) : {} > IPC_VRING_MEM
+    .bss:ddr_cache_wt_mem   (NOLOAD) : {} > DDR_DM_R5F_VISS_CONFIG_HEAP
 
     GROUP {
         .bss:    {} palign(4)   /* This is where uninitialized globals go */

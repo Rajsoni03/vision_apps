@@ -66,6 +66,7 @@
 #include <app_cfg.h>
 
 #define DDR_HEAP_MEM_SIZE               (DDR_DM_R5F_LOCAL_HEAP_SIZE)
+#define DDR_VISS_HEAP_MEM_SIZE          (DDR_DM_R5F_VISS_CONFIG_HEAP_SIZE)
 #define ENABLE_SCISERVER
 
 #undef ENABLE_UDMA_COPY
