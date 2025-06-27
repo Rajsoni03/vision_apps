@@ -85,6 +85,7 @@
 from ti_psdk_rtos_tools import *
 import math, os, sys, re
 from gen_dts_file import Org_dts_file
+from gen_edgeai_dts_file import Edgeai_dts_file
 from gen_c7x_1_syscfg import C7x_1_Syscfg
 from gen_mcu1_0_syscfg import Mcu1_0_Syscfg
 from gen_qnx_bsp_carveout import QNX_BSP_UPDATE
@@ -266,13 +267,13 @@ mcu_r5f_ddr_resource_table  = MemSection("DDR_MCU_R5F_RESOURCE_TABLE", "RWIX", m
 mcu_r5f_ddr_ipc_tracebuf    = MemSection("DDR_MCU_R5F_IPC_TRACEBUF", "RWIX", mcu_r5f_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for MCU R5F for Linux IPC tracebuffer");
 mcu_r5f_ddr                 = MemSection("DDR_MCU_R5F", "RWIX", mcu_r5f_ddr_addr, mcu_r5f_ddr_size, "DDR for MCU R5F for code/data");
 mcu_r5f_ddr_local_heap      = MemSection("DDR_MCU_R5F_LOCAL_HEAP", "RWIX", mcu_r5f_ddr_local_heap_addr, mcu_r5f_ddr_local_heap_size, "DDR for MCU R5F for local heap");
-ddr_viss_config_heap        = MemSection("DDR_DM_R5F_VISS_CONFIG_HEAP", "RW", ddr_viss_config_heap_addr, ddr_viss_config_heap_size, "DDR for storing DMA buffers for VISS configuration");
 mcu_r5f_ddr_total           = MemSection("DDR_MCU_R5F_DTS", "", 0, 0, "DDR for MCU R5F for all sections, used for reserving memory in DTS file");
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr_resource_table);
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr_ipc_tracebuf);
 mcu_r5f_ddr_total.concat(mcu_r5f_ddr);
 mcu_r5f_ddr_total.setDtsName("mcu_r5fss0_core0_memory_region", "r5f-dma-memory");
 
+ddr_viss_config_heap        = MemSection("DDR_DM_R5F_VISS_CONFIG_HEAP", "RW", ddr_viss_config_heap_addr, ddr_viss_config_heap_size, "DDR for storing DMA buffers for VISS configuration");
 dm_r5f_ddr_ipc             = MemSection("DDR_DM_R5F_IPC", "RWIX", dm_r5f_ddr_ipc_addr, linux_ddr_ipc_size, "DDR for DM R5F for Linux IPC");
 dm_r5f_ddr_ipc.setDtsName("wkup_r5fss0_core0_dma_memory_region", "r5f-dma-memory");
 dm_r5f_ddr_resource_table  = MemSection("DDR_DM_R5F_RESOURCE_TABLE", "RWIX", dm_r5f_ddr_resource_table_addr, linux_ddr_resource_table_size, "DDR for DM R5F for Linux resource table");
@@ -316,7 +317,7 @@ app_fileio_mem        = MemSection("APP_FILEIO_MEM"        , "", app_fileio_mem_
 tiovx_log_rt_mem     = MemSection("TIOVX_LOG_RT_MEM" , "", tiovx_log_rt_mem_addr, tiovx_log_rt_mem_size, "Memory for TI OpenVX shared memory for Run-time logging. MUST be non-cached or cache-coherent");
 
 ipc_vring_mem      = MemSection("IPC_VRING_MEM"     , "", ipc_vring_mem_addr     , ipc_vring_mem_size     , "Memory for IPC Vring's. MUST be non-cached or cache-coherent");
-ipc_vring_mem.setDtsName("edgeai_rtos_ipc_memory_region", "edgeai-rtos-ipc-memory-region");
+ipc_vring_mem.setDtsName("rtos_ipc_memory_region", "ipc-memories");
 ipc_vring_mem.setAlignment(True)
 ipc_vring_mem.setPrintCompatibility(False)
 ipc_vring_mem.setOriginTag(False);
@@ -382,6 +383,7 @@ dm_r5f_mmap.addMemSection( app_fileio_mem          );
 dm_r5f_mmap.addMemSection( ipc_vring_mem        );
 dm_r5f_mmap.addMemSection( dm_r5f_ddr_local_heap  );
 dm_r5f_mmap.addMemSection( ddr_shared_mem       );
+dm_r5f_mmap.addMemSection( ddr_viss_config_heap       );
 dm_r5f_mmap.checkOverlap();
 
 c7x_1_mmap = MemoryMap("c7x_1");
@@ -475,11 +477,14 @@ dts_mmap.addMemSection( dm_r5f_ddr_ipc     );
 dts_mmap.addMemSection( dm_r5f_ddr_total   );
 dts_mmap.addMemSection( c7x_1_ddr_ipc      );
 dts_mmap.addMemSection( c7x_1_ddr_total    );
-dts_mmap.addMemSection( edgeai_ddr_total );
-dts_mmap.addMemSection( ipc_vring_mem      );
-dts_mmap.addMemSection( ddr_shared_mem     );
-dts_mmap.addMemSection( edgeai_core_heaps );
+dts_mmap.addMemSection( ipc_vring_mem );
 dts_mmap.checkOverlap();
+
+edgeai_dts_mmap = MemoryMap("Memory Map for Linux kernel dts/dtsi file");
+edgeai_dts_mmap.addMemSection( edgeai_ddr_total );
+edgeai_dts_mmap.addMemSection( ddr_shared_mem     );
+edgeai_dts_mmap.addMemSection( edgeai_core_heaps );
+edgeai_dts_mmap.checkOverlap();
 
 #Create Memory Sections required for example.syscfg under c7x_1
 c7x_1_syscfg = MemoryMap("Memory Map for example.syscfg under c7x_1");
@@ -533,7 +538,7 @@ Mcu1_0_Syscfg(mcu1_0_syscfg).export();
 if os.path.isdir(os.path.join(os.path.dirname(__file__),'../../../../psdkqa')):
 	QNX_BSP_UPDATE(qnx_bsp_carveout).export();
 
-def check_path():
+def org_dts_check_path():
         ORG_DTS_PATH = os.environ.get("ORG_DTS_PATH")
         if not ORG_DTS_PATH :
                 print("ERROR: ORG_DTS_PATH NOT SET, DTS CANNOT BE UPDATED")
@@ -541,4 +546,14 @@ def check_path():
         else:
                 Org_dts_file(dts_mmap).export();
 
-check_path();
+def edgeai_dts_check_path():
+        EDGEAI_DTS_PATH = os.environ.get("EDGEAI_DTS_PATH")
+        if not EDGEAI_DTS_PATH :
+                print("ERROR: EDGEAI_DTS_PATH NOT SET, OVERLAY CANNOT BE UPDATED")
+                sys.exit(1)
+        else:
+                Edgeai_dts_file(edgeai_dts_mmap).export();
+
+
+org_dts_check_path();
+edgeai_dts_check_path();

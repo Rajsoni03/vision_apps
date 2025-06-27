@@ -63,22 +63,18 @@ import os, sys, re
 #from . import *
 from ti_psdk_rtos_tools import *
 
-org_dts_path = os.environ.get("ORG_DTS_PATH")
+Edgeai_dts_path = os.environ.get("EDGEAI_DTS_PATH")
 
 memory_regions = [
-    "c7x_0_dma_memory_region",
-    "c7x_0_memory_region",
-    "mcu_r5fss0_core0_dma_memory_region",
-    "mcu_r5fss0_core0_memory_region",
-    "wkup_r5fss0_core0_dma_memory_region",
-    "wkup_r5fss0_core0_memory_region",
-    "rtos_ipc_memory_region"
+    "edgeai_memory_region",
+    "edgeai_shared_region",
+    "edgeai_core_heaps"
 ]
 
 #empty array declaration
 updated_sections = []
 
-class Org_dts_file :
+class Edgeai_dts_file :
     def __init__(self, memoryMap):
         self.memoryMap = memoryMap;
     
@@ -99,27 +95,24 @@ class Org_dts_file :
             section_content = [string1] 
             if(memSection.printCompatibility) :
                 string2 = 'compatible = "%s";' % (memSection.compatibility);
-                section_content.append(f'                       compatible = "{memSection.compatibility}";')
+                section_content.append(f'              compatible = "{memSection.compatibility}";')
             if (memSection.split_origin) :
                 val_lo = memSection.origin & 0xFFFFFFFF;
                 val_hi = (memSection.origin & 0xFF00000000 ) >> 32;
                 string3 = 'reg = <0x%02x 0x%08x 0x00 0x%08x>;' % (val_hi, val_lo, memSection.length);
-                section_content.append(f'                       reg = <0x{val_hi:02x} 0x{val_lo:08x} 0x00 0x{memSection.length:08x}>;')
+                section_content.append(f'              reg = <0x{val_hi:02x} 0x{val_lo:08x} 0x00 0x{memSection.length:08x}>;')
             else:
                 string3 = 'reg = <0x00 0x%08x 0x00 0x%08x>;' % (memSection.origin, memSection.length);
-                section_content.append(f'                       reg = <0x00 0x{memSection.origin:08x} 0x00 0x{memSection.length:08x}>;')
-            if( memSection.alignment) :
-                section_content.append('                       alignment = <0x1000>;')
+                section_content.append(f'              reg = <0x00 0x{memSection.origin:08x} 0x00 0x{memSection.length:08x}>;')
             if( memSection.no_map) :
-                section_content.append('                       no-map;')
-            section_content.append("                };")
+                section_content.append('              no-map;')
+            section_content.append("    };")
             updated_sections.append("\n".join(section_content))
-        with open(org_dts_path, "r") as file:
+        with open(Edgeai_dts_path, "r") as file:
             data = file.read()
         for regions, updated_strings in zip(memory_regions, updated_sections):
             pattern = rf"{regions}\s*:\s*[^\{{]*\{{.*?\}};"
             data = re.sub(pattern, updated_strings, data, flags=re.DOTALL)
-        with open(org_dts_path, "w") as file:
+            print(data)
+        with open(Edgeai_dts_path, "w") as file:
             file.write(data)
-
-
