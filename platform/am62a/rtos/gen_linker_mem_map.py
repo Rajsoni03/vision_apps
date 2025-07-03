@@ -85,7 +85,7 @@
 from ti_psdk_rtos_tools import *
 import math, os, sys, re
 from gen_dts_file import Org_dts_file
-from gen_edgeai_dts_file import Edgeai_dts_file
+from gen_edgeai_dtso import Edgeai_dts_file
 from gen_c7x_1_syscfg import C7x_1_Syscfg
 from gen_mcu1_0_syscfg import Mcu1_0_Syscfg
 from gen_qnx_bsp_carveout import QNX_BSP_UPDATE
