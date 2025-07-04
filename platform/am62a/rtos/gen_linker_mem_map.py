@@ -158,7 +158,8 @@ c7x_1_ddr_vecs_size = 16*KB;
 c7x_1_ddr_addr = c7x_1_ddr_vecs_addr + c7x_1_ddr_vecs_size;
 c7x_1_ddr_addr = roundUp(c7x_1_ddr_addr, 64*KB);
 c7x_1_ddr_size = 32*MB - (c7x_1_ddr_addr-c7x_1_ddr_ipc_addr);
-
+# Reduce 16Mb from the code/data segment to align with linux Sdk
+c7x_1_ddr_data_seg_size = (c7x_1_ddr_size ) - 16*MB;
 
 mcu_r5f_ddr_ipc_addr = c7x_1_ddr_addr + c7x_1_ddr_size ;
 mcu_r5f_ddr_resource_table_addr = mcu_r5f_ddr_ipc_addr + linux_ddr_ipc_size;
@@ -293,7 +294,7 @@ c7x_1_ddr_resource_table  = MemSection("DDR_C7x_1_RESOURCE_TABLE", "RWIX", c7x_1
 c7x_1_ddr_ipc_tracebuf    = MemSection("DDR_C7X_1_IPC_TRACEBUF", "RWIX", c7x_1_ddr_ipc_tracebuf_addr, linux_ddr_ipc_tracebuf_size, "DDR for C7X_1 for Linux IPC tracebuffer");
 c7x_1_ddr_boot            = MemSection("DDR_C7x_1_BOOT", "RWIX", c7x_1_ddr_boot_addr, c7x_1_ddr_boot_size, "DDR for C7x_1 for boot section");
 c7x_1_ddr_vecs            = MemSection("DDR_C7x_1_VECS", "RWIX", c7x_1_ddr_vecs_addr, c7x_1_ddr_vecs_size, "DDR for C7x_1 for vecs section");
-c7x_1_ddr                 = MemSection("DDR_C7x_1", "RWIX", c7x_1_ddr_addr, c7x_1_ddr_size, "DDR for C7x_1 for code/data");
+c7x_1_ddr                 = MemSection("DDR_C7x_1", "RWIX", c7x_1_ddr_addr, c7x_1_ddr_data_seg_size, "DDR for C7x_1 for code/data");
 c7x_1_ddr_local_heap_non_cacheable      = MemSection("DDR_C7X_1_LOCAL_HEAP_NON_CACHEABLE", "RWIX", c7x_1_ddr_local_heap_non_cacheable_addr, c7x_1_ddr_local_heap_non_cacheable_size, "DDR for c7x_1 for non cacheable local heap");
 c7x_1_ddr_scratch_non_cacheable         = MemSection("DDR_C7X_1_SCRATCH_NON_CACHEABLE", "RWIX", c7x_1_ddr_scratch_non_cacheable_addr, c7x_1_ddr_scratch_non_cacheable_size, "DDR for c7x_1 for non cacheable scratch Memory");
 c7x_1_ddr_local_heap      = MemSection("DDR_C7X_1_LOCAL_HEAP", "RWIX", c7x_1_ddr_local_heap_addr, c7x_1_ddr_local_heap_size, "DDR for c7x_1 for local heap");

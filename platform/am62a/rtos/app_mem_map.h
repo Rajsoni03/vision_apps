@@ -83,9 +83,9 @@
 #define DDR_C7x_1_IPC_ADDR (0x99800000u)
 #define DDR_C7x_1_IPC_SIZE (0x00100000u)
 
-/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 31.00 MB ] */
+/* DDR for C7x_1 for all sections, used for reserving memory in DTS file [ size 15.00 MB ] */
 #define DDR_C7x_1_DTS_ADDR (0x99900000u)
-#define DDR_C7x_1_DTS_SIZE (0x01F00000u)
+#define DDR_C7x_1_DTS_SIZE (0x00F00000u)
 
 /* DDR for MCU R5F for Linux IPC [ size 1024.00 KB ] */
 #define DDR_MCU_R5F_IPC_ADDR (0x9B800000u)

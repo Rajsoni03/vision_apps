@@ -47,7 +47,6 @@ mpu_armv73.size        = 31;
 mpu_armv73.$name       = "DDR";
 mpu_armv73.attributes  = "CUSTOM";
 mpu_armv73.tex         = 5;
-mpu_armv73.isCacheable = false;
 
 mpu_armv74.baseAddr     = 0x41010000;
 mpu_armv74.size         = 15;

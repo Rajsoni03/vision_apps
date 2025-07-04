@@ -82,8 +82,8 @@ MEMORY
     DDR_C7x_1_BOOT           ( RWIX ) : ORIGIN = 0x99A00000 , LENGTH = 0x00000400
     /* DDR for C7x_1 for vecs section [ size 16.00 KB ] */
     DDR_C7x_1_VECS           ( RWIX ) : ORIGIN = 0x99C00000 , LENGTH = 0x00004000
-    /* DDR for C7x_1 for code/data [ size 27.94 MB ] */
-    DDR_C7x_1                ( RWIX ) : ORIGIN = 0x99C10000 , LENGTH = 0x01BF0000
+    /* DDR for C7x_1 for code/data [ size 11.94 MB ] */
+    DDR_C7x_1                ( RWIX ) : ORIGIN = 0x99C10000 , LENGTH = 0x00BF0000
     /* Memory for IPC Vring's. MUST be non-cached or cache-coherent [ size 16.00 MB ] */
     IPC_VRING_MEM                     : ORIGIN = 0xA0000000 , LENGTH = 0x01000000
     /* Memory for remote core logging [ size 256.00 KB ] */
