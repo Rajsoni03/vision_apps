@@ -115,7 +115,12 @@
 
 #define ENABLE_FVID2
 #define ENABLE_VHWA_VPAC
-#define ENABLE_VHWA_DMPAC
+
+#if (defined(ECU_FC))                                           // Disabling DMPAC for FC demo
+    #undef ENABLE_VHWA_DMPAC
+#else                                                           // Enabling DMPAC for all non ECU demos
+    #define ENABLE_VHWA_DMPAC
+#endif
 
 #if defined (ENABLE_DSS_DSI) && defined (ENABLE_CSI2TX)
 #error "CSI2TX and DSI cannot be active at the same time"
