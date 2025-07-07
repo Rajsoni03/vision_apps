@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,37 +59,68 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef _BEV_TIDL_MODULE
+#define _BEV_TIDL_MODULE
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#include "bev_common.h"
+#include "itidl_ti.h"
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
-
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
-#endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
+typedef struct 
 {
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
+    vx_node    node;
+    vx_kernel  kernel;
 
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
+    vx_user_data_object  config;
+    vx_user_data_object  network;
+    vx_user_data_object  createParams;
+
+    vx_object_array  in_args_arr;
+    vx_object_array  out_args_arr;
+
+    /*! TIDL Xy-Cordinate Input tensor buffer*/
+    vx_size xycord_size[1];
+    vx_object_array XYCordinate_tensor_arr;
+    vx_object_array  input_xycord_arr[APP_MAX_BUFQ_DEPTH];
+    vx_tensor input_xycord[APP_MAX_BUFQ_DEPTH];
+
+    vx_object_array  output1_tensor_arr; /* Bev output */
+
+    /*! TIDL object array of output tensors */
+    vx_object_array  output_tensor_arr_batch[APP_MAX_TENSORS];
+
+    vx_uint32 num_input_tensors;
+    vx_uint32 num_output_tensors;
+
+    vx_int32 graph_parameter_index;
+
+    vx_int32 core_id;
+    /*! TIDL inferenceMode */
+    vx_uint32 inferenceMode;
+
+    /* Core number to be used for execution - 1 (c7x_1) for J721E and J721S2, any of 1,2,3,4, for J784S4 */
+    vx_uint32 coreNum;
+
+    /* Core number from which execution starts -- 1 indexed */
+    vx_int32 coreStartIdx;
+    
+    vx_char label_names[3][APP_MAX_FILE_PATH];
+    vx_char config_file_path[APP_MAX_FILE_PATH];
+    vx_char network_file_path[APP_MAX_FILE_PATH];
+    /* added for 4D BEV Demo*/
+    vx_char XYCordinate_file_path[APP_MAX_FILE_PATH];
+
+    vx_char objName[APP_MAX_FILE_PATH];
+
+    vx_uint8 config_checksum[TIVX_TIDL_J7_CHECKSUM_SIZE];
+    vx_uint8 network_checksum[TIVX_TIDL_J7_CHECKSUM_SIZE];
+
+} TIDLObj;
+
+vx_status app_init_tidl_bev(vx_context context, TIDLObj *obj, char *objName, vx_int32 bufq_depth);
+void app_deinit_tidl_bev(TIDLObj *obj, vx_int32 bufq_depth);
+void app_delete_tidl_bev(TIDLObj *obj);
+vx_status app_create_graph_tidl_4D(vx_context context, vx_graph graph, TIDLObj *tidlObj, vx_object_array input_tensor_arr1);
+
+vx_status writeTIDLOutput(vx_object_array output_arr, vx_char *out_name);
+
+#endif

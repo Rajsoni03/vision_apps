@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,36 +60,26 @@
  *
  */
 
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
 #include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#include <utils/app_init/include/app_init.h>
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
-
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
-#endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
+int main(int argc, char *argv[])
 {
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
+    int status = 0;
 
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
+    status = appInit();
+
+    if(status==0)
+    {
+        int app_tidl_bev_main(int argc, char* argv[]);
+
+        status = app_tidl_bev_main(argc, argv);
+        appDeInit();
+    }
+
+    return status;
 }

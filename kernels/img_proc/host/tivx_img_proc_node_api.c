@@ -66,6 +66,8 @@
 #include <tivx_img_mosaic_host.h>
 #include <tivx_dl_color_blend_host.h>
 #include <tivx_dl_draw_box_host.h>
+#include <tivx_dl_bev_post_proc_host.h>
+#include <tivx_dl_bev_cam_post_proc_host.h>
 
 VX_API_ENTRY vx_node VX_API_CALL tivxODPostProcNode(vx_graph graph,
                                       vx_array             configuration,
@@ -91,17 +93,48 @@ VX_API_ENTRY vx_node VX_API_CALL tivxODPostProcNode(vx_graph graph,
 }
 VX_API_ENTRY vx_node VX_API_CALL tivxImgPreProcNode(vx_graph graph,
                                       vx_array             configuration,
-                                      vx_image             in_img,
+                                      vx_image             in_img,                                     
                                       vx_tensor            out_img)
 {
     vx_reference prms[] = {
             (vx_reference)configuration,
-            (vx_reference)in_img,
+            (vx_reference)in_img,            
             (vx_reference)out_img
     };
-
     vx_node node = tivxCreateNodeByKernelName(graph,
                                            TIVX_KERNEL_IMG_PREPROCESS_NAME,
+                                           prms,
+                                           dimof(prms));
+    return node;
+}
+
+VX_API_ENTRY vx_node VX_API_CALL tivxDL4DPreProcArmv8Node(vx_graph graph,
+                                      vx_user_data_object            configuration,
+                                      /* check if Array or vx_user_data_object*/
+                                      vx_image            in_img,
+                                      vx_image            in_img2,
+                                      vx_image            in_img3,
+                                      vx_image            in_img4,  
+                                      vx_image            in_img5,
+                                      vx_image            in_img6,
+                                      vx_tensor           out_img)
+{
+    vx_reference prms[] = {
+            (vx_reference)configuration,
+            (vx_reference)in_img,
+            (vx_reference)in_img2,
+            (vx_reference)in_img3,
+            (vx_reference)in_img4,
+            (vx_reference)in_img5,
+            (vx_reference)in_img6,
+            (vx_reference)out_img
+    };
+    /*#####################################################################################
+        MOdification to take 6 Camera Images and create 4D Tensor.
+
+    ###################################################################################*/
+    vx_node node = tivxCreateNodeByKernelName(graph,
+                                           TIVX_KERNEL_DL_PRE_PROC_ARMV8_4D_NAME,
                                            prms,
                                            dimof(prms));
     return node;
@@ -322,6 +355,88 @@ VX_API_ENTRY vx_node VX_API_CALL tivxDrawBoxDetectionsNode(vx_graph             
 
     return(node);
 
+}
+
+VX_API_ENTRY vx_node VX_API_CALL tivxDLBEVPostProcNode(vx_graph             graph,
+                                                    vx_kernel            kernel,
+                                                    vx_user_data_object  config,
+                                                    vx_image             input_image,
+                                                    vx_tensor            Lidar_2_Img_tensor,
+                                                    vx_tensor            input_tensor[],
+                                                    vx_image             output_image)
+{   
+    vx_reference            prms[TIVX_KERNEL_DRAW_BOX_DETECTIONS_MAX_PARAMS];
+    vx_map_id               map_id_config;
+    tivxDLBEVPostProcParams    *postProcParams;
+    vx_uint32               num_input_tensors, num_params, i;
+
+    vxMapUserDataObject(config, 0, sizeof(tivxDLBEVPostProcParams), &map_id_config,
+        (void **)&postProcParams, (vx_enum)VX_READ_ONLY, (vx_enum)VX_MEMORY_TYPE_HOST, 0);
+
+    num_input_tensors = postProcParams->num_input_tensors;
+
+    vxUnmapUserDataObject(config, map_id_config);
+
+    num_params = (vx_uint32)TIVX_KERNEL_DRAW_BOX_DETECTIONS_BASE_PARAMS + (vx_uint32)num_input_tensors;
+    
+    prms[0] = (vx_reference)config;
+    prms[1] = (vx_reference)input_image;
+    prms[2] = (vx_reference)output_image;
+    prms[3] = (vx_reference)Lidar_2_Img_tensor;
+
+    for(i = 0; i < num_input_tensors; i++){
+        prms[TIVX_KERNEL_DRAW_BOX_DETECTIONS_INPUT_TENSOR_START_IDX + i] = (vx_reference)input_tensor[i];
+    }
+    VX_PRINT(VX_ZONE_INFO, "TIVX_KERNEL_DRAW_BOX_DETECTIONS_BASE_PARAMS %d \n",TIVX_KERNEL_DRAW_BOX_DETECTIONS_BASE_PARAMS);
+    VX_PRINT(VX_ZONE_INFO, "num_input_tensors- %d  ------- num_params - %d \n",num_input_tensors, num_params);
+            
+    vx_node node = tivxCreateNodeByKernelRef(graph,
+                                             kernel,
+                                             prms,
+                                             num_params);
+    return(node);
+}
+
+VX_API_ENTRY vx_node VX_API_CALL tivxDLBEVCamPostProcNode(vx_graph             graph,
+                                                    vx_kernel            kernel,
+                                                    vx_user_data_object  config,
+                                                    vx_image             input_image,
+                                                    vx_tensor            Lidar_to_Cam_tensor,
+                                                    vx_tensor        Cam_to_Img_tensor,
+                                                    vx_tensor            input_tensor[],
+                                                    vx_image             output_image)
+{   
+    vx_reference            prms[TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_MAX_PARAMS];
+    vx_map_id               map_id_config;
+    tivxDLBEVPostProcParams    *postProcParams;
+    vx_uint32               num_input_tensors, num_params, i;
+
+    vxMapUserDataObject(config, 0, sizeof(tivxDLBEVPostProcParams), &map_id_config,
+        (void **)&postProcParams, (vx_enum)VX_READ_ONLY, (vx_enum)VX_MEMORY_TYPE_HOST, 0);
+
+    num_input_tensors = postProcParams->num_input_tensors;
+
+    vxUnmapUserDataObject(config, map_id_config);
+
+    num_params = (vx_uint32)TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_BASE_PARAMS + (vx_uint32)num_input_tensors;
+    
+    prms[0] = (vx_reference)config;
+    prms[1] = (vx_reference)input_image;
+    prms[2] = (vx_reference)output_image;
+    prms[3] = (vx_reference)Lidar_to_Cam_tensor;
+    prms[4] = (vx_reference)Cam_to_Img_tensor;
+
+    for(i = 0; i < num_input_tensors; i++){
+        prms[TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_INPUT_TENSOR_START_IDX + i] = (vx_reference)input_tensor[i];
+    }
+    VX_PRINT(VX_ZONE_INFO, "TIVX_KERNEL_DRAW_BOX_DETECTIONS_BASE_PARAMS %d \n",TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_BASE_PARAMS);
+    VX_PRINT(VX_ZONE_INFO, "num_input_tensors- %d  ------- num_params - %d \n",num_input_tensors, num_params);
+            
+    vx_node node = tivxCreateNodeByKernelRef(graph,
+                                             kernel,
+                                             prms,
+                                             num_params);
+    return(node);
 }
 
 

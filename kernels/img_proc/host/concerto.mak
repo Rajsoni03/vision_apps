@@ -25,6 +25,11 @@ CSOURCES    += tivx_dl_pre_proc_host.c
 CSOURCES    += tivx_dl_color_blend_host.c
 CSOURCES    += tivx_dl_draw_box_host.c
 CSOURCES    += tivx_dl_color_convert_host.c
+ifeq ($(SOC),j784s4)
+CSOURCES    += tivx_dl_bev_pre_proc_armv8_host.c
+CSOURCES    += tivx_dl_bev_post_proc_host.c
+CSOURCES    += tivx_dl_bev_cam_post_proc_host.c
+endif
 endif
 
 IDIRS       += $(VISION_APPS_PATH)/kernels/img_proc/include

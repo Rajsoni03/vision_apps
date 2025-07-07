@@ -94,6 +94,13 @@ extern "C" {
  */
 #define TIVX_KERNEL_IMG_PREPROCESS_NAME     "com.ti.img_proc.img.preprocess"
 
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_NAME          "com.ti.img_proc.dl.pre.proc.armv8"
+
+/*! \brief Kernel Name: Image Pre Processing-4D
+ *  \see group_vision_apps_kernels_img_proc
+ */
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_4D_NAME          "com.ti.img_proc.dev.dl.pre.proc.armv8"
+
 /*! \brief Kernel Name: OC Pre Processing
  *  \see group_vision_apps_kernels_img_proc
  */
@@ -144,6 +151,17 @@ extern "C" {
  *  \see group_vision_apps_kernels_img_proc
  */
 #define TIVX_KERNEL_DRAW_BOX_DETECTIONS_NAME     "com.ti.img_proc.od.draw.box.detections"
+
+/*! \brief Kernel Name: Draw BEV Box Detections
+ *  \see group_vision_apps_kernels_img_proc
+ */
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_NAME     "com.ti.img_proc.od.draw.bev.box.detections"
+
+
+/*! \brief Kernel Name: Draw BEV Box Detections
+ *  \see group_vision_apps_kernels_img_proc
+ */
+#define TIVX_KERNEL_DRAW_BEV_CAM_BOX_DETECTIONS_NAME     "com.ti.img_proc.od.draw.cam.bev.box.detections"
 
 /*! \brief Kernel Name: Image histogram
  *  \see group_vision_apps_kernels_img_hist
@@ -232,6 +250,14 @@ extern "C" {
 #define TIVX_DL_COLOR_BLEND_MAX_CLASSES    (256U)
 #define TIVX_DL_COLOR_BLEND_MAX_COLORS     (3U)
 
+/* Macros to indicate max outputs, classes and colors in dl-post-proc */
+#define TIVX_DL_BEV_POST_PROC_CLASSIFICATION_TASK_TYPE  (0U)
+#define TIVX_DL_BEV_POST_PROC_DETECTION_TASK_TYPE       (1U)
+#define TIVX_DL_BEV_POST_PROC_SEGMENTATION_TASK_TYPE    (2U)
+#define TIVX_DL_BEV_POST_PROC_OC_MAX_CLASSES            (10)
+#define TIVX_DL_BEV_POST_PROC_MAX_NUM_CLASSNAMES        (1000)
+#define TIVX_DL_BEV_POST_PROC_MAX_SIZE_CLASSNAME        (64)
+
 /*!
  * \brief
  * \ingroup group_vision_apps_kernels_img_proc
@@ -263,6 +289,29 @@ typedef struct{
   vx_int32 skip_flag;
 
 }tivxImgPreProcParams;
+
+typedef struct {
+
+  /** Skip processing */
+  vx_int32 skip_flag;
+
+  /* Scale values to be applied per channel in the range of 0.0 to 1.0 */
+  vx_float32 scale[3];
+
+  /* Mean value per channel to be subtracted, range depends on channel bit-depth */
+  vx_float32 mean[3];
+
+  /* Channel ordering, 0-NCHW, 1-NHWC */
+  vx_int32 channel_order;
+
+  /* Tensor format, 0-RGB, 1-BGR */
+  vx_int32 tensor_format;
+
+  /* Crop values to be applied, 0-Top, 1-Bottom, 2-Right, 3-Left */
+  vx_int32 crop[4];
+
+}tivxDLPreProcArmv8Params4D;
+
 
 /*!
  * \brief
@@ -653,6 +702,58 @@ typedef struct {
  * \ingroup group_vision_apps_kernels_img_proc
  */
 typedef struct {
+  /** focal length of camera*/
+  vx_float32 focal_length;
+
+  /** Optical center x of the input image*/
+  vx_int32 center_x;
+
+  /** Optical center y of the input image*/
+  vx_int32 center_y;
+
+  /** Optical center x multiplication factor of the output image. output image optical center x = inter_center_x_fact*center_x */
+  vx_int32 inter_center_x_fact;
+
+  /** Optical center y multiplication factor of the output image. output image optical center y = inter_center_y_fact*center_y */
+  vx_int32 inter_center_y_fact;
+
+  /** Number of table entries provided for each angular value for transformation */
+  vx_int32 num_table_rows;
+
+  /** Maximum nuber of detection */
+  vx_int32 num_max_det;
+
+  /** Width of the image */
+  vx_int32 width;
+
+  /** Height of the image */
+  vx_int32 height;
+
+  /** Width of the image given to deep learning algorithm*/
+  vx_int32 dl_width;
+
+  /** Height of the image given to deep learning algorithm*/
+  vx_int32 dl_height;
+
+  /** Points per line to be interpolated for visualization purpose*/
+  vx_int32 points_per_line;
+
+  /** Number of keypoints to be detected by algorithm for each parking spot*/
+  vx_int32 num_keypoints;
+
+  /** Offset of the object information by the deep learning algorithm in output buffer*/
+  vx_int32 output_buffer_offset;
+
+  /** Skip processing */
+  vx_int32 skip_flag;
+
+}tivx3DODPostProcParams;
+
+/*!
+ * \brief
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+typedef struct {
 
   /** Detection tensor I/O params */
   sTIDL_IOBufDesc_t ioBufDesc;
@@ -676,6 +777,131 @@ typedef struct {
   vx_int32 skip_flag;
 
 }tivxDrawBoxDetectionsParams;
+
+
+typedef struct{
+
+    /** Classification tensor I/O params */
+    sTIDL_IOBufDesc_t *ioBufDesc;
+
+    /** Number of top results to consider */
+    vx_int32 num_top_results;
+
+    /** Extract labelOffset from param.yaml */
+    vx_int32 labelOffset;
+
+    /** Classnames corresponding to class indexs */
+    char (*classnames)[TIVX_DL_BEV_POST_PROC_MAX_SIZE_CLASSNAME];
+
+}
+oc_bev_params;
+
+typedef struct{
+
+    /** Detection tensor I/O params */
+    sTIDL_IOBufDesc_t *ioBufDesc;
+
+    /** User config visualization threshold */
+    vx_float32 viz_th;
+
+    /** Amount by which index is offset */
+    vx_int32 labelIndexOffset;
+
+    /** Extract labelOffset from param.yaml using labelIndexOffset */
+    vx_int32 *labelOffset;
+
+    /** Classnames corresponding to class indexs */
+    char (*classnames)[TIVX_DL_BEV_POST_PROC_MAX_SIZE_CLASSNAME];
+
+    /** formatter */
+    vx_int32 formatter[6];
+
+    /** scaleX */
+    vx_float32 scaleX;
+
+    /** scaleY */
+    vx_float32 scaleY;
+
+}
+od_bev_params;
+
+typedef struct{
+
+    /** Detection tensor I/O params */
+    sTIDL_IOBufDesc_t *ioBufDesc;
+
+    /** Input width for tensor, extract it from tensor format, NCHW or NHWC */
+    vx_int32 inDataWidth;
+
+    /** Input height for tensor */
+    vx_int32 inDataHeight;
+
+    /** Alpha determines the extent of blending, this is extracted from params.yaml of model */
+    vx_float32 alpha;
+
+    /** YUV Color Map based on class is. */
+    uint8_t **YUVColorMap;
+
+    /** Max number of classes the color map can support. If class if
+      * is more than max supported class, black is overlayed by default.
+      */
+    uint8_t MaxColorClass;
+
+}
+ss_bev_params;
+
+
+/*!
+ * \brief DL Post Process to be used with DL-RT
+ * \ingroup group_edgeai_tiovx_kernels_img_proc
+ */
+typedef struct {
+
+    /** Task type : Classification, Detection, Segmentation */
+    vx_int32 task_type;
+
+    /* Number of input tensors of Post Proc Kernel */
+    vx_uint32 num_input_tensors;
+
+    /* Classification params */
+    oc_bev_params oc_prms;
+
+    /* Detection params */
+    od_bev_params od_prms;
+
+    /* Segmentation params */
+    ss_bev_params ss_prms;
+
+}tivxDLBEVPostProcParams;
+
+/*!
+ * \brief
+ * \ingroup group_vision_apps_kernels_img_proc
+ */
+typedef struct {
+
+  /** Detection tensor I/O params */
+  sTIDL_IOBufDesc_t ioBufDesc;
+
+  /** User config visualization threshold */
+  vx_float32 viz_th;
+
+  /** width of the image */
+  vx_int32 width;
+
+  /** height of the image */
+  vx_int32 height;
+
+  /** Number of classes for each output tensor*/
+  vx_uint8 color_map[TIVX_DRAW_BOX_DETECTIONS_MAX_CLASSES][3];
+
+  /** Number of valid classes to draw*/
+  vx_int32 num_classes;
+
+  /** Skip processing */
+  vx_int32 skip_flag;
+
+}tivxDraw3DBoxDetectionsParams;
 
 /*!
  * \brief SFM frame level control parameter
@@ -876,6 +1102,31 @@ vx_kernel tivxAddKernelImgMosaic(vx_context context, vx_int32 num_inputs);
  * \ingroup group_vision_apps_kernels_img_proc
  */
 void tivxImgMosaicParamsSetDefaults(tivxImgMosaicParams *prms);
+
+/*!
+ * \brief Used by the application to create the dl post proc kernel from the context.
+ * \ingroup group_edgeai_tiovx_kernels_img_proc
+ */
+vx_kernel tivxAddKernelDLBEVPostProc(vx_context context, vx_int32 num_input_tensors);
+
+/*!
+ * \brief Used by the application to remove the dl post proc kernel from the context.
+ * \ingroup group_edgeai_tiovx_kernels_img_proc
+ */
+vx_status tivxRemoveKernelDLBEVPostProc(vx_context context);
+
+/*!
+ * \brief Used by the application to create the dl post proc kernel from the context.
+ * \ingroup group_edgeai_tiovx_kernels_img_proc
+ */
+vx_kernel tivxAddKernelDLBEVCAMPostProc(vx_context context, vx_int32 num_input_tensors);
+
+/*!
+ * \brief Used by the application to remove the dl post proc kernel from the context.
+ * \ingroup group_edgeai_tiovx_kernels_img_proc
+ */
+vx_status tivxRemoveKernelDLBEVCAMPostProc(vx_context context);
+
 
 #ifdef __cplusplus
 }

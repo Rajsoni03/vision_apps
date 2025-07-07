@@ -89,6 +89,16 @@ VX_API_ENTRY vx_node VX_API_CALL tivxImgPreProcNode(vx_graph   graph,
                                                     vx_image   in_img,
                                                     vx_tensor  out_tensor);
 
+VX_API_ENTRY vx_node VX_API_CALL tivxDL4DPreProcArmv8Node(vx_graph             graph,
+                                                        vx_user_data_object  config,
+                                                        vx_image             input_image,
+                                                        vx_image             input_image2,
+                                                        vx_image             input_image3,
+                                                        vx_image             input_image4,
+                                                        vx_image             input_image5,
+                                                        vx_image             input_image6,
+                                                        vx_tensor            output_tensor);
+
 /*! \brief Creates a OC Pre Processing Node.
  *
  * Node does pre processing needed for image classification operation
@@ -324,6 +334,39 @@ VX_API_ENTRY vx_node VX_API_CALL tivxDrawBoxDetectionsNode(vx_graph             
                                                            vx_image             input_image,
                                                            vx_image             output_image);
 
+
+
+/*! \brief Draw BEV Post Proc  Node
+  *
+  * Used to draw box detections on an image
+  *
+  * \param [in] graph            reference to the graph.
+  * \param [in] configuration    configuration of type tivxDrawBoxDetectionParams
+  * \param [in] input_tensor     TIDL output tensor of detected key points
+  * \param [in] input_image      Input image to draw detections
+  * \param [out] output_image    Output image with detections drawn
+  *
+  * \ingroup group_vision_apps_kernels_img_proc
+  *
+  * \retval vx_node A node reference. Any possible errors preventing a successful creation should be checked using <tt>vxGetStatus</tt>
+  */
+
+VX_API_ENTRY vx_node VX_API_CALL tivxDLBEVPostProcNode(vx_graph             graph,
+                                                    vx_kernel            kernel,
+                                                    vx_user_data_object  config,
+                                                    vx_image             input_image,
+                                                    vx_tensor            Lidar_2_Img_tensor,
+                                                    vx_tensor            input_tensor[],
+                                                    vx_image             output_image);
+
+VX_API_ENTRY vx_node VX_API_CALL tivxDLBEVCamPostProcNode(vx_graph             graph,
+                                                      vx_kernel            kernel,
+                                                      vx_user_data_object  config,
+                                                      vx_image             input_image,
+                                                      vx_tensor            Lidar_2_Cam_tensor,
+                                                      vx_tensor            Cam_2_Img_tensor,
+                                                      vx_tensor            input_tensor[],
+                                                      vx_image             output_image);
 /*! \brief Image Histogram Node
   *
   * Used to get histogram of image intensity, done on A72

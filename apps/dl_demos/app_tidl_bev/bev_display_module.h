@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,37 +59,33 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef _BEV_DISPLAY_MODULE
+#define _BEV_DISPLAY_MODULE
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#include "bev_common.h"
+#include <TI/video_io_display.h>
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
+#define DISPLAY_WIDTH  (1920)
+#define DISPLAY_HEIGHT (1080)
 
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
+typedef struct {
+    vx_node  disp_node;
+
+    vx_user_data_object disp_params_obj;
+    tivx_display_params_t disp_params;
+
+    vx_int32 display_option;
+    vx_int32 display_pipe_id;
+
+    vx_int32 graph_parameter_index;
+
+    vx_char objName[APP_MAX_FILE_PATH];
+
+} DisplayObj;
+
+vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *objName);
+void app_deinit_display(DisplayObj *obj);
+void app_delete_display(DisplayObj *obj);
+vx_status app_create_graph_display(vx_graph graph, DisplayObj *scalerObj, vx_image disp_image);
+
 #endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
-
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}

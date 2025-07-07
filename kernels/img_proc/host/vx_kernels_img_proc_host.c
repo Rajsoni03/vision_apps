@@ -85,6 +85,9 @@ vx_status tivxAddKernelDLPreProc(vx_context context);
 vx_status tivxAddKernelDLColorBlend(vx_context context);
 vx_status tivxAddKernelDLDrawBox(vx_context context);
 vx_status tivxAddKernelDLColorConvert(vx_context context);
+#if defined(SOC_J784S4)
+vx_status tivxAddKernelDLPreProc4DArmv8(vx_context context);
+#endif
 
 vx_status tivxRemoveKernelODPostProc(vx_context context);
 vx_status tivxRemoveKernelImgPreProc(vx_context context);
@@ -101,6 +104,9 @@ vx_status tivxRemoveKernelDLPreProc(vx_context context);
 vx_status tivxRemoveKernelDLColorBlend(vx_context context);
 vx_status tivxRemoveKernelDLDrawBox(vx_context context);
 vx_status tivxRemoveKernelDLColorConvert(vx_context context);
+#if defined(SOC_J784S4)
+vx_status tivxRemoveKernelDLPreProc4DArmv8(vx_context context);
+#endif
 
 static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelImgPreProc, &tivxRemoveKernelImgPreProc},
@@ -115,6 +121,9 @@ static Tivx_Host_Kernel_List  gTivx_host_kernel_list[] = {
     {&tivxAddKernelImgHist, &tivxRemoveKernelImgHist},
     {&tivxAddKernelSFM, &tivxRemoveKernelSFM},
     {&tivxAddKernelDLPreProc, &tivxRemoveKernelDLPreProc},
+#if defined(SOC_J784S4)
+    {&tivxAddKernelDLPreProc4DArmv8, &tivxRemoveKernelDLPreProc4DArmv8},
+#endif
     {&tivxAddKernelDLColorBlend, &tivxRemoveKernelDLColorBlend},
     {&tivxAddKernelDLDrawBox, &tivxRemoveKernelDLDrawBox},
     {&tivxAddKernelDLColorConvert, &tivxRemoveKernelDLColorConvert}

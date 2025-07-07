@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,37 +59,72 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef _BEV_POST_PROC_MODULE
+#define _BEV_POST_PROC_MODULE
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#include "bev_common.h"
+#include "itidl_ti.h"
+#include "bev_display_module.h"
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
+typedef struct {
+    vx_node  node;
 
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
+    vx_user_data_object config;
+
+    tivxDLBEVPostProcParams params;
+
+    sTIDL_IOBufDesc_t ioBufDesc;
+
+    vx_uint32 num_input_tensors;
+
+    vx_uint32 num_output_tensors;
+
+
+    vx_uint32 output_img_width;
+
+    vx_uint32 output_img_height;
+    vx_size lidar_points[1];
+    vx_size lidar2cam_points[1];
+    vx_size cam_2img_points[1];
+
+    vx_float32 viz_th;
+
+    vx_uint32 num_top_results;
+
+    vx_kernel kernel;
+
+    vx_tensor input_temp;
+
+    vx_object_array output_image_arr;
+    vx_object_array  output_arr[APP_MAX_BUFQ_DEPTH];
+    vx_image  output_image[APP_MAX_BUFQ_DEPTH];
+
+    vx_int32 graph_parameter_index;
+
+    vx_char objName[APP_MAX_FILE_PATH];
+    vx_object_array  Lidar_2_img_tensor_arr;
+    vx_object_array  input_lidar_arr[APP_MAX_BUFQ_DEPTH];
+    vx_tensor input_lidar[APP_MAX_BUFQ_DEPTH];
+    vx_object_array  input_lidar2cam_arr[APP_MAX_BUFQ_DEPTH];
+    vx_tensor input_lidar2cam[APP_MAX_BUFQ_DEPTH];
+    vx_object_array  input_cam2img_arr[APP_MAX_BUFQ_DEPTH];
+    vx_tensor input_cam2img[APP_MAX_BUFQ_DEPTH];
+    vx_char Lidar_2_img_file_path[APP_MAX_FILE_PATH];
+
+} BEVPostProcObj;
+
+#define APP_MODULES_MAX_TENSORS         (8u)
+
+vx_status app_update_bev_post_proc(vx_context context, BEVPostProcObj *postProcObj, vx_user_data_object config);
+vx_status app_update_bev_cam_post_proc(vx_context context, BEVPostProcObj *postProcObj, vx_user_data_object config);
+vx_status app_init_bev_post_proc(vx_context context, BEVPostProcObj *postProcObj, char *objName,vx_int32 bufq_depth, vx_int32 num_ch);
+vx_status app_init_bev_cam_post_proc(vx_context context, BEVPostProcObj *postProcObj, char *objName,vx_int32 bufq_depth, vx_int32 num_ch);
+void app_deinit_bev_post_proc(vx_context context, BEVPostProcObj *obj, vx_int32 bufq_depth);
+void app_deinit_bev_cam_post_proc(vx_context context, BEVPostProcObj *obj, vx_int32 bufq_depth);
+void app_delete_bev_post_proc(BEVPostProcObj *obj);
+vx_status app_create_graph_bev_post_proc(vx_graph graph, BEVPostProcObj *postProcObj,vx_object_array in_tensor_arr, vx_object_array input_img_arr);
+vx_status app_create_graph_bev_cam_post_proc(vx_graph graph, BEVPostProcObj *postProcObj,vx_object_array in_tensor_arr, vx_object_array input_img_arr);
+vx_status writebevPostProcOutput(char* file_name, BEVPostProcObj *postProcObj);
+
+vx_status readCameraIntrinsicInput( vx_object_array tensor_arr);
 #endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
-
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}

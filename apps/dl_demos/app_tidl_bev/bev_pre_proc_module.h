@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,37 +59,39 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef _BEV_PRE_PROC_MODULE
+#define _BEV_PRE_PROC_MODULE
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#include "bev_common.h"
+#include "tiadalg_interface.h"
+#include "itidl_ti.h"
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
+typedef struct {
+    vx_node  node;
 
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
+    vx_user_data_object config;
+    tivxDLPreProcArmv8Params4D params;
+
+    sTIDL_IOBufDesc_t ioBufDesc;
+
+    vx_uint32 num_input_tensors;
+    vx_uint32 num_output_tensors;
+
+    vx_object_array  output_tensor_arr;
+
+    vx_int32 graph_parameter_index;
+
+    vx_char objName[APP_MAX_FILE_PATH];
+
+} PreProcObj;
+
+vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_user_data_object config);
+vx_status app_init_pre_proc(vx_context context, PreProcObj *preProcObj, char *objName);
+void app_deinit_pre_proc(PreProcObj *obj);
+void app_delete_pre_proc(PreProcObj *obj);
+vx_status app_create_graph_pre_proc_4D(vx_graph graph, PreProcObj *preProcObj, vx_object_array input_arr1, vx_object_array input_arr2,
+vx_object_array input_arr3, vx_object_array input_arr4, vx_object_array input_arr5, vx_object_array input_arr6, char *node_name);
+
+vx_status writePreProcOutput(char* file_name, vx_object_array output_arr);
+
 #endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
-
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}

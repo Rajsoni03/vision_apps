@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,36 +60,30 @@
  *
  */
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#ifndef _TIVX_KERNEL_DL_PRE_PROC_ARMV8_
+#define _TIVX_KERNEL_DL_PRE_PROC_ARMV8_
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
-
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
+#ifdef __cplusplus
+extern "C" {
 #endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
 
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_CONFIG_IDX        (0U)
+
+/*#########################################################################################
+----------------------------------MOdification for 6 Batch Images----------------------
+*/
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_INPUT_IMAGE_IDX   (1U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_INPUT_IMAGE2_IDX   (2U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_INPUT_IMAGE3_IDX   (3U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_INPUT_IMAGE4_IDX   (4U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_INPUT_IMAGE5_IDX   (5U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_INPUT_IMAGE6_IDX   (6U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_OUTPUT_TENSOR_IDX  (7U)
+#define TIVX_KERNEL_DL_PRE_PROC_ARMV8_MAX_PARAMS (8U)
+/*##############################################################################################*/
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* _TIVX_KERNEL_DL_PRE_PROC_ARMV8_ */

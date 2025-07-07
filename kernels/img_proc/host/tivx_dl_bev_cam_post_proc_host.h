@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -60,36 +60,32 @@
  *
  */
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#ifndef _TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_
+#define _TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
-
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
+#ifdef __cplusplus
+extern "C" {
 #endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
 
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_MAX_INPUTS          (8U)
+
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_CONFIGURATION_IDX   (0U)
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_INPUT_IMAGE_IDX     (1U)
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_OUTPUT_IMAGE_IDX    (2U)
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_LIDAR_2_IMG_TENSOR_IDX  (3U)
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_CAM_2_IMG_TENSOR_IDX  (4U)
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_INPUT_TENSOR_START_IDX    (5U)
+
+
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_BASE_PARAMS         (5U)
+
+#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_MAX_PARAMS          (TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_BASE_PARAMS + TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS_MAX_INPUTS)
+
+//#define TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONSBEV_TENSOR_IDX    (2U)
+
+#ifdef __cplusplus
 }
+#endif
+
+
+#endif /* _TIVX_KERNEL_DRAW_BEV_BOX_DETECTIONS */

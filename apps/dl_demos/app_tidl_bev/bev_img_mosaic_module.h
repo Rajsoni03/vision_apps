@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,37 +59,35 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef _BEV_IMG_MOSAIC_MODULE
+#define _BEV_IMG_MOSAIC_MODULE
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
+#include "bev_common.h"
 
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
+typedef struct {
+    vx_node  node;
+    vx_kernel kernel;
 
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
+    vx_user_data_object config;
+    tivxImgMosaicParams params;
+
+    vx_object_array input_arr[TIVX_IMG_MOSAIC_MAX_INPUTS];
+
+    vx_image output_image[APP_MAX_BUFQ_DEPTH];
+
+    vx_int32 graph_parameter_index;
+
+    vx_int32 out_width;
+    vx_int32 out_height;
+    vx_int32 num_inputs;
+
+} ImgMosaicObj;
+
+vx_status app_init_img_mosaic(vx_context context, ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth);
+void app_deinit_img_mosaic(ImgMosaicObj *imgMosaicObj, vx_int32 bufq_depth);
+void app_delete_img_mosaic(ImgMosaicObj *imgMosaicObj);
+void app_create_graph_img_mosaic(vx_graph graph, ImgMosaicObj *imgMosaicObj, vx_image background);
+
+vx_status writeMosaicOutput(char* file_name, vx_image out_img);
+vx_status clearImage(vx_image out_img);
 #endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
-{
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}
-
-void tivxUnRegisterImgProcTargetA72Kernels(void)
-{
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
-}

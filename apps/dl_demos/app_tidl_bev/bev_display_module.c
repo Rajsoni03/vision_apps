@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2020 Texas Instruments Incorporated
+ * Copyright (c) 2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -59,37 +59,68 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include "bev_display_module.h"
 
-#include <TI/tivx.h>
-#include <TI/tivx_target_kernel.h>
-#include "tivx_img_proc_kernels_priv.h"
-#include "tivx_kernels_target_utils.h"
-
-void tivxAddTargetKernelImgHist(void);
-void tivxRemoveTargetKernelImgHist(void);
-
-#if defined(SOC_J784S4) 
-void tivxAddTargetKernelDrawBevBoxDetections(void);
-void tivxAddTargetKernelDrawBevCamBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevBoxDetections(void);
-void tivxRemoveTargetKernelDrawBevCamBoxDetections(void);
-void tivxAddTargetKernelDLPreProc4DArmv8(void);
-void tivxRemoveTargetKernelDLPreProc4DArmv8(void);
-#endif
-static Tivx_Target_Kernel_List  gTivx_target_kernel_list[] = {
-    {&tivxAddTargetKernelImgHist, &tivxRemoveTargetKernelImgHist},
-#if defined(SOC_J784S4)
-    {&tivxAddTargetKernelDLPreProc4DArmv8, &tivxRemoveTargetKernelDLPreProc4DArmv8},
-    {&tivxAddTargetKernelDrawBevBoxDetections, &tivxRemoveTargetKernelDrawBevBoxDetections},
-    {&tivxAddTargetKernelDrawBevCamBoxDetections, &tivxRemoveTargetKernelDrawBevCamBoxDetections}
-#endif
-};
-void tivxRegisterImgProcTargetA72Kernels(void)
+vx_status app_init_display(vx_context context, DisplayObj *displayObj, char *objName)
 {
-    tivxRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
+    vx_status status = VX_SUCCESS;
+
+    if (displayObj->display_option == 1)
+    {
+        if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1))
+        {
+            status = VX_SUCCESS;
+        }
+        else
+        {
+            status = VX_FAILURE;
+        }
+
+        if(VX_SUCCESS == status)
+        {
+            memset(&displayObj->disp_params, 0, sizeof(tivx_display_params_t));
+
+            displayObj->disp_params.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;//TIVX_KERNEL_DISPLAY_BUFFER_COPY_MODE;
+            displayObj->disp_params.pipeId = displayObj->display_pipe_id;
+            displayObj->disp_params.outWidth = DISPLAY_WIDTH;
+            displayObj->disp_params.outHeight = DISPLAY_HEIGHT;
+            displayObj->disp_params.posX = (1920-DISPLAY_WIDTH)/2;
+            displayObj->disp_params.posY = (1080-DISPLAY_HEIGHT)/2;
+
+            displayObj->disp_params_obj = vxCreateUserDataObject(context, "tivx_display_params_t", sizeof(tivx_display_params_t), &displayObj->disp_params);
+            status = vxGetStatus((vx_reference)displayObj->disp_params_obj);
+        }
+    }
+
+    return status;
 }
 
-void tivxUnRegisterImgProcTargetA72Kernels(void)
+void app_deinit_display(DisplayObj *displayObj)
 {
-    tivxUnRegisterTargetKernels(gTivx_target_kernel_list, dimof(gTivx_target_kernel_list));
+    if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (displayObj->display_option == 1))
+    {
+        vxReleaseUserDataObject(&displayObj->disp_params_obj);
+    }
+}
+
+void app_delete_display(DisplayObj *displayObj)
+{
+    if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (displayObj->display_option == 1))
+    {
+        vxReleaseNode(&displayObj->disp_node);
+    }
+}
+
+vx_status app_create_graph_display(vx_graph graph, DisplayObj *displayObj, vx_image disp_image)
+{
+    vx_status status = VX_SUCCESS;
+
+    if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY1)) && (displayObj->display_option == 1))
+    {
+        displayObj->disp_node = tivxDisplayNode(graph, displayObj->disp_params_obj, disp_image);
+        vxSetNodeTarget(displayObj->disp_node, VX_TARGET_STRING, TIVX_TARGET_DISPLAY1);
+        vxSetReferenceName((vx_reference)displayObj->disp_node, "DisplayNode");
+        status = vxGetStatus((vx_reference)displayObj->disp_node);
+    }
+    return status;
 }
