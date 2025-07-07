@@ -68,7 +68,7 @@ endif
 endif
 
 
-ifeq ($(SOC),$(filter $(SOC), j721s2 j721e j742s4 j7200))
+ifneq ($(SOC),$(filter $(SOC), j722s j784s4))
 SKIPBUILD=1
 endif
 
