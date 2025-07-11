@@ -224,7 +224,10 @@ int main(void)
     Board_init(); 
 #endif
 
+/* LPM for VPAC will be enabled once support is provided */ 
+#if 0
     Sciclient_initLPMSusResHook(appSuspend, appResume);
+#endif
 
 #if !defined (THREADX)
     /* Initialize the task params */
