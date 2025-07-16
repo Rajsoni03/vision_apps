@@ -330,7 +330,7 @@ void *appEglWindowOpen()
         goto goto_error;
     }
 
-    obj->surface = eglCreateWindowSurface(obj->display, obj->config, obj->screen_win, NULL);
+    obj->surface = eglCreateWindowSurface(obj->display, obj->config, (EGLNativeWindowType)obj->screen_win, NULL);
     appEglCheckEglError("eglCreateWindowSurface", EGL_TRUE);
 
     ret = eglMakeCurrent(obj->display, obj->surface,
@@ -527,7 +527,7 @@ static EGLImageKHR appEglWindowCreateIMG(app_egl_obj_t *obj,
                                 disp,
                                 EGL_NO_CONTEXT,
                                 EGL_NATIVE_PIXMAP_KHR,
-                                (EGLNativePixmapType)(screen_pix),
+                                (EGLClientBuffer)(screen_pix),
                                 NULL
                               );
     appEglCheckEglError("eglCreateImageKHR", EGL_TRUE);
