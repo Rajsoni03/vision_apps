@@ -113,6 +113,7 @@
 typedef struct {
 
     vx_object_array arr[APP_MODULES_MAX_BUFQ_DEPTH];
+    vx_image        img[APP_MODULES_MAX_BUFQ_DEPTH];
 
     void           *data_ptr[APP_MODULES_MAX_BUFQ_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
     vx_map_id       map_id[APP_MODULES_MAX_BUFQ_DEPTH][CODEC_MAX_NUM_CHANNELS][CODEC_MAX_NUM_PLANES];
@@ -956,6 +957,7 @@ static vx_status app_init(AppObj *obj)
             for(q = 0; q < obj->enc_pool.bufq_depth; q++)
             {
                 obj->enc_pool.arr[q] = vxCreateObjectArray(obj->context, (vx_reference)intermediate_img, obj->num_ch);
+                obj->enc_pool.img[q] = (vx_image)vxGetObjectArrayItem(obj->enc_pool.arr[q], 0);
                 status = vxGetStatus((vx_reference)obj->enc_pool.arr[q]);
                 if(status != VX_SUCCESS)
                 {
@@ -1068,6 +1070,7 @@ static void app_deinit(AppObj *obj)
         for(vx_int32 i = 0; i < obj->enc_pool.bufq_depth; i++)
         {
             vxReleaseObjectArray(&obj->enc_pool.arr[i]);
+            vxReleaseImage(&obj->enc_pool.img[i]);
         }
     }
 
@@ -1274,7 +1277,7 @@ static vx_status app_create_graph(AppObj *obj)
                 obj->enc_pool.graph_parameter_index = capt_graph_parameter_index;
                 capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
                 capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = obj->enc_pool.bufq_depth;
-                capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->enc_pool.arr[0];
+                capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->enc_pool.img[0];
                 capt_graph_parameter_index++;
             }
             else
@@ -1284,7 +1287,7 @@ static vx_status app_create_graph(AppObj *obj)
                 obj->enc_pool.graph_parameter_index = capt_graph_parameter_index;
                 capt_graph_parameters_queue_params_list[capt_graph_parameter_index].graph_parameter_index = capt_graph_parameter_index;
                 capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list_size = obj->enc_pool.bufq_depth;
-                capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->enc_pool.arr[0];
+                capt_graph_parameters_queue_params_list[capt_graph_parameter_index].refs_list = (vx_reference*)&obj->enc_pool.img[0];
                 capt_graph_parameter_index++;
             }
 
@@ -1554,7 +1557,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
     AppGraphParamRefPool *enc_pool = &obj->enc_pool;
 
     vx_object_array capture_input_arr;
-    vx_object_array ldc_output_arr;
+    vx_reference ldc_output_arr;
     uint32_t num_refs;
 
     if ( frame_id >= APP_ENC_BUFFER_Q_DEPTH )
@@ -1598,7 +1601,7 @@ static vx_status capture_encode(AppObj* obj, vx_int32 frame_id)
     }
     if (status == VX_SUCCESS)
     {
-        status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, enc_pool->graph_parameter_index, (vx_reference*)&enc_pool->arr[obj->ldc_enq_id], 1);
+        status = vxGraphParameterEnqueueReadyRef(obj->capture_graph, enc_pool->graph_parameter_index, (vx_reference*)&enc_pool->img[obj->ldc_enq_id], 1);
     }
     obj->ldc_enq_id++;
     obj->ldc_enq_id         = (obj->ldc_enq_id  >= enc_pool->bufq_depth)? 0 : obj->ldc_enq_id;
