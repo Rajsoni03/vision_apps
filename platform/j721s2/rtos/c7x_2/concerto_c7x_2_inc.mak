@@ -52,6 +52,14 @@ STATIC_LIBS += vx_target_kernels_srv_c66
 STATIC_LIBS += vx_target_kernels_img_proc_c66
 STATIC_LIBS += vx_target_kernels_stereo
 
+# [Note]: no mma in c7x_2
+# linking libraries to enable c7x_1 MMA loading on thermal_load_test
+MMA_LIBS =
+MMA_LIBS += common_C7120
+MMA_LIBS += mmalib_C7120
+MMA_LIBS += mmalib_cn_C7120
+SYS_STATIC_LIBS += $(MMA_LIBS)
+
 ADDITIONAL_STATIC_LIBS += dmautils.ae71
 ADDITIONAL_STATIC_LIBS += libtiadalg_fisheye_transformation.a
 ADDITIONAL_STATIC_LIBS += libtiadalg_image_preprocessing.a
