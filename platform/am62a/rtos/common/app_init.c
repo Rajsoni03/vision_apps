@@ -277,14 +277,16 @@ int32_t appInit()
     #ifdef DDR_SCRATCH_SIZE
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR_SCRATCH];
     heap_prm->base = g_ddr_scratch_mem;
-    strncpy(heap_prm->name, "DDR_SCRATCH_MEM", APP_MEM_HEAP_NAME_MAX);
+    strncpy(heap_prm->name, "DDR_SCRATCH_MEM", APP_MEM_HEAP_NAME_MAX -1U);
+    heap_prm->name[APP_MEM_HEAP_NAME_MAX-1U] = '\0';
     heap_prm->size = DDR_SCRATCH_SIZE;
     heap_prm->flags = APP_MEM_HEAP_FLAGS_TYPE_LINEAR_ALLOCATE;
     #endif
     #ifdef DDR_HEAP_NON_CACHE_MEM_SIZE
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR_NON_CACHE];
     heap_prm->base = g_ddr_non_cache_mem;
-    strncpy(heap_prm->name, "DDR_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX);
+    strncpy(heap_prm->name, "DDR_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX -1U);
+    heap_prm->name[APP_MEM_HEAP_NAME_MAX-1U] = '\0';
     heap_prm->size = DDR_HEAP_NON_CACHE_MEM_SIZE;
     heap_prm->flags = APP_MEM_HEAP_FLAGS_TYPE_LINEAR_ALLOCATE;
     #endif
@@ -292,7 +294,8 @@ int32_t appInit()
     #ifdef DDR_SCRATCH_NON_CACHE_SIZE
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR_NON_CACHE_SCRATCH];
     heap_prm->base = g_ddr_scratch_non_cache_mem;
-    strncpy(heap_prm->name, "DDR_SCRATCH_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX);
+    strncpy(heap_prm->name, "DDR_SCRATCH_NON_CACHE_MEM", APP_MEM_HEAP_NAME_MAX -1U);
+    heap_prm->name[APP_MEM_HEAP_NAME_MAX-1U] = '\0';
     heap_prm->size = DDR_SCRATCH_NON_CACHE_SIZE;
     heap_prm->flags = APP_MEM_HEAP_FLAGS_TYPE_LINEAR_ALLOCATE;
     #endif
@@ -300,7 +303,8 @@ int32_t appInit()
     #ifdef DDR_VISS_HEAP_MEM_SIZE
     heap_prm = &mem_init_prm.heap_info[APP_MEM_HEAP_DDR_WT_CACHE];
     heap_prm->base = g_ddr_cache_wt_mem;
-    strncpy(heap_prm->name, "DDR_CACHE_WT_MEM", APP_MEM_HEAP_NAME_MAX);
+    strncpy(heap_prm->name, "DDR_CACHE_WT_MEM", APP_MEM_HEAP_NAME_MAX -1U);
+    heap_prm->name[APP_MEM_HEAP_NAME_MAX-1U] = '\0';
     heap_prm->size = DDR_VISS_HEAP_MEM_SIZE;
     heap_prm->flags = 0;
     #endif
@@ -370,8 +374,8 @@ int32_t appInit()
 
     fileio_init_prm.shared_mem = &g_app_fileio_shared_mem;
     fileio_init_prm.self_cpu_index = ipc_init_prm.self_cpu_id;
-    strncpy(fileio_init_prm.self_cpu_name, log_init_prm.self_cpu_name, APP_LOG_MAX_CPU_NAME);
-
+    strncpy(fileio_init_prm.self_cpu_name, log_init_prm.self_cpu_name, APP_LOG_MAX_CPU_NAME-1U);
+    fileio_init_prm.self_cpu_name[APP_LOG_MAX_CPU_NAME -1U] = '\0';
     appPerfStatsInitRegister(perf_fxns_list);
 
     #ifdef ENABLE_UART
