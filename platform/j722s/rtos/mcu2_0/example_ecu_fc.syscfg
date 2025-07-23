@@ -118,9 +118,9 @@ dm_power_config1.MAIN_R5FSS_1                    = 0;
 dm_power_config1.MCU_R5FSS_0                     = 0;
 dm_power_config1.MAIN_GPU_0                      = 0;
 dm_power_config1["MAIN_Video_Encoder/Decoder_0"] = 0;
-dm_power_config1.MAIN_DMPAC_0                    = 0;
 dm_power_config1.CSI_TX_MAIN_CLK                 = 0;
 dm_power_config1.CSI_TX_ESC_CLK                  = 0;
+dm_power_config1.MAIN_DMPAC_0                    = 0;
 dm_power_config1.MAIN_A53SS_0                    = 1000;
 dm_power_config1.MAIN_CSI_RX                     = ["TISCI_DEV_CSI_RX_IF0","TISCI_DEV_DPHY_RX0"];
 
