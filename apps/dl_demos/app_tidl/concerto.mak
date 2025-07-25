@@ -28,6 +28,10 @@ include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 endif
 endif
 
+ifeq ($(TARGET_OS),QNX)
+SHARED_LIBS += m
+endif
+
 ifeq ($(TARGET_OS),SYSBIOS)
 ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 A53))
 TARGETTYPE  := library
