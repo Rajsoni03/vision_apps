@@ -91,5 +91,9 @@ void add_graph_parameter_by_node_index(vx_graph graph, vx_node node, vx_uint32 n
 
 int appSingleCamUpdateVpacDcc(AppObj *obj, uint8_t* dcc_buf, uint32_t dcc_buf_size);
 
+#if defined (LDRA_COVERAGE)
+int32_t imaging_vpac_coverage_start(void);
+int32_t imaging_vpac_coverage_end(void);
+#endif
 
 #endif //_APP_SINGLE_CAM_MAIN_H_

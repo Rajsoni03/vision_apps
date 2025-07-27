@@ -81,6 +81,9 @@
 #if defined(SOC_AM62A) && defined(QNX)
 #include <screen/screen.h>
 #endif
+#if defined (LDRA_COVERAGE)
+#include <kernels/coverage_files/include/ldra_remote_core_coverage_main.h>
+#endif
 
 #define CAPTURE_BUFFER_Q_DEPTH  (4)
 #define APP_BUFFER_Q_DEPTH      (4)
@@ -173,6 +176,10 @@ static vx_int32 calc_grid_size(vx_uint32 ch);
 static void set_img_mosaic_params(ImgMosaicObj *imgMosaicObj, vx_uint32 in_width, vx_uint32 in_height, vx_int32 numCh, ObjArrSplitObj *objArrSplitObj, int32_t enable_split_graph);
 #if !(defined(SOC_AM62A) && defined(QNX))
 static void app_draw_graphics(Draw2D_Handle *handle, Draw2D_BufInfo *draw2dBufInfo, uint32_t update_type);
+#endif
+#if defined (LDRA_COVERAGE)
+int32_t imaging_vpac_coverage_start(void);
+int32_t imaging_vpac_coverage_end(void);
 #endif
 
 #if defined(SOC_AM62A) && defined(QNX)
@@ -892,6 +899,9 @@ static void app_parse_cmd_line_args(AppObj *obj, vx_int32 argc, vx_char *argv[])
 vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
 {
     vx_status status = VX_SUCCESS;
+#if defined (LDRA_COVERAGE)
+    imaging_vpac_coverage_start();
+#endif
 
     AppObj *obj = &gAppObj;
 
@@ -984,6 +994,9 @@ vx_int32 app_multi_cam_main(vx_int32 argc, vx_char* argv[])
             printf("\n\nTEST PASSED\n\n");
         }
     }
+#if defined (LDRA_COVERAGE)
+    imaging_vpac_coverage_end();
+#endif
     return status;
 }
 

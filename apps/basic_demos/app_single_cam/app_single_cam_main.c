@@ -66,6 +66,9 @@
 #include <TI/hwa_vpac_msc.h>
 #include <TI/video_io_kernels.h>
 #include <TI/video_io_capture.h>
+#if defined (LDRA_COVERAGE)
+#include <kernels/coverage_files/include/ldra_remote_core_coverage_main.h>
+#endif
 
 #if defined(A72) || defined(A53)
 #if defined(LINUX)
@@ -2030,6 +2033,9 @@ int app_single_cam_main(int argc, char* argv[])
 {
     AppObj *obj = &gAppObj;
     vx_status status = VX_FAILURE;
+#if defined (LDRA_COVERAGE)
+    imaging_vpac_coverage_start();
+#endif
     status = app_parse_cmd_line_args(obj, argc, argv);
     if(VX_SUCCESS == status)
     {
@@ -2106,6 +2112,9 @@ int app_single_cam_main(int argc, char* argv[])
             printf("\n\nTEST PASSED\n\n");
         }
     }
+#if defined (LDRA_COVERAGE)
+    imaging_vpac_coverage_end();
+#endif
     return status;
 }
 

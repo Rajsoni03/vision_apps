@@ -12,6 +12,10 @@ endif
 
 BUILD_DEFS += $(SOC_DEF)
 
+ifeq ($(LDRA_COVERAGE_ENABLED_IMAGING), yes)
+BUILD_DEFS += LDRA_COVERAGE
+endif
+
 DIRECTORIES :=
 ifeq ($(SOC),am62a)
 DIRECTORIES += utils/app_init

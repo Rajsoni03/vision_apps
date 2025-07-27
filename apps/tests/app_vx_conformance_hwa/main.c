@@ -109,12 +109,27 @@ void TestModuleUnRegister();
 int vision_apps_test_main(int argc, char* argv[]);
 int CT_main(int argc, char* argv[], const char* version_str, CT_RegisterTestCaseFN register_fns[]);;
 
+#if defined (LDRA_COVERAGE)
+int32_t imaging_vpac_coverage_start(void);
+int32_t imaging_dmpac_coverage_start(void);
+int32_t imaging_vpac_coverage_end(void);
+int32_t imaging_dmpac_coverage_end(void);
+#endif
+
 int main(int argc, char* argv[])
 {
     int status;
     appInit();
     TestModuleRegister();
+#if defined (LDRA_COVERAGE)
+    imaging_vpac_coverage_start();
+    imaging_dmpac_coverage_start();
+#endif
     status = vision_apps_test_main(argc, argv);
+#if defined (LDRA_COVERAGE)
+    imaging_vpac_coverage_end();
+    imaging_dmpac_coverage_end();
+#endif
     TestModuleUnRegister();
     appDeInit();
     return status;
