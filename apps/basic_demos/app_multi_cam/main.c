@@ -64,7 +64,11 @@
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/console_io/include/app_get.h>
 #include <utils/grpx/include/app_grpx.h>
+#if defined (SOC_J721S2) || defined (SOC_J784S4) || defined (SOC_J742S2)
+#include <utils/hwa/include/app_hwa_linux.h>
+#else
 #include <utils/hwa/include/app_hwa_api.h>
+#endif
 #include <VX/vx_khr_pipelining.h>
 #include <TI/video_io_kernels.h>
 
