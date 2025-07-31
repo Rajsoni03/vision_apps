@@ -186,6 +186,9 @@ VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 
 TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_tests_testmodule
+ifeq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
+TEST_LIBS += vx_target_kernels_vpac_aewb
+endif
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_tiovx_tidl_tests
 ifeq ($(SOC),$(filter $(SOC), j721e j721s2 j784s4 j742s2))
