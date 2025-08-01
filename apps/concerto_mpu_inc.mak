@@ -162,10 +162,14 @@ IMAGING_LIBS += vx_kernels_imaging
 endif
 
 ifeq ($(TARGET_OS), LINUX)
+ifneq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
 IMAGING_LIBS += ti_2a_wrapper
+endif
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
+ifneq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
 IMAGING_LIBS += ti_imaging_dcc
+endif
 IMAGING_LIBS += ti_imaging_ittsrvr
 IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_itt_server
