@@ -246,7 +246,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         /* ulRegionNumber */
         .ulRegionNumber         = 9U,
         /* Starting address */
-        .ulRegionBeginAddress   = DDR_MCU2_0_VISS_CONFIG_HEAP_ADDR,
+        .ulRegionBeginAddress   = DDR_MCU4_0_VISS_CONFIG_HEAP_ADDR,
         /* Access permission */
         {
             .ulexeNeverControl  = 1U,
