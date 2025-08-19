@@ -81,10 +81,10 @@ typedef struct {
    /* input is 1280x720 NV12 */
    ImgObj input;
 
-   /* output[0] TIDL input is 768x384 for input stream Mosaic */
+   /* output[0] TIDL input is 768x432 for input stream Mosaic */
    /* output[1] TIDL input is 416x416 for OD network */
    /* output[2] TIDL input is 512x512 for Seg network */
-   /* output[3] TIDL input is 768x384 for output stream network */
+   /* output[3] TIDL input is 768x432 for input for post proc node */
    ImgObj output[4];
 
    vx_user_data_object coeff_obj;

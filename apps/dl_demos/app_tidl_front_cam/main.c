@@ -86,7 +86,7 @@
 #include "omx_encode_module.h"
 #endif
 
-#define APP_BUFFER_Q_DEPTH      (4u)
+#define APP_BUFFER_Q_DEPTH      (5u)
 #define APP_PIPELINE_DEPTH      (10u)
 #define APP_ENC_BUFFER_Q_DEPTH  (6u)
 
@@ -316,6 +316,14 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                     appPerfPointPrintFPS(&obj->total_perf);
                     appPerfPointReset(&obj->total_perf);
                     printf("\n");
+                    vx_reference refs[1];
+                    refs[0] = (vx_reference)obj->captureObj.raw_image_arr[0];
+                    if (status == VX_SUCCESS)
+                    {
+                        status = tivxNodeSendCommand(obj->captureObj.node, 0u,
+                                    TIVX_CAPTURE_PRINT_STATISTICS,
+                                    refs, 1u);
+                    }
                     break;
                 case 'e':
                     perf_arr[0] = &obj->total_perf;
@@ -1382,21 +1390,24 @@ static vx_status app_create_graph(AppObj *obj)
 
         if (obj->enable_scaler == 1)
         {
-            tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 1, 2);
+            tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 1, 4);
+            tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 2, 4);
+            tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 3, 4);
+            tivxSetNodeParameterNumBufByIndex(obj->scalerObj.node, 4, 4);
         }
         
         if(obj->enable_od == 1)
         {
-            tivxSetNodeParameterNumBufByIndex(obj->odPreProcObj.node, 2, 2);
+            tivxSetNodeParameterNumBufByIndex(obj->odPreProcObj.node, 2, APP_BUFFER_Q_DEPTH);
             status = tivxSetNodeParameterNumBufByIndex(obj->odTIDLObj.node, 7, APP_BUFFER_Q_DEPTH);
-            tivxSetNodeParameterNumBufByIndex(obj->odPostProcObj.node, 2, APP_BUFFER_Q_DEPTH);
+            tivxSetNodeParameterNumBufByIndex(obj->odPostProcObj.node, 2, 4);
         }
 
         if(obj->enable_sem_seg == 1)
         {
-            tivxSetNodeParameterNumBufByIndex(obj->sgPreProcObj.node, 2, 2);
+            tivxSetNodeParameterNumBufByIndex(obj->sgPreProcObj.node, 2, APP_BUFFER_Q_DEPTH);
             status = tivxSetNodeParameterNumBufByIndex(obj->sgTIDLObj.node, 7, APP_BUFFER_Q_DEPTH);
-            tivxSetNodeParameterNumBufByIndex(obj->odPostProcObj.node, 2, APP_BUFFER_Q_DEPTH);
+            tivxSetNodeParameterNumBufByIndex(obj->sgPostProcObj.node, 2, 4);
         }
         
 
@@ -1523,6 +1534,9 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
             obj->buf_index = (obj->buf_index >= obj->omx_encode_cfg.bufq_depth)? 0 : obj->buf_index;
         }
 #endif
+        // add delay to set 25 fps
+        tivxTaskWaitMsecs(25);
+
         /* Enqueue input - start execution */
         vxGraphParameterEnqueueReadyRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&mosaic_output_image, 1);
         
@@ -1728,7 +1742,7 @@ static void set_img_mosaic_defaults(AppObj *obj, ImgMosaicObj *imgMosaicObj)
     imgMosaicObj->params.num_windows  = idx;
 
     /* Number of time to clear the output buffer before it gets reused */
-    imgMosaicObj->params.clear_count  = 4;
+    imgMosaicObj->params.clear_count  = 12;
 }
 
 static void set_display_defaults(DisplayObj *displayObj)
