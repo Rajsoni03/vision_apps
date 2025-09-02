@@ -66,7 +66,8 @@ memory_regions = [
     "mpu_armv76",
     "mpu_armv77",
     "mpu_armv78",
-    "mpu_armv79"
+    "mpu_armv79",
+    "mpu_armv710"
 ]
 
 class Mcu1_0_Syscfg :
