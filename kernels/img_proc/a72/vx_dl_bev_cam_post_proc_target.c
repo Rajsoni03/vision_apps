@@ -316,40 +316,7 @@ static vx_size getTensorDataType(vx_int32 tidl_type)
  * @returns original frame with some in-place post processing done
  */
 
-/*static void overlayBoundingBox(Image                        *img,
-                               int                          *box,
-                               char                         *objectname,
-                               YUVColor                     *boxColor,
-                               YUVColor                     *textColor,
-                               YUVColor                     *textBGColor,
-                               FontProperty                 *textFont
-                               )
-{
-    // Draw bounding box for the detected object
-    drawRect(img,
-             box[0],
-             box[1],
-             box[2] - box[0],
-             box[3] - box[1],
-             boxColor,
-             2);
 
-    drawRect(img,
-             (box[0] + box[2])/2 - 5,
-             (box[1] + box[3])/2 - 5,
-             strlen(objectname) * textFont->width + 10,
-             textFont->height + 10,
-             textBGColor,
-             -1);
-
-    drawText(img,
-             objectname,
-             (box[0] + box[2])/2,
-             (box[1] + box[3])/2,
-             textFont,
-             textColor);
-}
-*/
 static void blendSegMask(vx_uint8 *frame_uv_ptr,
                          void *classes,
                          int32_t inDataWidth,
@@ -439,29 +406,7 @@ static void blendSegMask(vx_uint8 *frame_uv_ptr,
         }
     }
 }
-/*
-static vx_float32 getVal(vx_uint32 firstDims[], vx_uint32 num_input_tensors, vx_float32 *output_buffer[], vx_int32 iter, vx_int32 pos)
-{
-    vx_int32 cumuDims = 0;
 
-    for (vx_uint32 i=0; i < num_input_tensors; i++)
-    {
-        cumuDims += firstDims[i];
-
-        //VX_PRINT(VX_ZONE_ERROR, " iter = %d, firstDims[%d] = %d, pos = %d, cumuDims = %d \n", iter, i, firstDims[i], pos, cumuDims);
-        vx_int32 offset = iter * firstDims[i] + pos - cumuDims + firstDims[i];
-
-        //VX_PRINT(VX_ZONE_ERROR, " i = %d, offset = %d \n", i, offset);
-
-        if(pos < cumuDims)
-        {
-            return output_buffer[i][offset];
-        }
-    }
-
-    return 0;
-}
-*/
 static vx_status VX_CALLBACK tivxKernelDrawBevCamBoxDetectionsProcess(
     tivx_target_kernel_instance kernel,
     tivx_obj_desc_t *obj_desc[],
@@ -900,28 +845,6 @@ static vx_status VX_CALLBACK tivxKernelDrawBevCamBoxDetectionsProcess(
                 uint32_t nDims = in_tensor_desc[i]->number_of_dimensions;
                 VX_PRINT(VX_ZONE_ERROR, "nDims = %d \n", nDims);
 #endif
-                /*for (j = 0; j < in_tensor_desc[i]->number_of_dimensions; j++)
-                {
-#ifdef BEV_DEBUG_LOGS
-                    VX_PRINT(VX_ZONE_ERROR, "in_tensor_desc[%d]->dimensions[%d] = %d \n",i,j, in_tensor_desc[i]->dimensions[j]);
-#endif
-                    if(in_tensor_desc[i]->dimensions[j] == 1)
-                    {
-                        nDims--;
-                    }
-                }
-
-                if(nDims == 1)
-                {
-                    firstDims[i] = 1;
-                }
-                else
-                {
-                    firstDims[i] = in_tensor_desc[i]->dimensions[0];
-                }
-#ifdef BEV_DEBUG_LOGS
-                VX_PRINT(VX_ZONE_ERROR, "firstDims[%d] = %d \n", i, firstDims[i]);
-#endif*/
             }
 #ifdef BEV_DEBUG_LOGS
             VX_PRINT(VX_ZONE_ERROR, "BEV Additions \n");
@@ -935,9 +858,6 @@ static vx_status VX_CALLBACK tivxKernelDrawBevCamBoxDetectionsProcess(
 #endif
             Box3D box;
 
-            /*int32_t numEntries = (in_tensor_desc[prms->num_input_tensors-1]->dimensions[0] *
-                                    in_tensor_desc[prms->num_input_tensors-1]->dimensions[1] *
-                                    in_tensor_desc[prms->num_input_tensors-1]->dimensions[2]) / firstDims[prms->num_input_tensors-1];*/
 #ifdef BEV_DEBUG_LOGS
             VX_PRINT(VX_ZONE_ERROR, "numEntries = %d \n", numEntries);
             VX_PRINT(VX_ZONE_ERROR, "num of detected Objs = %d \n", numObjs);

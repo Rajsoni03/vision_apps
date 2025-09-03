@@ -74,16 +74,16 @@
 
 static vx_kernel vx_DLPreProcArmv8_kernel = NULL;
 
-static vx_status VX_CALLBACK tivxAddKernelDLPreProcArmv8Validate(vx_node node,
+static vx_status VX_CALLBACK tivxAddKernelDLPreProc4DArmv8Validate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[]);
 
-static vx_status VX_CALLBACK tivxAddKernelDLPreProcArmv8Initialize(vx_node node,
+static vx_status VX_CALLBACK tivxAddKernelDLPreProc4DArmv8Initialize(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num_params);
 
-static vx_status VX_CALLBACK tivxAddKernelDLPreProcArmv8Validate(vx_node node,
+static vx_status VX_CALLBACK tivxAddKernelDLPreProc4DArmv8Validate(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num,
             vx_meta_format metas[])
@@ -166,7 +166,7 @@ static vx_status VX_CALLBACK tivxAddKernelDLPreProcArmv8Validate(vx_node node,
     return status;
 }
 
-static vx_status VX_CALLBACK tivxAddKernelDLPreProcArmv8Initialize(vx_node node,
+static vx_status VX_CALLBACK tivxAddKernelDLPreProc4DArmv8Initialize(vx_node node,
             const vx_reference parameters[ ],
             vx_uint32 num_params)
 {
@@ -190,7 +190,6 @@ vx_status tivxAddKernelDLPreProc4DArmv8(vx_context context)
     vx_status status;
     uint32_t index;
     vx_enum kernel_id;
-    //vx_char name[256] = TIVX_KERNEL_DL_PRE_PROC_ARMV8_NAME ;
     /*BEV 4D Change*/
     vx_char name[256] = TIVX_KERNEL_DL_PRE_PROC_ARMV8_4D_NAME;
     status = vxAllocateUserKernelId(context, &kernel_id);
@@ -207,8 +206,8 @@ vx_status tivxAddKernelDLPreProc4DArmv8(vx_context context)
                     kernel_id,
                     NULL,
                     TIVX_KERNEL_DL_PRE_PROC_ARMV8_MAX_PARAMS,
-                    tivxAddKernelDLPreProcArmv8Validate,
-                    tivxAddKernelDLPreProcArmv8Initialize,
+                    tivxAddKernelDLPreProc4DArmv8Validate,
+                    tivxAddKernelDLPreProc4DArmv8Initialize,
                     NULL);
 
         status = vxGetStatus((vx_reference)kernel);
@@ -236,9 +235,9 @@ vx_status tivxAddKernelDLPreProc4DArmv8(vx_context context)
             );
             index++;
         }
-        /*#######################################################################
-        -------------------------------Modifications to take 6 BEV Image iNPuts into kernel---------------------------
-         ###########################################################*/
+        /*###########################################################################################################
+        -------------------------------Modifications to take 6 BEV Image inputs into kernel---------------------------
+         ############################################################################################################*/
          if (status == VX_SUCCESS)
         {
             status = vxAddParameterToKernel(kernel,
@@ -289,7 +288,6 @@ vx_status tivxAddKernelDLPreProc4DArmv8(vx_context context)
             );
             index++;
         }
-        /*###########################################################################*/
         if (status == VX_SUCCESS)
         {
             status = vxAddParameterToKernel(kernel,

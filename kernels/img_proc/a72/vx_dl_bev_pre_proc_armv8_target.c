@@ -179,23 +179,23 @@ typedef struct
     */
 
 
-}dlPreProcessImageParams;
+}dl4DPreProcessImageParams;
 
-void dlPreProcess_RGB_image
+void dlPreProcess_4D_RGB_image
 (
-    dlPreProcessImageParams *prms
+    dl4DPreProcessImageParams *prms
 );
 
-void dlPreProcess_NV12_image
+void dlPreProcess_4D_NV12_image
 (
-    dlPreProcessImageParams *prms
+    dl4DPreProcessImageParams *prms
 );
 
 
 
 static tivx_target_kernel vx_dl_pre_proc_armv8_target_kernel[DL_PRE_PROC_MAX_KERNELS] = {NULL};
 
-static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Create
+static vx_status VX_CALLBACK tivxKernelDLPreProc4DArmv8Create
 (
     tivx_target_kernel_instance kernel,
     tivx_obj_desc_t *obj_desc[],
@@ -230,7 +230,7 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Create
     return (status);
 }
 
-static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Delete(
+static vx_status VX_CALLBACK tivxKernelDLPreProc4DArmv8Delete(
     tivx_target_kernel_instance kernel, tivx_obj_desc_t *obj_desc[],
     vx_uint16 num_params, void *priv_arg)
 {
@@ -263,7 +263,7 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Delete(
     return (status);
 }
 
-static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Process
+static vx_status VX_CALLBACK tivxKernelDLPreProc4DArmv8Process
 (
     tivx_target_kernel_instance kernel,
     tivx_obj_desc_t *obj_desc[],
@@ -521,7 +521,7 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Process
         
 
         tivxDLPreProcArmv8Params4D *dlParams = (tivxDLPreProcArmv8Params4D *)config_target_ptr;
-        dlPreProcessImageParams params;
+        dl4DPreProcessImageParams params;
 
         params.channel_order            = dlParams->channel_order;
         params.tensor_format            = dlParams->tensor_format;
@@ -574,7 +574,7 @@ static vx_status VX_CALLBACK tivxKernelDLPreProcArmv8Process
         {
 
             VX_PRINT(VX_ZONE_INFO, "Entering NV12 PRE PROC\n");
-            dlPreProcess_NV12_image(&params);
+            dlPreProcess_4D_NV12_image(&params);
             
         }
 
@@ -642,9 +642,9 @@ void tivxAddTargetKernelDLPreProc4DArmv8()
                                                     (
                                                         TIVX_KERNEL_DL_PRE_PROC_ARMV8_4D_NAME,
                                                         target_name[i],
-                                                        tivxKernelDLPreProcArmv8Process,
-                                                        tivxKernelDLPreProcArmv8Create,
-                                                        tivxKernelDLPreProcArmv8Delete,
+                                                        tivxKernelDLPreProc4DArmv8Process,
+                                                        tivxKernelDLPreProc4DArmv8Create,
+                                                        tivxKernelDLPreProc4DArmv8Delete,
                                                         NULL,
                                                         NULL
                                                     );
@@ -666,9 +666,9 @@ void tivxRemoveTargetKernelDLPreProc4DArmv8()
         }
     }
 }
-void dlPreProcess_NV12_image
+void dlPreProcess_4D_NV12_image
 (
-    dlPreProcessImageParams *prms
+    dl4DPreProcessImageParams *prms
 )
 {
     
