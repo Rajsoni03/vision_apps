@@ -125,8 +125,6 @@ typedef struct {
     vx_image   background;
     vx_int32 en_out_img_write;
 
-    vx_float32 viz_th_pd;
-    vx_float32 viz_th_vd;
     vx_float32 viz_th_BEV;
 
     vx_int32 num_classes[TIVX_PIXEL_VIZ_MAX_CLASS];
@@ -551,16 +549,6 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 if(token != NULL)
                 {
                     obj->viz_th_BEV = atof(token);
-
-                    token = strtok(NULL, s);
-                    if(token != NULL)
-                    {
-                        if(token[strlen(token)-1] == '\n')
-                        {
-                            token[strlen(token)-1]=0;
-                        }
-                        obj->viz_th_vd = atof(token);
-                    }
                 }
             }
             else
