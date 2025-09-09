@@ -1752,7 +1752,7 @@ static void set_display_defaults(DisplayObj *displayObj)
 
 static void app_pipeline_params_defaults(AppObj *obj)
 {
-    obj->pipeline       = -APP_BUFFER_Q_DEPTH;
+    obj->pipeline       = -APP_BUFFER_Q_DEPTH + 1;
     obj->enqueueCnt     = 0;
     obj->dequeueCnt     = 0;
 }
