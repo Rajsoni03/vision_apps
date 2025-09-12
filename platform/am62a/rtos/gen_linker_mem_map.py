@@ -506,7 +506,7 @@ c7x_1_syscfg.addMemSection(c7x_1_ddr_scratch_non_cacheable);
 c7x_1_syscfg.checkOverlap();
 
 #Create Memory Sections required for example.syscfg under mcu1_0
-mcu1_0_syscfg = MemoryMap("Memory Map for example.syscfg under c7x_1");
+mcu1_0_syscfg = MemoryMap("Memory Map for example.syscfg under mcu1_0");
 mcu1_0_syscfg.addMemSection(dm_r5f_ddr_ipc);
 mcu1_0_syscfg.addMemSection(ipc_vring_mem);
 mcu1_0_syscfg.addMemSection(app_log_mem);

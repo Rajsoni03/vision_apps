@@ -62,23 +62,6 @@
 import os, sys, re
 from ti_psdk_rtos_tools import *
 
-memory_regions = [
-    "mmu_armv88",
-    "mmu_armv89",
-    "mmu_armv818",
-    "mmu_armv810",
-    "mmu_armv817",
-    "mmu_armv814",
-    "mmu_armv816",
-    "mmu_armv815",
-    "mmu_armv819",
-    "mmu_armv811",
-    "mmu_armv820",
-    "mmu_armv821",
-    "mmu_armv812",
-    "mmu_armv813"
-]
-
 class C7x_1_Syscfg :
     def __init__(self, memoryMap):
         self.memoryMap = memoryMap;
@@ -95,7 +78,10 @@ class C7x_1_Syscfg :
         with open("./c7x_1/example.syscfg", "r") as file:
             data = file.read()
 
-        for (key,memSection), regions in zip(sorted(self.memoryMap.memoryMap.items(), key=CHeaderFile.sortKey), memory_regions):
+        for key, memSection in sorted(self.memoryMap.memoryMap.items()):
+            name_pattern = rf'(mmu_armv\d+)\.\$name\s*=\s*"{key}";'
+            match = re.search(name_pattern, data)
+            regions = match.group(1)
             string1 = f'{regions}.vAddr     = 0x{memSection.origin:08X};'
             vaddr_pattern = rf'{regions}.vAddr\s*=\s*0x[0-9A-Fa-f]+;'
             data = re.sub(vaddr_pattern, string1, data)

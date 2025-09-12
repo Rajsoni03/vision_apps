@@ -62,14 +62,6 @@
 import os, sys, re
 from ti_psdk_rtos_tools import *
 
-memory_regions = [
-    "mpu_armv76",
-    "mpu_armv77",
-    "mpu_armv78",
-    "mpu_armv79",
-    "mpu_armv710"
-]
-
 class Mcu1_0_Syscfg :
     def __init__(self, memoryMap):
         self.memoryMap = memoryMap;
@@ -86,7 +78,10 @@ class Mcu1_0_Syscfg :
         with open("./mcu1_0/example.syscfg", "r") as file:
             data = file.read()
 
-        for (key,memSection), regions in zip(sorted(self.memoryMap.memoryMap.items(), key=CHeaderFile.sortKey), memory_regions):
+        for key, memSection in sorted(self.memoryMap.memoryMap.items()):
+            name_pattern = rf'(mpu_armv\d+)\.\$name\s*=\s*"{key}";'
+            match = re.search(name_pattern, data)
+            regions = match.group(1)
             string1 = f'{regions}.baseAddr     = 0x{memSection.origin:08X};'
             baseAddr_pattern = rf'{regions}.baseAddr\s*=\s*0x[0-9A-Fa-f]+;'
             data = re.sub(baseAddr_pattern, string1, data)
