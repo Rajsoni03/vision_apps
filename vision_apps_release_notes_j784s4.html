@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 11.00.00</h2>
+<h2 align='center'>Version: 11.01.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -140,21 +140,24 @@ New features in this release are highlighted in <strong>bold</strong>
 
 <li>Deep Learning demos
     <ul>
-    <li>Image Classification demo</li>
+    <li>Image Classification demo
         <ul>
         <li>File based</li>
         <li>Camera based</li>
         </ul>
-    <li>Standalone Semantic Segmentation application</li>
+    </li>
+    <li>Standalone Semantic Segmentation application
         <ul>
         <li>File based</li>
         <li>Camera based</li>
         </ul>
-    <li>Standalone Object Detection application</li>
+    </li>
+    <li>Standalone Object Detection application
         <ul>
         <li>File based</li>
         <li>Camera based</li>
         </ul>
+    </li>
     <li>Auto valet parking (AVP) demo
         <ul>
         <li>semantic segmentation, Parking spot detect and Vehicle detect algorithms</li>
@@ -162,6 +165,16 @@ New features in this release are highlighted in <strong>bold</strong>
         <li>3 channel, 3 algo mode (combined network for parking spot and vehicle detect)</li>
         <li>3 channel, 5 algo mode - combined network for parking spot and vehicle detect + Three task network for Semantic Segmentation, Motion Segmentation and Depth Estimation (AVP3 demo)</li>
         </ul>
+    </li>
+    <li><b>Bird's Eye View (BEV) demo</b>
+      <ul>
+      <li>File based fastBEV demo</li>
+      </ul>
+    </li>
+    <li><b>Front camera demo</b>
+      <ul>
+      <li>Camera based</li>
+      </ul>
     </li>
     <li>DKAZE-based Visual Localization application</li>
     <li>Debug support for the ability to debug intermediate layer information from TIDL node</li>
@@ -249,36 +262,20 @@ The tools used to validate this package are listed in top level user guide <a hr
 </thead>
 <tbody>
 <tr class="even">
-<td align="center">ADASVISION-6597</a></td>
-<td align="left"><span>Inconsistent rf5 crash during reboot</span></td>
+<td align="center">ADASVISION-6386</a></td>
+<td align="left"><span>QoS Settings cause artifacts in DSS M2M output</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12590">ADASVISION-6436</a></td>
-<td align="left"><span>Extend multicam support to any channel mask instead of contiguous</span></td>
+<td align="center">ADASVISION-6679</a></td>
+<td align="left"><span>[QNX] GCC version of compiler is used in concerto instead of QCC</span></td>
 </tr>
 <tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10992">ADASVISION-5669</a></td>
-<td align="left"><span>SCIserver should use UART logs instead of appLogPrintf</span></td>
+<td align="center">ADASVISION-6738</a></td>
+<td align="left"><span>[QNX] vx_app_tidl app build broken for debug mode</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10790">ADASVISION-5393</a></td>
-<td align="left"><span>AVP4 freezes in first second of running</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10716">ADASVISION-5100</a></td>
-<td align="left"><span>Peak DDR BW numbers seem too high for some demos</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12589">ADASVISION-5034</a></td>
-<td align="left"><span>[Doc]: Details about 8-channels/camera usecase</span></td>
-</tr>
-<tr class="even">
-<td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4920">ADASVISION-6283</a></td>
-<td align="left"><span>[J784s4] CoreId needs to set for all TIDL based vision_apps demos</span></td>
-</tr>
-<tr class="odd">
-<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12591">ADASVISION-6512</a></td>
-<td align="left"><span>Incorrect type of dmaBufFD in appMemCloseDmaBufFd()</span></td>
+<td align="center">ADASVISION-6647</a></td>
+<td align="left"><span>MMALIB profile is hardcoded to "release" in linker paths</span></td>
 </tr>
 </tbody>
 </table>
@@ -295,7 +292,7 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-  <tr class="even">
+<tr class="even">
 <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-10505">ADASVISION-4923</a></td>
 <td align="left"><span>Single cam error on ports other than port 1 after running multi cam</span></td>
 </tr>
@@ -308,8 +305,8 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>Race Conditions in c7x-mma-tidl and tiadalg builds</span></td>
 </tr>
 <tr class="odd">
-<td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4720">ADASVISION-6386</a></td>
-<td align="left"><span>QoS Settings cause artifacts in DSS M2M output</span></td>
+<td align="center">ADASVISION-6531</td>
+<td align="left"><span>4k Display Flickers high C7x load</span></td>
 </tr>
 <tr class="even">
 <td align="center"><a href="https://jira.itg.ti.com/browse/EXTSYNC-4919">ADASVISION-6387</a></td>
@@ -324,7 +321,7 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>SFM demo failing on J784S4 and J742S2</span></td>
 </tr>
 <tr class="odd">
-<td align="center">ADASVISION-6453</td>
+<td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12925"></a>ADASVISION-6453</td>
 <td align="left"><span>SRV + AVP demo not working</span></td>
 </tr>
 <tr class="even">
@@ -338,6 +335,10 @@ The tools used to validate this package are listed in top level user guide <a hr
 <tr class="even">
 <td align="center">ADASVISION-6520</td>
 <td align="left"><span>Apps killed with Cntrl^C do not do proper cleanup ... can't be run again</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6564</td>
+<td align="left"><span>Vision app utils: qnx: All thread creation must use default stack instead of global stack</span></td>
 </tr>
 </tbody>
 </table>

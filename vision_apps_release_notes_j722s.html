@@ -50,7 +50,7 @@
 
 </table>
 <h1 align='center'><a name='XDC_TOP'></a>Vision Apps Release Notes</h1>
-<h2 align='center'>Version: 11.00.00</h2>
+<h2 align='center'>Version: 11.01.00</h2>
 <p>
 <p>
 <h2><a class="anchor" name="Contents"></a>Contents</h2>
@@ -133,11 +133,23 @@ New features in this release are highlighted in <strong>bold</strong>
 
 <li>Deep Learning demos
     <ul>
-    <li>Image Classification demo</li>
+    <li>Image Classification demo
         <ul>
         <li>File based</li>
         <li>Camera based</li>
         </ul>
+      </li>
+      <li>Standalone Object Detection application
+        <ul>
+        <li>File based</li>
+        <li>Camera based</li>
+        </ul>
+      </li>
+      <li><b>Front camera demo</b>
+        <ul>
+        <li>Camera based</li>
+        </ul>
+      </li>
     <li>Debug support for the ability to debug intermediate layer information from TIDL node</li>
     </ul>
 </li>
@@ -187,42 +199,26 @@ The tools used to validate this package are listed in top level user guide <a hr
 </tr>
 </thead>
 <tbody>
-  <tr class="even">
-    <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXTSYNC-4756">ADASVISION-6315</a></td>
-    <td align="left"><span>DOF: Display2 with PipeID 1 fails to create</span></td>
-  </tr>
-  <tr class="odd">
-    <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12590">ADASVISION-6436</a></td>
-    <td align="left"><span>Extend multicam support to any channel mask instead of contiguous</span></td>
-  </tr>
-  <tr class="even">
-    <td align="center">ADASVISION-6484</a></td>
-    <td align="left"><span>C7x hangs on repeated reboot</span></td>
-  </tr>
-  <tr class="odd">
-    <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12591">ADASVISION-6512</a></td>
-    <td align="left"><span>Incorrect type of dmaBufFD in appMemCloseDmaBufFd()</span></td>
-  </tr>
-  <tr class="even">
-    <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12592">ADASVISION-6607</a></td>
-    <td align="left"><span>Multicam app has non-fatal reference bookeeping error prints</span></td>
-  </tr>
-  <tr class="odd">
-    <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXT_EP-12593">ADASVISION-6606</a></td>
-    <td align="left"><span>Multicam app doesn't run multiple times from the same process</span></td>
-  </tr>
-  <tr class="even">
-    <td align="center"><a href="https://sir.ext.ti.com/jira/browse/EXTSYNC-4922">ADASVISION-6371</a></td>
-    <td align="left"><span>Enable vision app UDMA utils</span></td>
-  </tr>
-  <tr class="odd">
-    <td align="center">ADASVISION-6414</td>
-    <td align="left"><span>Update Vision Apps Users Guide</span></td>
-  </tr>
-  <tr class="even">
-    <td align="center">ADASVISION-6498</a></td>
-    <td align="left"><span>Enable DebugP_Log in vision apps</span></td>
-  </tr>
+<tr class="even">
+<td align="center">ADASVISION-6376</a></td>
+<td align="left"><span>Removal of SKIPBUILD flag from Vision_apps for modules and demos</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6679</a></td>
+<td align="left"><span>[QNX] GCC version of compiler is used in concerto instead of QCC</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6738</a></td>
+<td align="left"><span>[QNX] vx_app_tidl app build broken for debug mode</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6647</a></td>
+<td align="left"><span>MMALIB profile is hardcoded to "release" in linker paths</span></td>
+</tr>
+<tr class="even">
+<td align="center">ADASVISION-6434</a></td>
+<td align="left"><span>SDK Components for RTOS documentation is missing C7x libraries: DSPLIB, FFTLIB, MATHLIB, VXLIB, TISP</span></td>
+</tr>
 </tbody>
 </table>
 
@@ -243,12 +239,24 @@ The tools used to validate this package are listed in top level user guide <a hr
 <td align="left"><span>mailbox queue overflowing while running vx_app_arm_ipc.out</span></td>
 </tr>
 <tr class="odd">
+  <td align="center">ADASVISION-6473</td>
+  <td align="left"><span>Multi-cam codec app fails on QNX</span></td>
+  </tr>
+<tr class="even">
 <td align="center">ADASVISION-6520</a></td>
 <td align="left"><span>[J722S/J7AEN] DOF: Display2 with PipeID 1 fails to create</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6564</a></td>
+<td align="left"><span>Vision app utils: qnx: All thread creation must use default stack instead of global stack</span></td>
 </tr>
 <tr class="even">
 <td align="center">ADASVISION-6621</a></td>
 <td align="left"><span>Memory map tool does not update sysconfig files if addresses change</span></td>
+</tr>
+<tr class="odd">
+<td align="center">ADASVISION-6634</a></td>
+<td align="left"><span>make sbl_bootimage fails from top level SDK build</span></td>
 </tr>
 </tbody>
 </table>
