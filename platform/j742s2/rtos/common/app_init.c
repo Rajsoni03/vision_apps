@@ -77,6 +77,7 @@
 #include <utils/misc/include/app_misc.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/timer/include/app_timer.h>
+#include <utils/mpu/include/app_mpu.h>
 
 #if defined(ENABLE_FVID2)
 #include <utils/hwa/include/app_hwa.h>
@@ -614,6 +615,15 @@ int32_t appInit()
         status = appMemAddrTranslate(&ddr_mem_rat_prm);
         APP_ASSERT_SUCCESS(status);
     }
+    #endif
+
+    #if defined(R5F)
+    /* NOTE: This does not initialize or set anything, it is just error checking address alignments in the MPU table and forcing
+             a fatal error and error log so that the developer is forced to fix rather than a bug going unnoticed
+             This can be removed in production code once the memory map is locked
+    */
+    status = appVerifyMpuConfigAlignment();
+    APP_ASSERT_SUCCESS(status);
     #endif
 
     #ifdef ENABLE_UART

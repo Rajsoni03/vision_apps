@@ -38,6 +38,7 @@ LDIRS += $(APP_UTILS_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(T
 LDIRS += $(VIDEO_IO_PATH)/lib/$(TARGET_PLATFORM)/$(TARGET_CPU)/$(TARGET_OS)/$(TARGET_BUILD)
 
 STATIC_LIBS += vx_target_kernels_img_proc_r5f
+STATIC_LIBS += app_mpu
 
 APP_UTILS_LIBS =
 APP_UTILS_LIBS += app_utils_mem
