@@ -327,18 +327,7 @@ void appDssConfigureBoard(app_dss_default_prm_t *prm)
 #if defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_J742S2)
     if(prm->display_type == APP_DSS_DEFAULT_DISPLAY_TYPE_DSI)
     {
-        if ((prm->timings.width       == 1920U  &&
-            prm->timings.height       == 1080U   &&
-            prm->timings.hFrontPorch  == 8U    &&
-            prm->timings.hBackPorch   == 40U    &&
-            prm->timings.hSyncLen     == 32U    &&
-            prm->timings.vFrontPorch  == 17U     &&
-            prm->timings.vBackPorch   == 6U    &&
-            prm->timings.vSyncLen     == 8U) 
-        )
-        {
-            appDssDsiConfigureSN65(VX_DSI_RESO_1080P);
-        }
+        appDssDsiConfigureSN65(VX_DSI_RESO_1080P);
     }
 #endif
 
@@ -580,39 +569,46 @@ void appDssPrepareSN65I2cConfig(uint32_t resolution)
                 gI2cDsiBridgeCfg[i][1] = 0x4;
             }
         }
+        else if (gI2cDsiBridgeCfg[i][0] == 0x2C)
+        {
+            if (resolution == VX_DSI_RESO_1080P)
+            {
+                gI2cDsiBridgeCfg[i][1] = 0x3E;
+            }
+        }
         else if (gI2cDsiBridgeCfg[i][0] == 0x30)
         {
             if (resolution == VX_DSI_RESO_1080P)
             {
-                gI2cDsiBridgeCfg[i][1] = 0x08;
+                gI2cDsiBridgeCfg[i][1] = 0x37;
             }
         }
         else if (gI2cDsiBridgeCfg[i][0] == 0x34)
         {
             if (resolution == VX_DSI_RESO_1080P)
             {
-                gI2cDsiBridgeCfg[i][1] = 0x28;
+                gI2cDsiBridgeCfg[i][1] = 0x46;
             }
         }
         else if (gI2cDsiBridgeCfg[i][0] == 0x36)
         {
             if (resolution == VX_DSI_RESO_1080P)
             {
-                gI2cDsiBridgeCfg[i][1] = 0x06;
+                gI2cDsiBridgeCfg[i][1] = 0x3c;
             }
         }
         else if (gI2cDsiBridgeCfg[i][0] == 0x38)
         {
             if (resolution == VX_DSI_RESO_1080P)
             {
-                gI2cDsiBridgeCfg[i][1] = 0x08;
+                gI2cDsiBridgeCfg[i][1] = 0x3c;
             }
         }
         else if (gI2cDsiBridgeCfg[i][0] == 0x3a)
         {
             if (resolution == VX_DSI_RESO_1080P)
             {
-                gI2cDsiBridgeCfg[i][1] = 0x10;
+                gI2cDsiBridgeCfg[i][1] = 0x37;
             }
         }
     }

@@ -433,7 +433,7 @@ int32_t appDctrlDualDisplayDefaultInit(app_dss_dual_display_default_obj_t *dual_
              * With 2 lanes, the DSITX clock will be high enough for the DSI to DP bridge to break;
              */
             dsiParams.num_lanes = 4u;
-            dsiParams.lane_speed_in_kbps = 799920u;
+            dsiParams.lane_speed_in_kbps = 950400u;
             retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_DSI_PARAMS, &dsiParams, sizeof(app_dctrl_dsi_params_t), 0U);
         }
         retVal+= appRemoteServiceRun(cpuId, APP_DCTRL_REMOTE_SERVICE_NAME, APP_DCTRL_CMD_SET_VP_PARAMS, &vpParams[i], sizeof(vpParams[i]), 0U);

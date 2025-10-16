@@ -765,13 +765,13 @@ int32_t appInit()
             prm.display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_DSI;
             prm.timings.width        = 1920U;
             prm.timings.height       = 1080U;
-            prm.timings.hFrontPorch  = 8U;
-            prm.timings.hBackPorch   = 40U;
-            prm.timings.hSyncLen     = 32U;
-            prm.timings.vFrontPorch  = 17U;
-            prm.timings.vBackPorch   = 6U;
-            prm.timings.vSyncLen     = 8U;
-            prm.timings.pixelClock   = 133320000U;
+            prm.timings.hFrontPorch  = 60U;
+            prm.timings.hBackPorch   = 70U;
+            prm.timings.hSyncLen     = 62U;
+            prm.timings.vFrontPorch  = 55U;
+            prm.timings.vBackPorch   = 60U;
+            prm.timings.vSyncLen     = 55U;
+            prm.timings.pixelClock   = 158400000ULL;
         #endif
 
         status = appDssDefaultInit(&prm);
@@ -810,13 +810,13 @@ int32_t appInit()
                 prm.display[i].display_type = APP_DSS_DEFAULT_DISPLAY_TYPE_DSI;
                 prm.display[i].timings.width        = 1920U;
                 prm.display[i].timings.height       = 1080U;
-                prm.display[i].timings.hFrontPorch  = 8U;
-                prm.display[i].timings.hBackPorch   = 40U;
-                prm.display[i].timings.hSyncLen     = 32U;
-                prm.display[i].timings.vFrontPorch  = 17U;
-                prm.display[i].timings.vBackPorch   = 6U;
-                prm.display[i].timings.vSyncLen     = 8U;
-                prm.display[i].timings.pixelClock   = 133320000U;
+                prm.display[i].timings.hFrontPorch  = 60U;
+                prm.display[i].timings.hBackPorch   = 70U;
+                prm.display[i].timings.hSyncLen     = 62U;
+                prm.display[i].timings.vFrontPorch  = 55U;
+                prm.display[i].timings.vBackPorch   = 60U;
+                prm.display[i].timings.vSyncLen     = 55U;
+                prm.display[i].timings.pixelClock   = 158400000ULL;
             }
         }
 

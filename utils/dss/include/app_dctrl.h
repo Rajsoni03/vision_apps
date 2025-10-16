@@ -122,13 +122,19 @@ extern "C" {
 #define APP_DCTRL_NODE_EDP_DPI1               (0x10U)
 #define APP_DCTRL_NODE_EDP_DPI2               (0x11U)
 #define APP_DCTRL_NODE_EDP_DPI3               (0x12U)
-#define APP_DCTRL_NODE_DSI_DPI2               (0x13U)
+#define APP_DCTRL_NODE_EDP_MST                (0x13U)
+#define APP_DCTRL_NODE_DSI_DPI1               (0x14U)
+#define APP_DCTRL_NODE_DSI_DPI2               (0x15U)
+#define APP_DCTRL_NODE_DSI_DPI3               (0x16U)
+#define APP_DCTRL_NODE_DISCSYNC0              (0x17U)
+#define APP_DCTRL_NODE_DISCSYNC1              (0x18U)
+#define APP_DCTRL_NODE_WB                     (0x19U)
 /* @} */
 
 /** \brief Defines maximum number of edges for allocation. This is derived by
  *         looking at all possible DSS connections in the SoC.
  */
-#define APP_DCTRL_MAX_EDGES                   (29U)
+#define APP_DCTRL_MAX_EDGES                   (39U)
 
 /**
  *  \anchor App_DctrlVidStandard
