@@ -194,7 +194,7 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 7 configuration: Log mem + Carveout */
+        /* Region 7 configuration: Log mem (256K) + Obj Descriptor Mem (63.75M) */
         /* ulRegionNumber */
         .ulRegionNumber         = 7U,
         /* Starting address */
@@ -214,11 +214,11 @@ xMPU_CONFIG_PARAMETERS __attribute__((section(".startupData"))) __attribute__((w
         .ulSubRegionDisable     = mpuREGION_ALL_SUB_REGIONS_ENABLED,
     },
     {
-        /* Region 8 configuration: Log mem + Carveout */
+        /* Region 8 configuration: FileIO (4M) + RT Log memory (28M) */
         /* ulRegionNumber */
         .ulRegionNumber         = 8U,
         /* Starting address */
-        .ulRegionBeginAddress   = TIOVX_LOG_RT_MEM_ADDR,
+        .ulRegionBeginAddress   = APP_FILEIO_MEM_ADDR,
         /* Access permission */
         {
             .ulexeNeverControl  = 1U,

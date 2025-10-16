@@ -161,7 +161,7 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 8 configuration: Log mem + Carveout */
+        /* Region 8 configuration: Log mem (256K) + Obj Descriptor Mem (63.75M) */
         .regionId         = 8U,
         .enable           = 1U,
         .baseAddr         = APP_LOG_MEM_ADDR,
@@ -175,10 +175,10 @@ const CSL_ArmR5MpuRegionCfg  gCslR5MpuCfg[CSL_ARM_R5F_MPU_REGIONS_MAX] =
         .memAttr          = 0U,
     },
     {
-        /* Region 9 configuration: RT Log memory */
+        /* Region 9 configuration: FileIO (4M) + RT Log memory (28M) */
         .regionId         = 9U,
         .enable           = 1U,
-        .baseAddr         = TIOVX_LOG_RT_MEM_ADDR,
+        .baseAddr         = APP_FILEIO_MEM_ADDR,
         .size             = CSL_ARM_R5_MPU_REGION_SIZE_32MB,
         .subRegionEnable  = CSL_ARM_R5_MPU_SUB_REGION_ENABLE_ALL,
         .exeNeverControl  = 1U,
