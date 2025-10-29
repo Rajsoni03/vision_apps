@@ -193,6 +193,11 @@ VISION_APPS_UTILS_LIBS += app_utils_timer
 VISION_APPS_UTILS_LIBS += app_utils_file_io
 VISION_APPS_UTILS_LIBS += app_utils_remote_service
 VISION_APPS_UTILS_LIBS += app_utils_perf_stats
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72))
+ifeq ($(CTOOLS_BUILD_ENABLED), yes)
+VISION_APPS_UTILS_LIBS += app_utils_ctools
+endif
+endif
 
 ifneq ($(TARGET_PLATFORM), AM62A)
 VISION_APPS_UTILS_LIBS += app_utils_grpx

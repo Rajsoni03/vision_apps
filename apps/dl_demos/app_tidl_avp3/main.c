@@ -83,6 +83,9 @@
 #include "avp_img_mosaic_module.h"
 #include "avp_display_module.h"
 #include "avp_test.h"
+#if defined(APP_CTOOLS_ENABLED) && !defined(x86_64)
+#include "avp_cpt_ddr_bw.h"
+#endif
 
 #ifndef x86_64
 #define AVP_ENABLE_PIPELINE_FLOW
@@ -313,6 +316,11 @@ static vx_status app_run_graph_interactive(AppObj *obj)
                         printf("fp is null\n");
                     }
                     break;
+            #if defined(APP_CTOOLS_ENABLED) && !defined(x86_64)
+                case 'c':
+                    runCtoolsDdrBw();
+                    break;
+            #endif
                 case 'x':
                     obj->stop_task = 1;
                     done = 1;

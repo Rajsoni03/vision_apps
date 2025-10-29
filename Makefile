@@ -17,6 +17,12 @@ ifeq ($(LDRA_COVERAGE_ENABLED_IMAGING), yes)
 BUILD_DEFS += LDRA_COVERAGE
 endif
 
+ifeq ($(CTOOLS_BUILD_ENABLED), yes)
+ifeq ($(SOC),$(filter $(SOC),j721e j721s2 j784s4 j742s2))
+BUILD_DEFS += APP_CTOOLS_ENABLED
+endif
+endif
+
 DIRECTORIES :=
 ifeq ($(SOC),am62a)
 DIRECTORIES += utils/app_init
