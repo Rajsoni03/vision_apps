@@ -21,6 +21,7 @@ DIRECTORIES :=
 ifeq ($(SOC),am62a)
 DIRECTORIES += utils/app_init
 DIRECTORIES += utils/sciserver
+DIRECTORIES += utils/mpu
 
 DIRECTORIES += platform/$(SOC)
 
