@@ -1,7 +1,7 @@
 ifeq ($(TARGET_CPU),R5F)
 
 include $(PRELUDE)
-TARGET      := app_mpu
+TARGET      := app_utils_mpu
 TARGETTYPE  := library
 
 ifeq ($(RTOS),FREERTOS)
