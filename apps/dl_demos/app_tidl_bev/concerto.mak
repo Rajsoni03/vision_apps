@@ -1,4 +1,4 @@
-ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 ))
+ifeq ($(TARGET_CPU),$(filter $(TARGET_CPU), A72 x86_64))
 
 include $(PRELUDE)
 
@@ -7,6 +7,16 @@ CSOURCES    := main.c bev_scaler_module.c bev_pre_proc_module_batch.c bev_tidl_m
 
 ifeq ($(HOST_COMPILER),GCC_LINUX)
 CFLAGS += -Wno-unused-function
+endif
+
+ifeq ($(TARGET_CPU),x86_64)
+
+TARGETTYPE  := exe
+
+CSOURCES    += main_x86.c
+
+include $(VISION_APPS_PATH)/apps/concerto_x86_64_inc.mak
+
 endif
 
 ifeq ($(TARGET_OS),$(filter $(TARGET_OS), LINUX QNX))
@@ -18,11 +28,9 @@ CSOURCES    += main_linux_arm.c
 
 include $(VISION_APPS_PATH)/apps/concerto_mpu_inc.mak
 
-IDIRS       += $(VISION_APPS_KERNELS_IDIRS)
 IDIRS 		+= $(EDGEAI_KERNELS_PATH)/include
 IDIRS 		+= $(TIOVX_PATH)/source/include
 
-STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
 SHARED_LIBS += edgeai-apps-utils
 SHARED_LIBS += edgeai-tiovx-kernels
 
@@ -31,6 +39,10 @@ endif
 endif
 
 IDIRS       += $(EDGEAI_IDIRS)
+IDIRS       += $(VISION_APPS_KERNELS_IDIRS)
+
+STATIC_LIBS += $(VISION_APPS_KERNELS_LIBS)
+
 SHARED_LIBS += edgeai-apps-utils
 SHARED_LIBS += edgeai-tiovx-kernels
 

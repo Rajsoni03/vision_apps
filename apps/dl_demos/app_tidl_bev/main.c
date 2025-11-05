@@ -82,9 +82,9 @@
 #ifndef x86_64
 #define AVP_ENABLE_PIPELINE_FLOW
 //#define WRITE_INTERMEDIATE_OUTPUTS
-#define LIDAR_XYCORD_PER_FRAME
 #endif
 
+#define LIDAR_XYCORD_PER_FRAME
 #define AVP_BUFFER_Q_DEPTH   (7)
 #define AVP_PIPELINE_DEPTH   (5)
 
@@ -1671,7 +1671,10 @@ static vx_status app_run_graph_for_one_frame_sequential(AppObj *obj, vx_int32 fr
     APP_PRINTF("App Reading Input Done!\n");
 
 #ifdef x86_64
-    printf("Processing files %s ......%s", input_file_name_bc,input_file_name_fc);
+    printf("Processing files ...... \n %s\n %s\n %s\n %s\n %s\n %s\n",
+            input_file_name_bc,input_file_name_fc,
+            input_file_name_lc,input_file_name_rc,
+            input_file_name_frc,input_file_name_flc);
 #endif
 
     status = vxProcessGraph(obj->graph);

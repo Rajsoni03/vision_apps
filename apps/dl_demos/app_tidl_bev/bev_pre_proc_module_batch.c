@@ -61,7 +61,6 @@
  */
 
 #include "bev_pre_proc_module.h"
-#include <vx_internal.h>
 
 static void createOutputTensors(vx_context context, vx_user_data_object config, vx_tensor output_tensors[]);
 
