@@ -493,7 +493,7 @@ vx_status app_init(AppObj *obj)
         /* Display initialization MV*/
         memset(&obj->display_params_MV, 0, sizeof(tivx_display_params_t));
         obj->display_params_MV.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
-        obj->display_params_MV.pipeId = 0;
+        obj->display_params_MV.pipeId = 2;
         obj->display_params_MV.outHeight = 1080;
         obj->display_params_MV.outWidth = 960;
         obj->display_params_MV.posX = 960;
