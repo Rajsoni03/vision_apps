@@ -509,8 +509,6 @@ c7x_1_syscfg.checkOverlap();
 mcu1_0_syscfg = MemoryMap("Memory Map for example.syscfg under mcu1_0");
 mcu1_0_syscfg.addMemSection(dm_r5f_ddr_ipc);
 mcu1_0_syscfg.addMemSection(ipc_vring_mem);
-mcu1_0_syscfg.addMemSection(app_log_mem);
-mcu1_0_syscfg.addMemSection(app_fileio_mem);
 mcu1_0_syscfg.addMemSection(ddr_viss_config_heap);
 mcu1_0_syscfg.checkOverlap();
 
