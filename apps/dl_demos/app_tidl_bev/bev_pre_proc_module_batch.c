@@ -134,6 +134,7 @@ vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_use
     vx_status status = VX_SUCCESS;
 
     vx_map_id map_id_config;
+    vx_uint32 id;
     sTIDL_IOBufDesc_t *ioBufDesc;
     tivxTIDLJ7Params *tidlParams;
     vx_tensor output_tensors[APP_MAX_TENSORS];
@@ -155,7 +156,11 @@ vx_status app_update_pre_proc(vx_context context, PreProcObj *preProcObj, vx_use
     
     
     preProcObj->output_tensor_arr = vxCreateObjectArray(context, (vx_reference)output_tensors[0], NUM_CH);
-    vxReleaseTensor(&output_tensors[0]);
+
+    for(id = 0; id < ioBufDesc->numInputBuf; id++)
+    {
+        vxReleaseTensor(&output_tensors[id]);
+    }
     
     return status;
 }
@@ -347,10 +352,10 @@ static void createOutputTensors(vx_context context, vx_user_data_object config, 
         }
         else{
             /*############################################           MODIFICATION FOR BEV*/
-        input_sizes[2] = (ioBufDesc->inNumChannels[id] + ioBufDesc->inPadCh[id] + 1) * ioBufDesc->inDIM1[id]* ioBufDesc->inDIM2[id];
-        input_sizes[3] = ioBufDesc->inNumBatches[id]; 
-        output_tensors[id] = vxCreateTensor(context, 4 , input_sizes, data_type, 0);
-        /*###############################################*/
+            input_sizes[2] = (ioBufDesc->inNumChannels[id] + ioBufDesc->inPadCh[id] + 1) * ioBufDesc->inDIM1[id]* ioBufDesc->inDIM2[id];
+            input_sizes[3] = ioBufDesc->inNumBatches[id]; 
+            output_tensors[id] = vxCreateTensor(context, 4 , input_sizes, data_type, 0);
+            /*###############################################*/
         }
         
     }

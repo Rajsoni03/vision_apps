@@ -304,7 +304,7 @@ vx_status app_create_graph_tidl_4D(vx_context context, vx_graph graph, TIDLObj *
 
     tidlObj->node = tivxTIDLNode(graph, tidlObj->kernel, params, input_tensor,output_tensor1);
     status = vxGetStatus((vx_reference)tidlObj->node);
-    vxSetReferenceName((vx_reference)tidlObj->node, "ODTIDLNode");
+    vxSetReferenceName((vx_reference)tidlObj->node, "BEVTIDLNode");
     
     #if defined(SOC_J784S4) || defined(SOC_J722S) || defined (SOC_J742S2)
     const char* mpuTargets[] = {

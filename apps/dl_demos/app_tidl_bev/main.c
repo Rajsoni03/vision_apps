@@ -2546,7 +2546,7 @@ vx_status readTensorInput(char* file_name, vx_object_array tensor_arr, vx_int32 
             start[0] = 0;
 
             status = vxCopyTensorPatch(in_tensor, input_dims_num, start, input_dims, strides, lidar_tensor_buffer, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
-
+            vxReleaseTensor(&in_tensor);
         }
         fclose(fp);
         free(lidar_tensor_buffer);

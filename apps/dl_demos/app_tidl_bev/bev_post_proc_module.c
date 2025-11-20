@@ -408,7 +408,7 @@ vx_status readCameraIntrinsicInput( vx_object_array tensor_arr)
             start[0] = 0;
 
             status = vxCopyTensorPatch(in_tensor, input_dims_num, start, input_dims, strides, Cam2img_tensor_buffer, VX_WRITE_ONLY, VX_MEMORY_TYPE_HOST);
-
+            vxReleaseTensor(&in_tensor);
         }
 
         free(Cam2img_tensor_buffer);
