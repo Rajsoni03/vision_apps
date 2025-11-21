@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2018 Texas Instruments Incorporated
+ * Copyright (c) 2018-2025 Texas Instruments Incorporated
  *
  * All rights reserved not granted herein.
  *
@@ -92,12 +92,12 @@ void appMemAllocTest()
 
     for(i=0; i<loop; i++)
     {
-        ptr[i] = appMemAlloc(APP_MEM_HEAP_DDR, size, 1);
+        ptr[i] = appMemAlloc(APP_MEM_HEAP_DDR_SHARED, size, 1);
         if(ptr[i])
         {
             printf("APP_MEM: %d: Allocated memory @ %p of size %d bytes \n", i, ptr[i], size);
 
-            phyPtr = appMemGetVirt2PhyBufPtr((uint64_t)ptr[i], APP_MEM_HEAP_DDR);
+            phyPtr = appMemGetVirt2PhyBufPtr((uint64_t)ptr[i], APP_MEM_HEAP_DDR_SHARED);
             printf("APP_MEM: %d: Translated virtual addr = %p -> phyical addr = %lx \n", i, ptr[i], phyPtr);
 
             dmaBufFd[i] = appMemGetDmaBufFd(ptr[i], &offset);
@@ -146,7 +146,7 @@ void appMemAllocTest()
     {
         if(ptr[i])
         {
-            appMemFree(APP_MEM_HEAP_DDR, ptr[i], size);
+            appMemFree(APP_MEM_HEAP_DDR_SHARED, ptr[i], size);
             printf("APP_MEM: %d: Free'ed memory @ %p of size %d bytes \n", i, ptr[i], size);
         }
     }
