@@ -162,14 +162,13 @@ IMAGING_LIBS += vx_kernels_imaging
 endif
 
 ifeq ($(TARGET_OS), LINUX)
-ifneq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
-IMAGING_LIBS += ti_2a_wrapper
-endif
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
-ifneq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
-IMAGING_LIBS += ti_imaging_dcc
+
+ifeq ($(TISDK_IMAGE), edgeai)
+IMAGING_LIBS += ti_2a_wrapper
 endif
+
 IMAGING_LIBS += ti_imaging_ittsrvr
 IMAGING_LIBS += app_utils_network_api
 IMAGING_LIBS += app_utils_itt_server
@@ -245,8 +244,10 @@ TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conf
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink vx_kernels_hwa_tests
-ifeq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
+ifeq ($(TISDK_IMAGE), adas)
+ifeq ($(SOC),$(filter $(SOC), j722s j721s2 j784s4 j742s2))
 TEST_LIBS += vx_target_kernels_vpac_aewb
+endif
 endif
 TEST_LIBS += vx_kernels_video_io_tests
 TEST_LIBS += vx_tiovx_tidl_tests

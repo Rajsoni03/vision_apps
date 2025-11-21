@@ -110,8 +110,10 @@ TIOVX_LIBS += vx_vxu
 IMAGING_LIBS = vx_kernels_imaging
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
-ifneq ($(SOC), am62a)
+ifeq ($(TISDK_IMAGE), adas)
+ifneq ($(SOC), j721e)
 IMAGING_LIBS += vx_target_kernels_imaging_aewb
+endif
 endif
 
 TIADALG_LIBS  =
@@ -186,8 +188,10 @@ VISION_APPS_STEREO_LIBS += vx_target_kernels_stereo
 
 TEST_LIBS =
 TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conformance_tests_testmodule
-ifeq ($(SOC),$(filter $(SOC), j721s2 j784s4 j742s2))
+ifeq ($(TISDK_IMAGE), adas)
+ifeq ($(SOC),$(filter $(SOC), j722s j721s2 j784s4 j742s2))
 TEST_LIBS += vx_target_kernels_vpac_aewb
+endif
 endif
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_tiovx_tidl_tests
