@@ -516,7 +516,7 @@ static int app_init(AppObj *obj)
 
         memset(&obj->disp_params, 0, sizeof(tivx_display_params_t));
 
-        obj->disp_params.opMode = TIVX_KERNEL_DISPLAY_BUFFER_COPY_MODE;
+        obj->disp_params.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
         obj->disp_params.pipeId = 0;
         obj->disp_params.outWidth = DISPLAY_WIDTH;
         obj->disp_params.outHeight = DISPLAY_HEIGHT;
@@ -554,7 +554,7 @@ static int app_init(AppObj *obj)
 
             memset(&obj->disp_params2, 0, sizeof(tivx_display_params_t));
 
-            obj->disp_params2.opMode = TIVX_KERNEL_DISPLAY_BUFFER_COPY_MODE;
+            obj->disp_params2.opMode = TIVX_KERNEL_DISPLAY_ZERO_BUFFER_COPY_MODE;
             obj->disp_params2.pipeId = 1;
             obj->disp_params2.outWidth = DISPLAY_WIDTH;
             obj->disp_params2.outHeight = DISPLAY_HEIGHT;
@@ -702,6 +702,17 @@ static void app_delete_graph(AppObj *obj)
         vxReleaseGraph(&obj->disp_graph);
     }
 
+#if !(defined(SOC_AM62A) && defined(QNX))
+    if (obj->use_dual_display == 1)
+    {
+        if (vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2) && (obj->display_option == 1))
+        {
+            vxReleaseNode(&obj->disp_node2);
+            vxReleaseGraph(&obj->disp_graph2);
+        }
+    }
+#endif
+
     #ifdef APP_TIVX_LOG_RT_ENABLE
     tivxLogRtTraceExportToFile("app_tidl.bin");
     tivxLogRtTraceDisable(obj->graph);
@@ -740,6 +751,17 @@ static void app_delete_graph(AppObj *obj)
         vxReleaseImage(&obj->disp_image);
         vxReleaseUserDataObject(&obj->disp_params_obj);
     }
+
+#if !(defined(SOC_AM62A) && defined(QNX))
+    if (obj->use_dual_display == 1)
+    {
+        if ((vx_true_e == tivxIsTargetEnabled(TIVX_TARGET_DISPLAY2)) && (obj->display_option == 1))
+        {
+            vxReleaseImage(&obj->disp_image2);
+            vxReleaseUserDataObject(&obj->disp_params_obj2);
+        }
+    }
+#endif
 
     APP_PRINTF("app_tidl: Delete ... Done.\n");
 }
