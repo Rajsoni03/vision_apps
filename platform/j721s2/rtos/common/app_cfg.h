@@ -76,8 +76,13 @@
 #define ENABLE_IPC_MCU2_1
 //#define ENABLE_IPC_MCU3_0
 //#define ENABLE_IPC_MCU3_1
-#define ENABLE_IPC_C7x_1
-#define ENABLE_IPC_C7x_2
+
+#if (defined(ECU_FC))                                         // Enabling C7x_1 IPC only for FC Demo
+    #define ENABLE_IPC_C7x_1
+#else                                                         // Enabling all C7x IPCs for SRV, AVP4 or non ECU demos
+    #define ENABLE_IPC_C7x_1
+    #define ENABLE_IPC_C7x_2
+#endif
 
 #define ENABLE_UDMA
 #define ENABLE_UDMA_COPY
