@@ -86,10 +86,35 @@
 #include "omx_encode_module.h"
 #endif
 
+#if SOC_J722S 
 #define APP_BUFFER_Q_DEPTH      (5u)
+#else
+#define APP_BUFFER_Q_DEPTH      (6u)
+#endif
 #define APP_PIPELINE_DEPTH      (10u)
 #define APP_ENC_BUFFER_Q_DEPTH  (6u)
 
+/*
+ * Macros for RGB to YUV color space conversion and value clipping.
+ *
+ * CLIP(X):
+ *   Ensures the input value X is within the 0-255 range.
+ *   If X > 255, returns 255.
+ *   If X < 0, returns 0.
+ *   Otherwise, returns X.
+ *
+ * RGB2Y(R, G, B):
+ *   Converts RGB values to the Y (luminance) component of YUV.
+ *   Uses the formula: Y = CLIP(((66*R + 129*G + 25*B + 128) >> 8) + 16)
+ *
+ * RGB2U(R, G, B):
+ *   Converts RGB values to the U (chrominance) component of YUV.
+ *   Uses the formula: U = CLIP(((-38*R - 74*G + 112*B + 128) >> 8) + 128)
+ *
+ * RGB2V(R, G, B):
+ *   Converts RGB values to the V (chrominance) component of YUV.
+ *   Uses the formula: V = CLIP(((112*R - 94*G - 18*B + 128) >> 8) + 128)
+ */
 #define CLIP(X) ( (X) > 255 ? 255 : (X) < 0 ? 0 : X)
 #define RGB2Y(R, G, B) CLIP(( ( 66*(R) + 129*(G) + 25*(B) + 128) >>8 ) + 16)
 #define RGB2U(R, G, B) CLIP(( ( -38*(R) - 74*(G) + 112*(B) + 128) >>8) + 128)
@@ -132,6 +157,7 @@ typedef struct {
     vx_uint32           num_frames_to_write;
     vx_uint32           num_frames_to_skip;
 
+    vx_uint32           delay_in_msecs;
     vx_uint32           num_iterations;
     vx_uint32           is_interactive;
     vx_uint32           test_mode;
@@ -403,6 +429,7 @@ static void app_set_cfg_default(AppObj *obj)
  *       - ip_rgb_or_yuv   : 1 if the input is RGB, 0 if the input is YUV
  *       - op_rgb_or_yuv   : 1 if the output is RGB, 0 if the output is YUV
  *       - display_option  : 1 if the output should be displayed on the screen, 0 otherwise
+ *       - delay_in_msecs  : the delay in milliseconds between each frame
  *       - num_iterations  : the number of iterations to run the application
  *       - is_interactive  : 1 if the application is interactive, 0 otherwise
  *       - test_mode       : 1 if the application is in test mode, 0 otherwise
@@ -630,6 +657,18 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
                 }
             }
             else
+            if(strcmp(token, "delay_in_msecs")==0)
+            {
+                token = strtok(NULL, s);
+                if(token != NULL)
+                {
+                    token[strlen(token)-1]=0;
+                    obj->delay_in_msecs = atoi(token);
+                    if(obj->delay_in_msecs > 2000)
+                        obj->delay_in_msecs = 2000;
+                }
+            }
+            else
             if(strcmp(token, "num_iterations")==0)
             {
                 token = strtok(NULL, s);
@@ -720,6 +759,7 @@ static void app_parse_cfg_file(AppObj *obj, vx_char *cfg_file_name)
     }
     if (obj->test_mode == 1)
     {
+        obj->delay_in_msecs = 0;
         obj->is_interactive = 0;
         obj->sensorObj.is_interactive = 0;
         obj->displayObj.display_option = 1;
@@ -802,13 +842,13 @@ vx_int32 app_tidl_front_cam_main(vx_int32 argc, vx_char* argv[])
     app_parse_cmd_line_args(obj, argc, argv);
     APP_PRINTF("App Parse User params Done! \n");
     
-    // Querry sensor parameters
-    app_querry_sensor(&obj->sensorObj);
-    APP_PRINTF("Sensor params queried! \n");
-
     // Update of parameters are config file read
     app_update_param_set(obj);
     APP_PRINTF("App Update Params Done! \n");
+
+    // Querry sensor parameters
+    app_querry_sensor(&obj->sensorObj);
+    APP_PRINTF("Sensor params queried! \n");
 
     // Initialize modules
     status = app_init(obj);
@@ -831,6 +871,7 @@ vx_int32 app_tidl_front_cam_main(vx_int32 argc, vx_char* argv[])
     {   
         if (obj->enable_cpu_load == 1)
         {
+            // Initializes and launches a task to generate 50% dummy load on A72/A53 CPU cores
             load_cpu_task_create_and_start(obj);
         }
 
@@ -1484,14 +1525,18 @@ static vx_status app_verify_graph(AppObj *obj)
 static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 frame_id)
 {
     vx_status status = VX_SUCCESS;
-    
+    uint64_t cur_time;
     appPerfPointBegin(&obj->total_perf);
+    cur_time = tivxPlatformGetTimeInUsecs();
 
     if(obj->pipeline <= 0)
     {
-        /* Enqueue outputs */
-        vxGraphParameterEnqueueReadyRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&obj->imgMosaicObj.output_image[obj->enqueueCnt], 1);
-
+#ifdef QNX
+        if (obj->enable_encode == 1){
+            /* Enqueue outputs */
+            vxGraphParameterEnqueueReadyRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&obj->imgMosaicObj.output_image[obj->enqueueCnt], 1);
+        }
+#endif
         /* Enqueue inputs during pipeup dont execute */
         vxGraphParameterEnqueueReadyRef(obj->graph, obj->captureObj.graph_parameter_index, (vx_reference*)&obj->captureObj.raw_image_arr[obj->enqueueCnt], 1);
 
@@ -1503,16 +1548,17 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
     {
         vx_reference raw_image;
         uint32_t num_refs;
-        vx_image mosaic_output_image;
 
         /* Dequeue input */
         vxGraphParameterDequeueDoneRef(obj->graph, obj->captureObj.graph_parameter_index, (vx_reference*)&raw_image, 1, &num_refs);
-        
-        vxGraphParameterDequeueDoneRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
     
 #ifdef QNX
+        vx_image mosaic_output_image;
+
         if (obj->enable_encode == 1)
         {    
+            vxGraphParameterDequeueDoneRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&mosaic_output_image, 1, &num_refs);
+    
             obj->encode_buf[obj->buf_index].buf_index = obj->buf_index;
             obj->encode_buf[obj->buf_index].handle = (vx_reference)mosaic_output_image;
 
@@ -1532,14 +1578,12 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
 
             obj->buf_index++;
             obj->buf_index = (obj->buf_index >= obj->omx_encode_cfg.bufq_depth)? 0 : obj->buf_index;
+
+            /* Enqueue input - start execution */
+            vxGraphParameterEnqueueReadyRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&mosaic_output_image, 1);
         }
 #endif
-        // add delay to set 25 fps
-        tivxTaskWaitMsecs(25);
-
         /* Enqueue input - start execution */
-        vxGraphParameterEnqueueReadyRef(obj->graph, obj->imgMosaicObj.graph_parameter_index, (vx_reference*)&mosaic_output_image, 1);
-        
         vxGraphParameterEnqueueReadyRef(obj->graph, obj->captureObj.graph_parameter_index, &raw_image, 1);
 
         obj->enqueueCnt++;
@@ -1548,9 +1592,30 @@ static vx_status app_run_graph_for_one_frame_pipeline(AppObj *obj, vx_int32 fram
         obj->enqueueCnt = (obj->enqueueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->enqueueCnt;
         obj->dequeueCnt = (obj->dequeueCnt >= APP_BUFFER_Q_DEPTH)? 0 : obj->dequeueCnt;
     }
-    
+
+#if SOC_J722S
+    // add delay to set 20 fps
+    tivxTaskWaitMsecs(25);
+#endif
+
     obj->pipeline++;
     appPerfPointEnd(&obj->total_perf);
+
+    /**
+     * Ensures that each iteration of the processing loop takes at least a predefined duration,
+     * effectively controlling the minimum cycle time (or maximum frame rate).
+     *
+     * The variable `obj->delay_in_msecs` represents the target duration for one iteration,
+     * not an additional delay. If the processing completes faster than this target,
+     * the function waits for the remaining time to maintain a consistent iteration period.
+     */
+    cur_time = (tivxPlatformGetTimeInUsecs() - cur_time) / 1000;
+    cur_time = cur_time/1000;  /* convert to msecs */
+    
+    if(cur_time < obj->delay_in_msecs)
+    {
+        tivxTaskWaitMsecs(obj->delay_in_msecs - cur_time);
+    }
 
     return status;
 }
@@ -1825,6 +1890,7 @@ static void app_default_param_set(AppObj *obj)
 #endif
 
     obj->num_iterations = 1000000000;
+    obj->delay_in_msecs = 0;
     obj->is_interactive = 1;
     obj->test_mode      = 0;
     obj->enable_gui     = 1;
@@ -1859,6 +1925,11 @@ static void app_update_param_set(AppObj *obj)
     if(obj->is_interactive)
     {
         obj->num_iterations = 1000000000;
+    }
+    else{
+        obj->sensorObj.is_interactive = 0;
+        obj->sensorObj.ch_mask = 0x01;
+        obj->sensorObj.enable_ldc = 1;
     }
     obj->enable_ldc = obj->sensorObj.enable_ldc;
 }

@@ -101,7 +101,10 @@
 #ifdef SOC_J784S4
 #define NUM_CPU_CORES               (8u)
 #endif
-#if SOC_J722S 
+#ifdef SOC_J721S2
+#define NUM_CPU_CORES               (2u)
+#endif
+#ifdef SOC_J722S 
 #define NUM_CPU_CORES               (2u)
 #endif
 
