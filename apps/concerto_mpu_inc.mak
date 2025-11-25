@@ -245,9 +245,7 @@ TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink vx_kernels_hwa_tests
 ifeq ($(TISDK_IMAGE), adas)
-ifeq ($(SOC),$(filter $(SOC), j722s j721s2 j784s4 j742s2))
 TEST_LIBS += vx_target_kernels_vpac_aewb
-endif
 endif
 TEST_LIBS += vx_kernels_video_io_tests
 TEST_LIBS += vx_tiovx_tidl_tests
