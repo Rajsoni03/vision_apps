@@ -111,7 +111,9 @@ IMAGING_LIBS = vx_kernels_imaging
 IMAGING_LIBS += ti_imaging_aealg
 IMAGING_LIBS += ti_imaging_awbalg
 ifeq ($(TISDK_IMAGE), adas)
+ifneq ($(TARGET_PLATFORM), J721E)
 IMAGING_LIBS += vx_target_kernels_imaging_aewb
+endif
 endif
 
 TIADALG_LIBS  =
