@@ -244,10 +244,9 @@ TEST_LIBS += vx_tiovx_tests vx_tiovx_internal_tests vx_conformance_tests vx_conf
 TEST_LIBS += vx_kernels_openvx_ext_tests
 TEST_LIBS += vx_kernels_test_kernels_tests vx_kernels_test_kernels
 TEST_LIBS += vx_target_kernels_source_sink vx_kernels_hwa_tests
-ifeq ($(TISDK_IMAGE), adas)
-ifneq ($(TARGET_PLATFORM), J721E)
+
+ifeq ($(SOC),$(filter $(SOC),J721E J722S J721S2 J784S4 J742S2))
 TEST_LIBS += vx_target_kernels_vpac_aewb
-endif
 endif
 TEST_LIBS += vx_kernels_video_io_tests
 TEST_LIBS += vx_tiovx_tidl_tests
